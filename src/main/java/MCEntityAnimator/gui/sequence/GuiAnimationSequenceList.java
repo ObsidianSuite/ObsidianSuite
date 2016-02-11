@@ -67,7 +67,7 @@ public class GuiAnimationSequenceList extends GuiScreen
 		}
 		else
 		{
-			mc.displayGuiScreen(new GuiAnimationTimeline(entityName, sequences.get(button.id)));
+			mc.displayGuiScreen(new GuiAnimationTimelineNew(entityName, sequences.get(button.id)));
 		}
 	}
 

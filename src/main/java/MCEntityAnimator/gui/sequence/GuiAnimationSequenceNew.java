@@ -85,7 +85,7 @@ public class GuiAnimationSequenceNew extends GuiScreen
 		case 0:
 			AnimationSequence sequence = new AnimationSequence(animationNameTextBar.getText());
 			if(AnimationData.addNewSequence(entityName, sequence))
-				mc.displayGuiScreen(new GuiAnimationTimeline(entityName, sequence, startingStance)); 
+				mc.displayGuiScreen(new GuiAnimationTimelineNew(entityName, sequence, startingStance)); 
 			else
 				initFlashMessage("An animation with that name already exists.");
 			break;

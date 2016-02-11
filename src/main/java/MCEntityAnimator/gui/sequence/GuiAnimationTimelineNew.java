@@ -36,8 +36,10 @@ import MCEntityAnimator.render.objRendering.PartObj;
 import MCEntityAnimator.render.objRendering.RenderObj;
 
 
-public class GuiAnimationTimeline extends GuiScreen 
+public class GuiAnimationTimelineNew extends GuiScreen 
 {
+	
+	//TODO come on, organise and comment all this you lazy cunt. 
 	int posX;
 	int posY;
 
@@ -73,13 +75,8 @@ public class GuiAnimationTimeline extends GuiScreen
 	private boolean boolGround = false;
 	private boolean boolShield = false;
 
-	private boolean showPositionSliders = false;
-
 	private ArrayList<String> parts = new ArrayList<String>();
 	private ArrayList<Keyframe> keyframes = new ArrayList<Keyframe>();
-	private Keyframe currentKeyframe;
-	private boolean keyframeSelected = false;
-	private PartObj currentPart;
 	private int listOffset = 0;
 	private int listOffset2 = 0;
 	private int lastButton = 0;
@@ -91,7 +88,6 @@ public class GuiAnimationTimeline extends GuiScreen
 
 	private boolean copyingFrame = false;
 	private boolean copyingFrames = false;
-	private boolean multiSelected = false;
 	private ArrayList<Keyframe> selectedFrames = new ArrayList<Keyframe>();
 	private boolean rotationLocked = false;
 	private boolean rotationLockPressed = false;
@@ -104,20 +100,29 @@ public class GuiAnimationTimeline extends GuiScreen
 	private boolean filter = false;
 
 	private boolean boolDelete = false;
+	
+	/**The current state of the GUI - 0 main, 1 part selected but no keyframe, 2 keyframe selected (for going back and editing), 3 multi selected (TODO think about how this will work).**/ 
+	private int guiState;
+	
+	/**The currently selected part, if this is selected then gui state should probably equal 1? TODO any instances when it shouldn't be one?!**/
+	private String currentPartName;
 
+	/**The currently selected keyframe, gui state should defo equal 2. TODO for sure? **/
+	private Keyframe currentKeyframe;
+	
 	private float sliderLength = 29.0F;
 
-	public GuiAnimationTimeline(String par0Str, AnimationSequence par1Sequence) 
+	public GuiAnimationTimelineNew(String par0Str, AnimationSequence par1Sequence) 
 	{
 		this(par0Str, par1Sequence, new EntityObj(Minecraft.getMinecraft().theWorld, par0Str), null);
 	}
 
-	public GuiAnimationTimeline(String par0Str, AnimationSequence par1Sequence, AnimationStance par3Stance) 
+	public GuiAnimationTimelineNew(String par0Str, AnimationSequence par1Sequence, AnimationStance par3Stance) 
 	{
 		this(par0Str, par1Sequence, new EntityObj(Minecraft.getMinecraft().theWorld, par0Str), par3Stance);
 	}
 
-	public GuiAnimationTimeline(String par0Str, AnimationSequence par1Sequence, EntityLivingBase par2EntityLivingBase, AnimationStance par3Stance)
+	public GuiAnimationTimelineNew(String par0Str, AnimationSequence par1Sequence, EntityLivingBase par2EntityLivingBase, AnimationStance par3Stance)
 	{
 		this.mc = Minecraft.getMinecraft();
 		entityName = par0Str;
@@ -153,6 +158,7 @@ public class GuiAnimationTimeline extends GuiScreen
 			}
 		}
 		this.loadAnimations();
+		guiState = 0;
 	}
 
 	/**
@@ -232,10 +238,9 @@ public class GuiAnimationTimeline extends GuiScreen
 		{
 			Util.getButtonFromID(33, this.buttonList).enabled = false;
 		}
-		if(!this.showPositionSliders)
+		//TODO main gui state (initial)
+		if(guiState == 0)
 		{
-			//TODO change what button 2 does.
-			//this.buttonList.add(new GuiButton(2, posX + 195, posY + 4, 90, 20, "New Keyframe"));
 			this.buttonList.add(new GuiButton(21, posX + 195, posY + 26, 90, 20, "Reset Rotation"));
 			this.buttonList.add(new GuiButton(22, posX + 195, posY + 48, 90, 20, "Choose Prop"));
 			if(!this.entityName.equals("Human"))
@@ -259,30 +264,34 @@ public class GuiAnimationTimeline extends GuiScreen
 
 			this.buttonList.add(new GuiSlider(51, (int) Math.round((posX + 239 + animationSpeedSlider)), posY + 116));
 		}
-		else
+		else if(guiState == 1)
 		{
-			if(!multiSelected)
-			{
-				this.buttonList.add(new GuiButton(2, posX + 195, posY + 4, 90, 20, "Add Keyframe"));
-				this.buttonList.add(new GuiButton(25, posX + 195, posY + 26, 90, 20, "Copy Keyframe"));
-				this.buttonList.add(new GuiButton(26, posX + 195, posY + 48, 90, 20, "Delete Keyframe"));
-				this.buttonList.add(new GuiButton(20, posX + 290, posY + 26, 90, 20, "Done"));
-				this.buttonList.add(new GuiSlider(17, (int) Math.round((posX + 255 + xPosSlider)), posY + 73));
-				this.buttonList.add(new GuiSlider(18, (int) Math.round((posX + 255 + yPosSlider)), posY + 90));
-				this.buttonList.add(new GuiSlider(19, (int) Math.round((posX + 255 + zPosSlider)), posY + 107));	
-			}
-			else
-			{
-				this.buttonList.add(new GuiButton(27, posX + 195, posY + 4, 90, 20, "Copy Keyframes"));
-				this.buttonList.add(new GuiButton(28, posX + 195, posY + 26, 90, 20, "Delete Keyframes"));
-				this.buttonList.add(new GuiButton(29, posX + 195, posY + 48, 90, 20, "Done"));			
-			}
+			this.buttonList.add(new GuiButton(2, posX + 195, posY + 4, 90, 20, "Add Keyframe"));
+			this.buttonList.add(new GuiButton(25, posX + 195, posY + 26, 90, 20, "Copy Keyframe"));
+			this.buttonList.add(new GuiButton(26, posX + 195, posY + 48, 90, 20, "Delete Keyframe"));
+			this.buttonList.add(new GuiButton(20, posX + 290, posY + 26, 90, 20, "Done"));
+			this.buttonList.add(new GuiSlider(17, (int) Math.round((posX + 255 + xPosSlider)), posY + 73));
+			this.buttonList.add(new GuiSlider(18, (int) Math.round((posX + 255 + yPosSlider)), posY + 90));
+			this.buttonList.add(new GuiSlider(19, (int) Math.round((posX + 255 + zPosSlider)), posY + 107));	
+		}
+		else if(guiState == 2)
+		{
+			//TODO what to do when a keyframe is selected (button wise)
+			
+		}
+		else if(guiState == 3)
+		{
+			//TODO are these cool?
+			this.buttonList.add(new GuiButton(27, posX + 195, posY + 4, 90, 20, "Copy Keyframes"));
+			this.buttonList.add(new GuiButton(28, posX + 195, posY + 26, 90, 20, "Delete Keyframes"));
+			this.buttonList.add(new GuiButton(29, posX + 195, posY + 48, 90, 20, "Done"));		
 		}
 
+		//TODO So these buttons should always be here ye?
 		if(parts.size() > 10)
 		{
-			this.buttonList.add(new GuiButton(4, posX + 380, 2, 50, 20, "^"));
-			this.buttonList.add(new GuiButton(5, posX + 380, 233, 50, 20, "V"));
+			this.buttonList.add(new GuiButton(4, posX + 382, 2, 50, 20, "^"));
+			this.buttonList.add(new GuiButton(5, posX + 382, 233, 50, 20, "V"));
 		}
 		int max = parts.size() > 10 ? 10 : parts.size();	
 		for(int i = 0; i < max; i++)
@@ -318,7 +327,7 @@ public class GuiAnimationTimeline extends GuiScreen
 			}			
 			break;
 		case 1: GuiCheckBox checkBox = (GuiCheckBox) button; checkBox.isChecked = !checkBox.isChecked; boolLoop = checkBox.isChecked; break; 
-		case 2: addOrSelectKeyframe(currentPart.getName()); break;
+		case 2: addOrSelectKeyframe(currentPartName); break;
 		case 4:
 			if(listOffset > 0)
 			{
@@ -333,17 +342,21 @@ public class GuiAnimationTimeline extends GuiScreen
 			}
 			this.updateButtons();
 			break;
-		case 20: this.currentKeyframe = null; this.currentPart = null; this.keyframeSelected = false; this.showPositionSliders = false; lastButton = 0; entityModel.clearHighlights(); break;
+		//TODO Done button
+		//case 20: this.currentKeyframe = null; this.currentPart = null; this.keyframeSelected = false; this.showPositionSliders = false; lastButton = 0; entityModel.clearHighlights(); break;
 		case 21: this.horizontalPan = 0; this.horizontalRotation = 0; this.verticalPan = 0; this.verticalRotation = 0; break;
 		case 22: this.mc.displayGuiScreen(new GuiInventoryChooseItem(this, (EntityObj) this.entityToRender)); break;
 		case 23: boolDelete = true; break;
 		case 24: mc.displayGuiScreen(new GuiAnimationSequenceList(entityName, AnimationData.getSequences(entityName))); break;
 		case 25: this.copyingFrame = true; this.popUp("Copied key frame", 0xff00ff00); break;
-		case 26: keyframes.remove(this.currentKeyframe); this.updateAnimations(); this.currentKeyframe = null; this.currentPart = null; this.keyframeSelected = false; this.showPositionSliders = false; lastButton = 0; entityModel.clearHighlights(); break;
+		//TODO Delete keyframe
+		//case 26: keyframes.remove(this.currentKeyframe); this.updateAnimations(); this.currentKeyframe = null; this.currentPart = null; this.keyframeSelected = false; this.showPositionSliders = false; lastButton = 0; entityModel.clearHighlights(); break;
 		case 27: this.copyingFrames = true; this.popUp("Copied key frames", 0xff00ff00); break;
-		case 28: for(Keyframe kf : this.selectedFrames){keyframes.remove(kf);} this.multiSelected = false; this.updateAnimations(); this.currentKeyframe = null; 
-		this.currentPart = null; this.keyframeSelected = false; this.showPositionSliders = false; lastButton = 0; entityModel.clearHighlights(); break;
-		case 29: this.selectedFrames.clear(); multiSelected = false; entityModel.clearHighlights(); break;
+		//TODO Delete multiple keyframes?
+		//case 28: for(Keyframe kf : this.selectedFrames){keyframes.remove(kf);} this.multiSelected = false; this.updateAnimations(); this.currentKeyframe = null; 
+		//this.currentPart = null; this.keyframeSelected = false; this.showPositionSliders = false; lastButton = 0; entityModel.clearHighlights(); break;
+		//TODO Another done?
+//		/case 29: this.selectedFrames.clear(); multiSelected = false; entityModel.clearHighlights(); break;
 		case 30:
 			if(listOffset2 < parts.size() - 12)
 			{
@@ -380,45 +393,50 @@ public class GuiAnimationTimeline extends GuiScreen
 			mc.displayGuiScreen(new GuiAnimationStanceNew(entityName, stance)); 
 			break;
 		}
+		
+		//Part button pressed
 		if(button.id > 5 && button.id < 17)
 		{
 			//Check if an existing key frame exists, and if it does select it. 
 			//TODO should this be moved into addorselectkeyframe() ?!?
-			boolean flag = false;
-			for(Keyframe k : keyframes)
-			{
-				if(k.frameTime == time && k.partName.equals(button.displayString))
-				{
-					flag = true; 
-					this.currentPart = Util.getPartFromName(button.displayString, entityModel.parts);
-					this.currentKeyframe = k; 
-					this.updateButtons();
-					if(button.displayString.equals("entitypos"))
-					{
-						float[] position = currentKeyframe.position;
-						this.xPosSlider = position[0]*50.0F;
-						this.yPosSlider = position[1]*50.0F;
-						this.zPosSlider = position[2]*50.0F;
-					}
-					else
-					{
-						float[] rotation = currentKeyframe.rotation;
-						this.xPosSlider = rotation[0] * sliderLength / Math.PI;
-						this.yPosSlider = rotation[1] * sliderLength / Math.PI;
-						this.zPosSlider = rotation[2] * sliderLength / Math.PI;
-					}
-					this.updateAnimations();
-					showPositionSliders = true;
-					break;
-				}
-			}
-			if(!flag)
-			{
-				this.currentPart = Util.getPartFromName(button.displayString, entityModel.parts);
-				this.showPositionSliders = true;
-			}
+//			boolean flag = false;
+//			for(Keyframe k : keyframes)
+//			{
+//				if(k.frameTime == time && k.partName.equals(button.displayString))
+//				{
+//					flag = true; 
+//					this.currentPart = Util.getPartFromName(button.displayString, entityModel.parts);
+//					this.currentKeyframe = k; 
+//					this.updateButtons();
+//					if(button.displayString.equals("entitypos"))
+//					{
+//						float[] position = currentKeyframe.position;
+//						this.xPosSlider = position[0]*50.0F;
+//						this.yPosSlider = position[1]*50.0F;
+//						this.zPosSlider = position[2]*50.0F;
+//					}
+//					else
+//					{
+//						float[] rotation = currentKeyframe.rotation;
+//						this.xPosSlider = rotation[0] * sliderLength / Math.PI;
+//						this.yPosSlider = rotation[1] * sliderLength / Math.PI;
+//						this.zPosSlider = rotation[2] * sliderLength / Math.PI;
+//					}
+//					this.updateAnimations();
+//					showPositionSliders = true;
+//					break;
+//				}
+//			}
+//			if(!flag)
+//			{
+//				this.currentPart = Util.getPartFromName(button.displayString, entityModel.parts);
+//				this.showPositionSliders = true;
+//			}
+			guiState = 1;
+			this.currentPartName = button.displayString;
 			this.updateButtons();
 		}
+		
 		if(button.id > 34 && button.id < 47)
 		{
 			GuiCheckBox checkBox3 = (GuiCheckBox) button; checkBox3.isChecked = !checkBox3.isChecked;
@@ -443,7 +461,10 @@ public class GuiAnimationTimeline extends GuiScreen
 	
 	private void addOrSelectKeyframe(String partName)
 	{
-		Keyframe kf = new Keyframe(time, partName); this.keyframes.add(kf); this.currentKeyframe = kf; this.updateButtons();
+		Keyframe kf = new Keyframe(time, partName); this.keyframes.add(kf); 
+		this.currentKeyframe = kf; 
+		this.updateButtons();
+		//TODO don't manually set the slider positions, they should already be set before clicking add keyframe. 
 		if(partName.equals("entitypos"))
 		{
 			float[] position;
@@ -468,6 +489,7 @@ public class GuiAnimationTimeline extends GuiScreen
 
 			if(this.currentKeyframe.hasNextKeyframe())
 			{
+				PartObj currentPart =  Util.getPartFromName(currentPartName, entityModel.parts);
 				rotation = new float[]{currentPart.getRotation(0), currentPart.getRotation(1), currentPart.getRotation(2)};
 			}
 			else
@@ -481,7 +503,7 @@ public class GuiAnimationTimeline extends GuiScreen
 			currentKeyframe.setPartRotation(rotation[0], rotation[1], rotation[2]);
 		}
 		this.updateAnimations();
-		showPositionSliders = true;
+		//guiState = 2; //TODO do we want to do this every time we create a new keyframe, or keep it at state 1?
 	}
 
 	@Override
@@ -559,7 +581,7 @@ public class GuiAnimationTimeline extends GuiScreen
 				{
 					if(this.isCtrlKeyDown())
 					{
-						this.multiSelected = true;
+						guiState = 3;
 						if(this.selectedFrames.contains(keyframe))
 						{
 							this.selectedFrames.remove(keyframe);
@@ -571,13 +593,13 @@ public class GuiAnimationTimeline extends GuiScreen
 							entityModel.hightlightPart(Util.getPartFromName(keyframe.partName, entityModel.parts), false);		
 						}
 						if(!this.selectedFrames.contains(this.currentKeyframe)){this.selectedFrames.add(this.currentKeyframe);}
-						if(this.selectedFrames.size() == 1){this.multiSelected = false;}
+						if(this.selectedFrames.size() == 1){guiState = 2;}
 						this.updateButtons();
 					}
 					else
 					{
 						this.currentKeyframe = keyframe; 
-						this.currentPart = Util.getPartFromName(keyframe.partName, entityModel.parts);
+						this.currentPartName = keyframe.partName;
 						this.time = keyframe.frameTime;
 
 						if(currentKeyframe.partName.equals("entitypos"))
@@ -595,7 +617,8 @@ public class GuiAnimationTimeline extends GuiScreen
 							this.zPosSlider = rotation[2] * sliderLength / Math.PI;
 						}		
 
-						showPositionSliders = true;
+						//TODO ahem?
+						//showPositionSliders = true;
 						this.updateButtons();
 						entityModel.hightlightPart(Util.getPartFromName(keyframe.partName, entityModel.parts), true);		
 					}
@@ -604,16 +627,17 @@ public class GuiAnimationTimeline extends GuiScreen
 			}
 		}
 
-		if(!multiSelected)
+		//TODO what about keyframeSelected?!
+		if(guiState != 3)
 		{
 			if(currentKeyframe != null && currentKeyframe.hoveredOver(par0, par1))
 			{
-				keyframeSelected = true;
+				//keyframeSelected = true;
 				this.xReference = par0;
 			}
 			else
 			{
-				keyframeSelected = false;
+				//keyframeSelected = false;
 			}
 		}
 		else
@@ -623,14 +647,14 @@ public class GuiAnimationTimeline extends GuiScreen
 			{
 				if(kf != null && kf.hoveredOver(par0, par1))
 				{
-					keyframeSelected = true;
+					//keyframeSelected = true;
 					this.xReference = par0;
 					flag = false;
 				}
 			}
 			if(flag)
 			{
-				keyframeSelected = false;
+				//keyframeSelected = false;
 			}
 		}
 
@@ -690,9 +714,10 @@ public class GuiAnimationTimeline extends GuiScreen
 			this.xReference = par0;
 		}
 
-		if(keyframeSelected)
+		if(guiState == 2)
 		{
-			if(multiSelected)
+			//TODO ahem this will never happen 
+			if(guiState == 3)
 			{
 				ArrayList<Float> differences = new ArrayList<Float>();
 				for(Keyframe kf : this.selectedFrames)
@@ -742,7 +767,8 @@ public class GuiAnimationTimeline extends GuiScreen
 			//this.updateAnimations();
 		}
 
-		if(currentPart != null || (currentKeyframe != null && currentKeyframe.partName.equals("entitypos")))
+		//TODO currentPartCheck
+		if(currentPartName != null || (currentKeyframe != null && currentPartName.equals("entitypos")))
 		{
 			double d = 0.0D;
 			if(par0 <= posX + 255 - 58)
@@ -763,6 +789,7 @@ public class GuiAnimationTimeline extends GuiScreen
 			case 18: yPosSlider = d; break; 
 			case 19: zPosSlider = d; break; 
 			}
+			PartObj currentPart = Util.getPartFromName(currentPartName, entityModel.parts);
 			if(currentPart != null)
 			{
 				this.currentKeyframe.setPartRotation((float) (xPosSlider/sliderLength * Math.PI), (float) (yPosSlider/sliderLength * Math.PI), (float) (zPosSlider/sliderLength * Math.PI));
@@ -932,7 +959,8 @@ public class GuiAnimationTimeline extends GuiScreen
 		this.drawDefaultBackground();
 		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 
-		this.mc.getTextureManager().bindTexture(showPositionSliders && (currentPart != null || currentKeyframe.partName.equals("entitypos"))  ? texture2 : texture);		
+		PartObj currentPart = Util.getPartFromName(currentPartName, entityModel.parts);
+		this.mc.getTextureManager().bindTexture((guiState == 1 || guiState == 2) && (currentPart != null || currentPartName.equals("entitypos"))  ? texture2 : texture);		
 		Util.drawCustomGui(posX, posY, 384, 255, 0);		
 
 		if(entityToRender != null)
@@ -997,7 +1025,7 @@ public class GuiAnimationTimeline extends GuiScreen
 		fontRendererObj.drawString("W/A/S/D-Rotate    Arrow Keys-Move", posX + 4, posY + 4, 0);
 		fontRendererObj.drawString("Scroll-Zoom B-Base T-Txtr L-Lock", posX + 4, posY + 14, 0);
 
-		if(!showPositionSliders)
+		if(guiState == 1 || guiState == 2)
 		{
 			fontRendererObj.drawString("Speed: " + Math.round((animationSpeedSlider + 42.0F)/84.0F * 100)/50.0F, posX + 290, posY + 114, 0);
 		}
@@ -1040,15 +1068,15 @@ public class GuiAnimationTimeline extends GuiScreen
 			i++;
 		}
 
-		if(this.showPositionSliders && currentKeyframe != null)
+		if((guiState == 1 || guiState == 2) && currentKeyframe != null)
 		{
 			this.fontRendererObj.drawString("Frame Time: " + this.currentKeyframe.frameTime, posX + 293, posY + 60, 0);
 		}
 
 
-		if(this.showPositionSliders && !this.multiSelected)
+		if((guiState == 1 || guiState == 2))
 		{
-			if(this.currentKeyframe.partName.equals("entitypos"))
+			if(currentPartName.equals("entitypos"))
 			{
 				this.fontRendererObj.drawString("X: " + df.format(xPosSlider/50.0F), posX + 242, posY + 81, 0);
 				this.fontRendererObj.drawString("Y: " + df.format(yPosSlider/50.0F), posX + 242, posY + 98, 0);
@@ -1147,7 +1175,8 @@ public class GuiAnimationTimeline extends GuiScreen
 		renderBlocks.renderBlockAsItem(par5Block, 0, 1.0F);
 		GL11.glDepthMask(true);
 		blockToRender.setBlockBounds(0.5F + ((par2 - 50)/par2), 1.0F, 0.5F + ((par2 - 50)/par2), 3.5F - ((par2 - 50)/par2), 0.9F, 3.5F - ((par2 - 50)/par2));
-		this.mc.getTextureManager().bindTexture(showPositionSliders && (currentPart != null || currentKeyframe.partName.equals("entitypos"))  ? texture2 : texture);
+		PartObj currentPart = Util.getPartFromName(currentPartName, entityModel.parts);
+		this.mc.getTextureManager().bindTexture((guiState == 1 || guiState == 2) && (currentPart != null || currentKeyframe.partName.equals("entitypos"))  ? texture2 : texture);
 		GL11.glPopMatrix();
 		RenderHelper.disableStandardItemLighting();
 		GL11.glDisable(GL12.GL_RESCALE_NORMAL);
