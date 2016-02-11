@@ -74,7 +74,6 @@ public class GuiAnimationTimeline extends GuiScreen
 	private boolean boolShield = false;
 
 	private boolean showPositionSliders = false;
-	private boolean showParts = false;
 
 	private ArrayList<String> parts = new ArrayList<String>();
 	private ArrayList<Keyframe> keyframes = new ArrayList<Keyframe>();
@@ -105,7 +104,7 @@ public class GuiAnimationTimeline extends GuiScreen
 	private boolean filter = false;
 
 	private boolean boolDelete = false;
-	
+
 	private float sliderLength = 29.0F;
 
 	public GuiAnimationTimeline(String par0Str, AnimationSequence par1Sequence) 
@@ -168,7 +167,7 @@ public class GuiAnimationTimeline extends GuiScreen
 		setup();
 		this.updateButtons();
 	}
-	
+
 	public void setup()
 	{
 		String setup = AnimationData.getAnimationSetup(entityName);
@@ -180,12 +179,12 @@ public class GuiAnimationTimeline extends GuiScreen
 			scaleModifier = Integer.parseInt(split[2]);
 		}
 	}
-	
+
 	public void saveSetup()
 	{
 		AnimationData.setAnimationSetup(entityName, horizontalPan + "," + verticalPan + "," + scaleModifier);
 	}
-	
+
 	@Override
 	public void onGuiClosed()
 	{
@@ -235,6 +234,7 @@ public class GuiAnimationTimeline extends GuiScreen
 		}
 		if(!this.showPositionSliders)
 		{
+			//TODO change what button 2 does.
 			this.buttonList.add(new GuiButton(2, posX + 195, posY + 4, 90, 20, "New Keyframe"));
 			this.buttonList.add(new GuiButton(21, posX + 195, posY + 26, 90, 20, "Reset Rotation"));
 			this.buttonList.add(new GuiButton(22, posX + 195, posY + 48, 90, 20, "Choose Prop"));
@@ -256,7 +256,7 @@ public class GuiAnimationTimeline extends GuiScreen
 			this.buttonList.add(new GuiButton(24, posX + 195, posY + 92, 90, 20, "Back"));
 			this.buttonList.add(new GuiButton(32, posX + 290, posY + 26, 90, 20, "Set Action Point"));
 			this.buttonList.add(new GuiButton(50, posX + 290, posY + 70, 90, 20, "Export as Stance"));
-			
+
 			this.buttonList.add(new GuiSlider(51, (int) Math.round((posX + 239 + animationSpeedSlider)), posY + 116));
 		}
 		else
@@ -278,19 +278,15 @@ public class GuiAnimationTimeline extends GuiScreen
 			}
 		}
 
-		if(showParts)
+		if(parts.size() > 10)
 		{
-			if(parts.size() > 10)
-			{
-				this.buttonList.add(new GuiButton(4, posX + 380, 2, 50, 20, "^"));
-				this.buttonList.add(new GuiButton(5, posX + 380, 233, 50, 20, "V"));
-			}
-			int max = parts.size() > 10 ? 10 : parts.size();	
-			for(int i = 0; i < max; i++)
-			{
-				this.buttonList.add(new GuiButton(6+i, posX + 380, 23 + 21*i, 50, 20, parts.get(i + listOffset)));
-			}
-			this.buttonList.add(new GuiButton(34, posX + 328, 117, 50, 20, "Close"));
+			this.buttonList.add(new GuiButton(4, posX + 380, 2, 50, 20, "^"));
+			this.buttonList.add(new GuiButton(5, posX + 380, 233, 50, 20, "V"));
+		}
+		int max = parts.size() > 10 ? 10 : parts.size();	
+		for(int i = 0; i < max; i++)
+		{
+			this.buttonList.add(new GuiButton(6+i, posX + 382, 23 + 21*i, 50, 20, parts.get(i + listOffset)));
 		}
 
 		if(parts.size() > 12)
@@ -321,7 +317,6 @@ public class GuiAnimationTimeline extends GuiScreen
 			}			
 			break;
 		case 1: GuiCheckBox checkBox = (GuiCheckBox) button; checkBox.isChecked = !checkBox.isChecked; boolLoop = checkBox.isChecked; break; 
-		case 2: showParts = true; this.updateButtons(); break;
 		case 4:
 			if(listOffset > 0)
 			{
@@ -336,16 +331,16 @@ public class GuiAnimationTimeline extends GuiScreen
 			}
 			this.updateButtons();
 			break;
-		case 20: this.currentKeyframe = null; this.currentPart = null; this.keyframeSelected = false; this.showPositionSliders = false; this.showParts = false; lastButton = 0; entityModel.clearHighlights(); break;
+		case 20: this.currentKeyframe = null; this.currentPart = null; this.keyframeSelected = false; this.showPositionSliders = false; lastButton = 0; entityModel.clearHighlights(); break;
 		case 21: this.horizontalPan = 0; this.horizontalRotation = 0; this.verticalPan = 0; this.verticalRotation = 0; break;
 		case 22: this.mc.displayGuiScreen(new GuiInventoryChooseItem(this, (EntityObj) this.entityToRender)); break;
 		case 23: boolDelete = true; break;
 		case 24: mc.displayGuiScreen(new GuiAnimationSequenceList(entityName, AnimationData.getSequences(entityName))); break;
 		case 25: this.copyingFrame = true; this.popUp("Copied key frame", 0xff00ff00); break;
-		case 26: keyframes.remove(this.currentKeyframe); this.updateAnimations(); this.currentKeyframe = null; this.currentPart = null; this.keyframeSelected = false; this.showPositionSliders = false; this.showParts = false; lastButton = 0; entityModel.clearHighlights(); break;
+		case 26: keyframes.remove(this.currentKeyframe); this.updateAnimations(); this.currentKeyframe = null; this.currentPart = null; this.keyframeSelected = false; this.showPositionSliders = false; lastButton = 0; entityModel.clearHighlights(); break;
 		case 27: this.copyingFrames = true; this.popUp("Copied key frames", 0xff00ff00); break;
 		case 28: for(Keyframe kf : this.selectedFrames){keyframes.remove(kf);} this.multiSelected = false; this.updateAnimations(); this.currentKeyframe = null; 
-		this.currentPart = null; this.keyframeSelected = false; this.showPositionSliders = false; this.showParts = false; lastButton = 0; entityModel.clearHighlights(); break;
+		this.currentPart = null; this.keyframeSelected = false; this.showPositionSliders = false; lastButton = 0; entityModel.clearHighlights(); break;
 		case 29: this.selectedFrames.clear(); multiSelected = false; entityModel.clearHighlights(); break;
 		case 30:
 			if(listOffset2 < parts.size() - 12)
@@ -363,7 +358,6 @@ public class GuiAnimationTimeline extends GuiScreen
 			break;
 		case 32: animation.setActionPoint(time); break;
 		case 33: GuiCheckBox checkBox2 = (GuiCheckBox) button; checkBox2.isChecked = !checkBox2.isChecked; boolShield = checkBox2.isChecked; break; 
-		case 34: this.showParts = false; break;
 		case 47: GuiCheckBox checkBox4 = (GuiCheckBox) button; checkBox4.isChecked = !checkBox4.isChecked; filter = checkBox4.isChecked; listOffset2 = 0; break; 
 		case 48: AnimationData.deleteSequence(entityName, this.animation); mc.displayGuiScreen(new GuiAnimationSequenceList(entityName, AnimationData.getSequences(entityName))); break;
 		case 49: boolDelete = false; break;
@@ -386,6 +380,7 @@ public class GuiAnimationTimeline extends GuiScreen
 		}
 		if(button.id > 5 && button.id < 17)
 		{
+			//Check if an existing key frame exists, and if it does select it. 
 			boolean flag = false;
 			for(Keyframe k : keyframes)
 			{
@@ -411,10 +406,10 @@ public class GuiAnimationTimeline extends GuiScreen
 					}
 					this.updateAnimations();
 					showPositionSliders = true;
-					this.showParts = false;
 					break;
 				}
 			}
+			//If no existing keyframe exists, create a new one. 
 			if(!flag)
 			{
 				this.currentPart = Util.getPartFromName(button.displayString, entityModel.parts);
@@ -457,7 +452,6 @@ public class GuiAnimationTimeline extends GuiScreen
 				}
 				this.updateAnimations();
 				showPositionSliders = true;
-				this.showParts = false;
 			}
 			this.updateButtons();
 		}
@@ -776,7 +770,7 @@ public class GuiAnimationTimeline extends GuiScreen
 			}
 			this.updateAnimations();
 		}
-		
+
 		if(lastButton == 51)
 		{
 			double d = 0.0D;
@@ -794,13 +788,13 @@ public class GuiAnimationTimeline extends GuiScreen
 			}
 			animationSpeedSlider = d;
 		}
-		
-		
-		
+
+
+
 		this.updateButtons();
 
 	}
-	
+
 	@Override
 	public void mouseMovedOrUp(int par0, int par1, int par2)
 	{
@@ -810,7 +804,7 @@ public class GuiAnimationTimeline extends GuiScreen
 		}
 		super.mouseMovedOrUp(par0, par1, par2);
 	}
-	
+
 
 
 	public boolean doesGuiPauseGame()
@@ -909,7 +903,7 @@ public class GuiAnimationTimeline extends GuiScreen
 		}
 		return true;
 	}
-	
+
 	private float getLastKeyFrameTime() 
 	{
 		float lastTime = 0.0F;
@@ -964,7 +958,7 @@ public class GuiAnimationTimeline extends GuiScreen
 				//System.out.println(horizontalPan + " " + (scaleModifier/2 + verticalPan) + " " + scale + " " + par1 + " " + par2);
 			}
 		}
-		
+
 		if(this.popUpTime > 0)
 		{
 			this.drawCenteredString(this.fontRendererObj, popUpString, posX + 192, posY + 116, popUpColour);
@@ -979,23 +973,23 @@ public class GuiAnimationTimeline extends GuiScreen
 		{
 			drawVerticalLine((int) (posX + 79 + animation.getActionPoint()), posY + 128, posY + 134, 0xFFDAA520);
 		}
-		
+
 		//TODO remove?
-//		if(currentPart != null)
-//		{
-//			float x = currentPart.offsetX;
-//			float y = currentPart.offsetY;
-//			float z = currentPart.offsetZ;
-//			System.out.println(x/z);
-//			drawVerticalLine((int) (posX + 30 + x/z), (int) (posY + 30 + y/z), (int) (posY + 40 + y/z), 0xFFDAA520);
-//		}
+		//		if(currentPart != null)
+		//		{
+		//			float x = currentPart.offsetX;
+		//			float y = currentPart.offsetY;
+		//			float z = currentPart.offsetZ;
+		//			System.out.println(x/z);
+		//			drawVerticalLine((int) (posX + 30 + x/z), (int) (posY + 30 + y/z), (int) (posY + 40 + y/z), 0xFFDAA520);
+		//		}
 
 		fontRendererObj.drawString("Loop", posX + 352, posY + 5, 0);
 		fontRendererObj.drawString("Shield", posX + 352, posY + 15, 0);
 		fontRendererObj.drawString("Time: " + time, posX + 306, posY + 50, 0);
 		fontRendererObj.drawString("W/A/S/D-Rotate    Arrow Keys-Move", posX + 4, posY + 4, 0);
 		fontRendererObj.drawString("Scroll-Zoom B-Base T-Txtr L-Lock", posX + 4, posY + 14, 0);
-		
+
 		if(!showPositionSliders)
 		{
 			fontRendererObj.drawString("Speed: " + Math.round((animationSpeedSlider + 42.0F)/84.0F * 100)/50.0F, posX + 290, posY + 114, 0);
@@ -1062,19 +1056,17 @@ public class GuiAnimationTimeline extends GuiScreen
 		}
 
 		boolean flag1 = true;
-		if(this.showParts)
-		{
-			for(int k = 0; k < 10; k++)
-			{
-				GuiButton b = Util.getButtonFromID(k + 6, this.buttonList);
-				if(b != null && (par1 > b.xPosition && par1 < b.xPosition + b.width && par2 > b.yPosition && par2 < b.yPosition + b.height))
-				{
-					entityModel.hightlightPart(Util.getPartFromName(b.displayString, entityModel.parts), true);		
-					flag1 = false;
-					break;
-				}
 
+		for(int k = 0; k < 10; k++)
+		{
+			GuiButton b = Util.getButtonFromID(k + 6, this.buttonList);
+			if(b != null && (par1 > b.xPosition && par1 < b.xPosition + b.width && par2 > b.yPosition && par2 < b.yPosition + b.height))
+			{
+				entityModel.hightlightPart(Util.getPartFromName(b.displayString, entityModel.parts), true);		
+				flag1 = false;
+				break;
 			}
+
 		}
 
 		if((copyingFrame || copyingFrames) && par1 > 126 && par2 > 125 && par2 < 250)
