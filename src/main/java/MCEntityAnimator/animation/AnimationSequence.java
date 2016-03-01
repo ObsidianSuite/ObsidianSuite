@@ -47,6 +47,9 @@ public class AnimationSequence
 		movements.add(par0Movement);
 	}
 
+	/**
+	 * Clear all the animation parts and movements.
+	 */
 	public void clearAnimations() 
 	{
 		animations.clear();
