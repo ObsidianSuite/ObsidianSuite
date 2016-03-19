@@ -363,7 +363,7 @@ public class GuiAnimationParenting extends GuiScreen
 			this.drawCenteredString(this.fontRendererObj, "Parent with bend?", posX + 192, posY + 190, 0xFF555555);
 		}
 
-		entityModel.hightlightPart(Util.getPartFromName(this.currentPartName, entityModel.parts), true);		
+		entityModel.hightlightPart(Util.getPartFromName(this.currentPartName, entityModel.parts));		
 
 		boolean flag = true;
 		for(int j = 0; j < 10; j++)
@@ -371,7 +371,7 @@ public class GuiAnimationParenting extends GuiScreen
 			GuiButton b = Util.getButtonFromID(j + 18, this.buttonList);
 			if(b != null && (par1 > b.xPosition && par1 < b.xPosition + b.width && par2 > b.yPosition && par2 < b.yPosition + b.height && !this.currentPartName.equals(b.displayString.substring(0, b.displayString.length() - 1))))
 			{
-				entityModel.hightlightPart(Util.getPartFromName(b.displayString, entityModel.parts), false);		
+				entityModel.hightlightPart(Util.getPartFromName(b.displayString, entityModel.parts));		
 				flag = false;
 				break;
 			}
@@ -379,7 +379,7 @@ public class GuiAnimationParenting extends GuiScreen
 			GuiButton b2 = Util.getButtonFromID(j + 30, this.buttonList);
 			if(b2 != null && (par1 > b2.xPosition && par1 < b2.xPosition + b2.width && par2 > b2.yPosition && par2 < b2.yPosition + b2.height && !this.currentPartName.equals(b2.displayString.substring(0, b2.displayString.length() - 1))))
 			{
-				entityModel.hightlightPart(Util.getPartFromName(b2.displayString, entityModel.parts), false);		
+				entityModel.hightlightPart(Util.getPartFromName(b2.displayString, entityModel.parts));		
 				flag = false;
 				break;
 			}
@@ -387,7 +387,7 @@ public class GuiAnimationParenting extends GuiScreen
 		if(flag)
 		{
 			entityModel.clearHighlights();
-			entityModel.hightlightPart(Util.getPartFromName(this.currentPartName, entityModel.parts), true);		
+			entityModel.hightlightPart(Util.getPartFromName(this.currentPartName, entityModel.parts));		
 		}
 
 

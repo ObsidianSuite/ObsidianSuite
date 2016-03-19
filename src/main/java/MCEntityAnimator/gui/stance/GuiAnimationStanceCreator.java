@@ -173,9 +173,9 @@ public class GuiAnimationStanceCreator extends GuiScreen
 
 		this.buttonList.add(new GuiButton(24, posX + 195, posY + 92, 182, 20, "Export stance to sequence"));
 		this.buttonList.add(new GuiButton(25, posX + 195, posY + 114, 182, 20, "Back"));
-		this.buttonList.add(new GuiSlider(17, (int) Math.round((posX + 286 + xPosSlider)), posY + 193));
-		this.buttonList.add(new GuiSlider(18, (int) Math.round((posX + 286 + yPosSlider)), posY + 210));
-		this.buttonList.add(new GuiSlider(19, (int) Math.round((posX + 286 + zPosSlider)), posY + 227));	
+//		this.buttonList.add(new GuiSlider(17, (int) Math.round((posX + 286 + xPosSlider)), posY + 193));
+//		this.buttonList.add(new GuiSlider(18, (int) Math.round((posX + 286 + yPosSlider)), posY + 210));
+//		this.buttonList.add(new GuiSlider(19, (int) Math.round((posX + 286 + zPosSlider)), posY + 227));	
 
 		if(showParts)
 		{
@@ -463,7 +463,7 @@ public class GuiAnimationStanceCreator extends GuiScreen
 				GuiButton b = Util.getButtonFromID(k + 6, this.buttonList);
 				if(b != null && par1 > b.xPosition && par1 < b.xPosition + b.width && par2 > b.yPosition && par2 < b.yPosition + b.height)
 				{
-					entityModel.hightlightPart(Util.getPartFromName(b.displayString, entityModel.parts), true);		
+					//entityModel.hightlightPart(Util.getPartFromName(b.displayString, entityModel.parts), true);		
 					flag1 = false;
 					break;
 				}

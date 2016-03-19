@@ -6,6 +6,7 @@ import java.util.List;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.entity.Entity;
 import MCEntityAnimator.render.objRendering.PartObj;
 
 public class Util 
@@ -82,21 +83,13 @@ public class Util
 		return temp;
 	}
 	
-//	public static EntityPrototype getEntityFromName(String entityName)
-//	{
-//		EntityPrototype entity = null;
-//		try 
-//		{
-//			entity = (EntityPrototype) Class.forName("MCEntityAnimator.entity.EntityPrototype").getConstructor(World.class).newInstance(Minecraft.getMinecraft().theWorld);
-//		} 
-//		catch (InstantiationException e) {e.printStackTrace();} 
-//		catch (IllegalAccessException e) {e.printStackTrace();}
-//		catch (IllegalArgumentException e) {e.printStackTrace();} 
-//		catch (InvocationTargetException e) {e.printStackTrace();} 
-//		catch (NoSuchMethodException e) {e.printStackTrace();} 
-//		catch (SecurityException e) {e.printStackTrace();} 
-//		catch (ClassNotFoundException e) {e.printStackTrace();}
-//		return entity;
-//	}
+	public static float[] getEntityPosition(Entity e)
+	{
+		float[] pos = new float[3];
+		pos[0] = (float) e.posX;
+		pos[1] = (float) e.posY;
+		pos[2] = (float) e.posZ;
+		return pos;
+	}
 	
 }

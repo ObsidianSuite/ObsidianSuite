@@ -238,36 +238,13 @@ public class ModelObj extends ModelBase
 //----------------------------------------------------------------
 	
 	/**
-	 * Add a part to be highlighted, if green is true then the part will be green, if not then blue.
+	 * Add a part to be highlighted
 	 */
-	public void hightlightPart(PartObj part, boolean green) //single is so that only one part is highlighted
+	public void hightlightPart(PartObj part)
 	{
 		if(part != null)
 		{
-			if(green)
-			{
-				this.hightlightedParts.clear();
-				this.mainHighlight = part;
-			}
-			else if(!this.hightlightedParts.contains(part))
-			{
-				this.hightlightedParts.add(part);
-			}
-		}
-	}
-
-	public void removeHighlight(PartObj part)
-	{
-		if(part != null)
-		{
-			if(this.hightlightedParts.contains(part))
-			{
-				this.hightlightedParts.remove(part);
-			}
-			else
-			{
-				this.mainHighlight = null;
-			}
+			this.hightlightedParts.add(part);
 		}
 	}
 

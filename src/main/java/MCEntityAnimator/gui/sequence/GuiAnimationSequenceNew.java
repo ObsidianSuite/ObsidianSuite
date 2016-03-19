@@ -12,6 +12,7 @@ import MCEntityAnimator.Util;
 import MCEntityAnimator.animation.AnimationData;
 import MCEntityAnimator.animation.AnimationSequence;
 import MCEntityAnimator.animation.AnimationStance;
+import MCEntityAnimator.gui.sequence.timeline.GuiAnimationTimelineMain;
 
 
 public class GuiAnimationSequenceNew extends GuiScreen 
@@ -85,7 +86,7 @@ public class GuiAnimationSequenceNew extends GuiScreen
 		case 0:
 			AnimationSequence sequence = new AnimationSequence(animationNameTextBar.getText());
 			if(AnimationData.addNewSequence(entityName, sequence))
-				mc.displayGuiScreen(new GuiAnimationTimelineNew(entityName, sequence, startingStance)); 
+				mc.displayGuiScreen(new GuiAnimationTimelineMain(entityName, sequence, startingStance, null, 0)); 
 			else
 				initFlashMessage("An animation with that name already exists.");
 			break;

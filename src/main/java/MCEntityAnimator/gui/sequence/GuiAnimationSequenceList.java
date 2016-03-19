@@ -5,15 +5,13 @@ import java.util.ArrayList;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.gui.GuiTextField;
-import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.ResourceLocation;
 
 import org.lwjgl.opengl.GL11;
 
 import MCEntityAnimator.Util;
-import MCEntityAnimator.animation.AnimationData;
 import MCEntityAnimator.animation.AnimationSequence;
+import MCEntityAnimator.gui.sequence.timeline.GuiAnimationTimelineMain;
 
 
 public class GuiAnimationSequenceList extends GuiScreen 
@@ -67,7 +65,7 @@ public class GuiAnimationSequenceList extends GuiScreen
 		}
 		else
 		{
-			mc.displayGuiScreen(new GuiAnimationTimelineNew(entityName, sequences.get(button.id)));
+			mc.displayGuiScreen(new GuiAnimationTimelineMain(entityName, sequences.get(button.id), null, null, 0));
 		}
 	}
 

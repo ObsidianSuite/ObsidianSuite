@@ -59,6 +59,7 @@ public class GuiAnimationHome extends GuiScreen
 		this.buttonList.add(new GuiButton(0, posX + 5, posY + 19, 70, 20, "Parenting"));
 		this.buttonList.add(new GuiButton(1, posX + 5, posY + 41, 70, 20, "Sequences"));
 		this.buttonList.add(new GuiButton(2, posX + 5, posY + 63, 70, 20, "Stances"));
+		((GuiButton) this.buttonList.get(2)).enabled = false;
 		this.buttonList.add(new GuiButton(3, posX + 5, posY + 85, 70, 20, "Distribution"));
 	}
 

@@ -4,11 +4,7 @@ import java.util.HashMap;
 
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityClientPlayerMP;
-import net.minecraft.client.renderer.EntityRenderer;
-import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.RenderBlocks;
-import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.entity.RenderLiving;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -17,14 +13,12 @@ import net.minecraft.init.Items;
 import net.minecraft.item.EnumAction;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
 
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
 
 import MCEntityAnimator.Util;
-import MCEntityAnimator.gui.sequence.GuiAnimationTimeline;
+import MCEntityAnimator.gui.sequence.timeline.GuiAnimationTimeline;
 import MCEntityAnimator.gui.stance.GuiAnimationStanceCreator;
 import MCEntityAnimator.item.ModelLargeShield;
 import cpw.mods.fml.relauncher.Side;

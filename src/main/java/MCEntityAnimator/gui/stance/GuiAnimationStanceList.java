@@ -11,8 +11,6 @@ import org.lwjgl.opengl.GL11;
 
 import MCEntityAnimator.Util;
 import MCEntityAnimator.animation.AnimationStance;
-import MCEntityAnimator.gui.sequence.GuiAnimationSequenceMain;
-import MCEntityAnimator.gui.sequence.GuiAnimationTimeline;
 
 
 public class GuiAnimationStanceList extends GuiScreen 

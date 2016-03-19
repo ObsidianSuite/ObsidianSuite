@@ -1,13 +1,17 @@
 package MCEntityAnimator.animation;
 
 import java.util.ArrayList;
+import java.util.List;
 
-import net.minecraft.client.model.ModelBase;
-import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import MCEntityAnimator.Util;
+import MCEntityAnimator.gui.sequence.timeline.GuiAnimationTimeline;
+import MCEntityAnimator.gui.sequence.timeline.GuiAnimationTimeline.Keyframe;
+import MCEntityAnimator.render.objRendering.ModelObj;
+import MCEntityAnimator.render.objRendering.PartObj;
 
 public class AnimationSequence 
 {
@@ -36,12 +40,12 @@ public class AnimationSequence
 	{
 		animations.add(par0Animation);
 	}
-	
+
 	public ArrayList<AnimationMovement> getMovements() 
 	{
 		return movements;
 	}
-	
+
 	public void addMovement(AnimationMovement par0Movement)
 	{
 		movements.add(par0Movement);
@@ -55,20 +59,19 @@ public class AnimationSequence
 		animations.clear();
 		movements.clear();
 	}
-	
+
 	public void setActionPoint(float time)
 	{
 		this.actionPoint = time;
 	}
-	
+
 	public float getActionPoint()
 	{
 		return actionPoint;
 	}
 
-	public void animateAll(float f, float speedMultiplier, boolean inGame, Entity entity) 
+	public void animateAll(float time, float speedMultiplier, boolean inGame, Entity entity, String notAnimated) 
 	{
-		float time = f;
 		if(inGame)
 		{
 			time = time*speedMultiplier;
@@ -80,28 +83,32 @@ public class AnimationSequence
 		}
 		for(AnimationPart s : this.animations)
 		{
-			if(time > s.getStartTime() && time <= s.getFinishTime())
+			if(!notAnimated.equals(s.getPart().getName()) && time >= s.getStartTime() && time <= s.getEndTime())
 			{
 				s.animatePart(time - s.getStartTime());
 			}
 		}
-		for(AnimationMovement m : this.movements)
+		if(!notAnimated.equals("entitypos"))
 		{
-			if(time > m.getStartTime() && time <= m.getFinishTime())
+			for(AnimationMovement m : this.movements)
 			{
-				m.moveEntity(time - m.getStartTime(), entity);
+				if(time >= m.getStartTime() && time <= m.getFinishTime())
+				{
+					m.moveEntity(time - m.getStartTime(), entity);
+				}
 			}
 		}
+
 	}
-	
+
 	public float getTotalTime() 
 	{
 		float max = 0.0F;
 		for(AnimationPart animation : animations)
 		{
-			if(animation.getFinishTime() > max)
+			if(animation.getEndTime() > max)
 			{
-				max = animation.getFinishTime();
+				max = animation.getEndTime();
 			}
 		}
 		for(AnimationMovement movement : movements)
@@ -113,6 +120,43 @@ public class AnimationSequence
 		}
 		return max;
 	}	
+
+	/**
+	 * Creates keyframes from the animation sequence. 
+	 */
+	public List<Keyframe> getKeyframes(GuiAnimationTimeline gui, ModelObj entityModel)
+	{
+		List<Keyframe> keyframes = new ArrayList<Keyframe>();
+		//Part animations
+		for(AnimationPart animpart : getAnimations())
+		{
+			String partName = animpart.getPart().getName();
+			PartObj mr = Util.getPartFromName(animpart.getPart().getName(), entityModel.parts);	
+			float[] defaults = animpart.getPart().getOriginalRotation();
+			//If the movement starts at time zero, and the part isn't in its original position, add a keyframe at time zero.
+			if(animpart.getStartTime() == 0.0F && !animpart.compareRotation(defaults))
+			{
+				Keyframe kf = gui.new Keyframe(0.0F, partName, animpart.getStartPosition());
+				keyframes.add(kf);
+			}
+			//Add a keyframe for the final position 
+			Keyframe kf = gui.new Keyframe(animpart.getEndTime(), partName, animpart.getEndPosition());
+			keyframes.add(kf);
+		}
+		//Entity movement
+		for(AnimationMovement animmove : getMovements())
+		{
+			//If the movement starts at time zero, and the entity isn't in its original position, add a keyframe at time zero.
+			if(animmove.getStartTime() == 0.0F && (animmove.getStartPosition()[0] != 0.0F || animmove.getStartPosition()[1] != 0.0F || animmove.getStartPosition()[2] != 0.0F))
+			{
+				Keyframe kf = gui.new Keyframe(0.0F, "entitypos", animmove.getStartPosition());
+				keyframes.add(kf);
+			}
+			Keyframe kf = gui.new Keyframe(animmove.getFinishTime(), "entitypos", animmove.getEndPosition());
+			keyframes.add(kf);
+		}
+		return keyframes;
+	}
 
 	public NBTBase getSaveData() 
 	{
