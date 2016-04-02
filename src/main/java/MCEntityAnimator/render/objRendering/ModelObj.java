@@ -8,39 +8,35 @@ import java.util.Map;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ModelBase;
-import net.minecraft.client.model.ModelBox;
 import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.client.resources.IResource;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.AdvancedModelLoader;
 import net.minecraftforge.client.model.ModelFormatException;
-import net.minecraftforge.client.model.obj.GroupObject;
 import net.minecraftforge.client.model.obj.WavefrontObject;
 
 import org.lwjgl.opengl.GL11;
 
 import MCEntityAnimator.animation.AnimationData;
 import MCEntityAnimator.animation.AnimationParenting;
-import MCEntityAnimator.gui.GuiAnimationParenting;
+import MCEntityAnimator.render.objRendering.parts.Part;
+import MCEntityAnimator.render.objRendering.parts.PartEntityPos;
+import MCEntityAnimator.render.objRendering.parts.PartObj;
 
 import com.google.common.collect.Maps;
-
-import cpw.mods.fml.common.ObfuscationReflectionHelper;
 
 public class ModelObj extends ModelBase
 {
 
 	private String entityType;
 	public WavefrontObject model;
-	public ArrayList<PartObj> parts;
+	public ArrayList<Part> parts;
 	private ArrayList<Bend> bends;
 	private AnimationParenting parenting;
 	private Map<PartObj, float[]> defaults;
 	private PartObj mainHighlight = null;
 	private ArrayList<PartObj> hightlightedParts;
-
-	public PartObj currentPart;
 
 	public static final float initRotFix = 180.0F;
 	public static final float offsetFixY = -1.5F;
@@ -57,6 +53,7 @@ public class ModelObj extends ModelBase
 		pxyRL = new ResourceLocation("mod_mcea:objModels/" + entityType + "/" + entityType + ".pxy");
 		model = (WavefrontObject) AdvancedModelLoader.loadModel(modelRL);
 		parts = ObjUtil.createPartObjList(this, model.groupObjects);
+		parts.add(new PartEntityPos(this));
 		parenting = AnimationData.getAnipar(par0Str);
 		hightlightedParts = new ArrayList<PartObj>();
 		bends = new ArrayList<Bend>();
@@ -68,14 +65,18 @@ public class ModelObj extends ModelBase
 	
 	public void init() 
 	{
-		for(PartObj obj : this.parts)
+		for(Part p : this.parts)
 		{
-			float[] arr = new float[3];
-			arr[0] = obj.getRotationPoint(0);
-			arr[1] = obj.getRotationPoint(1);
-			arr[2] = obj.getRotationPoint(2);
-			defaults.put(obj, arr);
-		}
+			if(p instanceof PartObj)
+			{
+				PartObj obj = (PartObj) p;
+				float[] arr = new float[3];
+				arr[0] = obj.getRotationPoint(0);
+				arr[1] = obj.getRotationPoint(1);
+				arr[2] = obj.getRotationPoint(2);
+				defaults.put(obj, arr);
+			}
+		}		
 	}
 	
 	public float[] getDefaults(PartObj part)
@@ -104,12 +105,16 @@ public class ModelObj extends ModelBase
 				switch(i)
 				{
 				case 0: 
-					for(PartObj obj : parts)
+					for(Part p : parts)
 					{
-						if(obj.getName().equals(currentLine))
+						if(p instanceof PartObj)
 						{
-							currentPart = obj;
-							break;
+							PartObj obj = (PartObj) p;
+							if(obj.getName().equals(currentLine))
+							{
+								currentPart = obj;
+								break;
+							}
 						}
 					}
 					i++;
@@ -120,8 +125,8 @@ public class ModelObj extends ModelBase
 					break;
 				case 2:
 					float[] rot = read3Floats(currentLine);
-					currentPart.setOriginalRotation(rot);
-					currentPart.setRotation(rot);
+					currentPart.setOriginalValues(rot);
+					currentPart.setValues(rot);
 					i = 0;
 					break;
 				}
@@ -197,9 +202,13 @@ public class ModelObj extends ModelBase
 			boolean prevRenderWithTexture = renderWithTexture;
 			renderWithTexture = true;
 			
-			for(PartObj part : this.parts)
+			for(Part p : this.parts)
 			{
-				part.updateTextureCoordinates(false, false);
+				if(p instanceof PartObj)
+				{
+					PartObj obj = (PartObj) p;
+					obj.updateTextureCoordinates(false, false);
+				}
 			}
 			
 			Bend b = new Bend(child, parent);
@@ -278,12 +287,18 @@ public class ModelObj extends ModelBase
 		GL11.glRotatef(initRotFix, 1.0F, 0.0F, 0.0F);
 		GL11.glTranslatef(0.0F, offsetFixY, 0.0F);
 
-		for(PartObj part : this.parts) 
+		for(Part p : this.parts) 
 		{
-			if(!parenting.hasParent(part))
+			if(p instanceof PartObj)
 			{
-				part.render(isPartHighlighted(part), isMainHighlight(part));
+				PartObj part = (PartObj) p;
+				if(!parenting.hasParent(part))
+				{
+					part.render(entity, isPartHighlighted(part), isMainHighlight(part));
+				}
 			}
+			else
+				p.move(entity);
 		}
 		
 		for(Bend bend : this.bends)

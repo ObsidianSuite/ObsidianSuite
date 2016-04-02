@@ -9,8 +9,9 @@ import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import MCEntityAnimator.Util;
 import MCEntityAnimator.render.objRendering.EntityObj;
-import MCEntityAnimator.render.objRendering.PartObj;
 import MCEntityAnimator.render.objRendering.RenderObj;
+import MCEntityAnimator.render.objRendering.parts.Part;
+import MCEntityAnimator.render.objRendering.parts.PartObj;
 
 public class AnimationPart 
 {
@@ -20,11 +21,11 @@ public class AnimationPart
 	private float[] endPosition;
 	private float[] movement = new float[3];
 	private DecimalFormat df = new DecimalFormat("##.##");
-	private PartObj part;
+	private Part part;
 
 	public AnimationPart() {}
 
-	public AnimationPart(float startTime, float endTime, float[] startPos, float[] endPos, PartObj part)
+	public AnimationPart(float startTime, float endTime, float[] startPos, float[] endPos, Part part)
 	{
 		this.startTime = startTime;
 		this.endTime = endTime;
@@ -43,15 +44,15 @@ public class AnimationPart
 	}
 
 	public void animatePart(float time) 
-	{	
+	{			
 		float x = startPosition[0] + time*movement[0];
 		float y = startPosition[1] + time*movement[1];
 		float z = startPosition[2] + time*movement[2];
 		
-		part.setRotation(new float[]{x, y, z});
+		part.setValues(new float[]{x, y, z});
 	}
 
-	public PartObj getPart()
+	public Part getPart()
 	{
 		return part;
 	}
@@ -107,7 +108,7 @@ public class AnimationPart
 	public void loadData(String entityName, NBTTagCompound compound) 
 	{
 		EntityObj entity = new EntityObj(Minecraft.getMinecraft().theWorld, entityName);
-		ArrayList<PartObj> parts = ((RenderObj) RenderManager.instance.getEntityRenderObject(entity)).getModel(entityName).parts;
+		ArrayList<Part> parts = ((RenderObj) RenderManager.instance.getEntityRenderObject(entity)).getModel(entityName).parts;
 		this.startPosition = new float[3];
 		this.endPosition = new float[3];
 		this.startPosition[0] = compound.getFloat("XStart");

@@ -1,47 +1,37 @@
-package MCEntityAnimator.render.objRendering;
+package MCEntityAnimator.render.objRendering.parts;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import net.minecraft.entity.Entity;
 import net.minecraftforge.client.model.obj.Face;
 import net.minecraftforge.client.model.obj.GroupObject;
 import net.minecraftforge.client.model.obj.TextureCoordinate;
 
 import org.lwjgl.opengl.GL11;
 
+import MCEntityAnimator.render.objRendering.Bend;
+import MCEntityAnimator.render.objRendering.ModelObj;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
-public class PartObj 
+public class PartObj extends Part
 {
 	private float[] rotationPoint;
-	private float[] originalRotation;
-	private float rotationX;
-	private float rotationY;
-	private float rotationZ;
 	private boolean showModel;
 
 	private ArrayList<PartObj> children;
 
 	private HashMap<Face, TextureCoordinate[]> defaultTextureCoords;
-
-	private String name;
-
-	ModelObj modelObj;
-	GroupObject groupObj;
 	
 	private boolean visible;
 	private Bend bend = null;
+	public GroupObject groupObj;
 
-	public PartObj(ModelObj mObj, GroupObject gObj) 
+	public PartObj(ModelObj modelObject, GroupObject groupObj) 
 	{
-		modelObj = mObj;
-		groupObj = gObj;
-		name = groupObj.name.contains("_") ? groupObj.name.substring(0, groupObj.name.indexOf("_")) : groupObj.name;
-		name = name.toLowerCase();
-		rotationX = 0.0F;
-		rotationY = 0.0F;
-		rotationZ = 0.0F;
+		super(modelObject, (groupObj.name.contains("_") ? groupObj.name.substring(0, groupObj.name.indexOf("_")) : groupObj.name).toLowerCase());
+		this.groupObj = groupObj;
 		children = new ArrayList<PartObj>();
 		defaultTextureCoords = new HashMap<Face, TextureCoordinate[]>();
 		updateDefaultTextureCoordinates();
@@ -51,11 +41,6 @@ public class PartObj
 	//------------------------------------------
 	//  			Basics
 	//------------------------------------------
-
-	public String getName()
-	{
-		return name;
-	}
 
 	public void setShowModel(boolean show)
 	{
@@ -67,18 +52,6 @@ public class PartObj
 		return showModel;
 	}
 
-	public void setOriginalRotation(float[] rot) 
-	{
-		originalRotation = rot;
-	}
-
-
-	public float[] getOriginalRotation() 
-	{
-		return originalRotation;
-	}
-
-
 	public void setRotationPoint(float[] rot) 
 	{
 		rotationPoint = rot;
@@ -88,52 +61,10 @@ public class PartObj
 	{
 		return rotationPoint[i];
 	}
-	
 
 	public float[] getRotationPoint()
 	{
 		return rotationPoint;
-	}
-
-	public void setRotation(float[] rot)
-	{
-		rotationX = rot[0];
-		rotationY = rot[1];
-		rotationZ = rot[2];
-	}
-
-	public void setRotation(int i, float f) 
-	{
-		switch(i)
-		{
-		case 0: rotationX = f; break;
-		case 1: rotationY = f; break;
-		case 2: rotationZ = f; break;
-		}
-	}
-
-	public float getRotation(int i) 
-	{
-		switch(i)
-		{
-		case 0: return rotationX;
-		case 1: return rotationY;
-		case 2: return rotationZ;
-		}
-		return 0.0F;
-	}
-	
-	public float[] getRotation()
-	{
-		return new float[]{rotationX, rotationY, rotationZ};
-	}
-
-
-	public void setToOriginalRotation() 
-	{
-		rotationX = originalRotation[0];
-		rotationY = originalRotation[1];
-		rotationZ = originalRotation[2];
 	}
 	
 	public void setVisible(boolean bool)
@@ -172,7 +103,7 @@ public class PartObj
 	public void removeChild(PartObj child) 
 	{
 		this.children.remove(child);
-		child.setToOriginalRotation();
+		child.setToOriginalValues();
 	}
 
 	public void clearChildModels() 
@@ -254,12 +185,12 @@ public class PartObj
 		}
 	}
 	
-	public void render(boolean highlight, boolean main) 
+	public void render(Entity entity, boolean highlight, boolean main) 
 	{
 		updateTextureCoordinates(highlight, main);
 		
 		GL11.glPushMatrix();
-		rotate();
+		move(entity);
 		if(visible)
 		{
 			groupObj.render();
@@ -273,7 +204,7 @@ public class PartObj
 	@SideOnly(Side.CLIENT)
 	public void postRender(float p_78794_1_)
 	{
-		if (this.rotationX == 0.0F && this.rotationY == 0.0F && this.rotationZ == 0.0F)
+		if (this.valueX == 0.0F && this.valueY == 0.0F && this.valueZ == 0.0F)
 		{
 			if (this.rotationPoint[0] != 0.0F || this.rotationPoint[1] != 0.0F || this.rotationPoint[2] != 0.0F)
 			{
@@ -284,35 +215,34 @@ public class PartObj
 		{
 			GL11.glTranslatef(this.rotationPoint[0] * p_78794_1_, this.rotationPoint[1] * p_78794_1_, this.rotationPoint[2] * p_78794_1_);
 
-			if (this.rotationZ != 0.0F)
+			if (this.valueZ != 0.0F)
 			{
-				GL11.glRotatef(this.rotationZ * (180F / (float)Math.PI), 0.0F, 0.0F, 1.0F);
+				GL11.glRotatef(this.valueZ * (180F / (float)Math.PI), 0.0F, 0.0F, 1.0F);
 			}
 
-			if (this.rotationY != 0.0F)
+			if (this.valueY != 0.0F)
 			{
-				GL11.glRotatef(this.rotationY * (180F / (float)Math.PI), 0.0F, 1.0F, 0.0F);
+				GL11.glRotatef(this.valueY * (180F / (float)Math.PI), 0.0F, 1.0F, 0.0F);
 			}
 
-			if (this.rotationX != 0.0F)
+			if (this.valueX != 0.0F)
 			{
-				GL11.glRotatef(this.rotationX * (180F / (float)Math.PI), 1.0F, 0.0F, 0.0F);
+				GL11.glRotatef(this.valueX * (180F / (float)Math.PI), 1.0F, 0.0F, 0.0F);
 			}
 		}
 	}
 
-	/**
-	 * To be called inside a GL11 matrix, will move the part to (0,0,0), rotate it and then move it back. 
-	 */
-	private void rotate()
+
+	@Override
+	public void move(Entity entity)
 	{
 		//Translate part to centre
 		GL11.glTranslatef(-rotationPoint[0], -rotationPoint[1], -rotationPoint[2]);
 
 		//Rotate
-		GL11.glRotated((rotationX - originalRotation[0])/Math.PI*180.0F, 1.0F, 0.0F, 0.0F);
-		GL11.glRotated((rotationY - originalRotation[1])/Math.PI*180.0F, 0.0F, 1.0F, 0.0F);
-		GL11.glRotated((rotationZ - originalRotation[2])/Math.PI*180.0F, 0.0F, 0.0F, 1.0F);
+		GL11.glRotated((valueX - originalValues[0])/Math.PI*180.0F, 1.0F, 0.0F, 0.0F);
+		GL11.glRotated((valueY - originalValues[1])/Math.PI*180.0F, 0.0F, 1.0F, 0.0F);
+		GL11.glRotated((valueZ - originalValues[2])/Math.PI*180.0F, 0.0F, 0.0F, 1.0F);
 
 		//Translate to original position
 		GL11.glTranslatef(rotationPoint[0], rotationPoint[1], rotationPoint[2]);	
@@ -320,7 +250,7 @@ public class PartObj
 		//Do for children - rotation for parent compensated for!
 		for(PartObj child : this.children)
 		{
-			child.render(modelObj.isPartHighlighted(child), modelObj.isMainHighlight(child));
+			child.render(entity, modelObj.isPartHighlighted(child), modelObj.isMainHighlight(child));
 		}
 	}
 

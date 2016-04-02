@@ -11,7 +11,6 @@ import org.lwjgl.opengl.GL11;
 
 import MCEntityAnimator.Util;
 import MCEntityAnimator.animation.AnimationSequence;
-import MCEntityAnimator.gui.sequence.timeline.GuiAnimationTimelineMain;
 
 
 public class GuiAnimationSequenceList extends GuiScreen 
@@ -65,7 +64,7 @@ public class GuiAnimationSequenceList extends GuiScreen
 		}
 		else
 		{
-			mc.displayGuiScreen(new GuiAnimationTimelineMain(entityName, sequences.get(button.id), null, null, 0));
+			mc.displayGuiScreen(new GuiAnimationTimelineWithFrames(entityName, sequences.get(button.id)));
 		}
 	}
 

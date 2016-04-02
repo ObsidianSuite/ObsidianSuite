@@ -16,6 +16,7 @@ import org.lwjgl.opengl.GL11;
 
 import MCEntityAnimator.animation.AnimationData;
 import MCEntityAnimator.animation.AnimationParenting;
+import MCEntityAnimator.render.objRendering.parts.PartObj;
 
 public class Bend extends GroupObject
 {
@@ -254,9 +255,9 @@ public class Bend extends GroupObject
 		for(PartObj p : allParents)
 		{
 			GL11.glTranslatef(-p.getRotationPoint(0), -p.getRotationPoint(1), -p.getRotationPoint(2));
-			GL11.glRotated((p.getRotation(0) - p.getOriginalRotation()[0])/Math.PI*180.0F, 1.0F, 0.0F, 0.0F);
-			GL11.glRotated((p.getRotation(1) - p.getOriginalRotation()[1])/Math.PI*180.0F, 0.0F, 1.0F, 0.0F);
-			GL11.glRotated((p.getRotation(2) - p.getOriginalRotation()[2])/Math.PI*180.0F, 0.0F, 0.0F, 1.0F);
+			GL11.glRotated((p.getValue(0) - p.getOriginalValues()[0])/Math.PI*180.0F, 1.0F, 0.0F, 0.0F);
+			GL11.glRotated((p.getValue(1) - p.getOriginalValues()[1])/Math.PI*180.0F, 0.0F, 1.0F, 0.0F);
+			GL11.glRotated((p.getValue(2) - p.getOriginalValues()[2])/Math.PI*180.0F, 0.0F, 0.0F, 1.0F);
 			GL11.glTranslatef(p.getRotationPoint(0), p.getRotationPoint(1), p.getRotationPoint(2));
 		}
 
@@ -328,21 +329,21 @@ public class Bend extends GroupObject
 			for(int i = 0; i < 4; i++)
 			{
 				Vertex endPoint = new Vertex(baseX[i], childMainVertices.get(0).y, baseZ[i]);
-				rotateVertex(endPoint, child.getRotation(), new float[]{-child.getRotationPoint(0), -child.getRotationPoint(1), -child.getRotationPoint(2)});
+				rotateVertex(endPoint, child.getValues(), new float[]{-child.getRotationPoint(0), -child.getRotationPoint(1), -child.getRotationPoint(2)});
 
 				float bezierX = baseX[i];
 				float bezierY = -child.getRotationPoint(1);
 				float bezierZ = baseZ[i];
 
 
-				if(child.getRotation(0) != 0.0F || child.getRotation(2) != 0.0F)
+				if(child.getValue(0) != 0.0F || child.getValue(2) != 0.0F)
 				{
 					Vertex additionalPoint = new Vertex(baseX[i], childMainVertices.get(0).y - 1, baseZ[i]);
-					rotateVertex(additionalPoint, child.getRotation(), new float[]{-child.getRotationPoint(0), -child.getRotationPoint(1), -child.getRotationPoint(2)});
+					rotateVertex(additionalPoint, child.getValues(), new float[]{-child.getRotationPoint(0), -child.getRotationPoint(1), -child.getRotationPoint(2)});
 					float p1 = endPoint.z;
 					float p2 = additionalPoint.z;
 					float p3 = bezierZ;
-					if(Math.abs(child.getRotation(0)) < Math.abs(child.getRotation(2)))
+					if(Math.abs(child.getValue(0)) < Math.abs(child.getValue(2)))
 					{
 						p1 = endPoint.x;
 						p2 = additionalPoint.x;
@@ -377,7 +378,7 @@ public class Bend extends GroupObject
 		for(int i = 0; i < 4; i++)
 		{	
 			Vertex endPoint = new Vertex(baseX[i], childMainVertices.get(0).y, baseZ[i]);
-			rotateVertex(endPoint, child.getRotation(), new float[]{-child.getRotationPoint(0), -child.getRotationPoint(1), -child.getRotationPoint(2)});
+			rotateVertex(endPoint, child.getValues(), new float[]{-child.getRotationPoint(0), -child.getRotationPoint(1), -child.getRotationPoint(2)});
 			bottomVertices[i] = endPoint;
 		}
 
@@ -413,21 +414,21 @@ public class Bend extends GroupObject
 			for(int i = 0; i < 4; i++)
 			{
 				Vertex endPoint = new Vertex(baseX[i], childMainVertices.get(0).y, baseZ[i]);
-				rotateVertex(endPoint, child.getRotation(), new float[]{-child.getRotationPoint(0), -child.getRotationPoint(1), -child.getRotationPoint(2)});
+				rotateVertex(endPoint, child.getValues(), new float[]{-child.getRotationPoint(0), -child.getRotationPoint(1), -child.getRotationPoint(2)});
 
 				float bezierX = baseX[i];
 				float bezierY = -child.getRotationPoint(1);
 				float bezierZ = baseZ[i];
 
 
-				if(child.getRotation(0) != 0.0F || child.getRotation(2) != 0.0F)
+				if(child.getValue(0) != 0.0F || child.getValue(2) != 0.0F)
 				{
 					Vertex additionalPoint = new Vertex(baseX[i], childMainVertices.get(0).y - 1, baseZ[i]);
-					rotateVertex(additionalPoint, child.getRotation(), new float[]{-child.getRotationPoint(0), -child.getRotationPoint(1), -child.getRotationPoint(2)});
+					rotateVertex(additionalPoint, child.getValues(), new float[]{-child.getRotationPoint(0), -child.getRotationPoint(1), -child.getRotationPoint(2)});
 					float p1 = endPoint.z;
 					float p2 = additionalPoint.z;
 					float p3 = bezierZ;
-					if(Math.abs(child.getRotation(0)) < Math.abs(child.getRotation(2)))
+					if(Math.abs(child.getValue(0)) < Math.abs(child.getValue(2)))
 					{
 						p1 = endPoint.x;
 						p2 = additionalPoint.x;
@@ -468,7 +469,7 @@ public class Bend extends GroupObject
 		for(int i = 0; i < 4; i++)
 		{	
 			Vertex endPoint = new Vertex(baseX[i], childMainVertices.get(0).y, baseZ[i]);
-			rotateVertex(endPoint, child.getRotation(), new float[]{-child.getRotationPoint(0), -child.getRotationPoint(1), -child.getRotationPoint(2)});
+			rotateVertex(endPoint, child.getValues(), new float[]{-child.getRotationPoint(0), -child.getRotationPoint(1), -child.getRotationPoint(2)});
 			bottomVertices[i] = endPoint;
 		}
 

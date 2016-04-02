@@ -10,8 +10,8 @@ import net.minecraft.nbt.NBTTagList;
 import MCEntityAnimator.Util;
 import MCEntityAnimator.render.objRendering.EntityObj;
 import MCEntityAnimator.render.objRendering.ModelObj;
-import MCEntityAnimator.render.objRendering.PartObj;
 import MCEntityAnimator.render.objRendering.RenderObj;
+import MCEntityAnimator.render.objRendering.parts.PartObj;
 
 public class AnimationParenting 
 {
@@ -134,7 +134,7 @@ public class AnimationParenting
 			for (int i = 0; i < parentNBTList.tagCount(); i++)
 			{
 				NBTTagCompound parentCompound = parentNBTList.getCompoundTagAt(i);
-				PartObj parent = Util.getPartFromName(parentCompound.getString("Parent"), entityModel.parts);
+				PartObj parent = Util.getPartObjFromName(parentCompound.getString("Parent"), entityModel.parts);
 				int j = 0;
 				while(parentCompound.hasKey("Child" + j))
 				{
@@ -145,7 +145,7 @@ public class AnimationParenting
 						name = name.substring(0, name.length() - 1);
 						hasBend = true;
 					}
-					PartObj child = Util.getPartFromName(name, entityModel.parts);
+					PartObj child = Util.getPartObjFromName(name, entityModel.parts);
 					entityModel.setParent(child, parent, hasBend);
 					j++;
 				}

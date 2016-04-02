@@ -2,29 +2,17 @@ package MCEntityAnimator.gui;
 
 import java.awt.Desktop;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.ArrayList;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.nbt.CompressedStreamTools;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
 
 import org.lwjgl.opengl.GL11;
 
 import MCEntityAnimator.Util;
-import MCEntityAnimator.animation.AnimationData;
-import MCEntityAnimator.animation.AnimationParenting;
-import MCEntityAnimator.animation.AnimationSequence;
-import MCEntityAnimator.animation.AnimationStance;
 import MCEntityAnimator.gui.sequence.GuiAnimationSequenceMain;
-import MCEntityAnimator.gui.stance.GuiAnimationStanceMain;
-import MCEntityAnimator.render.objRendering.PartObj;
 
 
 public class GuiAnimationHome extends GuiScreen 
@@ -74,8 +62,19 @@ public class GuiAnimationHome extends GuiScreen
 			{
 			case 0: mc.displayGuiScreen(new GuiAnimationParenting(entityName)); break;
 			case 1: mc.displayGuiScreen(new GuiAnimationSequenceMain(entityName)); break;
-			case 2: mc.displayGuiScreen(new GuiAnimationStanceMain(entityName)); break;
-			case 3: mc.displayGuiScreen(new GuiImportExport(entityName)); break;
+			case 2: /**mc.displayGuiScreen(new GuiAnimationStanceMain(entityName));**/ break;
+			case 3: 
+				File folder = new File(this.mc.mcDataDir.getAbsolutePath() + "/Animation");
+				folder.mkdirs();
+				try 
+				{
+					Desktop.getDesktop().open(folder);
+				} 
+				catch (IOException e) 
+				{
+					e.printStackTrace();
+				}
+				break;
 			}
 		}
 	}

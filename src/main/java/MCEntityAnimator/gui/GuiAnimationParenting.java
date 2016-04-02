@@ -21,8 +21,9 @@ import MCEntityAnimator.animation.AnimationData;
 import MCEntityAnimator.render.objRendering.Bend;
 import MCEntityAnimator.render.objRendering.EntityObj;
 import MCEntityAnimator.render.objRendering.ModelObj;
-import MCEntityAnimator.render.objRendering.PartObj;
 import MCEntityAnimator.render.objRendering.RenderObj;
+import MCEntityAnimator.render.objRendering.parts.Part;
+import MCEntityAnimator.render.objRendering.parts.PartObj;
 
 
 public class GuiAnimationParenting extends GuiScreen 
@@ -64,13 +65,16 @@ public class GuiAnimationParenting extends GuiScreen
 		entityName = par0Str;
 		entityToRender = new EntityObj(mc.theWorld, entityName);
 		entityModel = ((RenderObj) RenderManager.instance.getEntityRenderObject(entityToRender)).getModel(entityName);
-		for(PartObj obj : entityModel.parts)
+		for(Part obj : entityModel.parts)
 		{
-			partNames.add(obj.getName());
-			obj.setToOriginalRotation();
+			//TODO parentable check...
+			if(obj instanceof PartObj)
+			{
+				partNames.add(obj.getName());
+				obj.setToOriginalValues();
+			}
 		}
 		currentPartName = partNames.get(0);
-		entityModel.currentPart = Util.getPartFromName(this.currentPartName, entityModel.parts);
 	}
 
 	/**
@@ -150,7 +154,7 @@ public class GuiAnimationParenting extends GuiScreen
 			this.buttonList.add(yesButton);
 			this.buttonList.add(new GuiButton(44, posX + 167, 200, 50, 20, "No"));
 			this.buttonList.add(new GuiButton(45, posX + 237, 200, 50, 20, "Cancel"));
-			if(!Bend.canCreateBend(Util.getPartFromName(this.currentPartName, entityModel.parts), Util.getPartFromName(parentPartName, entityModel.parts)))
+			if(!Bend.canCreateBend(Util.getPartObjFromName(this.currentPartName, entityModel.parts), Util.getPartObjFromName(parentPartName, entityModel.parts)))
 			{
 				yesButton.enabled = false;
 			}
@@ -244,7 +248,7 @@ public class GuiAnimationParenting extends GuiScreen
 			}
 			this.updateButtons();
 			break;
-		case 41: AnimationData.getAnipar(entityName).unParent(Util.getPartFromName(this.currentPartName, this.entityModel.parts)); this.boolRemove = false; this.updateButtons(); break;
+		case 41: AnimationData.getAnipar(entityName).unParent((PartObj) Util.getPartFromName(this.currentPartName, this.entityModel.parts)); this.boolRemove = false; this.updateButtons(); break;
 		case 42: this.boolRemove = false; this.updateButtons(); break;
 		case 43: parent(true); break;
 		case 44: parent(false); break;
@@ -253,7 +257,6 @@ public class GuiAnimationParenting extends GuiScreen
 		if(button.id > 17 && button.id < 28)
 		{
 			this.currentPartName = button.displayString;
-			entityModel.currentPart = Util.getPartFromName(this.currentPartName, entityModel.parts);
 			this.updateButtons();
 		}
 		if(button.id > 29 && button.id < 40)
@@ -267,9 +270,9 @@ public class GuiAnimationParenting extends GuiScreen
 		boolean flag = true;
 		if(!this.currentPartName.equals(buttonName))
 		{
-			if(AnimationData.getAnipar(entityName).hasParent(Util.getPartFromName(this.currentPartName, entityModel.parts)))
+			if(AnimationData.getAnipar(entityName).hasParent((PartObj) Util.getPartFromName(this.currentPartName, entityModel.parts)))
 			{
-				this.popUp(this.currentPartName + " is already parented to " + AnimationData.getAnipar(entityName).getParent(Util.getPartFromName(this.currentPartName, entityModel.parts)).getName(), 0xFFFF0000);
+				this.popUp(this.currentPartName + " is already parented to " + AnimationData.getAnipar(entityName).getParent((PartObj) Util.getPartFromName(this.currentPartName, entityModel.parts)).getName(), 0xFFFF0000);
 				this.boolRemove = true;
 				this.updateButtons();
 				flag = false;
@@ -291,7 +294,7 @@ public class GuiAnimationParenting extends GuiScreen
 	
 	private void parent(boolean bend) 
 	{
-		entityModel.setParent(Util.getPartFromName(this.currentPartName, entityModel.parts), Util.getPartFromName(parentPartName, entityModel.parts), bend);
+		entityModel.setParent(Util.getPartObjFromName(this.currentPartName, entityModel.parts), Util.getPartObjFromName(parentPartName, entityModel.parts), bend);
 		this.popUp("Parented " + this.currentPartName + " to " + parentPartName, 0xFF00FF00);
 		boolParent = false; 
 		this.updateButtons();
@@ -363,7 +366,7 @@ public class GuiAnimationParenting extends GuiScreen
 			this.drawCenteredString(this.fontRendererObj, "Parent with bend?", posX + 192, posY + 190, 0xFF555555);
 		}
 
-		entityModel.hightlightPart(Util.getPartFromName(this.currentPartName, entityModel.parts));		
+		entityModel.hightlightPart(Util.getPartObjFromName(this.currentPartName, entityModel.parts));		
 
 		boolean flag = true;
 		for(int j = 0; j < 10; j++)
@@ -371,7 +374,7 @@ public class GuiAnimationParenting extends GuiScreen
 			GuiButton b = Util.getButtonFromID(j + 18, this.buttonList);
 			if(b != null && (par1 > b.xPosition && par1 < b.xPosition + b.width && par2 > b.yPosition && par2 < b.yPosition + b.height && !this.currentPartName.equals(b.displayString.substring(0, b.displayString.length() - 1))))
 			{
-				entityModel.hightlightPart(Util.getPartFromName(b.displayString, entityModel.parts));		
+				entityModel.hightlightPart(Util.getPartObjFromName(b.displayString, entityModel.parts));		
 				flag = false;
 				break;
 			}
@@ -379,7 +382,7 @@ public class GuiAnimationParenting extends GuiScreen
 			GuiButton b2 = Util.getButtonFromID(j + 30, this.buttonList);
 			if(b2 != null && (par1 > b2.xPosition && par1 < b2.xPosition + b2.width && par2 > b2.yPosition && par2 < b2.yPosition + b2.height && !this.currentPartName.equals(b2.displayString.substring(0, b2.displayString.length() - 1))))
 			{
-				entityModel.hightlightPart(Util.getPartFromName(b2.displayString, entityModel.parts));		
+				entityModel.hightlightPart(Util.getPartObjFromName(b2.displayString, entityModel.parts));		
 				flag = false;
 				break;
 			}
@@ -387,7 +390,7 @@ public class GuiAnimationParenting extends GuiScreen
 		if(flag)
 		{
 			entityModel.clearHighlights();
-			entityModel.hightlightPart(Util.getPartFromName(this.currentPartName, entityModel.parts));		
+			entityModel.hightlightPart(Util.getPartObjFromName(this.currentPartName, entityModel.parts));		
 		}
 
 

@@ -18,8 +18,6 @@ import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
 
 import MCEntityAnimator.Util;
-import MCEntityAnimator.gui.sequence.timeline.GuiAnimationTimeline;
-import MCEntityAnimator.gui.stance.GuiAnimationStanceCreator;
 import MCEntityAnimator.item.ModelLargeShield;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -77,17 +75,17 @@ public class RenderObj extends RenderLiving
 	protected void renderEquippedItems(EntityLivingBase player, float f)
 	{
 
-		if(Minecraft.getMinecraft() != null && Minecraft.getMinecraft().currentScreen != null && Minecraft.getMinecraft().currentScreen instanceof GuiAnimationTimeline 
-				&& ((GuiAnimationTimeline) Minecraft.getMinecraft().currentScreen).shouldRenderShield())
-		{
-			renderShield();
-		}
-
-		if(Minecraft.getMinecraft() != null && Minecraft.getMinecraft().currentScreen != null && Minecraft.getMinecraft().currentScreen instanceof GuiAnimationStanceCreator 
-				&& ((GuiAnimationStanceCreator) Minecraft.getMinecraft().currentScreen).shouldRenderShield())
-		{
-			renderShield();
-		}
+//		if(Minecraft.getMinecraft() != null && Minecraft.getMinecraft().currentScreen != null && Minecraft.getMinecraft().currentScreen instanceof GuiAnimationTimeline 
+//				&& ((GuiAnimationTimeline) Minecraft.getMinecraft().currentScreen).shouldRenderShield())
+//		{
+//			renderShield();
+//		}
+//
+//		if(Minecraft.getMinecraft() != null && Minecraft.getMinecraft().currentScreen != null && Minecraft.getMinecraft().currentScreen instanceof GuiAnimationStanceCreator 
+//				&& ((GuiAnimationStanceCreator) Minecraft.getMinecraft().currentScreen).shouldRenderShield())
+//		{
+//			renderShield();
+//		}
 		
 		GL11.glColor3f(1.0F, 1.0F, 1.0F);       
 		ItemStack itemstack1 = player.getHeldItem();
@@ -98,9 +96,9 @@ public class RenderObj extends RenderLiving
 		if (itemstack1 != null)
 		{
 			GL11.glPushMatrix();
-			Util.getPartFromName("chest", modelObj.parts).postRender(0.0625f);
-			Util.getPartFromName("armupr", modelObj.parts).postRender(0.0625f);
-			Util.getPartFromName("armlwr", modelObj.parts).postRender(0.0625f);
+			Util.getPartObjFromName("chest", modelObj.parts).postRender(0.0625f);
+			Util.getPartObjFromName("armupr", modelObj.parts).postRender(0.0625f);
+			Util.getPartObjFromName("armlwr", modelObj.parts).postRender(0.0625f);
 			//this.modelBipedMain.bipedRightArm.postRender(0.0625F);
 			GL11.glTranslatef(-0.0625F, 0.2075F, 0.0625F);
 
@@ -141,9 +139,10 @@ public class RenderObj extends RenderLiving
 				GL11.glScalef(f2, -f2, f2);
 				GL11.glRotatef(-100.0F, 1.0F, 0.0F, 0.0F);
 				GL11.glRotatef(45.0F, 0.0F, 1.0F, 0.0F);
-				GL11.glRotatef((float) (Util.getPartFromName("prop", modelObj.parts).getRotation(0)/Math.PI)*180.0F, -1.0F, -0.5F, 1.0F);
-				GL11.glRotatef((float) (Util.getPartFromName("prop", modelObj.parts).getRotation(1)/Math.PI)*180.0F, -0.1F, 1.0F, 0.2F);
-				GL11.glRotatef((float) (Util.getPartFromName("prop", modelObj.parts).getRotation(2)/Math.PI)*180.0F, 1.0F, 0.0F, 1.0F);
+				//TODO prop!!
+//				GL11.glRotatef((float) (Util.getPartObjFromName("prop", modelObj.parts).getRotation(0)/Math.PI)*180.0F, -1.0F, -0.5F, 1.0F);
+//				GL11.glRotatef((float) (Util.getPartObjFromName("prop", modelObj.parts).getRotation(1)/Math.PI)*180.0F, -0.1F, 1.0F, 0.2F);
+//				GL11.glRotatef((float) (Util.getPartObjFromName("prop", modelObj.parts).getRotation(2)/Math.PI)*180.0F, 1.0F, 0.0F, 1.0F);
 				//				File file = new File(Minecraft.getMinecraft().mcDataDir, "Temp.txt");
 				//				try
 				//				{
@@ -202,9 +201,9 @@ public class RenderObj extends RenderLiving
 
 		GL11.glPushMatrix();
 		Minecraft.getMinecraft().renderEngine.bindTexture(shieldTexture);
-		Util.getPartFromName("chest", modelObj.parts).postRender(0.0625f);
-		Util.getPartFromName("armupl", modelObj.parts).postRender(0.0625f);
-		Util.getPartFromName("armlwl", modelObj.parts).postRender(0.0625f);
+		Util.getPartObjFromName("chest", modelObj.parts).postRender(0.0625f);
+		Util.getPartObjFromName("armupl", modelObj.parts).postRender(0.0625f);
+		Util.getPartObjFromName("armlwl", modelObj.parts).postRender(0.0625f);
 		GL11.glTranslatef(-0.375F, 0.0F, 0.0F); 
 		shieldModel.render(player, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0625F);
 		GL11.glPopMatrix();

@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.minecraft.client.gui.GuiButton;
-import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.entity.Entity;
-import MCEntityAnimator.render.objRendering.PartObj;
+import MCEntityAnimator.render.objRendering.parts.Part;
+import MCEntityAnimator.render.objRendering.parts.PartObj;
 
 public class Util 
 {
@@ -42,13 +42,29 @@ public class Util
 //		return mrs;
 //	}
 
-	public static PartObj getPartFromName(String name, ArrayList<PartObj> parts) 
+	public static Part getPartFromName(String name, ArrayList<Part> parts) 
 	{
-		for(PartObj part : parts)
+		for(Part part : parts)
 		{
 			if(part.getName().equals(name))
 			{
 				return part;
+			}
+		}
+		return null;
+	}
+	
+	public static PartObj getPartObjFromName(String name, ArrayList<Part> parts) 
+	{
+		for(Part p : parts)
+		{
+			if(p instanceof PartObj)
+			{
+				PartObj part = (PartObj) p;
+				if(part.getName().equals(name))
+				{
+					return part;
+				}
 			}
 		}
 		return null;
