@@ -99,7 +99,7 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 
 		loadKeyframes();
 		updateAnimation();
-		
+
 		controllerFrame = new ControllerFrame();
 		settingsFrame = new SettingsFrame();
 		timelineFrame = new TimelineFrame();
@@ -176,11 +176,11 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 			//If the movement starts at time zero, and the part isn't in its original position, add a keyframe at time zero.
 			if(animpart.getStartTime() == 0.0F && !animpart.compareRotation(defaults))
 			{
-				Keyframe kf = new Keyframe(0.0F, partName, animpart.getStartPosition());
+				Keyframe kf = new Keyframe(0, partName, animpart.getStartPosition());
 				partKfs.add(kf);
 			}
 			//Add a keyframe for the final position 
-			Keyframe kf = new Keyframe(animpart.getEndTime(), partName, animpart.getEndPosition());
+			Keyframe kf = new Keyframe((int) animpart.getEndTime(), partName, animpart.getEndPosition());
 			partKfs.add(kf);
 			keyframes.put(partName, partKfs);
 		}
@@ -224,9 +224,9 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 			entityModel.hightlightPart((PartObj) currentPart);
 		if(additionalPart instanceof PartObj)
 			entityModel.hightlightPart((PartObj) additionalPart);
-		
+
 		this.animation.animateAll(time, entityModel, exceptionPartName);
-		
+
 		super.drawScreen(par1, par2, par3);
 	}
 
@@ -243,7 +243,7 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 	{
 		Part part = Util.getPartFromName(currentPartName, entityModel.parts);
 		List<Keyframe> partKeyframes = keyframes.get(currentPartName);
-		Keyframe kf = new Keyframe(time, currentPartName, part.getValues());
+		Keyframe kf = new Keyframe((int) time, currentPartName, part.getValues());
 		if(partKeyframes == null)
 			partKeyframes = new ArrayList<Keyframe>();
 		else 
@@ -1016,7 +1016,21 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 				this.addMouseMotionListener(new MouseMotionListener()
 				{
 					@Override
-					public void mouseDragged(MouseEvent arg0) {}
+					public void mouseDragged(MouseEvent e) 
+					{
+						int kfx = (int)(closestKeyframe.frameTime/(float)timelineLength*(getWidth() - 10));
+						int dx = Math.abs(kfx - e.getX());
+						if(dx < 15)
+						{
+							int t = (int) (e.getX()*timelineLength/(float)(getWidth() - 10));
+							if(t >= 0 && t <= 300)
+							{
+								closestKeyframe.frameTime = t;
+								repaint();
+								updateAnimation();
+							}
+						}
+					}
 
 					@Override
 					public void mouseMoved(MouseEvent e)
@@ -1046,6 +1060,7 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 				}
 				closestKeyframe = closestKf;
 			}
+
 
 			@Override
 			public void paint(Graphics g)
@@ -1077,14 +1092,14 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 	private class Keyframe 
 	{
 		String partName;
-		float frameTime;
+		int frameTime;
 		//Rotation for parts and position for entityPosition
 		float[] values;
 		//Is current keyframe, or is a selected keyframe (multiple selected).
 		boolean isCurrent;
 		boolean isSelected;
 
-		public Keyframe(float frameTime, String partName, float[] values)
+		public Keyframe(int frameTime, String partName, float[] values)
 		{
 			this.frameTime = frameTime;		
 			this.partName = partName;
@@ -1112,7 +1127,7 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 		private Keyframe getPreviousKeyframe()
 		{
 			Keyframe previousKf = null;
-			Float prevFt = null;
+			Integer prevFt = null;
 			for(Keyframe kf : keyframes.get(partName))
 			{
 				if(kf.frameTime < frameTime && (prevFt == null || kf.frameTime > prevFt))
@@ -1125,13 +1140,13 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 			{
 				if(partName.equals("entitypos"))
 				{
-					previousKf = new Keyframe(0.0F, partName, new float[]{0.0F, 0.0F, 0.0F});
+					previousKf = new Keyframe(0, partName, new float[]{0.0F, 0.0F, 0.0F});
 				}
 				else
 				{
 					Part part = Util.getPartFromName(this.partName, entityModel.parts);
 					float[] defaults = part.getOriginalValues();
-					previousKf = new Keyframe(0.0F, part.getName(), new float[]{0.0F, 0.0F, 0.0F});
+					previousKf = new Keyframe(0, part.getName(), new float[]{0.0F, 0.0F, 0.0F});
 				}
 			}
 			return previousKf;

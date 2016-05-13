@@ -20,7 +20,7 @@ public class MCEA_Main
 {
 	
 	public static final File resourceFolder = new File(Minecraft.getMinecraft().mcDataDir.getAbsolutePath() + "/Animation");
-	public static final String version = "3.1";
+	public static final String version = "3.2";
 
 	
 	@Mod.Instance("MCEA")
