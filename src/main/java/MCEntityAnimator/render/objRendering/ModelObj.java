@@ -1,11 +1,32 @@
 package MCEntityAnimator.render.objRendering;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.zip.ZipOutputStream;
 
+import org.lwjgl.opengl.GL11;
+
+import com.google.common.collect.Maps;
+
+import MCEntityAnimator.MCEA_Main;
+import MCEntityAnimator.Util;
+import MCEntityAnimator.ZipUtils;
+import MCEntityAnimator.animation.AnimationData;
+import MCEntityAnimator.animation.AnimationParenting;
+import MCEntityAnimator.animation.PartGroupsAndNames;
+import MCEntityAnimator.render.objRendering.parts.Part;
+import MCEntityAnimator.render.objRendering.parts.PartEntityPos;
+import MCEntityAnimator.render.objRendering.parts.PartObj;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelRenderer;
@@ -16,16 +37,6 @@ import net.minecraftforge.client.model.AdvancedModelLoader;
 import net.minecraftforge.client.model.ModelFormatException;
 import net.minecraftforge.client.model.obj.WavefrontObject;
 
-import org.lwjgl.opengl.GL11;
-
-import MCEntityAnimator.animation.AnimationData;
-import MCEntityAnimator.animation.AnimationParenting;
-import MCEntityAnimator.render.objRendering.parts.Part;
-import MCEntityAnimator.render.objRendering.parts.PartEntityPos;
-import MCEntityAnimator.render.objRendering.parts.PartObj;
-
-import com.google.common.collect.Maps;
-
 public class ModelObj extends ModelBase
 {
 
@@ -34,22 +45,27 @@ public class ModelObj extends ModelBase
 	public ArrayList<Part> parts;
 	private ArrayList<Bend> bends;
 	private AnimationParenting parenting;
+	public PartGroupsAndNames groupsAndNames;
 	private Map<PartObj, float[]> defaults;
+	//private Map<String, List<PartObj>> groups;
+
 	private PartObj mainHighlight = null;
 	private ArrayList<PartObj> hightlightedParts;
 
 	public static final float initRotFix = 180.0F;
 	public static final float offsetFixY = -1.5F;
 
-	private final ResourceLocation modelRL;
-	private final ResourceLocation pxyRL;
-	
+	private final ResourceLocation modelRL, txtRL, pxyRL;
+
 	public boolean renderWithTexture;
-	
+
+	private boolean partSetupComplete;
+
 	public ModelObj(String par0Str)
 	{	
 		entityType = par0Str;
 		modelRL = new ResourceLocation("mod_mcea:objModels/" + entityType + "/" + entityType + ".obj");
+		txtRL = new ResourceLocation("mod_mcea:objModels/" + entityType + "/" + entityType + ".png");
 		pxyRL = new ResourceLocation("mod_mcea:objModels/" + entityType + "/" + entityType + ".pxy");
 		model = (WavefrontObject) AdvancedModelLoader.loadModel(modelRL);
 		parts = ObjUtil.createPartObjList(this, model.groupObjects);
@@ -60,9 +76,12 @@ public class ModelObj extends ModelBase
 		defaults = Maps.newHashMap();
 		loadFromFile();
 		renderWithTexture = true;
+		partSetupComplete = true;
+		groupsAndNames = AnimationData.getPartGroupsAndNames(entityType, this);
+
 		init();
 	}
-	
+
 	public void init() 
 	{
 		for(Part p : this.parts)
@@ -78,17 +97,16 @@ public class ModelObj extends ModelBase
 			}
 		}		
 	}
-	
+
 	public float[] getDefaults(PartObj part)
 	{
 		return defaults.get(part).clone();
 	}
-	
+
 	public String getEntityType()
 	{
 		return entityType;
 	}
-
 
 	private void loadFromFile() 
 	{
@@ -99,36 +117,47 @@ public class ModelObj extends ModelBase
 			String currentLine;
 			PartObj currentPart = null;
 			int i = 0;
+			boolean readingRotation = true;
 
 			while ((currentLine = reader.readLine()) != null)
 			{
-				switch(i)
+				if(currentLine.equals("PART SETUP"))
+					readingRotation = false;
+
+				if(readingRotation)
 				{
-				case 0: 
-					for(Part p : parts)
+					switch(i)
 					{
-						if(p instanceof PartObj)
+					case 0: 
+						for(Part p : parts)
 						{
-							PartObj obj = (PartObj) p;
-							if(obj.getName().equals(currentLine))
+							if(p instanceof PartObj)
 							{
-								currentPart = obj;
-								break;
+								PartObj obj = (PartObj) p;
+								if(obj.getName().equals(currentLine))
+								{
+									currentPart = obj;
+									break;
+								}
 							}
 						}
+						i++;
+						break;
+					case 1:
+						currentPart.setRotationPoint(read3Floats(currentLine));
+						i++;
+						break;
+					case 2:
+						float[] rot = read3Floats(currentLine);
+						currentPart.setOriginalValues(rot);
+						currentPart.setValues(rot);
+						i = 0;
+						break;
 					}
-					i++;
-					break;
-				case 1:
-					currentPart.setRotationPoint(read3Floats(currentLine));
-					i++;
-					break;
-				case 2:
-					float[] rot = read3Floats(currentLine);
-					currentPart.setOriginalValues(rot);
-					currentPart.setValues(rot);
-					i = 0;
-					break;
+				}
+				else
+				{
+
 				}
 			}
 		}
@@ -137,71 +166,153 @@ public class ModelObj extends ModelBase
 			throw new ModelFormatException("IO Exception reading model format", e);
 		}
 	}
-	
-//----------------------------------------------------------------
-//						Parenting
-//----------------------------------------------------------------
-	
+
+	//----------------------------------------------------------------
+	//				     Parts and Groups
+	//----------------------------------------------------------------
+
+	public List<PartObj> getPartObjs()
+	{
+		List<PartObj> partObjs = new ArrayList<PartObj>();
+		for(Part part : parts)
+		{
+			if(part instanceof PartObj)
+				partObjs.add((PartObj) part);
+		}
+		return partObjs;
+	}
+
+	public String getPartOrderAsString()
+	{
+		String s = "";
+		for(PartObj p : getPartObjs())
+		{
+			s = s + p.getName() + ",";
+		}
+		s = s.substring(0, s.length() - 1);
+		return s;
+	}
+
+	public void setPartOrderFromString(String order)
+	{
+		ArrayList<Part> newPartList = new ArrayList<Part>();
+		for(String partName : order.split(","))
+		{
+			newPartList.add(Util.getPartFromName(partName, parts));
+		}
+		for(Part part : parts)
+		{
+			if(!newPartList.contains(part))
+				newPartList.add(part);
+		}
+		parts = newPartList;
+	}
+
+	public void exportSource()
+	{
+		try
+		{
+			for(int i = 0; i < 3; i++)
+			{
+				ResourceLocation resLoc = null;
+				String fileExtension = "";
+				switch(i)
+				{
+				case 0: 
+					resLoc = modelRL; 
+					fileExtension = ".obj";
+					break;
+				case 1: 
+					resLoc = txtRL;
+					fileExtension = ".png";
+					break;
+				case 2: 
+					resLoc = pxyRL;
+					fileExtension = ".pxy";
+					break;
+				}
+
+				IResource res = Minecraft.getMinecraft().getResourceManager().getResource(resLoc);
+				InputStream input = res.getInputStream();
+
+				File file = new File(MCEA_Main.getEntityAnimationFolder(entityType), entityType + fileExtension);
+				file.createNewFile();
+				FileOutputStream output = new FileOutputStream(file, false);
+
+				int read = 0;
+				byte[] bytes = new byte[1024];
+
+				while ((read = input.read(bytes)) != -1) 
+				{
+					output.write(bytes, 0, read);
+				}
+
+				output.close();
+			}  	
+		}
+		catch(Exception e)
+		{
+			System.out.println(e.getStackTrace());
+		}
+	}
+
+	public void appendGroups()
+	{
+		try
+		{
+			//Get existing text that is correct.
+			List<String> lines = new ArrayList<String>();
+			File file = new File(MCEA_Main.getEntityAnimationFolder(entityType), entityType + ".pxy");
+			FileReader reader = new FileReader(file);
+			BufferedReader bufferedReader = new BufferedReader(reader);
+			String currentLine;
+			boolean flag = false;
+			while(!flag && (currentLine = bufferedReader.readLine()) != null)
+			{
+				if(currentLine.equals("Part Setup"))
+					flag = true;
+				lines.add(currentLine);
+			}
+			bufferedReader.close();
+
+			//Write correct existing text and append groups.
+			FileWriter writer = new FileWriter(file);
+			BufferedWriter bufferedWriter = new BufferedWriter(writer);
+			for(String line : lines)
+			{
+				bufferedWriter.write(line);
+				bufferedWriter.newLine();
+			}	
+			for(PartObj p : this.getPartObjs())
+			{
+				bufferedWriter.write(p.getDisplayName() + ":" + groupsAndNames.getPartGroup(p));
+				bufferedWriter.newLine();
+			}
+			bufferedWriter.close();	
+		}
+		catch(Exception e)
+		{
+			System.out.println(e.getStackTrace());
+		}
+	}
+
+	public void packageEntityFilesToZip()
+	{
+		ZipUtils.zipFolder(MCEA_Main.getEntityAnimationFolder(entityType).getAbsolutePath(), new File(MCEA_Main.getEntityAnimationFolder(entityType), entityType + ".zip").getAbsolutePath());
+	}
+
+	//----------------------------------------------------------------
+	//						Parenting
+	//----------------------------------------------------------------
+
 	public void setParent(PartObj child, PartObj parent, boolean addBend)
 	{
-//		float[] originalParentValues = new float[6];
-//		originalParentValues[0] = Float.valueOf(parent.getRotation(0));
-//		originalParentValues[1] = Float.valueOf(parent.getRotation(1));
-//		originalParentValues[2] = Float.valueOf(parent.getRotation(2));
-//		originalParentValues[3] = Float.valueOf(parent.getRotationPoint(0));
-//		originalParentValues[4] = Float.valueOf(parent.getRotationPoint(1));
-//		originalParentValues[5] = Float.valueOf(parent.getRotationPoint(2));
-//		if(parenting.hasParent(parent))
-//		{
-//			float[] defs = this.defaults.get(parent);
-//			parent.setRotation(new float[]{defs[0], defs[1], defs[2]});
-//			parent.setRotationPoint(new float[]{defs[3], defs[4], defs[5]});;
-//		}
-//		float xDif = child.getRotation(0) - parent.getRotation(0);
-//		float yDif = child.getRotation(1) - parent.getRotation(1);
-//		float zDif = child.getRotation(2) - parent.getRotation(2);
-//		float xRotP = 0.0F;
-//		float yRotP = 0.0F;
-//		float zRotP = 0.0F;
-//		child.setRotation(new float[]{child.getRotation(0) - parent.getRotation(0), child.getRotation(1) - parent.getRotation(1), 
-//											child.getRotation(2) - parent.getRotation(2)});
-//		if(parent.getRotation(0) != 0.0F)
-//		{
-//			yRotP = (float) (yDif*Math.cos(-parent.getRotation(0)) - zDif*Math.sin(-parent.getRotation(0)));
-//			zRotP = (float) (yDif*Math.sin(-parent.getRotation(0)) + zDif*Math.cos(-parent.getRotation(0)));
-//			yDif = yRotP;
-//			zDif = zRotP;
-//			parent.setRotation(0, 0.0F);
-//		}
-//		if(parent.getRotation(1) != 0.0F)
-//		{
-//			xRotP = (float) (xDif*Math.cos(-parent.getRotation(1)) + zDif*Math.sin(-parent.getRotation(1)));
-//			zRotP = (float) (-xDif*Math.sin(-parent.getRotation(1)) + zDif*Math.cos(-parent.getRotation(1)));
-//			xDif = xRotP;
-//			zDif = zRotP;
-//			parent.setRotation(1, 0.0F);
-//		}
-//		if(parent.getRotation(2) != 0.0F)
-//		{
-//			xRotP = (float) (xDif*Math.cos(-parent.getRotation(2)) - yDif*Math.sin(-parent.getRotation(2)));
-//			yRotP = (float) (xDif*Math.sin(-parent.getRotation(2)) + yDif*Math.cos(-parent.getRotation(2)));
-//			xDif = xRotP;
-//			yDif = yRotP;
-//			parent.setRotation(2, 0.0F);
-//		}
-//		if(xRotP == 0.0F){xRotP = xDif;}
-//		if(yRotP == 0.0F){yRotP = yDif;}
-//		if(zRotP == 0.0F){zRotP = zDif;}
-//		child.setRotationPoint(new float[]{xRotP, yRotP, zRotP});
-//		parent.setRotation(new float[]{originalParentValues[0], originalParentValues[1], originalParentValues[2]});
-//		parent.setRotationPoint(new float[]{originalParentValues[3], originalParentValues[4], originalParentValues[5]});
-//		postParentingRotations.put(child, new float[]{child.getRotation(0), child.getRotation(1), child.getRotation(2)});
 		parenting.addParent(parent, child);
 		if(addBend)
 		{			
 			boolean prevRenderWithTexture = renderWithTexture;
 			renderWithTexture = true;
-			
+
 			for(Part p : this.parts)
 			{
 				if(p instanceof PartObj)
@@ -210,42 +321,42 @@ public class ModelObj extends ModelBase
 					obj.updateTextureCoordinates(false, false);
 				}
 			}
-			
+
 			Bend b = new Bend(child, parent);
 			bends.add(b);
 			child.setBend(b);
-			
+
 			renderWithTexture = prevRenderWithTexture;
 		}
 	}
-	
+
 
 	public void removeBend(Bend bend) 
 	{
 		bends.remove(bend);
 	}
-	
 
-//----------------------------------------------------------------
-//							Rotation
-//----------------------------------------------------------------
-	
+
+	//----------------------------------------------------------------
+	//							Rotation
+	//----------------------------------------------------------------
+
 	public void setRotation(ModelRenderer model, float x, float y, float z)
 	{
 		model.rotateAngleX = x;
 		model.rotateAngleY = y;
 		model.rotateAngleZ = z;
 	}
-	
+
 	public void setRotationAngles(float f, float f1, float f2, float f3, float f4, float f5, Entity entity) 
 	{				
 		super.setRotationAngles(f, f1, f2, f3, f4, f5, entity);
 	}
-	
-//----------------------------------------------------------------
-// 							Highlighting
-//----------------------------------------------------------------
-	
+
+	//----------------------------------------------------------------
+	// 							Highlighting
+	//----------------------------------------------------------------
+
 	/**
 	 * Add a part to be highlighted
 	 */
@@ -262,7 +373,7 @@ public class ModelObj extends ModelBase
 		this.hightlightedParts.clear();
 		this.mainHighlight = null;
 	}
-	
+
 	public boolean isPartHighlighted(PartObj partObj) 
 	{
 		return mainHighlight == partObj || hightlightedParts.contains(partObj);
@@ -273,11 +384,11 @@ public class ModelObj extends ModelBase
 	{
 		return mainHighlight == partObj;
 	}
-	
-//----------------------------------------------------------------
-//							Rendering
-//----------------------------------------------------------------
-	
+
+	//----------------------------------------------------------------
+	//							Rendering
+	//----------------------------------------------------------------
+
 	@Override
 	public void render(Entity entity, float time, float distance, float loop, float lookY, float lookX, float scale) 
 	{		
@@ -300,20 +411,20 @@ public class ModelObj extends ModelBase
 			else
 				p.move(entity);
 		}
-		
+
 		for(Bend bend : this.bends)
 		{
 			bend.render();
 		}
 
 		GL11.glPopMatrix();
-	
+
 		//TODO rendering with different textures - for highlighting parts but also for rendering with actual textures.
 	}
-	
-//----------------------------------------------------------------
-//							Utils
-//----------------------------------------------------------------
+
+	//----------------------------------------------------------------
+	//							Utils
+	//----------------------------------------------------------------
 
 	private static float[] read3Floats(String str)
 	{

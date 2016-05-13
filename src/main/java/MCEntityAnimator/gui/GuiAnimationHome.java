@@ -4,15 +4,20 @@ import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
 
+import org.lwjgl.opengl.GL11;
+
+import MCEntityAnimator.MCEA_Main;
+import MCEntityAnimator.Util;
+import MCEntityAnimator.animation.AnimationData;
+import MCEntityAnimator.gui.sequence.GuiAnimationSequenceMain;
+import MCEntityAnimator.render.objRendering.EntityObj;
+import MCEntityAnimator.render.objRendering.ModelObj;
+import MCEntityAnimator.render.objRendering.RenderObj;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.util.ResourceLocation;
-
-import org.lwjgl.opengl.GL11;
-
-import MCEntityAnimator.Util;
-import MCEntityAnimator.gui.sequence.GuiAnimationSequenceMain;
 
 
 public class GuiAnimationHome extends GuiScreen 
@@ -44,11 +49,12 @@ public class GuiAnimationHome extends GuiScreen
 	public void updateButtons()
 	{
 		this.buttonList.clear();
-		this.buttonList.add(new GuiButton(0, posX + 5, posY + 19, 70, 20, "Parenting"));
-		this.buttonList.add(new GuiButton(1, posX + 5, posY + 41, 70, 20, "Sequences"));
-		this.buttonList.add(new GuiButton(2, posX + 5, posY + 63, 70, 20, "Stances"));
-		((GuiButton) this.buttonList.get(2)).enabled = false;
-		this.buttonList.add(new GuiButton(3, posX + 5, posY + 85, 70, 20, "Distribution"));
+		this.buttonList.add(new GuiButton(0, posX + 5, posY + 19, 70, 20, "Part Setup"));
+		this.buttonList.add(new GuiButton(1, posX + 5, posY + 41, 70, 20, "Parenting"));
+		this.buttonList.add(new GuiButton(2, posX + 5, posY + 63, 70, 20, "Sequences"));
+		this.buttonList.add(new GuiButton(3, posX + 5, posY + 85, 70, 20, "Stances"));
+		((GuiButton) this.buttonList.get(3)).enabled = false;
+		this.buttonList.add(new GuiButton(4, posX + 5, posY + 107, 70, 20, "Distribution"));
 	}
 
 	/**
@@ -60,21 +66,11 @@ public class GuiAnimationHome extends GuiScreen
 		{
 			switch(button.id)
 			{
-			case 0: mc.displayGuiScreen(new GuiAnimationParenting(entityName)); break;
-			case 1: mc.displayGuiScreen(new GuiAnimationSequenceMain(entityName)); break;
-			case 2: /**mc.displayGuiScreen(new GuiAnimationStanceMain(entityName));**/ break;
-			case 3: 
-				File folder = new File(this.mc.mcDataDir.getAbsolutePath() + "/Animation");
-				folder.mkdirs();
-				try 
-				{
-					Desktop.getDesktop().open(folder);
-				} 
-				catch (IOException e) 
-				{
-					e.printStackTrace();
-				}
-				break;
+			case 0: mc.displayGuiScreen(new GuiPartSetup(entityName)); break;
+			case 1: mc.displayGuiScreen(new GuiAnimationParenting(entityName)); break;
+			case 2: mc.displayGuiScreen(new GuiAnimationSequenceMain(entityName)); break;
+			case 3: /**mc.displayGuiScreen(new GuiAnimationStanceMain(entityName));**/ break;
+			case 4: export(); break;
 			}
 		}
 	}
@@ -108,6 +104,26 @@ public class GuiAnimationHome extends GuiScreen
 		if(init < 5)
 		{
 			init += 1;
+		}
+	}
+	
+	private void export()
+	{
+		EntityObj entity = new EntityObj(Minecraft.getMinecraft().theWorld, entityName);
+		ModelObj entityModel = ((RenderObj) RenderManager.instance.getEntityRenderObject(entity)).getModel(entityName);
+		
+		entityModel.exportSource();
+		entityModel.appendGroups();
+		entityModel.packageEntityFilesToZip();
+		
+		File folder = MCEA_Main.resourceFolder;
+		try 
+		{
+			Desktop.getDesktop().open(folder);
+		} 
+		catch (IOException e) 
+		{
+			e.printStackTrace();
 		}
 	}
 }

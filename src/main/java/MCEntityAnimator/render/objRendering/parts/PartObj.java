@@ -27,11 +27,13 @@ public class PartObj extends Part
 	private boolean visible;
 	private Bend bend = null;
 	public GroupObject groupObj;
+	private String displayName;
 
 	public PartObj(ModelObj modelObject, GroupObject groupObj) 
 	{
 		super(modelObject, (groupObj.name.contains("_") ? groupObj.name.substring(0, groupObj.name.indexOf("_")) : groupObj.name).toLowerCase());
 		this.groupObj = groupObj;
+		this.displayName = getName();
 		children = new ArrayList<PartObj>();
 		defaultTextureCoords = new HashMap<Face, TextureCoordinate[]>();
 		updateDefaultTextureCoordinates();
@@ -42,6 +44,17 @@ public class PartObj extends Part
 	//  			Basics
 	//------------------------------------------
 
+	@Override
+	public String getDisplayName()
+	{
+		return displayName;
+	}
+	
+	public void setDisplayName(String displayName)
+	{
+		this.displayName = displayName;
+	}
+	
 	public void setShowModel(boolean show)
 	{
 		showModel = show;

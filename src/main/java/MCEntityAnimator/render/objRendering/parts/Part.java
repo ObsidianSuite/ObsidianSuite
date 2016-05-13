@@ -40,6 +40,11 @@ public abstract class Part
 	{
 		return name;
 	}
+	
+	public String getDisplayName()
+	{
+		return getName();
+	}
 
 	public void setValues(float[] values)
 	{

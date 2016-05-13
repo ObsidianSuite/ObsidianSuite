@@ -20,7 +20,7 @@ public class DataHandler
 {
 
 
-	private final static File resourceFolder = new File(System.getProperty("user.dir"), "/Animation");
+	private final static File resourceFolder = MCEA_Main.resourceFolder;
 	private final static File saveFile = new File(resourceFolder, "AnimationData.data");
 
 	public void saveNBTData()
@@ -64,8 +64,7 @@ public class DataHandler
 		{
 			e.printStackTrace();
 		}
-		
-		
+
 		
 //		if(!importFolder.exists())
 //		{

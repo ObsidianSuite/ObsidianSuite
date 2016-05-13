@@ -108,4 +108,9 @@ public class Util
 		return pos;
 	}
 	
+	public void checkForUpdate()
+	{
+		
+	}
+	
 }

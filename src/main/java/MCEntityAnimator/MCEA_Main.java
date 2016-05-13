@@ -1,20 +1,28 @@
 package MCEntityAnimator;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.material.Material;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.item.Item;
-import net.minecraftforge.common.MinecraftForge;
+import java.io.File;
+
 import MCEntityAnimator.block.BlockTest;
 import MCEntityAnimator.item.ItemWeapon;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
+import net.minecraft.block.Block;
+import net.minecraft.block.material.Material;
+import net.minecraft.client.Minecraft;
+import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.item.Item;
+import net.minecraftforge.common.MinecraftForge;
 
 @Mod(modid = "MCEA")
 public class MCEA_Main
 {
+	
+	public static final File resourceFolder = new File(Minecraft.getMinecraft().mcDataDir.getAbsolutePath() + "/Animation");
+	public static final String version = "3.1";
+
+	
 	@Mod.Instance("MCEA")
 	public static MCEA_Main instance;
 
@@ -37,7 +45,9 @@ public class MCEA_Main
 		
 	@Mod.EventHandler
 	public void init(FMLInitializationEvent event)
-	{
+	{		
+		
+		
 		instance = this;
 		
 		proxy.init();
@@ -49,6 +59,13 @@ public class MCEA_Main
         {
             FMLCommonHandler.instance().bus().register(new KeyHandler());
         }
+	}
+	
+	public static File getEntityAnimationFolder(String entityName)
+	{
+		File folder = new File(resourceFolder, entityName);
+		folder.mkdirs();
+		return folder;
 	}
 
 }

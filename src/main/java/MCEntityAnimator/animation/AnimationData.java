@@ -3,11 +3,15 @@ package MCEntityAnimator.animation;
 import java.util.ArrayList;
 import java.util.Map;
 
-import net.minecraft.client.model.ModelRenderer;
+import com.google.common.collect.Maps;
+
+import MCEntityAnimator.render.objRendering.EntityObj;
+import MCEntityAnimator.render.objRendering.ModelObj;
+import MCEntityAnimator.render.objRendering.RenderObj;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-
-import com.google.common.collect.Maps;
 
 public class AnimationData 
 {	
@@ -17,14 +21,13 @@ public class AnimationData
 	private static Map<String, String> animationSetup = Maps.newHashMap();
 	private static Map<String, String> stanceSetup = Maps.newHashMap();
 	private static Map<String, String> parentingSetup = Maps.newHashMap();
+	private static Map<String, PartGroupsAndNames> partGroupsAndNames = Maps.newHashMap();
 
 
 	public static AnimationParenting getAnipar(String par0Str) 
 	{
 		if(!parenting.containsKey(par0Str) || parenting.get(par0Str) == null)
-		{
 			parenting.put(par0Str, new AnimationParenting());
-		}
 		return parenting.get(par0Str);
 	}
 
@@ -132,12 +135,23 @@ public class AnimationData
 	{
 		return parentingSetup.get(entityName);
 	}
+	
+	public static PartGroupsAndNames getPartGroupsAndNames(String entityName, ModelObj model)
+	{
+		if(partGroupsAndNames.containsKey(entityName) && partGroupsAndNames.get(entityName) != null)
+			return partGroupsAndNames.get(entityName);
+		PartGroupsAndNames p = new PartGroupsAndNames(model);
+		partGroupsAndNames.put(entityName, p);
+		return p;
+	}
 
 	public static void saveData(NBTTagCompound compound) 
 	{
 		NBTTagList entityList = new NBTTagList();
+		//Loop through every entity.
 		for(String entity : parenting.keySet())
 		{
+			//save entity  - name and various GUI setups.
 			NBTTagCompound entityCompound = new NBTTagCompound();
 			entityCompound.setString("EntityName", entity);
 			String setup;
@@ -154,8 +168,11 @@ public class AnimationData
 				entityCompound.setString("ParentingSetup", setup);
 			}
 			entityList.appendTag(entityCompound);
+			
+			//Save parenting
 			compound.setTag(entity + "Parenting", getAnipar(entity).getSaveData(entity));
-
+			
+			//Save sequences
 			if(sequences.containsKey(entity))
 			{
 				NBTTagList sequenceList = new NBTTagList();
@@ -166,6 +183,7 @@ public class AnimationData
 				compound.setTag(entity + "Sequences", sequenceList);		
 			}
 
+			//Save stances
 			if(stances.containsKey(entity))
 			{
 				NBTTagList stanceList = new NBTTagList();
@@ -175,42 +193,58 @@ public class AnimationData
 				}		
 				compound.setTag(entity + "Stances", stanceList);		
 			}
+			
+			//Save groups and part names
+			if(partGroupsAndNames.get(entity) != null)
+				compound.setTag(entity + "GroupsAndName", partGroupsAndNames.get(entity).getSaveData(entity));
 		}
+		
+		//Add to compound.
 		compound.setTag("Entities", entityList);
 	}
 
 	public static void loadData(NBTTagCompound compound) 
 	{
 		NBTTagList entityList = compound.getTagList("Entities", 10);
+		//Loop through every entity
 		for(int i = 0; i < entityList.tagCount(); i++)
 		{
+			//Load entity and gui stuff
 			NBTTagCompound entityCompound = entityList.getCompoundTagAt(i);
-			String entity = entityCompound.getString("EntityName");
-			setAnimationSetup(entity, entityCompound.getString("AnimationSetup"));
-			setStanceSetup(entity, entityCompound.getString("StanceSetup"));
-			setParentingSetup(entity, entityCompound.getString("ParentingSetup"));
-			AnimationParenting anipar = getAnipar(entity);
-			anipar.loadData(compound.getCompoundTag(entity + "Parenting"), entity);
+			String entityName = entityCompound.getString("EntityName");
+			setAnimationSetup(entityName, entityCompound.getString("AnimationSetup"));
+			setStanceSetup(entityName, entityCompound.getString("StanceSetup"));
+			setParentingSetup(entityName, entityCompound.getString("ParentingSetup"));
+			
+			//Load paretning
+			AnimationParenting anipar = getAnipar(entityName);
+			anipar.loadData(compound.getCompoundTag(entityName + "Parenting"), entityName);
 
+			//Load sequences
 			ArrayList<AnimationSequence> sqs = new ArrayList<AnimationSequence>();
-			NBTTagList sequenceList = compound.getTagList(entity + "Sequences", 10);
+			NBTTagList sequenceList = compound.getTagList(entityName + "Sequences", 10);
 			for(int j = 0; j < sequenceList.tagCount(); j++)
 			{
 				AnimationSequence sequence = new AnimationSequence("");
-				sequence.loadData(entity, sequenceList.getCompoundTagAt(j));
+				sequence.loadData(entityName, sequenceList.getCompoundTagAt(j));
 				sqs.add(sequence);
 			}
-			sequences.put(entity, sqs);
+			sequences.put(entityName, sqs);
 
+			//Load stances
 			ArrayList<AnimationStance> sts = new ArrayList<AnimationStance>();
-			NBTTagList stanceList = compound.getTagList(entity + "Stances", 10);
+			NBTTagList stanceList = compound.getTagList(entityName + "Stances", 10);
 			for(int j = 0; j < stanceList.tagCount(); j++)
 			{
 				AnimationStance stance = new AnimationStance();
 				stance.loadData(stanceList.getCompoundTagAt(j));
 				sts.add(stance);
 			}
-			stances.put(entity, sts);
+			stances.put(entityName, sts);
+			
+			//Load groups and part names
+			PartGroupsAndNames p = partGroupsAndNames.get(entityName);
+			p.loadData(compound.getCompoundTag(entityName + "GroupsAndName"), entityName);
 		}
 	}
 
