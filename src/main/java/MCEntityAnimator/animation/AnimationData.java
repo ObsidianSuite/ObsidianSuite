@@ -13,22 +13,37 @@ import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 
+/*
+ * Contains all the data for animations and models.
+ * 
+ * Also holds information regarding the setup of GUIs (zoom, rotation, position etc.)
+ */
+
 public class AnimationData 
 {	
+	
+	//All sequences, stances and parenting data.
 	private static Map<String, ArrayList<AnimationSequence>> sequences = Maps.newHashMap();	
 	private static Map<String, ArrayList<AnimationStance>> stances = Maps.newHashMap();	
 	private static Map<String, AnimationParenting> parenting = Maps.newHashMap();
+	
+	//Setup for GUIs
 	private static Map<String, String> animationSetup = Maps.newHashMap();
 	private static Map<String, String> stanceSetup = Maps.newHashMap();
 	private static Map<String, String> parentingSetup = Maps.newHashMap();
+	
+	//List of part names and groupings. 
 	private static Map<String, PartGroupsAndNames> partGroupsAndNames = Maps.newHashMap();
 
-
-	public static AnimationParenting getAnipar(String par0Str) 
+	/**
+	 * Get the animation parenting that applies to this model.
+	 * Will return a new one if one doesn't already exist.
+	 */
+	public static AnimationParenting getAnipar(String model) 
 	{
-		if(!parenting.containsKey(par0Str) || parenting.get(par0Str) == null)
-			parenting.put(par0Str, new AnimationParenting());
-		return parenting.get(par0Str);
+		if(!parenting.containsKey(model) || parenting.get(model) == null)
+			parenting.put(model, new AnimationParenting());
+		return parenting.get(model);
 	}
 
 	/**

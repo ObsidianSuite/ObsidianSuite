@@ -2,7 +2,6 @@ package MCEntityAnimator;
 
 import java.io.File;
 
-import MCEntityAnimator.block.BlockTest;
 import MCEntityAnimator.item.ItemWeapon;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
@@ -40,9 +39,7 @@ public class MCEA_Main
     public static final Item Halberd= new ItemWeapon().setUnlocalizedName("halberd").setFull3D().setCreativeTab(CreativeTabs.tabCombat);;
     public static final Item Katana = new ItemWeapon().setUnlocalizedName("katana").setFull3D().setCreativeTab(CreativeTabs.tabCombat);;
     public static final Item Spear = new ItemWeapon().setUnlocalizedName("spear").setFull3D().setCreativeTab(CreativeTabs.tabCombat);;
-    
-    public static final Block testBlock = new BlockTest(Material.ground).setCreativeTab(CreativeTabs.tabBlock);
-		
+    		
 	@Mod.EventHandler
 	public void init(FMLInitializationEvent event)
 	{		
