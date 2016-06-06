@@ -35,6 +35,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.AdvancedModelLoader;
 import net.minecraftforge.client.model.ModelFormatException;
+import net.minecraftforge.client.model.obj.GroupObject;
 import net.minecraftforge.client.model.obj.WavefrontObject;
 
 public class ModelObj extends ModelBase
@@ -47,7 +48,6 @@ public class ModelObj extends ModelBase
 	private AnimationParenting parenting;
 	public PartGroupsAndNames groupsAndNames;
 	private Map<PartObj, float[]> defaults;
-	//private Map<String, List<PartObj>> groups;
 
 	private PartObj mainHighlight = null;
 	private ArrayList<PartObj> hightlightedParts;
@@ -68,7 +68,7 @@ public class ModelObj extends ModelBase
 		txtRL = new ResourceLocation("mod_mcea:objModels/" + entityType + "/" + entityType + ".png");
 		pxyRL = new ResourceLocation("mod_mcea:objModels/" + entityType + "/" + entityType + ".pxy");
 		model = (WavefrontObject) AdvancedModelLoader.loadModel(modelRL);
-		parts = ObjUtil.createPartObjList(this, model.groupObjects);
+		parts = createPartObjList(this, model.groupObjects);
 		parts.add(new PartEntityPos(this));
 		parenting = AnimationData.getAnipar(par0Str);
 		hightlightedParts = new ArrayList<PartObj>();
@@ -305,9 +305,8 @@ public class ModelObj extends ModelBase
 	//						Parenting
 	//----------------------------------------------------------------
 
-	public void setParent(PartObj child, PartObj parent, boolean addBend)
+	public void setParent(PartObj child, PartObj parent, boolean addBend) throws Exception
 	{
-		parenting.addParent(parent, child);
 		if(addBend)
 		{			
 			boolean prevRenderWithTexture = renderWithTexture;
@@ -328,6 +327,7 @@ public class ModelObj extends ModelBase
 
 			renderWithTexture = prevRenderWithTexture;
 		}
+		parenting.addParenting(parent, child);
 	}
 
 
@@ -443,9 +443,15 @@ public class ModelObj extends ModelBase
 		}
 		return arr;
 	}
-
-
-
+	
+	public ArrayList<Part> createPartObjList(ModelObj model, ArrayList<GroupObject> groupObjects)
+	{
+		ArrayList<Part> parts = new ArrayList<Part>();
+		for(GroupObject gObj : groupObjects)
+		{
+			parts.add(new PartObj(model, gObj));
+		}
+		return parts;
+	}
 
 }
-

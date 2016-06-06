@@ -93,6 +93,14 @@ public class GuiEntityRenderer extends GuiScreen
 				renderBlockIntoGui(posX + (width-posX-5)/2 + horizontalPan, posY + (height - 10)/2 + scaleModifier/2 + verticalPan, scale, 0.0F, 0.0F, blockToRender);
 			renderEntityIntoGui(posX + (width-posX-5)/2 + horizontalPan, posY + (height - 10)/2 + scaleModifier/2 + verticalPan, scale, 0.0F, 0.0F, entityToRender); 
 		}
+		
+		entityModel.clearHighlights();
+		Part currentPart = Util.getPartFromName(currentPartName, entityModel.parts);
+		Part additionalPart = Util.getPartFromName(additionalHighlightPartName, entityModel.parts);
+		if(currentPart instanceof PartObj)
+			entityModel.hightlightPart((PartObj) currentPart);
+		if(additionalPart instanceof PartObj)
+			entityModel.hightlightPart((PartObj) additionalPart);
 
 		super.drawScreen(par1, par2, par3);
 	}

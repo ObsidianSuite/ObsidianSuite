@@ -5,16 +5,15 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Map;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
+import javax.swing.JOptionPane;
+
+import com.google.common.io.Files;
+
+import MCEntityAnimator.animation.AnimationData;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.world.World;
-import net.minecraftforge.common.IExtendedEntityProperties;
-import MCEntityAnimator.animation.AnimationData;
-import MCEntityAnimator.animation.AnimationSequence;
-import MCEntityAnimator.animation.AnimationStance;
 
 public class DataHandler
 {
@@ -45,68 +44,34 @@ public class DataHandler
 	{	
 		try
 		{
-			AnimationData.loadData(CompressedStreamTools.readCompressed(new FileInputStream(saveFile)));
-			//CompressedStreamTools.readCompressed(new FileInputStream(saveFile));
-		}
-		catch(FileNotFoundException e)
-		{
+			//Create file if it doesn't exist, or create backup if it does.
+			if(!saveFile.exists())
+				saveFile.createNewFile();
+
+			//File backup = new File(resourceFolder, "AnimationDataBackup.data");
+			
+//			if(!backup.exists())
+//				backup.createNewFile();
+						
+//			Runtime.getRuntime().exec("attrib +H Animation/AnimationDataBackup.data");
+//			Files.copy(saveFile, backup);
+
 			try 
 			{
-				saveFile.createNewFile();
-			}
-			catch (IOException e1) 
+				AnimationData.loadData(CompressedStreamTools.readCompressed(new FileInputStream(saveFile)));
+			} 
+			catch (Exception e) 
 			{
-				e1.printStackTrace();
-			}
-			e.printStackTrace();
-		} 
-		catch (IOException e) 
+				//Files.copy(backup, saveFile);
+				//JOptionPane.showMessageDialog(null, "Error when loading data. Restored from backup. Restart game to reload.", "Loading error", JOptionPane.ERROR_MESSAGE);
+				e.printStackTrace();
+			} 
+		}
+		catch(IOException e)
 		{
 			e.printStackTrace();
 		}
 
-		
-//		if(!importFolder.exists())
-//		{
-//			importFolder.mkdirs();
-//		}
-//
-//		String[] entityFolders = importFolder.list();
-//
-//		for(String entity : entityFolders)
-//		{
-//			File entityFolder = new File(importFolder, entity);
-//			String[] animationFiles = entityFolder.list();
-//			for(String animationName : animationFiles)
-//			{
-//				File animationFile = new File(entityFolder, animationName);
-//				try 
-//				{
-//					if(animationName.contains("Stance"))
-//					{
-//						NBTTagCompound nbt = CompressedStreamTools.readCompressed(new FileInputStream(animationFile));
-//						AnimationStance stance = new AnimationStance();
-//						stance.loadData(nbt);
-//						AnimationData.addNewStance(entity, stance);
-//					}
-//					else
-//					{
-//						NBTTagCompound nbt = CompressedStreamTools.readCompressed(new FileInputStream(animationFile));
-//						AnimationSequence sequence = new AnimationSequence("");
-//						sequence.loadData(entity, nbt);
-//						AnimationData.addNewSequence(entity, sequence);
-//					}
-//				}
-//				catch (IOException e) 
-//				{
-//					e.printStackTrace();
-//				}
-//			}
-//
-//		}
 	}
-
-
-
 
 }

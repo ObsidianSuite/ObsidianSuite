@@ -316,8 +316,7 @@ public class GuiPartSetup extends GuiEntityRenderer
 			@Override
 			public void mouseEntered(MouseEvent arg0) 
 			{
-				entityModel.clearHighlights();
-				entityModel.hightlightPart(part);
+				currentPartName = part.getName();
 			}
 
 			@Override

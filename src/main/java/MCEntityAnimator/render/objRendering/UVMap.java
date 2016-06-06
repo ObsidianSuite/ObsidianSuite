@@ -27,9 +27,9 @@ public class UVMap
 	private float uvheight;
 
 	//Setup the UVMap from the top face of the side. 
-	public UVMap(Face topFace)
+	public UVMap(Face topFace) throws Exception
 	{
-		Vertex[] orderedVertices = TextureUtil.orderVertices(topFace.vertices);
+		Vertex[] orderedVertices = TextureUtil.instance.orderVertices(topFace.vertices);
 		topLeftVertex = new Vertex(orderedVertices[1].x, orderedVertices[1].y, orderedVertices[1].z);
 		sideWidth = orderedVertices[0].x - orderedVertices[1].x;
 
@@ -41,7 +41,7 @@ public class UVMap
 
 		sideHeight = orderedVertices[1].y - orderedVertices[2].y;
 
-		TextureCoordinate[] orderedTCs = TextureUtil.orderCoords(topFace.textureCoordinates);
+		TextureCoordinate[] orderedTCs = TextureUtil.instance.orderCoords(topFace.textureCoordinates);
 		topLeftUVCoord = new TextureCoordinate(orderedTCs[1].u, orderedTCs[1].v);
 		uvwidth = orderedTCs[0].u - orderedTCs[1].u;
 		uvheight = orderedTCs[1].v - orderedTCs[2].v;
@@ -81,7 +81,7 @@ public class UVMap
 	
 	public boolean isMapInCorrectPlaneForFace(Face f)
 	{
-		Vertex[] orderedVertices = TextureUtil.orderVertices(f.vertices);
+		Vertex[] orderedVertices = TextureUtil.instance.orderVertices(f.vertices);
 
 		//True if x changes and not z.
 		boolean faceXDom = true; 

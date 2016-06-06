@@ -3,6 +3,7 @@ package MCEntityAnimator;
 import java.io.File;
 
 import MCEntityAnimator.item.ItemWeapon;
+import MCEntityAnimator.render.objRendering.TextureUtil;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.SidedProxy;
@@ -19,7 +20,7 @@ public class MCEA_Main
 {
 	
 	public static final File resourceFolder = new File(Minecraft.getMinecraft().mcDataDir.getAbsolutePath() + "/Animation");
-	public static final String version = "3.2";
+	public static final String version = "3.3";
 
 	
 	@Mod.Instance("MCEA")
@@ -43,9 +44,8 @@ public class MCEA_Main
 	@Mod.EventHandler
 	public void init(FMLInitializationEvent event)
 	{		
-		
-		
 		instance = this;
+		TextureUtil.init();
 		
 		proxy.init();
 		proxy.registerItems();

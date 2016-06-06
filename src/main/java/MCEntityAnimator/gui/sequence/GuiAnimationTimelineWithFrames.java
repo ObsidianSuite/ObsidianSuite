@@ -174,14 +174,16 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 			Part mr = Util.getPartFromName(animpart.getPart().getName(), entityModel.parts);	
 			float[] defaults = animpart.getPart().getOriginalValues();
 			//If the movement starts at time zero, and the part isn't in its original position, add a keyframe at time zero.
-			if(animpart.getStartTime() == 0.0F && !animpart.compareRotation(defaults))
+			if(animpart.getStartTime() == 0.0F && !animpart.atStartRotation(defaults))
 			{
 				Keyframe kf = new Keyframe(0, partName, animpart.getStartPosition());
 				partKfs.add(kf);
 			}
-			//Add a keyframe for the final position 
-			Keyframe kf = new Keyframe((int) animpart.getEndTime(), partName, animpart.getEndPosition());
-			partKfs.add(kf);
+			else
+			{
+				Keyframe kf = new Keyframe((int) animpart.getEndTime(), partName, animpart.getEndPosition());
+				partKfs.add(kf);
+			}
 			keyframes.put(partName, partKfs);
 		}
 	}
@@ -216,14 +218,6 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 			timelineFrame.repaint();
 			settingsFrame.repaint();
 		}
-
-		entityModel.clearHighlights();
-		Part currentPart = Util.getPartFromName(currentPartName, entityModel.parts);
-		Part additionalPart = Util.getPartFromName(additionalHighlightPartName, entityModel.parts);
-		if(currentPart instanceof PartObj)
-			entityModel.hightlightPart((PartObj) currentPart);
-		if(additionalPart instanceof PartObj)
-			entityModel.hightlightPart((PartObj) additionalPart);
 
 		this.animation.animateAll(time, entityModel, exceptionPartName);
 
@@ -442,7 +436,7 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 					{
 						setBackground(list.getSelectionBackground());
 						setForeground(list.getSelectionForeground());
-						if (-1 < index) 
+						if (index > -1) 
 							additionalHighlightPartName = parts.get(index);
 					} 
 					else 
@@ -451,7 +445,7 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 						setForeground(list.getForeground());
 					}
 					setFont(list.getFont());
-					setText((value == null) ? "" : value.toString());
+					setText((value == null) ? "" : Util.getDisplayName(value.toString(), entityModel.parts));
 					return this;
 				}
 			});
@@ -917,7 +911,7 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 				//				partDropDown.setSelectedIndex(i);
 				//				mainPanel.add(partDropDown, c);
 
-				JLabel partLabel = new JLabel(parts.get(i));
+				JLabel partLabel = new JLabel(Util.getDisplayName(parts.get(i), entityModel.parts));
 				partLabels[i] = partLabel;
 				mainPanel.add(partLabel, c);
 
@@ -1146,7 +1140,7 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 				{
 					Part part = Util.getPartFromName(this.partName, entityModel.parts);
 					float[] defaults = part.getOriginalValues();
-					previousKf = new Keyframe(0, part.getName(), new float[]{0.0F, 0.0F, 0.0F});
+					previousKf = new Keyframe(0, this.partName, new float[]{0.0F, 0.0F, 0.0F});
 				}
 			}
 			return previousKf;

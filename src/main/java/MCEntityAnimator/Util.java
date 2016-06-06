@@ -41,6 +41,14 @@ public class Util
 //		}
 //		return mrs;
 //	}
+	
+	public static String getDisplayName(String partName, ArrayList<Part> parts) 
+	{
+		Part p = getPartFromName(partName, parts);
+		if(p != null)
+			return p.getDisplayName();
+		return partName;
+	}
 
 	public static Part getPartFromName(String name, ArrayList<Part> parts) 
 	{

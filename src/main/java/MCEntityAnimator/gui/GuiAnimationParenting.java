@@ -1,80 +1,42 @@
 package MCEntityAnimator.gui;
 
-import java.util.ArrayList;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiButton;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.renderer.OpenGlHelper;
-import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.util.ResourceLocation;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.plaf.basic.BasicComboBoxRenderer;
 
-import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
 
 import MCEntityAnimator.Util;
 import MCEntityAnimator.animation.AnimationData;
 import MCEntityAnimator.render.objRendering.Bend;
-import MCEntityAnimator.render.objRendering.EntityObj;
-import MCEntityAnimator.render.objRendering.ModelObj;
-import MCEntityAnimator.render.objRendering.RenderObj;
 import MCEntityAnimator.render.objRendering.parts.Part;
 import MCEntityAnimator.render.objRendering.parts.PartObj;
 
 
-public class GuiAnimationParenting extends GuiScreen 
+public class GuiAnimationParenting extends GuiEntityRenderer 
 {
-	int posX;
-	int posY;
-	private boolean boolRemove = false;
-	private boolean boolParent = false;
 
-	String entityName;
-	EntityLivingBase entityToRender;
-	ModelObj entityModel;
-	String currentPartName;
-	String parentPartName;
-	ArrayList<String> partNames = new ArrayList<String>();
+	private ParentingFrame parentingFrame;
+	private RelationFrame relationFrame;
 
-	private static final ResourceLocation texture = new ResourceLocation("mod_MCEA:gui/animation_parenting.png");
-
-	private int listOffset1 = 0;
-	private int listOffset2 = 0;
-
-	private int scaleModifier = 0;
-	private int horizontalPan = 0;
-	private int verticalPan = 0;
-	private int horizontalRotation = 0;
-	private int verticalRotation = 0;
-	private boolean rotationLocked = false;
-	private boolean rotationLockPressed = false;
-	private float lockX;
-	private float lockY;
-
-	private String popUpString = "";
-	private int popUpTime = 0;
-	private int popUpColour;
-	
-	public GuiAnimationParenting(String par0Str)
+	public GuiAnimationParenting(String entityName)
 	{
-		this.mc = Minecraft.getMinecraft();
-		entityName = par0Str;
-		entityToRender = new EntityObj(mc.theWorld, entityName);
-		entityModel = ((RenderObj) RenderManager.instance.getEntityRenderObject(entityToRender)).getModel(entityName);
-		for(Part obj : entityModel.parts)
-		{
-			//TODO parentable check...
-			if(obj instanceof PartObj)
-			{
-				partNames.add(obj.getName());
-				obj.setToOriginalValues();
-			}
-		}
-		currentPartName = partNames.get(0);
+		super(entityName);
+		parentingFrame = new ParentingFrame();
+		relationFrame = new RelationFrame();
 	}
 
 	/**
@@ -83,12 +45,9 @@ public class GuiAnimationParenting extends GuiScreen
 	public void initGui()
 	{
 		super.initGui();
-		this.posX = (this.width - 384)/2;
-		this.posY = (this.height - 255)/2;
 		setup();
-		this.updateButtons();
 	}
-	
+
 	public void setup()
 	{
 		String setup = AnimationData.getParentingSetup(entityName);
@@ -100,108 +59,18 @@ public class GuiAnimationParenting extends GuiScreen
 			scaleModifier = Integer.parseInt(split[2]);
 		}
 	}
-	
+
 	public void saveSetup()
 	{
 		AnimationData.setParentingSetup(entityName, horizontalPan + "," + verticalPan + "," + scaleModifier);
 	}
-	
+
 	@Override
 	public void onGuiClosed()
 	{
 		saveSetup();
-	}
-
-	public void updateButtons()
-	{
-		this.buttonList.clear();
-		this.buttonList.add(new GuiButton(0, posX + 132, posY + 10, 50, 20, "Clear"));
-		this.buttonList.add(new GuiButton(1, posX + 202, posY + 10, 50, 20, "Done"));
-		if(partNames.size() > 10)
-		{
-			this.buttonList.add(new GuiButton(17, posX + 5, 2, 50, 20, "^"));
-			this.buttonList.add(new GuiButton(28, posX + 5, 233, 50, 20, "V"));
-		}
-		int max = partNames.size() > 10 ? 10 : partNames.size();	
-		for(int i = 0; i < max; i++)
-		{
-			if(currentPartName.equals(partNames.get(i + listOffset1)))
-			{
-				this.buttonList.add(new GuiButton(18+i, posX + 5, 23 + 21*i, 50, 20, partNames.get(i + listOffset1) + "*"));
-			}
-			else
-			{
-				this.buttonList.add(new GuiButton(18+i, posX + 5, 23 + 21*i, 50, 20, partNames.get(i + listOffset1)));
-			}
-		}
-		if(partNames.size() > 10)
-		{
-			this.buttonList.add(new GuiButton(29, posX + 328, 2, 50, 20, "^"));
-			this.buttonList.add(new GuiButton(40, posX + 328, 233, 50, 20, "V"));
-		}
-		for(int i = 0; i < max; i++)
-		{
-			this.buttonList.add(new GuiButton(30+i, posX + 328, 23 + 21*i, 50, 20, partNames.get(i + listOffset2)));
-		}
-		if(boolRemove)
-		{
-			this.buttonList.add(new GuiButton(41, posX + 132, 200, 50, 20, "Yes"));
-			this.buttonList.add(new GuiButton(42, posX + 202, 200, 50, 20, "No"));
-		}
-		if(boolParent)
-		{
-			GuiButton yesButton = new GuiButton(43, posX + 97, 200, 50, 20, "Yes");
-			this.buttonList.add(yesButton);
-			this.buttonList.add(new GuiButton(44, posX + 167, 200, 50, 20, "No"));
-			this.buttonList.add(new GuiButton(45, posX + 237, 200, 50, 20, "Cancel"));
-			if(!Bend.canCreateBend(Util.getPartObjFromName(this.currentPartName, entityModel.parts), Util.getPartObjFromName(parentPartName, entityModel.parts)))
-			{
-				yesButton.enabled = false;
-			}
-			
-		}
-	}
-
-	@Override
-	protected void keyTyped(char par1, int par2)
-	{
-		switch(par2)
-		{
-		case Keyboard.KEY_LEFT:
-			horizontalPan -= 3;
-			break;
-		case Keyboard.KEY_RIGHT:
-			horizontalPan += 3;
-			break;
-		case Keyboard.KEY_UP:
-			verticalPan -= 3;
-			break;
-		case Keyboard.KEY_DOWN:
-			verticalPan += 3;
-			break;	
-		case Keyboard.KEY_A:
-			horizontalRotation += 10;
-			break;
-		case Keyboard.KEY_D:
-			horizontalRotation -= 10;
-			break;
-		case Keyboard.KEY_S:
-			verticalRotation += 10;
-			break;
-		case Keyboard.KEY_W:
-			verticalRotation -= 10;
-			break;	
-		case Keyboard.KEY_L:
-			this.rotationLocked = !this.rotationLocked;
-			this.rotationLockPressed = this.rotationLocked;
-			if(rotationLocked){this.popUp("Locked rotation", 0xFF00FF00);} 
-			else{this.popUp("Unlocked rotation", 0xFFFF0000);}
-			break;	
-		case Keyboard.KEY_T:
-			this.entityModel.renderWithTexture = !this.entityModel.renderWithTexture;
-			break;
-		}
-		super.keyTyped(par1, par2);
+		parentingFrame.dispose();
+		relationFrame.dispose();
 	}
 
 	@Override
@@ -211,93 +80,49 @@ public class GuiAnimationParenting extends GuiScreen
 		super.handleMouseInput();
 	}
 
-	/**
-	 * Fired when a control is clicked. This is the equivalent of ActionListener.actionPerformed(ActionEvent e).
-	 */
-	public void actionPerformed(GuiButton button)
-	{	
-		switch(button.id)
-		{
-		case 0: AnimationData.getAnipar(entityName).clear((EntityObj) entityToRender); break;
-		case 1: mc.displayGuiScreen(new GuiAnimationHome(entityName)); break;
-		case 17: 
-			if(listOffset1 > 0)
-			{
-				listOffset1--;
-			}
-			this.updateButtons();
-			break;
-		case 28: 
-			if(listOffset1 < partNames.size() - 10)
-			{
-				listOffset1++;
-			}
-			this.updateButtons();
-			break;
-		case 29: 
-			if(listOffset2 > 0)
-			{
-				listOffset2--;
-			}
-			this.updateButtons();
-			break;
-		case 40: 
-			if(listOffset2 < partNames.size() - 10)
-			{
-				listOffset2++;
-			}
-			this.updateButtons();
-			break;
-		case 41: AnimationData.getAnipar(entityName).unParent((PartObj) Util.getPartFromName(this.currentPartName, this.entityModel.parts)); this.boolRemove = false; this.updateButtons(); break;
-		case 42: this.boolRemove = false; this.updateButtons(); break;
-		case 43: parent(true); break;
-		case 44: parent(false); break;
-		case 45:  boolParent = false; this.updateButtons(); break;
-		}
-		if(button.id > 17 && button.id < 28)
-		{
-			this.currentPartName = button.displayString;
-			this.updateButtons();
-		}
-		if(button.id > 29 && button.id < 40)
-		{
-			prepParent(button.displayString);
-		}
-	}
-
-	private void prepParent(String buttonName)
+	private void attemptParent()
 	{
-		boolean flag = true;
-		if(!this.currentPartName.equals(buttonName))
+		PartObj parent = getParent();
+		PartObj child = getChild();
+		if(parent.getName().equals(child.getName()))
+			JOptionPane.showMessageDialog(parentingFrame, "Cannot parent a part to itself.", "Parenting issue", JOptionPane.ERROR_MESSAGE);
+		else if(AnimationData.getAnipar(entityName).hasParent(child))
 		{
-			if(AnimationData.getAnipar(entityName).hasParent((PartObj) Util.getPartFromName(this.currentPartName, entityModel.parts)))
+			Object[] options = {"OK", "Remove bend"};
+			int n = JOptionPane.showOptionDialog(parentingFrame, child.getDisplayName() + " already has a parent.", "Parenting issue",
+						JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE,null,options,options[0]);
+			if(n == 1)
 			{
-				this.popUp(this.currentPartName + " is already parented to " + AnimationData.getAnipar(entityName).getParent((PartObj) Util.getPartFromName(this.currentPartName, entityModel.parts)).getName(), 0xFFFF0000);
-				this.boolRemove = true;
-				this.updateButtons();
-				flag = false;
+				AnimationData.getAnipar(entityName).unParent(child);
+				relationFrame.updateLabels();
 			}
 		}
 		else
 		{
-			this.popUp("Can't parent a part to itself", 0xFFFF0000);
-			flag = false;
-		}
-		
-		if(flag)
-		{
-			boolParent = true;
-			parentPartName = buttonName;
-			this.updateButtons();
+			int n = JOptionPane.showConfirmDialog(parentingFrame, "Parent " + child.getDisplayName() + " to " + parent.getDisplayName() + "?", "Parenting", 
+					JOptionPane.YES_NO_CANCEL_OPTION);
+			if(n == 0)
+			{
+				if(Bend.canCreateBend(child, parent) && JOptionPane.showConfirmDialog(parentingFrame, "Parent with bend?", "Parenting", JOptionPane.YES_NO_OPTION) == 0)
+					parent(parent, child, true);
+				else
+					parent(parent, child, false);
+			}
 		}
 	}
-	
-	private void parent(boolean bend) 
+
+	private void parent(PartObj parent, PartObj child, boolean bend) 
 	{
-		entityModel.setParent(Util.getPartObjFromName(this.currentPartName, entityModel.parts), Util.getPartObjFromName(parentPartName, entityModel.parts), bend);
-		this.popUp("Parented " + this.currentPartName + " to " + parentPartName, 0xFF00FF00);
-		boolParent = false; 
-		this.updateButtons();
+		try
+		{
+			entityModel.setParent(child, parent, bend);
+			relationFrame.updateLabels();
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+			JOptionPane.showMessageDialog(parentingFrame, "Issue creating relation with bend. Parenting aborted.", "Parenting issue", JOptionPane.ERROR_MESSAGE);
+		}
 	}
 
 	public boolean doesGuiPauseGame()
@@ -305,123 +130,220 @@ public class GuiAnimationParenting extends GuiScreen
 		return false;
 	}
 
-	public void popUp(String string, int colour) 
+	private PartObj getParent()
 	{
-		this.popUpString = string;
-		this.popUpColour = colour;
-		this.popUpTime = 100;
+		return Util.getPartObjFromName((String) parentingFrame.parentDropDown.getSelectedItem(), entityModel.parts);
 	}
 
-	/**
-	 * Draws the screen and all the components in it.
-	 */
-	public void drawScreen(int par1, int par2, float par3)
+	private PartObj getChild()
 	{
-		this.drawDefaultBackground();
-		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+		return Util.getPartObjFromName((String) parentingFrame.childDropDown.getSelectedItem(), entityModel.parts);
+	}
 
-		this.mc.getTextureManager().bindTexture(texture);		
-		Util.drawCustomGui(posX, posY, 384, 255, 0);
+	private class ParentingFrame extends JFrame
+	{
+		JComboBox<String> parentDropDown;
+		JComboBox<String> childDropDown;
 
-		if(entityToRender != null)
+		private ParentingFrame()
 		{
-			int scale = 50 + scaleModifier;
+			super("Parenting");
 
-			if(rotationLocked)
+			JPanel mainPanel = new JPanel();
+			mainPanel.setLayout(new GridBagLayout());
+			GridBagConstraints c = new GridBagConstraints();
+
+			parentDropDown = new JComboBox<String>();
+			childDropDown = new JComboBox<String>();
+			for(String s : parts)
 			{
-				if(this.rotationLockPressed)
+				Part p = Util.getPartFromName(s, entityModel.parts);
+				if(p instanceof PartObj)
 				{
-					lockX = (float)(posX + 190) - par1;
-					lockY = (float)(posY + 25) - par2;
-					this.rotationLockPressed = false;
+					parentDropDown.addItem(s);
+					childDropDown.addItem(s);
 				}
-				renderEntityIntoGui(posX + 190 + horizontalPan, posY + 180 + scaleModifier/2 + verticalPan, scale, lockX, lockY, entityToRender); 
 			}
-			else
+			parentDropDown.setRenderer(new PartComboBoxRenderer(true));
+			childDropDown.setRenderer(new PartComboBoxRenderer(false));
+
+			parentDropDown.addActionListener(new ActionListener()
 			{
-				renderEntityIntoGui(posX + 190 + horizontalPan, posY + 180 + scaleModifier/2 + verticalPan, scale, (float)(posX + 190) - par1, (float)(posY + 25) - par2, entityToRender); 
-			}
-		}
+				@Override
+				public void actionPerformed(ActionEvent e) 
+				{
+					currentPartName = (String) ((JComboBox<String>) e.getSource()).getSelectedItem();
+				}
+			});
 
-		if(this.popUpTime > 0)
-		{
-			this.drawCenteredString(this.fontRendererObj, popUpString, posX + 190, posY + 40, popUpColour);
-			popUpTime -= 1;
-		}
-		
-		fontRendererObj.drawString("W/A/S/D-Rotate    Arrow Keys-Move", posX + 99, posY + 230, 0);
-		fontRendererObj.drawString("Scroll-Zoom B-Base T-Txtr L-Lock", posX + 99, posY + 240, 0);
-		
-		fontRendererObj.drawString("Child", posX + 20, posY + 10, 0);
-		fontRendererObj.drawString("Parent", posX + 340, posY + 10, 0);
-
-
-		if(this.boolRemove)
-		{
-			this.drawCenteredString(this.fontRendererObj, "Unparent?", posX + 192, posY + 190, 0xFF555555);
-		}
-		
-		if(this.boolParent)
-		{
-			this.drawCenteredString(this.fontRendererObj, "Parent with bend?", posX + 192, posY + 190, 0xFF555555);
-		}
-
-		entityModel.hightlightPart(Util.getPartObjFromName(this.currentPartName, entityModel.parts));		
-
-		boolean flag = true;
-		for(int j = 0; j < 10; j++)
-		{
-			GuiButton b = Util.getButtonFromID(j + 18, this.buttonList);
-			if(b != null && (par1 > b.xPosition && par1 < b.xPosition + b.width && par2 > b.yPosition && par2 < b.yPosition + b.height && !this.currentPartName.equals(b.displayString.substring(0, b.displayString.length() - 1))))
+			childDropDown.addActionListener(new ActionListener()
 			{
-				entityModel.hightlightPart(Util.getPartObjFromName(b.displayString, entityModel.parts));		
-				flag = false;
-				break;
-			}
+				@Override
+				public void actionPerformed(ActionEvent e) 
+				{
+					additionalHighlightPartName = (String) ((JComboBox<String>) e.getSource()).getSelectedItem();
+				}
+			});
 
-			GuiButton b2 = Util.getButtonFromID(j + 30, this.buttonList);
-			if(b2 != null && (par1 > b2.xPosition && par1 < b2.xPosition + b2.width && par2 > b2.yPosition && par2 < b2.yPosition + b2.height && !this.currentPartName.equals(b2.displayString.substring(0, b2.displayString.length() - 1))))
+			JButton relationButton = new JButton("Add relation");
+			relationButton.addActionListener(new ActionListener()
 			{
-				entityModel.hightlightPart(Util.getPartObjFromName(b2.displayString, entityModel.parts));		
-				flag = false;
-				break;
-			}
-		}
-		if(flag)
-		{
-			entityModel.clearHighlights();
-			entityModel.hightlightPart(Util.getPartObjFromName(this.currentPartName, entityModel.parts));		
+				@Override
+				public void actionPerformed(ActionEvent e) 
+				{
+					attemptParent();
+				}
+			});
+
+			JButton clearButton = new JButton("Clear");
+			clearButton.addActionListener(new ActionListener()
+			{
+				@Override
+				public void actionPerformed(ActionEvent e) 
+				{
+					AnimationData.getAnipar(entityName).clear();
+					relationFrame.updateLabels();
+				}
+			});
+
+			JButton doneButton = new JButton("Done");
+			doneButton.addActionListener(new ActionListener()
+			{
+				@Override
+				public void actionPerformed(ActionEvent e) 
+				{
+					mc.displayGuiScreen(new GuiAnimationHome(entityName));
+				}
+			});
+
+			c.gridx = 0;
+			c.gridy = 0;
+			c.weightx = 1;
+			c.weighty = 1;
+			c.fill = GridBagConstraints.BOTH;
+			mainPanel.add(new JLabel("Parent: "), c);
+			c.gridx = 1;
+			mainPanel.add(parentDropDown, c);
+			c.gridx = 2;
+			mainPanel.add(new JLabel("Child: "), c);
+			c.gridx = 3;
+			mainPanel.add(childDropDown, c);
+
+			c.gridx = 0;
+			c.gridy = 1;
+			c.weightx = 2;
+			c.gridwidth = 2;
+			mainPanel.add(relationButton, c);
+			c.weightx = 1;
+			c.gridwidth = 1;
+			c.gridx = 2;
+			mainPanel.add(clearButton, c);
+			c.gridx = 3;
+			mainPanel.add(doneButton, c);
+
+			setContentPane(mainPanel);
+			pack();
+			setAlwaysOnTop(true);
+			setLocation(50, 50);
+			setVisible(true);
 		}
 
-
-		super.drawScreen(par1, par2, par3);
 	}
 
-	/**
-	 * Renders an entity into a gui. Parameters - xpos, ypos, scale, rotx, roty, entity.
-	 */
-	private void renderEntityIntoGui(int par0, int par1, float par2, float par3, float par4, EntityLivingBase par5EntityLivingBase)
+	private class RelationFrame extends JFrame
 	{
-		GL11.glEnable(GL11.GL_COLOR_MATERIAL);
-		GL11.glPushMatrix();
-		GL11.glTranslatef((float)par0, (float)par1, 50.0F);
-		GL11.glScalef((float)(-par2), (float)par2, (float)par2);
-		GL11.glRotatef(180.0F, 0.0F, 0.0F, 1.0F);
-		GL11.glRotatef(135.0F, 0.0F, 1.0F, 0.0F);
-		RenderHelper.enableStandardItemLighting();
-		GL11.glRotatef(-135.0F, 0.0F, 1.0F, 0.0F);
-		GL11.glRotatef(-((float)Math.atan((double)(par4 / 40.0F))) * 20.0F + verticalRotation, 1.0F, 0.0F, 0.0F);
-		GL11.glRotatef(((float)Math.atan((double)(par3 / 40.0F))) * 20.0F + horizontalRotation, 0.0F, -1.0F, 0.0F);
-		GL11.glTranslated(par5EntityLivingBase.posX, par5EntityLivingBase.posY, par5EntityLivingBase.posZ);
-		RenderManager.instance.playerViewY = 180.0F;
-		RenderManager.instance.renderEntityWithPosYaw(par5EntityLivingBase, 0.0D, 0.0D, 0.0D, 0.0F, 1.0F);
-		GL11.glPopMatrix();
-		RenderHelper.disableStandardItemLighting();
-		GL11.glDisable(GL12.GL_RESCALE_NORMAL);
-		OpenGlHelper.setActiveTexture(OpenGlHelper.lightmapTexUnit);
-		GL11.glDisable(GL11.GL_TEXTURE_2D);
-		OpenGlHelper.setActiveTexture(OpenGlHelper.defaultTexUnit);
-		GL11.glDisable(GL11.GL_COLOR_MATERIAL);
+		
+		private JPanel mainPanel;
+		private GridBagConstraints c;
+		
+		private RelationFrame()
+		{
+			super("Parenting");
+			
+			setMinimumSize(new Dimension(270,50));
+			
+			mainPanel = new JPanel();
+			mainPanel.setLayout(new GridBagLayout());
+			c = new GridBagConstraints();
+			
+			c.insets = new Insets(5,10,5,10);
+			c.weightx = 1;
+			c.weighty = 1;
+			c.fill = GridBagConstraints.BOTH;
+			updateLabels();
+			
+			setContentPane(mainPanel);
+			pack();
+			setAlwaysOnTop(true);
+			setLocation(50, 150);
+			setVisible(true);
+		}
+		
+		private void updateLabels()
+		{
+			mainPanel.removeAll();
+			
+			c.gridx = 0;
+			c.gridy = 0;
+			mainPanel.add(new JLabel("Parents"),c);
+			c.gridx = 1;
+			mainPanel.add(new JLabel("Children"),c);
+			
+			int h = 1;
+			for(PartObj parent : AnimationData.getAnipar(entityName).getAllParents())
+			{
+				c.gridx = 0;
+				c.gridy = h;
+				mainPanel.add(new JLabel(parent.getDisplayName()),c);
+				c.gridx = 1;
+				String s = "";
+				for(PartObj child : AnimationData.getAnipar(entityName).getChildren(parent))
+				{
+					s = s + child.getDisplayName() + ",";
+				}
+				if(s.length() > 1)
+					s = s.substring(0, s.length() - 1);
+				
+				mainPanel.add(new JLabel(s),c);
+				h++;
+			}
+			revalidate();
+			pack();
+		}
+	}
+
+	private class PartComboBoxRenderer extends BasicComboBoxRenderer
+	{
+		private boolean parentPart;
+
+		private PartComboBoxRenderer(boolean parentPart)
+		{
+			this.parentPart = parentPart;
+		}
+
+		public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) 
+		{
+			if(isSelected) 
+			{
+				setBackground(list.getSelectionBackground());
+				setForeground(list.getSelectionForeground());
+				if (index > -1) 
+				{
+					if(parentPart)
+						currentPartName = parts.get(index);
+					else
+						additionalHighlightPartName = parts.get(index);
+				}
+			} 
+			else 
+			{
+				setBackground(list.getBackground());
+				setForeground(list.getForeground());
+			}
+			setFont(list.getFont());
+			setText((value == null) ? "" : Util.getDisplayName(value.toString(), entityModel.parts));
+			return this;
+		}
 	}
 
 }

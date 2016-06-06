@@ -43,7 +43,7 @@ public class Bend extends GroupObject
 
 	}
 
-	public Bend(PartObj par0Child, PartObj par1Parent)
+	public Bend(PartObj par0Child, PartObj par1Parent) throws Exception
 	{
 		super("", par0Child.groupObj.glDrawingMode);
 		child = par0Child;
@@ -62,7 +62,7 @@ public class Bend extends GroupObject
 		create();
 	}
 
-	public void init()
+	public void init() throws Exception
 	{
 		float[] rotationPoint = child.getRotationPoint();
 
@@ -610,7 +610,7 @@ public class Bend extends GroupObject
 	{	
 		Face f = new Face();
 
-		f.vertices = TextureUtil.orderVertices(new Vertex[]{v1, v2, v3});
+		f.vertices = TextureUtil.instance.orderVertices(new Vertex[]{v1, v2, v3});
 
 		try 
 		{
@@ -776,7 +776,7 @@ public class Bend extends GroupObject
 		{
 			boolean add = true;
 
-			Vertex[] orderedVertices = TextureUtil.orderVertices(f.vertices);
+			Vertex[] orderedVertices = TextureUtil.instance.orderVertices(f.vertices);
 
 			if(orderedVertices[0].y == orderedVertices[1].y && orderedVertices[0].y == orderedVertices[2].y)
 			{
@@ -788,9 +788,6 @@ public class Bend extends GroupObject
 				add = false;
 			}
 			
-
-			
-
 			if(add)
 			{
 				if(index < 4)
@@ -819,7 +816,7 @@ public class Bend extends GroupObject
 
 		UVMap correctMap = null;
 
-		Vertex cornerVertex = TextureUtil.orderVertices(f.vertices)[1];
+		Vertex cornerVertex = TextureUtil.instance.orderVertices(f.vertices)[1];
 
 		for(UVMap map : maps)
 		{

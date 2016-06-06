@@ -94,15 +94,12 @@ public class AnimationData
 		return stances.get(entityName) == null ? new ArrayList<AnimationStance>() : stances.get(entityName);
 	}
 
-
-
 	public static void deleteSequence(String entityName, AnimationSequence sequence) 
 	{
 		ArrayList<AnimationSequence> temp = sequences.get(entityName);
 		temp.remove(sequence);
 		sequences.put(entityName, temp);
 	}
-
 
 	public static void deleteStance(String entityName, AnimationStance stance) 
 	{
@@ -160,6 +157,9 @@ public class AnimationData
 		return p;
 	}
 
+	/**
+	 * Saves all the data for animations and gui setup.
+	 */
 	public static void saveData(NBTTagCompound compound) 
 	{
 		NBTTagList entityList = new NBTTagList();
@@ -218,6 +218,9 @@ public class AnimationData
 		compound.setTag("Entities", entityList);
 	}
 
+	/**
+	 * Loads all the data
+	 */
 	public static void loadData(NBTTagCompound compound) 
 	{
 		NBTTagList entityList = compound.getTagList("Entities", 10);

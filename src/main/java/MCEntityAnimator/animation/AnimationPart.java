@@ -13,6 +13,9 @@ import MCEntityAnimator.render.objRendering.RenderObj;
 import MCEntityAnimator.render.objRendering.parts.Part;
 import MCEntityAnimator.render.objRendering.parts.PartObj;
 
+/**
+ * A section of an animation for a specific part. 
+ */
 public class AnimationPart 
 {
 	private float startTime;
@@ -23,7 +26,10 @@ public class AnimationPart
 	private DecimalFormat df = new DecimalFormat("##.##");
 	private Part part;
 
-	public AnimationPart() {}
+	public AnimationPart(String entityName, NBTTagCompound compound) 
+	{
+		loadData(entityName, compound);
+	}
 
 	public AnimationPart(float startTime, float endTime, float[] startPos, float[] endPos, Part part)
 	{
@@ -78,13 +84,13 @@ public class AnimationPart
 	}
 
 	/**
-	 * Return true is the float array has the same values as the startPosition
+	 * Return true if the float array has the same values as the startPosition
 	 */
-	public boolean compareRotation(float[] defaults) 
+	public boolean atStartRotation(float[] rotation) 
 	{
 		for(int i = 0; i < 3; i++)
 		{
-			if(defaults[i] != startPosition[i])
+			if(rotation[i] != startPosition[i])
 				return false;
 		}
 		return true;

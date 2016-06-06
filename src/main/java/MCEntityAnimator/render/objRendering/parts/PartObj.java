@@ -1,29 +1,31 @@
 package MCEntityAnimator.render.objRendering.parts;
 
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
+import org.lwjgl.opengl.GL11;
+
+import MCEntityAnimator.animation.AnimationData;
+import MCEntityAnimator.render.objRendering.Bend;
+import MCEntityAnimator.render.objRendering.ModelObj;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.entity.Entity;
 import net.minecraftforge.client.model.obj.Face;
 import net.minecraftforge.client.model.obj.GroupObject;
 import net.minecraftforge.client.model.obj.TextureCoordinate;
 
-import org.lwjgl.opengl.GL11;
-
-import MCEntityAnimator.render.objRendering.Bend;
-import MCEntityAnimator.render.objRendering.ModelObj;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-
+/**
+ * One partObj for each 'part' of the model.
+ * 
+ */
 public class PartObj extends Part
 {
 	private float[] rotationPoint;
 	private boolean showModel;
 
-	private ArrayList<PartObj> children;
-
 	private HashMap<Face, TextureCoordinate[]> defaultTextureCoords;
-	
+
 	private boolean visible;
 	private Bend bend = null;
 	public GroupObject groupObj;
@@ -34,7 +36,6 @@ public class PartObj extends Part
 		super(modelObject, (groupObj.name.contains("_") ? groupObj.name.substring(0, groupObj.name.indexOf("_")) : groupObj.name).toLowerCase());
 		this.groupObj = groupObj;
 		this.displayName = getName();
-		children = new ArrayList<PartObj>();
 		defaultTextureCoords = new HashMap<Face, TextureCoordinate[]>();
 		updateDefaultTextureCoordinates();
 		visible = true;
@@ -49,12 +50,12 @@ public class PartObj extends Part
 	{
 		return displayName;
 	}
-	
+
 	public void setDisplayName(String displayName)
 	{
 		this.displayName = displayName;
 	}
-	
+
 	public void setShowModel(boolean show)
 	{
 		showModel = show;
@@ -79,49 +80,27 @@ public class PartObj extends Part
 	{
 		return rotationPoint;
 	}
-	
+
 	public void setVisible(boolean bool)
 	{
 		visible = bool;
 	}
-	
+
 	public void setBend(Bend b)
 	{
 		bend = b;
 	}
-	
+
 	public boolean hasBend()
 	{
 		return bend != null;
 	}
-	
+
 	public void removeBend()
 	{
 		modelObj.removeBend(bend);
 		bend.remove();
 		bend = null;
-	}
-
-
-	//------------------------------------------
-	//              Parenting
-	//------------------------------------------
-
-
-	public void addChild(PartObj child) 
-	{
-		this.children.add(child);
-	}
-
-	public void removeChild(PartObj child) 
-	{
-		this.children.remove(child);
-		child.setToOriginalValues();
-	}
-
-	public void clearChildModels() 
-	{
-		this.children.clear();
 	}
 
 	//------------------------------------------
@@ -140,17 +119,17 @@ public class PartObj extends Part
 					f.textureCoordinates[i] = new TextureCoordinate(0, 0);
 				}
 			}	
-			
+
 			TextureCoordinate[] coordsToStore = new TextureCoordinate[3];
 			for(int i = 0; i < 3; i++)
 			{
 				coordsToStore[i] = new TextureCoordinate(f.textureCoordinates[i].u, f.textureCoordinates[i].v);
 			}
-				
+
 			defaultTextureCoords.put(f, coordsToStore);
 		}
 	}
-	
+
 	public void updateTextureCoordinates(boolean highlight, boolean main)
 	{
 		float u = 0.0F;
@@ -168,8 +147,8 @@ public class PartObj extends Part
 				v = 0.0F;
 			}
 		}
-		
-		
+
+
 		if(!modelObj.renderWithTexture)
 		{
 			for(Face f : groupObj.faces)
@@ -197,11 +176,11 @@ public class PartObj extends Part
 			}			
 		}
 	}
-	
+
 	public void render(Entity entity, boolean highlight, boolean main) 
 	{
 		updateTextureCoordinates(highlight, main);
-		
+
 		GL11.glPushMatrix();
 		move(entity);
 		if(visible)
@@ -261,9 +240,13 @@ public class PartObj extends Part
 		GL11.glTranslatef(rotationPoint[0], rotationPoint[1], rotationPoint[2]);	
 
 		//Do for children - rotation for parent compensated for!
-		for(PartObj child : this.children)
+		List<PartObj> children = AnimationData.getAnipar(modelObj.getEntityType()).getChildren(this);
+		if(children != null)
 		{
-			child.render(entity, modelObj.isPartHighlighted(child), modelObj.isMainHighlight(child));
+			for(PartObj child : children)
+			{
+				child.render(entity, modelObj.isPartHighlighted(child), modelObj.isMainHighlight(child));
+			}	
 		}
 	}
 

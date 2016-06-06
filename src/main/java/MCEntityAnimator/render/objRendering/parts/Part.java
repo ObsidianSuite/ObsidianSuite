@@ -15,6 +15,9 @@ import MCEntityAnimator.render.objRendering.ModelObj;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
+/**
+ * An abstract object for tracking information about a part (limb, position of model etc).
+ */
 public abstract class Part
 {
 	protected float valueX, valueY, valueZ;

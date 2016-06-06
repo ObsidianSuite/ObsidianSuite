@@ -22,6 +22,11 @@ import net.minecraft.client.resources.IResource;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 
+/**
+ * Model parts can have names assigned to them as blender gives them names like part.001.
+ * Parts can also be grouped together, eg upper and lower arm -> arm.
+ * The order of the parts is also flexible.
+ */
 public class PartGroupsAndNames 
 {
 	private ModelObj model;

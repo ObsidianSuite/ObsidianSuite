@@ -29,7 +29,6 @@ public class CommonProxy
 		GameRegistry.registerItem(MCEA_Main.Katana, MCEA_Main.Katana.getUnlocalizedName());
 		GameRegistry.registerItem(MCEA_Main.Musket, MCEA_Main.Musket.getUnlocalizedName());
 		GameRegistry.registerItem(MCEA_Main.Spear, MCEA_Main.Spear.getUnlocalizedName());
-		GameRegistry.registerBlock(MCEA_Main.testBlock, "testBlock");
 		
 		LanguageRegistry.addName(MCEA_Main.Battleaxe, "Battleaxe");
 		LanguageRegistry.addName(MCEA_Main.Bayonet, "Bayonet");
@@ -41,7 +40,6 @@ public class CommonProxy
 		LanguageRegistry.addName(MCEA_Main.Katana, "Katana");
 		LanguageRegistry.addName(MCEA_Main.Musket, "Musket");
 		LanguageRegistry.addName(MCEA_Main.Spear, "Spear");
-		LanguageRegistry.addName(MCEA_Main.testBlock, "Test");
 	}
 }
 

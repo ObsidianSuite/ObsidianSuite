@@ -7,11 +7,23 @@ import net.minecraftforge.client.model.obj.Vertex;
 
 public class TextureUtil 
 {
+	
+	public static TextureUtil instance;
+	
+	public TextureUtil()
+	{
+		this.instance = this;
+	}
+
+	public static void init() 
+	{
+		new TextureUtil();
+	}
 
 	/**
 	 * Orders the vertices according to this order - horizontal, corner, vertical.
 	 */
-	public static Vertex[] orderVertices(Vertex[] vertices)
+	public Vertex[] orderVertices(Vertex[] vertices)
 	{
 		//Vertices
 		//1-Create an array list of all the combinations of vertices - (size 3).
@@ -120,7 +132,7 @@ public class TextureUtil
 	/**
 	 * Orders the texture coordinates according to this order - horizontal, corner, vertical.
 	 */
-	public static TextureCoordinate[] orderCoords(TextureCoordinate[] textureCoordinates)
+	public TextureCoordinate[] orderCoords(TextureCoordinate[] textureCoordinates) throws Exception
 	{
 		//Texture Coordinates
 		//1-Create an array list of all the combinations of texture coordinates - (size 3).
@@ -133,17 +145,11 @@ public class TextureUtil
 		ArrayList<TextureCombination> textureCombinations = new ArrayList<TextureCombination>();
 
 		//1-Combinations of coordinates
-		for(TextureCoordinate tc1 : textureCoordinates)
-		{
-			for(TextureCoordinate tc2 : textureCoordinates)
-			{
-				if(!tc1.equals(tc2))
-				{
-					textureCombinations.add(new TextureCombination(tc1, tc2));
-				}
-			}	
-		}
+		textureCombinations.add(new TextureCombination(textureCoordinates[0], textureCoordinates[1]));
+		textureCombinations.add(new TextureCombination(textureCoordinates[0], textureCoordinates[2]));
+		textureCombinations.add(new TextureCombination(textureCoordinates[1], textureCoordinates[2]));
 
+		
 		//2 - dU and dV for all combinations
 		for(TextureCombination tc : textureCombinations)
 		{
@@ -152,24 +158,18 @@ public class TextureUtil
 		}
 
 		//3- Side coord
-		float minDU = -10.0F;
+		Float minDU = null;
 		TextureCombination verticalCoords = null;
 		for(TextureCombination tc : textureCombinations)
 		{
-			if(tc.dU < minDU || minDU == -10.0F)
+			if(minDU == null || tc.dU < minDU)
 			{
 				minDU = tc.dU;
 				verticalCoords = tc;
 			}
 		}
-		try
-		{
-			sideTC = getOtherCoordinate(textureCoordinates, verticalCoords);
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-		}
+		sideTC = getOtherCoordinate(textureCoordinates, verticalCoords);
+
 
 		//4 - Corner coord
 		float minDV = -10.0F;
@@ -200,7 +200,7 @@ public class TextureUtil
 	/**
 	 * Returns the absolute distance between the two vertices.
 	 */
-	public static float getDistanceBetween3DPoints(Vertex v1, Vertex v2)
+	public float getDistanceBetween3DPoints(Vertex v1, Vertex v2)
 	{
 		float x = v1.x - v2.x;
 		float y = v1.y - v2.y;
@@ -212,7 +212,7 @@ public class TextureUtil
 	/**
 	 * Returns the vertex from the array vertices that is not part of the vertex combination.
 	 */
-	private static Vertex getOtherVertex(Vertex[] vertices, VertexCombination vc) throws Exception 
+	private Vertex getOtherVertex(Vertex[] vertices, VertexCombination vc) throws Exception 
 	{
 		if(vc == null)
 		{
@@ -231,7 +231,7 @@ public class TextureUtil
 	/**
 	 * Returns the vertex from the array vertices that is not part of the vertex combination.
 	 */
-	private static TextureCoordinate getOtherCoordinate(TextureCoordinate[] coords, TextureCombination tc) throws Exception 
+	private TextureCoordinate getOtherCoordinate(TextureCoordinate[] coords, TextureCombination tc) throws Exception 
 	{
 		if(tc == null)
 		{
@@ -247,27 +247,27 @@ public class TextureUtil
 		throw new Exception("Can't find other coordinate.");
 	}
 
-	private static float getDX(Vertex v1, Vertex v2)
+	private float getDX(Vertex v1, Vertex v2)
 	{
 		return Math.abs(v1.x - v2.x);
 	}
 
-	private static float getDY(Vertex v1, Vertex v2)
+	private float getDY(Vertex v1, Vertex v2)
 	{
 		return Math.abs(v1.y - v2.y);
 	}
 
-	private static float getDZ(Vertex v1, Vertex v2)
+	private float getDZ(Vertex v1, Vertex v2)
 	{
 		return Math.abs(v1.z - v2.z);
 	}
 
-	private static float getDU(TextureCoordinate tc1, TextureCoordinate tc2)
+	private float getDU(TextureCoordinate tc1, TextureCoordinate tc2)
 	{
 		return Math.abs(tc1.u - tc2.u);
 	}
 
-	private static float getDV(TextureCoordinate tc1, TextureCoordinate tc2)
+	private float getDV(TextureCoordinate tc1, TextureCoordinate tc2)
 	{
 		return Math.abs(tc1.v - tc2.v);
 	}
@@ -280,4 +280,47 @@ public class TextureUtil
 
 		return (float) Math.sqrt(x*x + y*y + z*z);
 	}
+	
+	private class VertexCombination
+	{
+		Vertex v1;
+		Vertex v2;
+
+		float dW;
+		float dY;
+
+		VertexCombination(Vertex v1, Vertex v2)
+		{
+			this.v1 = v1;
+			this.v2 = v2;
+		}
+		
+		public Vertex[] getVertices()
+		{
+			return new Vertex[]{v1, v2};
+		}
+
+	}
+	
+	private class TextureCombination
+	{
+		TextureCoordinate tc1;
+		TextureCoordinate tc2;
+
+		float dU;
+		float dV;
+
+		TextureCombination(TextureCoordinate tc1, TextureCoordinate tc2)
+		{
+			this.tc1 = tc1;
+			this.tc2 = tc2;
+		}
+		
+		public TextureCoordinate[] getCoords()
+		{
+			return new TextureCoordinate[]{tc1, tc2};
+		}
+
+	}
+
 }

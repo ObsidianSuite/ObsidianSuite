@@ -3,6 +3,9 @@ package MCEntityAnimator.render.objRendering.parts;
 import MCEntityAnimator.render.objRendering.ModelObj;
 import net.minecraft.entity.Entity;
 
+/**
+ * Part for tracking the position of the model.
+ */
 public class PartEntityPos extends Part
 {
 

@@ -8,6 +8,10 @@ import net.minecraft.nbt.NBTTagList;
 import MCEntityAnimator.render.objRendering.ModelObj;
 import MCEntityAnimator.render.objRendering.parts.Part;
 
+/**
+ * An actual animation. Comprised of animation parts - sections for each part of the model.
+ *
+ */
 public class AnimationSequence 
 {
 
@@ -35,9 +39,6 @@ public class AnimationSequence
 		animations.add(par0Animation);
 	}
 
-	/**
-	 * Clear all the animation parts and movements.
-	 */
 	public void clearAnimations() 
 	{
 		animations.clear();
@@ -53,13 +54,21 @@ public class AnimationSequence
 		return actionPoint;
 	}
 
+	/**
+	 * Sets all the parts of a model to their rotation at a given time.
+	 * The part with name = exceptionPartName will not be rotated.
+	 */
 	public void animateAll(float time, ModelObj entityModel, String exceptionPartName) 
 	{
 		for(Part part : entityModel.parts)
 		{
 			if(!part.getName().equals(exceptionPartName))
 			{
-				part.setToOriginalValues();
+				AnimationPart lastAnimation = getLastAnimation(part.getName());
+				if(lastAnimation != null && time >= lastAnimation.getEndTime())
+					lastAnimation.animatePart(lastAnimation.getEndTime());
+				else
+					part.setToOriginalValues();
 			}
 		}
 		for(AnimationPart s : this.animations)
@@ -84,6 +93,26 @@ public class AnimationSequence
 		return max;
 	}	
 
+	/**
+	 * Returns the time of the last frame for a given part.
+	 */
+	private AnimationPart getLastAnimation(String partName)
+	{
+		AnimationPart lastAnimation = null;
+		for(AnimationPart s : this.animations)
+		{
+			if(s.getPart().getName().equals(partName))
+				if(lastAnimation != null)
+				{
+					if(s.getEndTime() > lastAnimation.getEndTime())
+						lastAnimation = s;
+				}
+				else
+					lastAnimation = s;
+		}
+		return lastAnimation;
+	}
+
 	public NBTBase getSaveData() 
 	{
 		NBTTagCompound sequenceData = new NBTTagCompound();
@@ -103,8 +132,7 @@ public class AnimationSequence
 		NBTTagList segmentList = compound.getTagList("Animations", 10);
 		for(int i = 0; i < segmentList.tagCount(); i++)
 		{
-			AnimationPart animation = new AnimationPart();
-			animation.loadData(entityName, segmentList.getCompoundTagAt(i));
+			AnimationPart animation = new AnimationPart(entityName, segmentList.getCompoundTagAt(i));
 			animations.add(animation);
 		}		
 		animationName = compound.getString("Name");

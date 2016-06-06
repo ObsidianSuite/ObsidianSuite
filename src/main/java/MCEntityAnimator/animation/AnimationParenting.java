@@ -1,71 +1,92 @@
 package MCEntityAnimator.animation;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
+import javax.swing.JOptionPane;
+
 import MCEntityAnimator.Util;
 import MCEntityAnimator.render.objRendering.EntityObj;
 import MCEntityAnimator.render.objRendering.ModelObj;
 import MCEntityAnimator.render.objRendering.RenderObj;
 import MCEntityAnimator.render.objRendering.parts.PartObj;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 
 public class AnimationParenting 
 {
-	private ArrayList<PartObj> children = new ArrayList<PartObj>();
-	private ArrayList<PartObj> parents = new ArrayList<PartObj>();
 
-	public AnimationParenting()
-	{
-	}
-
+	private Map<PartObj, List<PartObj>> parentingMap = new HashMap<PartObj, List<PartObj>>();
+	
+	/**
+	 * Get the parent of a child, or null if it doesn't exist.
+	 */
 	public PartObj getParent(PartObj child)
 	{
-		return parents.get(children.indexOf(child));
-	}
-
-	public ArrayList<PartObj> getChildren(PartObj parent) 
-	{
-		ArrayList<PartObj> childrenToReturn = new ArrayList<PartObj>();
-		for(int i = 0; i < parents.size(); i++)
+		for(Entry<PartObj, List<PartObj>> e : parentingMap.entrySet())
 		{
-			PartObj mr = parents.get(i);
-			if(mr.equals(parent))
-			{
-				childrenToReturn.add(children.get(i));
-			}
+			if(e.getValue().contains(child))
+				return e.getKey();
 		}
-		return childrenToReturn;
+		return null;
 	}
 
-	public void addParent(PartObj parent, PartObj child)
+	/**
+	 * Get the list of children belongning to this parent.
+	 */
+	public List<PartObj> getChildren(PartObj parent) 
 	{
-		parents.add(parent);
-		children.add(child);
-		parent.addChild(child);
+		return parentingMap.get(parent);
+	}
+
+	/**
+	 * Add a relationship between parent and child.
+	 */
+	public void addParenting(PartObj parent, PartObj child)
+	{
+		List<PartObj> list = parentingMap.get(parent);
+		if(list == null)
+			list = new ArrayList<PartObj>();
+		list.add(child);
+		parentingMap.put(parent, list);
 	}
 
 	public boolean hasParent(PartObj child) 
 	{
-		return children.contains(child);
+		for(List<PartObj> list : parentingMap.values())
+		{
+			if(list.contains(child))
+				return true;
+		}
+		return false;
 	}
 
 	public boolean isParent(PartObj parent) 
 	{
-		return parents.contains(parent);
+		return parentingMap.keySet().contains(parent);
 	}
 
-	public ArrayList<PartObj> getAllParents()
+	public List<PartObj> getAllParents()
 	{
-		return parents;
+		List<PartObj> allParents = new ArrayList<PartObj>();
+		allParents.addAll(parentingMap.keySet());
+		return allParents;
 	}
 	
-	public ArrayList<PartObj> getAllChildren()
+	public List<PartObj> getAllChildren()
 	{
-		return children;
+		List<PartObj> allChildren = new ArrayList<PartObj>();
+		for(List<PartObj> list : parentingMap.values())
+		{
+			allChildren.addAll(list);
+		}
+		return allChildren;
 	}
 
 	/**
@@ -74,27 +95,34 @@ public class AnimationParenting
 	 */
 	public boolean areUnrelated(PartObj child, PartObj parent) 
 	{
-		PartObj mr = child;
-		while(hasParent(mr))
+		PartObj c = child;
+		while(hasParent(c))
 		{
-			PartObj mr2 = getParent(mr);
-			if(mr2.equals(parent))
-			{
+			PartObj p = getParent(c);
+			if(p.equals(parent))
 				return false;
-			}
-			mr = mr2;
+			c = p;
 		}
 		return true;
 	}
 
+	/**
+	 * Removes the relationship between parent and child. 
+	 * Will also remove the bend if one exists.
+	 */
 	public void unParent(PartObj child)
 	{
-		int index = this.children.indexOf(child);
-		this.parents.get(index).removeChild(child);
-		this.parents.remove(index);
-		if(child.hasBend())
+		if(hasParent(child))
 		{
-			child.removeBend();
+			PartObj p = getParent(child);
+			List<PartObj> list = parentingMap.get(p);
+			list.remove(child);
+			if(list.isEmpty())
+				parentingMap.remove(p);
+			else
+				parentingMap.put(p, list);
+			if(child.hasBend())
+				child.removeBend();
 		}
 	}
 
@@ -102,12 +130,11 @@ public class AnimationParenting
 	{	
 		NBTTagCompound parentNBT = new NBTTagCompound();
 		NBTTagList parentNBTList = new NBTTagList();
-		ArrayList<PartObj> temp = Util.removeDuplicates(parents);
-		for(PartObj parent : temp)
+		for(PartObj parent : parentingMap.keySet())
 		{
 			NBTTagCompound parentCompound = new NBTTagCompound();
 			parentCompound.setString("Parent", parent.getName());
-			ArrayList<PartObj> children = this.getChildren(parent);
+			List<PartObj> children = this.getChildren(parent);
 			for(int i = 0; i < children.size(); i++)
 			{
 				String name = children.get(i).getName();
@@ -146,34 +173,23 @@ public class AnimationParenting
 						hasBend = true;
 					}
 					PartObj child = Util.getPartObjFromName(name, entityModel.parts);
-					entityModel.setParent(child, parent, hasBend);
+					try 
+					{
+						entityModel.setParent(child, parent, hasBend);
+					} 
+					catch (Exception e) 
+					{
+						e.printStackTrace();
+					}
 					j++;
 				}
 			}
 		}
 	}
 
-	public void clear(EntityObj entity) 
-	{
-//		ModelObj model = ((RenderObj) RenderManager.instance.getEntityRenderObject(entity)).getModel(entity.getType());
-//
-//		for(PartObj parent : parents)
-//		{
-//			ArrayList<PartObj> temp = this.getChildren(parent);
-//			for(PartObj mr : temp)
-//			{
-//				float[] arr = model.getDefaults(mr);
-//				mr.setRotationPoint(new float[]{arr[0], arr[1], arr[2]});
-//			}
-//			parent.clearChildModels();
-//		}
-//
-//		children.clear();
-//		parents.clear();
-//		//((GuiAnimationParenting) Minecraft.getMinecraft().currentScreen).popUp("Restart Minecraft to clear.", 0xffff0000);
-		
-		
-		Iterator childrenIterator = children.iterator();
+	public void clear() 
+	{	
+		Iterator childrenIterator = getAllChildren().iterator();
 
 		while(childrenIterator.hasNext())
 		{
