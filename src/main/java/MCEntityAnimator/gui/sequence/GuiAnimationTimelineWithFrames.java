@@ -178,6 +178,11 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 			{
 				Keyframe kf = new Keyframe(0, partName, animpart.getStartPosition());
 				partKfs.add(kf);
+				if(!animpart.getStartPosition().equals(animpart.getEndPosition()))
+				{
+					Keyframe kf2 = new Keyframe((int) animpart.getEndTime(), partName, animpart.getEndPosition());
+					partKfs.add(kf2);
+				}
 			}
 			else
 			{
