@@ -46,26 +46,33 @@ public class DataHandler
 		{
 			//Create file if it doesn't exist, or create backup if it does.
 			if(!saveFile.exists())
+			{
+				if(!saveFile.exists())
+					resourceFolder.mkdirs();
 				saveFile.createNewFile();
-
-			//File backup = new File(resourceFolder, "AnimationDataBackup.data");
-			
-//			if(!backup.exists())
-//				backup.createNewFile();
-						
-//			Runtime.getRuntime().exec("attrib +H Animation/AnimationDataBackup.data");
-//			Files.copy(saveFile, backup);
-
-			try 
+			}
+			else
 			{
-				AnimationData.loadData(CompressedStreamTools.readCompressed(new FileInputStream(saveFile)));
-			} 
-			catch (Exception e) 
-			{
-				//Files.copy(backup, saveFile);
-				//JOptionPane.showMessageDialog(null, "Error when loading data. Restored from backup. Restart game to reload.", "Loading error", JOptionPane.ERROR_MESSAGE);
-				e.printStackTrace();
-			} 
+
+				//File backup = new File(resourceFolder, "AnimationDataBackup.data");
+
+				//			if(!backup.exists())
+				//				backup.createNewFile();
+
+				//			Runtime.getRuntime().exec("attrib +H Animation/AnimationDataBackup.data");
+				//			Files.copy(saveFile, backup);
+
+				try 
+				{
+					AnimationData.loadData(CompressedStreamTools.readCompressed(new FileInputStream(saveFile)));
+				} 
+				catch (Exception e) 
+				{
+					//Files.copy(backup, saveFile);
+					//JOptionPane.showMessageDialog(null, "Error when loading data. Restored from backup. Restart game to reload.", "Loading error", JOptionPane.ERROR_MESSAGE);
+					e.printStackTrace();
+				} 
+			}
 		}
 		catch(IOException e)
 		{
