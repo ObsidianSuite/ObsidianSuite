@@ -6,3 +6,8 @@
 	* Extract into the workspace.
 * Run `gradlew setupDecompWorkspace` and `gradlew idea` or `gradlew eclipse`
 * If using eclipse, run `gradlew --refresh-dependencies eclipse`
+
+### Branching ###
+
+* Based on: http://nvie.com/posts/a-successful-git-branching-model/
+* Use --no-ff please!
