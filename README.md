@@ -10,4 +10,5 @@
 ### Branching ###
 
 * Based on: http://nvie.com/posts/a-successful-git-branching-model/
+* Include issue branches for bug fixes, called issue-1 etc.
 * Use --no-ff please!
