@@ -36,7 +36,6 @@ public class EventHandler
 		if (event.entity instanceof EntityPlayer)
 		{
 			event.entity.registerExtendedProperties("ExtendedPropertiesAnimation", new ExtendedPropertiesAnimation());
-			System.out.println("Constructed");
 		}
 	}
 }

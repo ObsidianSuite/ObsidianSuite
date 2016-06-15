@@ -5,73 +5,113 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Map;
-
-import javax.swing.JOptionPane;
-
-import com.google.common.io.Files;
+import java.util.ArrayList;
+import java.util.List;
 
 import MCEntityAnimator.animation.AnimationData;
+import MCEntityAnimator.animation.AnimationSequence;
+import MCEntityAnimator.distribution.ServerAccess;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
 
 public class DataHandler
 {
 
-
-	private final static File resourceFolder = MCEA_Main.resourceFolder;
-	private final static File saveFile = new File(resourceFolder, "AnimationData.data");
-
 	public void saveNBTData()
 	{			
-		NBTTagCompound compoundToSave = new NBTTagCompound();
-		AnimationData.saveData(compoundToSave);
-		try 
+        try 
+        {
+			ServerAccess.uploadAll(new File(MCEA_Main.animationPath + "/data"), "");
+		} catch (IOException e) {e.printStackTrace();}
+		
+		List<String> entityNames = getEntities();
+
+		//GUI
+		writeNBTToFile(AnimationData.getGUISetupTag(entityNames), MCEA_Main.animationPath + "/data/GuiData.data");
+		//Entity data
+		for(String entityName : entityNames)
 		{
-			CompressedStreamTools.writeCompressed(compoundToSave, new FileOutputStream(saveFile));
-		} 
-		catch (FileNotFoundException e) 
-		{
-			e.printStackTrace();
-		} 
-		catch (IOException e) 
-		{
-			e.printStackTrace();
+			//Parenting and part names
+			writeNBTToFile(AnimationData.getEntityDataTag(entityName), MCEA_Main.animationPath + "/data/" + entityName + "/" + entityName + ".data");
+			//Sequences
+			for(AnimationSequence s : AnimationData.getSequences(entityName))
+			{
+				writeNBTToFile(s.getSaveData(), MCEA_Main.animationPath + "/data/" + entityName + "/animation/" + s.getName() + ".data");
+			}
 		}
+
 	}
 
 	public void loadNBTData()
 	{	
-		try
+        try 
+        {
+			ServerAccess.downloadData();
+		} catch (IOException e) {e.printStackTrace();}
+		
+		List<String> entityNames = getEntities();
+		//GUI
+		File guiDataFile = new File(MCEA_Main.animationPath + "/data/GuiData.data");
+		if(guiDataFile.exists())
+			AnimationData.loadGUISetup(getNBTFromFile(guiDataFile));
+		//Entity data
+		for(String entityName : entityNames)
 		{
-			//Create file if it doesn't exist, or create backup if it does.
-			if(!saveFile.exists())
-				saveFile.createNewFile();
+			//Parenting and part names)
+			File entityDataFile = new File(MCEA_Main.animationPath + "/data/" + entityName + "/" + entityName + ".data");
+			if(entityDataFile.exists())
+				AnimationData.loadEntityData(entityName, getNBTFromFile(entityDataFile));
 
-			//File backup = new File(resourceFolder, "AnimationDataBackup.data");
-			
-//			if(!backup.exists())
-//				backup.createNewFile();
-						
-//			Runtime.getRuntime().exec("attrib +H Animation/AnimationDataBackup.data");
-//			Files.copy(saveFile, backup);
+			//Sequences
+			for(File animationFile : getAnimationFiles(entityName))
+			{
+				AnimationSequence sequence = new AnimationSequence("");
+				sequence.loadData(entityName, getNBTFromFile(animationFile));
+				AnimationData.addNewSequence(entityName, sequence);
+			}
 
-			try 
-			{
-				AnimationData.loadData(CompressedStreamTools.readCompressed(new FileInputStream(saveFile)));
-			} 
-			catch (Exception e) 
-			{
-				//Files.copy(backup, saveFile);
-				//JOptionPane.showMessageDialog(null, "Error when loading data. Restored from backup. Restart game to reload.", "Loading error", JOptionPane.ERROR_MESSAGE);
-				e.printStackTrace();
-			} 
 		}
-		catch(IOException e)
+	}
+
+	private static void writeNBTToFile(NBTTagCompound nbt, String path)
+	{
+		try 
 		{
-			e.printStackTrace();
-		}
+			CompressedStreamTools.writeCompressed(nbt, new FileOutputStream(new File(path)));
+		} 
+		catch (FileNotFoundException e) {e.printStackTrace();}
+		catch (IOException e) {e.printStackTrace();}
+	}
 
+	private static NBTTagCompound getNBTFromFile(File file)
+	{
+		try 
+		{
+			return CompressedStreamTools.readCompressed(new FileInputStream(file));
+		} 
+		catch (FileNotFoundException e) {throw new RuntimeException(e);}
+		catch (IOException e) {throw new RuntimeException(e);}
+	}
+
+	public static List<String> getEntities()
+	{
+		List<String> entities = new ArrayList<String>();
+		File dataFolder = new File(MCEA_Main.animationPath + "/data");
+		for(File file : dataFolder.listFiles())
+		{
+			if(file.isDirectory())
+				entities.add(file.getName());
+		}
+		return entities;
+	}
+
+	private static List<File> getAnimationFiles(String entityName)
+	{
+		List<File> animationFiles = new ArrayList<File>();
+		File animationFolder = new File(MCEA_Main.animationPath + "/data/" + entityName + "/animation");
+		for(File f : animationFolder.listFiles())
+			animationFiles.add(f);
+		return animationFiles;
 	}
 
 }

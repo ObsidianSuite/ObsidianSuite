@@ -1,15 +1,15 @@
 package MCEntityAnimator;
 
 import java.io.File;
+import java.io.IOException;
 
+import MCEntityAnimator.distribution.ServerAccess;
 import MCEntityAnimator.item.ItemWeapon;
 import MCEntityAnimator.render.objRendering.TextureUtil;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
-import net.minecraft.block.Block;
-import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
@@ -19,8 +19,9 @@ import net.minecraftforge.common.MinecraftForge;
 public class MCEA_Main
 {
 	
-	public static final File resourceFolder = new File(Minecraft.getMinecraft().mcDataDir.getAbsolutePath() + "/Animation");
-	public static final String version = "3.3";
+	public static final String homePath = Minecraft.getMinecraft().mcDataDir.getAbsolutePath();
+	public static final String animationPath = homePath + "/animation";
+	public static final String version = "3.4";
 
 	
 	@Mod.Instance("MCEA")
@@ -60,7 +61,7 @@ public class MCEA_Main
 	
 	public static File getEntityAnimationFolder(String entityName)
 	{
-		File folder = new File(resourceFolder, entityName);
+		File folder = new File(animationPath + "/" + entityName);
 		folder.mkdirs();
 		return folder;
 	}

@@ -44,31 +44,13 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.plaf.basic.BasicComboBoxRenderer;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockStone;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.renderer.OpenGlHelper;
-import net.minecraft.client.renderer.RenderBlocks;
-import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.util.ResourceLocation;
-
 import org.lwjgl.input.Keyboard;
-import org.lwjgl.input.Mouse;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
 
-import MCEntityAnimator.MCEA_Main;
 import MCEntityAnimator.Util;
 import MCEntityAnimator.animation.AnimationData;
 import MCEntityAnimator.animation.AnimationPart;
 import MCEntityAnimator.animation.AnimationSequence;
 import MCEntityAnimator.gui.GuiEntityRenderer;
-import MCEntityAnimator.render.objRendering.EntityObj;
-import MCEntityAnimator.render.objRendering.ModelObj;
-import MCEntityAnimator.render.objRendering.RenderObj;
 import MCEntityAnimator.render.objRendering.parts.Part;
 import MCEntityAnimator.render.objRendering.parts.PartObj;
 
@@ -957,7 +939,7 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 		{
 			for(int i = 0; i < partLabels.length; i++)
 			{
-				if(partLabels[i].getText().equals(currentPartName))
+				if(partLabels[i].getText().equals(Util.getDisplayName(currentPartName, entityModel.parts)))
 					partLabels[i].setForeground(Color.red);
 				else
 					partLabels[i].setForeground(Color.black);
