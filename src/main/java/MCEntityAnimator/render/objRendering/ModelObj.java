@@ -3,16 +3,16 @@ package MCEntityAnimator.render.objRendering;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.zip.ZipOutputStream;
 
 import org.lwjgl.opengl.GL11;
 
@@ -33,7 +33,6 @@ import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.client.resources.IResource;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.client.model.AdvancedModelLoader;
 import net.minecraftforge.client.model.ModelFormatException;
 import net.minecraftforge.client.model.obj.GroupObject;
 import net.minecraftforge.client.model.obj.WavefrontObject;
@@ -55,7 +54,8 @@ public class ModelObj extends ModelBase
 	public static final float initRotFix = 180.0F;
 	public static final float offsetFixY = -1.5F;
 
-	private final ResourceLocation modelRL, txtRL, pxyRL;
+	private final ResourceLocation txtRL;
+	private final File pxyFile;
 
 	public boolean renderWithTexture;
 
@@ -64,10 +64,24 @@ public class ModelObj extends ModelBase
 	public ModelObj(String par0Str)
 	{	
 		entityType = par0Str;
-		modelRL = new ResourceLocation("mod_mcea:objModels/" + entityType + "/" + entityType + ".obj");
-		txtRL = new ResourceLocation("mod_mcea:objModels/" + entityType + "/" + entityType + ".png");
-		pxyRL = new ResourceLocation("mod_mcea:objModels/" + entityType + "/" + entityType + ".pxy");
-		model = (WavefrontObject) AdvancedModelLoader.loadModel(modelRL);
+		File modelFile = new File(MCEA_Main.animationPath + "/data/" + entityType + "/" + entityType + ".obj");
+		File textureFile = new File(MCEA_Main.animationPath + "/data/" + entityType + "/" + entityType + ".obj");
+		pxyFile = new File(MCEA_Main.animationPath + "/data/" + entityType + "/" + entityType + ".pxy");
+
+		
+		
+		//((SimpleReloadableResourceManager)Minecraft.getMinecraft().getResourceManager()).reloadResourcePack(new PXYResourcePack());
+		
+		txtRL = new ResourceLocation("animation:data/player/player.png");
+
+		
+		try 
+		{
+			model = new WavefrontObject(entityType + ".obj", new FileInputStream(modelFile));
+		}
+		catch (ModelFormatException e) {e.printStackTrace();} 
+		catch (FileNotFoundException e) {e.printStackTrace();}
+
 		parts = createPartObjList(this, model.groupObjects);
 		parts.add(new PartEntityPos(this));
 		parenting = AnimationData.getAnipar(par0Str);
@@ -80,6 +94,11 @@ public class ModelObj extends ModelBase
 		groupsAndNames = AnimationData.getPartGroupsAndNames(entityType, this);
 
 		init();
+	}
+	
+	public ResourceLocation getTexture()
+	{
+		return txtRL;
 	}
 
 	public void init() 
@@ -112,8 +131,7 @@ public class ModelObj extends ModelBase
 	{
 		try
 		{
-			IResource res = Minecraft.getMinecraft().getResourceManager().getResource(pxyRL);			
-			BufferedReader reader = new BufferedReader(new InputStreamReader(res.getInputStream()));
+			BufferedReader reader = new BufferedReader(new FileReader(pxyFile));
 			String currentLine;
 			PartObj currentPart = null;
 			int i = 0;
@@ -155,11 +173,8 @@ public class ModelObj extends ModelBase
 						break;
 					}
 				}
-				else
-				{
-
-				}
 			}
+			reader.close();
 		}
 		catch (IOException e)
 		{
@@ -206,99 +221,6 @@ public class ModelObj extends ModelBase
 				newPartList.add(part);
 		}
 		parts = newPartList;
-	}
-
-	public void exportSource()
-	{
-		try
-		{
-			for(int i = 0; i < 3; i++)
-			{
-				ResourceLocation resLoc = null;
-				String fileExtension = "";
-				switch(i)
-				{
-				case 0: 
-					resLoc = modelRL; 
-					fileExtension = ".obj";
-					break;
-				case 1: 
-					resLoc = txtRL;
-					fileExtension = ".png";
-					break;
-				case 2: 
-					resLoc = pxyRL;
-					fileExtension = ".pxy";
-					break;
-				}
-
-				IResource res = Minecraft.getMinecraft().getResourceManager().getResource(resLoc);
-				InputStream input = res.getInputStream();
-
-				File file = new File(MCEA_Main.getEntityAnimationFolder(entityType), entityType + fileExtension);
-				file.createNewFile();
-				FileOutputStream output = new FileOutputStream(file, false);
-
-				int read = 0;
-				byte[] bytes = new byte[1024];
-
-				while ((read = input.read(bytes)) != -1) 
-				{
-					output.write(bytes, 0, read);
-				}
-
-				output.close();
-			}  	
-		}
-		catch(Exception e)
-		{
-			System.out.println(e.getStackTrace());
-		}
-	}
-
-	public void appendGroups()
-	{
-		try
-		{
-			//Get existing text that is correct.
-			List<String> lines = new ArrayList<String>();
-			File file = new File(MCEA_Main.getEntityAnimationFolder(entityType), entityType + ".pxy");
-			FileReader reader = new FileReader(file);
-			BufferedReader bufferedReader = new BufferedReader(reader);
-			String currentLine;
-			boolean flag = false;
-			while(!flag && (currentLine = bufferedReader.readLine()) != null)
-			{
-				if(currentLine.equals("Part Setup"))
-					flag = true;
-				lines.add(currentLine);
-			}
-			bufferedReader.close();
-
-			//Write correct existing text and append groups.
-			FileWriter writer = new FileWriter(file);
-			BufferedWriter bufferedWriter = new BufferedWriter(writer);
-			for(String line : lines)
-			{
-				bufferedWriter.write(line);
-				bufferedWriter.newLine();
-			}	
-			for(PartObj p : this.getPartObjs())
-			{
-				bufferedWriter.write(p.getDisplayName() + ":" + groupsAndNames.getPartGroup(p));
-				bufferedWriter.newLine();
-			}
-			bufferedWriter.close();	
-		}
-		catch(Exception e)
-		{
-			System.out.println(e.getStackTrace());
-		}
-	}
-
-	public void packageEntityFilesToZip()
-	{
-		ZipUtils.zipFolder(MCEA_Main.getEntityAnimationFolder(entityType).getAbsolutePath(), new File(MCEA_Main.getEntityAnimationFolder(entityType), entityType + ".zip").getAbsolutePath());
 	}
 
 	//----------------------------------------------------------------

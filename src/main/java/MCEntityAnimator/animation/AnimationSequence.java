@@ -113,7 +113,7 @@ public class AnimationSequence
 		return lastAnimation;
 	}
 
-	public NBTBase getSaveData() 
+	public NBTTagCompound getSaveData() 
 	{
 		NBTTagCompound sequenceData = new NBTTagCompound();
 		NBTTagList animationList = new NBTTagList();

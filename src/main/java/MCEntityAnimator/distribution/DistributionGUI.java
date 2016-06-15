@@ -1,0 +1,294 @@
+package MCEntityAnimator.distribution;
+
+import java.awt.Color;
+import java.awt.Desktop;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.List;
+
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.JTree;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.border.BevelBorder;
+import javax.swing.border.Border;
+import javax.swing.text.DefaultCaret;
+import javax.swing.tree.DefaultMutableTreeNode;
+
+import MCEntityAnimator.MCEA_Main;
+
+public class DistributionGUI extends JFrame
+{
+
+	private static final long serialVersionUID = -3402393679860402540L;
+
+	private Border spaceBorder = BorderFactory.createEmptyBorder(5, 5, 5, 5);
+	private Border bevelBorder = BorderFactory.createBevelBorder(BevelBorder.LOWERED);
+	private Border customBorder = BorderFactory.createCompoundBorder(bevelBorder, spaceBorder);
+
+	private static final String logFolderPath = "logs";
+
+	private Calendar cal = Calendar.getInstance();
+	private SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+
+	JTextArea outputLog;
+
+	public DistributionGUI()
+	{
+		super("Animation Files");
+
+		JPanel mainPanel = new JPanel();
+		mainPanel.setLayout(new GridBagLayout());
+
+		createGUI(mainPanel, "");
+		
+		ServerAccess.gui = this;
+	}
+
+	private void createGUI(final JPanel mainPanel, String outputText)
+	{		
+		mainPanel.removeAll();
+
+		GridBagConstraints c = new GridBagConstraints();
+
+		JTree tree = new JTree(getFileTree(new File(MCEA_Main.animationPath + "/data")));
+		tree.setBorder(customBorder);
+		JScrollPane treeView = new JScrollPane(tree);
+		treeView.setPreferredSize(new Dimension(200,200));
+		treeView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		treeView.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+
+		JPanel todoPanel = createErrorPanel();
+		JScrollPane todoView = new JScrollPane(todoPanel);
+		todoView.setPreferredSize(new Dimension(200,200));
+		todoView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		todoView.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+
+		outputLog = new JTextArea(5,30);
+		DefaultCaret caret = (DefaultCaret)outputLog.getCaret();
+		caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
+		outputLog.setEditable(false);
+		outputLog.setLineWrap(true);
+		outputLog.setWrapStyleWord(true);
+		outputLog.setBackground(Color.black);
+		outputLog.setForeground(Color.gray);
+
+
+		c.fill = GridBagConstraints.BOTH;
+		c.insets = new Insets(5,5,5,5);
+		c.weightx = 1;
+		c.weighty = 1;
+		c.gridwidth = 1;
+		c.gridheight = 1;
+		c.gridx = 0;
+		c.gridy = 0;
+		mainPanel.add(new JLabel("Data"),c);
+		c.gridy = 1;
+		mainPanel.add(treeView,c);
+
+		c.gridx = 1;
+		c.gridy = 0;
+		mainPanel.add(new JLabel("Errors"),c);
+		c.gridy = 1;
+		mainPanel.add(todoView,c);
+
+		JPanel buttonPanel = new JPanel();
+		GridLayout layout = new GridLayout(0,3);
+		layout.setHgap(5);
+		buttonPanel.setLayout(layout);
+
+		JButton refresh = new JButton("Refresh");
+		refresh.setToolTipText("Pull all the latest data from the server. Will overwrite any local changes.");
+		refresh.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent arg0) 
+			{
+				updateOutput("/-------------< Beginning download >-------------\\", false);
+				Runnable downloadThread = new Runnable() 
+				{
+					public void run() 
+					{
+						try 
+						{
+							ServerAccess.downloadData();
+							updateOutput("\\-------------< Download complete >-------------/", false);
+							createGUI(mainPanel, outputLog.getText());
+						} 
+						catch (IOException e) {e.printStackTrace();}
+					}
+				};
+				new Thread(downloadThread).start();
+			}
+		});
+
+		JButton upload = new JButton("Upload");
+		upload.setToolTipText("Push all your data to the server.");
+		upload.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent arg0) 
+			{
+				updateOutput("/------------< Beginning upload >-------------\\", false);
+				Runnable uploadThread = new Runnable() 
+				{
+					public void run() 
+					{
+						try 
+						{
+							List<String> failedFiles = ServerAccess.uploadAll(new File(MCEA_Main.animationPath + "/data"), "");
+							if(failedFiles.isEmpty())
+								updateOutput("\\--------------< Upload complete >-------------/", false);
+							else
+							{
+								updateOutput("\\--------< Upload finished, some errors >--------/", false);
+								String s = "Upload failed for these files:\n";
+								for(String failedFile : failedFiles)
+									s += "   - " + failedFile + "\n";
+								showUploadErrorPopup(s);
+							}
+						} catch (IOException e) {e.printStackTrace();}
+					}
+				};
+				new Thread(uploadThread).start();
+			}
+		});
+
+		JButton close = new JButton("Close");
+		close.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent arg0) 
+			{
+				dispose();
+			}
+		});
+
+		buttonPanel.add(refresh, c);
+		buttonPanel.add(upload, c);
+		buttonPanel.add(close, c);
+
+		c.gridwidth = 2;
+		c.gridx = 0;
+		c.gridy = 2;
+		mainPanel.add(new JScrollPane(outputLog, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER),c);
+		c.gridy = 3;
+		mainPanel.add(buttonPanel,c);
+
+		setContentPane(mainPanel);
+		pack();
+		setVisible(true);
+		
+		outputLog.setText(outputText);
+	}
+
+	public void updateOutput(String text, boolean server)
+	{
+		String current = outputLog.getText();
+		text = "[" + (server ? "SERVER" : "CLIENT") + "] " + text;
+		text = "[" + sdf.format(cal.getTime()) + "] " + text;
+		outputLog.setText(current + text + "\n");
+	}
+
+	private DefaultMutableTreeNode getFileTree(File file)
+	{   
+		DefaultMutableTreeNode top = new DefaultMutableTreeNode(file.getName());
+
+		if(file.isDirectory())
+		{
+			File[] files = file.listFiles();
+			if(files.length == 0)
+				top.add(new DefaultMutableTreeNode("EMPTY!"));
+			else
+			{
+				for(File f : files)
+					top.add(getFileTree(f));
+			}
+
+		}
+		return top;
+	}
+
+	private JPanel createErrorPanel()
+	{
+		JPanel errorPanel = new JPanel();
+		errorPanel.setBorder(customBorder);
+		errorPanel.setBackground(Color.white);
+		errorPanel.setLayout(new BoxLayout(errorPanel, BoxLayout.Y_AXIS));
+
+		for(String s : ServerAccess.getErrors())
+		{
+			errorPanel.add(new JLabel(s));
+		}
+
+		return errorPanel;
+	}
+
+	private void showUploadErrorPopup(String text)
+	{
+		//Custom button text
+		Object[] options = {"Open log", "Ok"};
+		int n = JOptionPane.showOptionDialog(this, text, "Upload error",
+				JOptionPane.YES_NO_OPTION,
+				JOptionPane.ERROR_MESSAGE,
+				null,
+				options,
+				options[1]);
+		if(n == 0)
+		{
+			try 
+			{
+				Desktop.getDesktop().open(getLogLocation());
+				Desktop.getDesktop().open(writeOutputLogToFile());
+			} 
+			catch (IOException e) 
+			{
+				e.printStackTrace();
+			}
+		}
+	}
+
+	private File writeOutputLogToFile() throws IOException 
+	{
+		String fileName = "MCEA_Uploader_Log-" + sdf.format(cal.getTime()) + ".txt";
+		fileName = fileName.replace(":", "-");
+		File file = new File(getLogLocation(), fileName);
+		file.createNewFile();
+		FileOutputStream fos = new FileOutputStream(file);
+		PrintWriter writer = new PrintWriter(fos);
+		for(String s : outputLog.getText().split("\n"))
+		{
+			writer.println(s);
+		}
+		writer.close();
+		return file;
+	}
+
+	private File getLogLocation() 
+	{
+		File file = new File(logFolderPath);
+		file.mkdirs();
+		return file;
+	}
+
+
+}

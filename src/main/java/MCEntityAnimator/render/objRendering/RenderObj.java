@@ -62,7 +62,7 @@ public class RenderObj extends RenderLiving
 			modelObj = m;
 			mainModel = m;
 		}
-        properTexture = new ResourceLocation("mod_mcea:objModels/" + entityType + "/" + entityType + ".png");
+        properTexture = modelObj.getTexture();
 	}
 	
 	public ModelObj getModel(String entityType) 
