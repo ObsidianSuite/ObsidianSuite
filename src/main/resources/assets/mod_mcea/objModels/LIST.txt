@@ -1,4 +1,0 @@
-Joint
-Player
-MultiJointTest
-TestTexture

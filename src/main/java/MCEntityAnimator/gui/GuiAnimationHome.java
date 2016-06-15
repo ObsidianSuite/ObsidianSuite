@@ -1,22 +1,13 @@
 package MCEntityAnimator.gui;
 
-import java.awt.Desktop;
-import java.io.File;
-import java.io.IOException;
-
 import org.lwjgl.opengl.GL11;
 
-import MCEntityAnimator.MCEA_Main;
 import MCEntityAnimator.Util;
-import MCEntityAnimator.animation.AnimationData;
+import MCEntityAnimator.distribution.DistributionGUI;
 import MCEntityAnimator.gui.sequence.GuiAnimationSequenceMain;
-import MCEntityAnimator.render.objRendering.EntityObj;
-import MCEntityAnimator.render.objRendering.ModelObj;
-import MCEntityAnimator.render.objRendering.RenderObj;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.util.ResourceLocation;
 
 
@@ -70,7 +61,7 @@ public class GuiAnimationHome extends GuiScreen
 			case 1: mc.displayGuiScreen(new GuiAnimationParenting(entityName)); break;
 			case 2: mc.displayGuiScreen(new GuiAnimationSequenceMain(entityName)); break;
 			case 3: /**mc.displayGuiScreen(new GuiAnimationStanceMain(entityName));**/ break;
-			case 4: export(); break;
+			case 4: new DistributionGUI(); break;
 			}
 		}
 	}
@@ -107,25 +98,6 @@ public class GuiAnimationHome extends GuiScreen
 		}
 	}
 	
-	private void export()
-	{
-		EntityObj entity = new EntityObj(Minecraft.getMinecraft().theWorld, entityName);
-		ModelObj entityModel = ((RenderObj) RenderManager.instance.getEntityRenderObject(entity)).getModel(entityName);
-		
-		entityModel.exportSource();
-		entityModel.appendGroups();
-		entityModel.packageEntityFilesToZip();
-		
-		File folder = MCEA_Main.resourceFolder;
-		try 
-		{
-			Desktop.getDesktop().open(folder);
-		} 
-		catch (IOException e) 
-		{
-			e.printStackTrace();
-		}
-	}
 }
 
 
