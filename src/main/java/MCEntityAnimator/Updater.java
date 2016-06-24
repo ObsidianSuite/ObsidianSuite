@@ -20,8 +20,8 @@ import net.minecraft.client.Minecraft;
 public class Updater 
 {
 	
-	private final static String versionURL = "http://users.ecs.soton.ac.uk/je5g15/MCEA/version.html";
-    private final static String historyURL = "http://users.ecs.soton.ac.uk/je5g15/MCEA/history.html";
+	private final static String versionURL = "http://nthrootsoftware.com/MCEA/version.html";
+    private final static String historyURL = "http://nthrootsoftware.com/MCEA/history.html";
     
     private String modVersion;
     private String serverVersion;
@@ -32,8 +32,10 @@ public class Updater
     {
     	modVersion = currentVersion;
     	serverVersion = getLatestVersion();
-    	if(outOfDate(currentVersion, getLatestVersion()))
-    		updaterFrame = new UpdaterFrame();
+		updaterFrame = new UpdaterFrame();
+    	installUpdater();
+    	if(!outOfDate(currentVersion, getLatestVersion()))
+    		updaterFrame.dispose();
     }
     
 	public String getLatestVersion() throws IOException
@@ -112,7 +114,7 @@ public class Updater
 				public void actionPerformed(ActionEvent arg0) 
 				{
 					removeButtons();
-					installUpdater();
+					beginUpdate();
 				}
 			});
 			
@@ -173,12 +175,6 @@ public class Updater
 			pack();
 		}
 		
-	}
-	
-	private boolean updaterExists()
-	{
-		File file = new File("MCEA_Updater.jar");
-		return file.exists();
 	}
 	
 	private void installUpdater()

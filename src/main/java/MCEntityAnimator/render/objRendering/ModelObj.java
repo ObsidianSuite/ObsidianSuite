@@ -64,17 +64,11 @@ public class ModelObj extends ModelBase
 	public ModelObj(String par0Str)
 	{	
 		entityType = par0Str;
-		File modelFile = new File(MCEA_Main.animationPath + "/data/" + entityType + "/" + entityType + ".obj");
-		File textureFile = new File(MCEA_Main.animationPath + "/data/" + entityType + "/" + entityType + ".obj");
-		pxyFile = new File(MCEA_Main.animationPath + "/data/" + entityType + "/" + entityType + ".pxy");
+		File modelFile = new File(MCEA_Main.animationPath + "/data/shared/" + entityType + "/" + entityType + ".obj");
+		pxyFile = new File(MCEA_Main.animationPath + "/data/shared/" + entityType + "/" + entityType + ".pxy");
+		txtRL = new ResourceLocation("animation:data/shared/" + entityType + "/" + entityType + ".png");
 
-		
-		
-		//((SimpleReloadableResourceManager)Minecraft.getMinecraft().getResourceManager()).reloadResourcePack(new PXYResourcePack());
-		
-		txtRL = new ResourceLocation("animation:data/player/player.png");
 
-		
 		try 
 		{
 			model = new WavefrontObject(entityType + ".obj", new FileInputStream(modelFile));
@@ -95,7 +89,7 @@ public class ModelObj extends ModelBase
 
 		init();
 	}
-	
+
 	public ResourceLocation getTexture()
 	{
 		return txtRL;
@@ -243,9 +237,12 @@ public class ModelObj extends ModelBase
 				}
 			}
 
-			Bend b = new Bend(child, parent);
-			bends.add(b);
-			child.setBend(b);
+			if(!child.hasBend())
+			{
+				Bend b = new Bend(child, parent);
+				bends.add(b);
+				child.setBend(b);
+			}
 
 			renderWithTexture = prevRenderWithTexture;
 		}
@@ -365,7 +362,7 @@ public class ModelObj extends ModelBase
 		}
 		return arr;
 	}
-	
+
 	public ArrayList<Part> createPartObjList(ModelObj model, ArrayList<GroupObject> groupObjects)
 	{
 		ArrayList<Part> parts = new ArrayList<Part>();

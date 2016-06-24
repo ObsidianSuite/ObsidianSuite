@@ -69,7 +69,7 @@ public class Util
 			if(p instanceof PartObj)
 			{
 				PartObj part = (PartObj) p;
-				if(part.getName().equals(name))
+				if(part.getName().equals(name) || part.getDisplayName().equals(name))
 				{
 					return part;
 				}

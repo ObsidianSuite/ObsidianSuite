@@ -1,4 +1,4 @@
-package MCEntityAnimator.distribution;
+package MCEntityAnimator.gui.animation;
 
 import java.awt.Color;
 import java.awt.Desktop;
@@ -9,8 +9,11 @@ import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -33,10 +36,16 @@ import javax.swing.border.BevelBorder;
 import javax.swing.border.Border;
 import javax.swing.text.DefaultCaret;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreePath;
 
 import MCEntityAnimator.MCEA_Main;
+import MCEntityAnimator.animation.AnimationData;
+import MCEntityAnimator.animation.AnimationSequence;
+import MCEntityAnimator.distribution.ServerAccess;
+import MCEntityAnimator.gui.sequence.GuiAnimationTimelineWithFrames;
+import net.minecraft.client.Minecraft;
 
-public class DistributionGUI extends JFrame
+public class FileGUI extends JFrame
 {
 
 	private static final long serialVersionUID = -3402393679860402540L;
@@ -51,8 +60,12 @@ public class DistributionGUI extends JFrame
 	private SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
 
 	JTextArea outputLog;
+	JButton editButton;
 
-	public DistributionGUI()
+	private String entityToEdit;
+	private String animationToEdit;
+
+	public FileGUI()
 	{
 		super("Animation Files");
 
@@ -60,8 +73,6 @@ public class DistributionGUI extends JFrame
 		mainPanel.setLayout(new GridBagLayout());
 
 		createGUI(mainPanel, "");
-		
-		ServerAccess.gui = this;
 	}
 
 	private void createGUI(final JPanel mainPanel, String outputText)
@@ -70,8 +81,15 @@ public class DistributionGUI extends JFrame
 
 		GridBagConstraints c = new GridBagConstraints();
 
-		JTree tree = new JTree(getFileTree(new File(MCEA_Main.animationPath + "/data")));
+		final JTree tree = new JTree(getFileTree(new File(MCEA_Main.animationPath + "/data")));
 		tree.setBorder(customBorder);
+		tree.addMouseListener(new MouseAdapter() 
+		{
+			public void mouseClicked(MouseEvent e) 
+			{
+				processTreeClick(tree, e);
+			}
+		});
 		JScrollPane treeView = new JScrollPane(tree);
 		treeView.setPreferredSize(new Dimension(200,200));
 		treeView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -83,7 +101,7 @@ public class DistributionGUI extends JFrame
 		todoView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		todoView.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
 
-		outputLog = new JTextArea(5,30);
+		outputLog = new JTextArea(15,30);
 		DefaultCaret caret = (DefaultCaret)outputLog.getCaret();
 		caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
 		outputLog.setEditable(false);
@@ -92,7 +110,32 @@ public class DistributionGUI extends JFrame
 		outputLog.setBackground(Color.black);
 		outputLog.setForeground(Color.gray);
 
-
+		editButton = new JButton("Edit");
+		editButton.setToolTipText("Edit the selected animation.");
+		editButton.setEnabled(false);
+		editButton.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent arg0) 
+			{
+				AnimationSequence seq = null;
+				for(AnimationSequence s : AnimationData.getSequences(entityToEdit))
+				{
+					if(s.getName().equals(animationToEdit))
+					{
+						seq = s;
+						break;
+					}
+				}
+				if(seq != null)
+				{
+					dispose();
+					Minecraft.getMinecraft().displayGuiScreen(new GuiAnimationTimelineWithFrames(entityToEdit,seq));
+				}
+				else
+					JOptionPane.showMessageDialog(FileGUI.this, "Unable to load animation " + animationToEdit + " for " + entityToEdit + ".");
+			}
+		});
 		c.fill = GridBagConstraints.BOTH;
 		c.insets = new Insets(5,5,5,5);
 		c.weightx = 1;
@@ -104,17 +147,32 @@ public class DistributionGUI extends JFrame
 		mainPanel.add(new JLabel("Data"),c);
 		c.gridy = 1;
 		mainPanel.add(treeView,c);
+		c.gridy = 2;
+		mainPanel.add(editButton, c);
 
 		c.gridx = 1;
 		c.gridy = 0;
 		mainPanel.add(new JLabel("Errors"),c);
 		c.gridy = 1;
+		c.gridheight = 2;
 		mainPanel.add(todoView,c);
 
 		JPanel buttonPanel = new JPanel();
-		GridLayout layout = new GridLayout(0,3);
+		GridLayout layout = new GridLayout(0,4);
 		layout.setHgap(5);
 		buttonPanel.setLayout(layout);
+
+		JButton newButton = new JButton("New");
+		newButton.setToolTipText("Create a new animation.");
+		newButton.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent arg0) 
+			{
+				dispose();
+				new AnimationNewGUI();
+			}
+		});
 
 		JButton refresh = new JButton("Refresh");
 		refresh.setToolTipText("Pull all the latest data from the server. Will overwrite any local changes.");
@@ -123,21 +181,27 @@ public class DistributionGUI extends JFrame
 			@Override
 			public void actionPerformed(ActionEvent arg0) 
 			{
-				updateOutput("/-------------< Beginning download >-------------\\", false);
-				Runnable downloadThread = new Runnable() 
+				if(JOptionPane.showConfirmDialog(FileGUI.this, "Refreshing will overwrite any changes you may \n have made since the last time you uploaded.\n Continue?", 
+						"Refresh?", JOptionPane.YES_NO_OPTION) == 0)
 				{
-					public void run() 
+
+
+					updateOutput("/-------------< Beginning download >-------------\\", false);
+					Runnable downloadThread = new Runnable() 
 					{
-						try 
+						public void run() 
 						{
-							ServerAccess.downloadData();
-							updateOutput("\\-------------< Download complete >-------------/", false);
-							createGUI(mainPanel, outputLog.getText());
-						} 
-						catch (IOException e) {e.printStackTrace();}
-					}
-				};
-				new Thread(downloadThread).start();
+							try 
+							{
+								ServerAccess.downloadAll();
+								updateOutput("\\-------------< Download complete >-------------/", false);
+								createGUI(mainPanel, outputLog.getText());
+							} 
+							catch (IOException e) {e.printStackTrace();}
+						}
+					};
+					new Thread(downloadThread).start();
+				}
 			}
 		});
 
@@ -155,7 +219,7 @@ public class DistributionGUI extends JFrame
 					{
 						try 
 						{
-							List<String> failedFiles = ServerAccess.uploadAll(new File(MCEA_Main.animationPath + "/data"), "");
+							List<String> failedFiles = ServerAccess.uploadAll();
 							if(failedFiles.isEmpty())
 								updateOutput("\\--------------< Upload complete >-------------/", false);
 							else
@@ -183,22 +247,38 @@ public class DistributionGUI extends JFrame
 			}
 		});
 
-		buttonPanel.add(refresh, c);
-		buttonPanel.add(upload, c);
-		buttonPanel.add(close, c);
+		buttonPanel.add(newButton);
+		buttonPanel.add(refresh);
+		buttonPanel.add(upload);
+		buttonPanel.add(close);
 
 		c.gridwidth = 2;
+		c.gridheight = 1;
 		c.gridx = 0;
-		c.gridy = 2;
-		mainPanel.add(new JScrollPane(outputLog, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER),c);
 		c.gridy = 3;
+		mainPanel.add(new JScrollPane(outputLog, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER),c);
+		c.gridy = 4;
 		mainPanel.add(buttonPanel,c);
 
 		setContentPane(mainPanel);
 		pack();
 		setVisible(true);
+		setAlwaysOnTop(true);
 		
 		outputLog.setText(outputText);
+
+		addWindowListener(new WindowAdapter() 
+		{    
+			public void windowClosed(WindowEvent e) 
+			{
+				ServerAccess.gui = null;
+			}
+
+			public void windowClosing(WindowEvent e) 
+			{
+				ServerAccess.gui = null;			
+			}
+		});
 	}
 
 	public void updateOutput(String text, boolean server)
@@ -290,5 +370,30 @@ public class DistributionGUI extends JFrame
 		return file;
 	}
 
+	private void processTreeClick(JTree tree, MouseEvent e) 
+	{
+		TreePath tp = tree.getPathForLocation(e.getX(), e.getY());
+		if (tp != null)
+		{
+			int length = tp.getPathCount();
+			boolean enabled = false;
+			if(length == 4)
+			{
+				if(!tp.getPathComponent(1).toString().equals("shared"))
+				{
+					animationToEdit = tp.getPathComponent(3).toString();
+					if(!animationToEdit.equals("EMPTY!"))
+					{
+						enabled = true;
+						animationToEdit = animationToEdit.substring(0, animationToEdit.indexOf("."));
+						entityToEdit = tp.getPathComponent(2).toString();
+					}
+				}
+				else
+					JOptionPane.showMessageDialog(this, "Permission denied, must be root user.");
+			}
+			editButton.setEnabled(enabled);
+		}
+	}
 
 }

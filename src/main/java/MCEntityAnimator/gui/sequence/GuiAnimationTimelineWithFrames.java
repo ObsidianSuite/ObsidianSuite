@@ -17,6 +17,7 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -50,7 +51,9 @@ import MCEntityAnimator.Util;
 import MCEntityAnimator.animation.AnimationData;
 import MCEntityAnimator.animation.AnimationPart;
 import MCEntityAnimator.animation.AnimationSequence;
+import MCEntityAnimator.distribution.ServerAccess;
 import MCEntityAnimator.gui.GuiEntityRenderer;
+import MCEntityAnimator.gui.animation.FileGUI;
 import MCEntityAnimator.render.objRendering.parts.Part;
 import MCEntityAnimator.render.objRendering.parts.PartObj;
 
@@ -178,10 +181,19 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 	@Override
 	public void onGuiClosed()
 	{
+
 		saveSetup();
 		controllerFrame.dispose();
 		settingsFrame.dispose();
 		timelineFrame.dispose();
+		try 
+		{
+			ServerAccess.uploadAll();
+		} 
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
 	}
 
 	public void drawScreen(int par1, int par2, float par3)
@@ -519,9 +531,12 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 				public void actionPerformed(ActionEvent e) 
 				{
 					AnimationData.deleteSequence(entityName, animation);
-					mc.displayGuiScreen(new GuiAnimationSequenceList(entityName, AnimationData.getSequences(entityName)));
+					mc.displayGuiScreen(null);
+					ServerAccess.gui = new FileGUI();
+
 				}
 			});
+			deleteButton.setEnabled(false);
 
 			JButton backButton = new JButton("Back");
 			backButton.addActionListener(new ActionListener()
@@ -529,7 +544,8 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 				@Override
 				public void actionPerformed(ActionEvent e) 
 				{
-					mc.displayGuiScreen(new GuiAnimationSequenceList(entityName, AnimationData.getSequences(entityName)));
+					mc.displayGuiScreen(null);
+					ServerAccess.gui = new FileGUI();
 				}
 			});
 
@@ -1227,15 +1243,19 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 				{
 					String typed = textField.getText();
 					slider.setValue(0);
-					if(!typed.matches("\\d+(\\.\\d*)?")) 
+					Double d;
+					try
+					{
+						d = Double.parseDouble(typed);
+					}
+					catch(NumberFormatException e)
 					{
 						return;
 					}
-					double value = Double.parseDouble(typed)*slider.scale;
+					double value = d*slider.scale;
 					boolean prev = slider.shouldUpdate;
 					slider.shouldUpdate = true;
 					slider.setValue((int)value);
-					slider.shouldUpdate = prev;
 				}
 			});
 

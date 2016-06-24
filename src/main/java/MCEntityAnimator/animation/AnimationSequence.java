@@ -23,6 +23,11 @@ public class AnimationSequence
 	{
 		this.animationName = par0Str;
 	}
+	
+	public AnimationSequence(String entityName, NBTTagCompound compound) 
+	{
+		this.loadData(entityName, compound);
+	}
 
 	public String getName() 
 	{
@@ -65,8 +70,8 @@ public class AnimationSequence
 			if(!part.getName().equals(exceptionPartName))
 			{
 				AnimationPart lastAnimation = getLastAnimation(part.getName());
-				if(lastAnimation != null && time >= lastAnimation.getEndTime())
-					lastAnimation.animatePart(lastAnimation.getEndTime());
+				if(lastAnimation != null && time > lastAnimation.getEndTime())
+					lastAnimation.animatePart(lastAnimation.getEndTime() - lastAnimation.getStartTime());
 				else
 					part.setToOriginalValues();
 			}
@@ -74,9 +79,7 @@ public class AnimationSequence
 		for(AnimationPart s : this.animations)
 		{
 			if(!s.getPart().getName().equals(exceptionPartName) && time >= s.getStartTime() && time <= s.getEndTime())
-			{
 				s.animatePart(time - s.getStartTime());
-			}
 		}
 	}
 

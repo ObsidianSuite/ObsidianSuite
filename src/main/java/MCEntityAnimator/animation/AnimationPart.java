@@ -54,7 +54,7 @@ public class AnimationPart
 		float x = startPosition[0] + time*movement[0];
 		float y = startPosition[1] + time*movement[1];
 		float z = startPosition[2] + time*movement[2];
-		
+				
 		part.setValues(new float[]{x, y, z});
 	}
 

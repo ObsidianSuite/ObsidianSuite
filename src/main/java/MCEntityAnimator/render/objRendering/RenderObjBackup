@@ -208,7 +208,7 @@ public class PartObj extends Part
             {
                 switch(i)
                 {
-                case 0: /* X formula */ trans[0] = rotationPoint[0]*-0.78125f; break;
+                case 0: /* X formula */ break;
                 case 1: trans[1] = rotationPoint[1]*0.77f + 1.2f; break;
                 case 2: /* Z formula */  break;         
                 }
@@ -219,23 +219,39 @@ public class PartObj extends Part
             {
                 switch(i)
                 {
-                case 0: /* X formula */ prevtrans[0] = prevRotationPoint[0]*-0.78125f; break;
+                case 0: /* X formula */ break;
                 case 1: prevtrans[1] = prevRotationPoint[1]*0.77f + 1.2f; break;
                 case 2: /* Z formula */  break;         
                 }
             }
         }
-             
+
+        
+        
+        //GL11.glTranslatef(-trans[0], -trans[1], -trans[2]);
+        
         GL11.glTranslatef(trans[0] - prevtrans[0], trans[1] - prevtrans[1], trans[2] - prevtrans[2]);
-    
-        if (this.valueX != 0.0F)
-            GL11.glRotatef(this.valueX * (180F / (float)Math.PI), 1.0F, 0.0F, 0.0F);
+
+        
+        
         
         if (this.valueY != 0.0F)
             GL11.glRotatef(-this.valueY * (180F / (float)Math.PI), 0.0F, 1.0F, 0.0F);
         
+        if (this.valueX != 0.0F)
+            GL11.glRotatef(this.valueX * (180F / (float)Math.PI), 1.0F, 0.0F, 0.0F);
+        
         if (this.valueZ != 0.0F)
-            GL11.glRotatef(-this.valueZ * (180F / (float)Math.PI), 0.0F, 0.0F, 1.0F);   
+            GL11.glRotatef(-this.valueZ * (180F / (float)Math.PI), 0.0F, 0.0F, 1.0F);
+        
+        //GL11.glTranslatef(-trans[0], -trans[1], -trans[2]);
+        
+
+        
+        //GL11.glTranslatef(rotationPoint[0], rotationPoint[1], rotationPoint[2]);  
+        
+
+        
     }
 
 

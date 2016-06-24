@@ -9,16 +9,20 @@ import net.minecraft.client.renderer.entity.RenderLiving;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.EnumAction;
+import net.minecraft.item.Item.ToolMaterial;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemSword;
 import net.minecraft.util.ResourceLocation;
 
 import org.lwjgl.opengl.GL11;
 
 import MCEntityAnimator.Util;
 import MCEntityAnimator.item.ModelLargeShield;
+import MCEntityAnimator.render.objRendering.parts.PartObj;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
@@ -89,6 +93,7 @@ public class RenderObj extends RenderLiving
 		
 		GL11.glColor3f(1.0F, 1.0F, 1.0F);       
 		ItemStack itemstack1 = player.getHeldItem();
+		itemstack1 = new ItemStack(Blocks.cobblestone);
 
 		float f2;
 		float f4;
@@ -96,11 +101,17 @@ public class RenderObj extends RenderLiving
 		if (itemstack1 != null)
 		{
 			GL11.glPushMatrix();
-			Util.getPartObjFromName("chest", modelObj.parts).postRender(0.0625f);
-			Util.getPartObjFromName("armupr", modelObj.parts).postRender(0.0625f);
-			Util.getPartObjFromName("armlwr", modelObj.parts).postRender(0.0625f);
-			//this.modelBipedMain.bipedRightArm.postRender(0.0625F);
-			GL11.glTranslatef(-0.0625F, 0.2075F, 0.0625F);
+						
+			PartObj chest = Util.getPartObjFromName("chest", modelObj.parts);
+			PartObj armUpR = Util.getPartObjFromName("armUpR", modelObj.parts);
+			PartObj armLwR = Util.getPartObjFromName("armLwR", modelObj.parts);
+
+			
+			chest.postRender(new float[]{0.0f, 0.0f, 0.0f});
+			armUpR.postRender(chest.getRotationPoint());
+			armLwR.postRender(armUpR.getRotationPoint());
+
+			GL11.glTranslatef(-0.125F, 0.2F, 0.1F);
 
 			EnumAction enumaction = null;
 
@@ -201,9 +212,9 @@ public class RenderObj extends RenderLiving
 
 		GL11.glPushMatrix();
 		Minecraft.getMinecraft().renderEngine.bindTexture(shieldTexture);
-		Util.getPartObjFromName("chest", modelObj.parts).postRender(0.0625f);
-		Util.getPartObjFromName("armupl", modelObj.parts).postRender(0.0625f);
-		Util.getPartObjFromName("armlwl", modelObj.parts).postRender(0.0625f);
+//		Util.getPartObjFromName("chest", modelObj.parts).postRender(0.0625f);
+//		Util.getPartObjFromName("armupl", modelObj.parts).postRender(0.0625f);
+//		Util.getPartObjFromName("armlwl", modelObj.parts).postRender(0.0625f);
 		GL11.glTranslatef(-0.375F, 0.0F, 0.0F); 
 		shieldModel.render(player, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0625F);
 		GL11.glPopMatrix();
