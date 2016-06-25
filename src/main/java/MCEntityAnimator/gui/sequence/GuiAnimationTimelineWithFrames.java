@@ -39,6 +39,7 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.JTabbedPane;
@@ -253,8 +254,13 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 	private void addKeyframe()
 	{
 		Part part = Util.getPartFromName(currentPartName, entityModel.parts);
-		List<Keyframe> partKeyframes = keyframes.get(currentPartName);
 		Keyframe kf = new Keyframe((int) time, currentPartName, part.getValues());
+		addKeyframe(kf);
+	}
+	
+	private void addKeyframe(Keyframe kf)
+	{
+		List<Keyframe> partKeyframes = keyframes.get(kf.partName);
 		boolean keyframeExists = false;
 		if(partKeyframes == null)
 			partKeyframes = new ArrayList<Keyframe>();
@@ -263,7 +269,7 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 			Keyframe keyframeToRemove = null;
 			for(Keyframe pkf : partKeyframes)
 			{
-				if(pkf.frameTime == time)
+				if(pkf.frameTime == kf.frameTime)
 					keyframeToRemove = pkf;
 			}
 			if(keyframeToRemove != null)
@@ -273,8 +279,8 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 			}
 		}
 		partKeyframes.add(kf);
-		keyframes.put(currentPartName, partKeyframes);
-		timelineFrame.repaint();
+		keyframes.put(kf.partName, partKeyframes);
+		refreshFrames();
 		if(!keyframeExists)
 			updateAnimation();
 	}
@@ -381,9 +387,7 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 		if(animationVersion > 0)
 		{
 			animationVersion --;
-			System.out.println(currentAnimation);
 			currentAnimation = animationVersions.get(animationVersion);
-			System.out.println(currentAnimation);
 			AnimationData.addSequence(entityName, currentAnimation);
 			loadKeyframes();
 			refreshFrames();
@@ -407,15 +411,12 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 	}
 
 	private void refreshFrames()
-	{
-		System.out.println(currentAnimation);
-		
+	{		
 		String s = exceptionPartName;
 		exceptionPartName = "";
 		settingsFrame.updateRotationSliderValues();
 		settingsFrame.refreshButtons();
 		timelineFrame.refresthLineColours();
-		timelineFrame.repaintLines();
 		exceptionPartName = s;
 	}
 	
@@ -790,6 +791,15 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 			yRotPanel.slider.setDoubleValue(y);
 			zRotPanel.slider.setDoubleValue(z);
 		}
+		
+		private Double[] getSliderValues()
+		{
+			Double[] sliderVals = new Double[3];
+			sliderVals[0] = xRotPanel.slider.getScaledValue();
+			sliderVals[1] = yRotPanel.slider.getScaledValue();
+			sliderVals[2] = zRotPanel.slider.getScaledValue();
+			return getSliderValues();
+		}
 
 		private void refreshButtons()
 		{
@@ -933,7 +943,6 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 					double value = Double.parseDouble(typed);
 					timeSlider.setValue((int)value);
 					time = (float) value;
-					repaintLines();
 					settingsFrame.refreshButtons();
 				}
 			});
@@ -1028,14 +1037,6 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 			}
 			repaint();
 		}
-		
-		private void repaintLines()
-		{
-//			for(int i = 0; i < parts.size(); i++)
-//			{
-//				lines[i].repaint();
-//			}
-		}
 
 		private class KeyframeLine extends JPanel
 		{		
@@ -1055,7 +1056,21 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 					@Override
 					public void mouseClicked(MouseEvent e) 
 					{
-						if(closestKeyframe != null)
+						Keyframe kf = getExistingKeyframe();
+						if(kf != null && e.isControlDown())
+						{
+							if(partName.equals("entitypos") && !kf.partName.equals("entitypos"))
+								JOptionPane.showMessageDialog(timelineFrame, "Only entitypos can copy to entitypos.");
+							else if(partName.equals("prop_rot") && !kf.partName.equals("prop_rot"))
+								JOptionPane.showMessageDialog(timelineFrame, "Only prop_rot can copy to prop_rot.");
+							else if(partName.equals("prop_trans") && !kf.partName.equals("prop_trans"))
+								JOptionPane.showMessageDialog(timelineFrame, "Only prop_trans can copy to prop_trans.");
+							else if((kf.partName.equals("entitypos") || kf.partName.equals("prop_rot") || kf.partName.equals("prop_trans")) && !kf.partName.equals(partName))
+								JOptionPane.showMessageDialog(timelineFrame, kf.partName + " can only copy to itself.");
+							else
+								addKeyframe(new Keyframe(xToKeyframeTime(e.getX()), partName, kf.values));
+						}
+						else if(closestKeyframe != null)
 						{
 							time = closestKeyframe.frameTime;
 							timelineFrame.timeSlider.setValue((int) time);
@@ -1099,14 +1114,15 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 						if(closestKeyframe != null)
 						{
 							int prevFrameTime = closestKeyframe.frameTime;
-							int kfx = (int)(closestKeyframe.frameTime/(float)timelineLength*(getWidth() - 10));
+							int kfx = keyframeTimeToX(prevFrameTime);
 							int dx = Math.abs(kfx - e.getX());
 							if(dx < 15)
 							{
-								int t = (int) (e.getX()*timelineLength/(float)(getWidth() - 10));
+								int t = xToKeyframeTime(e.getX());
 								if(t >= 0 && t <= 300)
 								{
 									closestKeyframe.frameTime = t;
+									timelineFrame.timeSlider.setValue(t);
 									repaint();
 								}
 								if(t != prevFrameTime)
@@ -1123,7 +1139,17 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 					}			
 				});
 			}
+			
+			private int keyframeTimeToX(int keyframeTime)
+			{
+				return (int)(keyframeTime/(float)timelineLength*(getWidth() - 10));
+			}
 
+			private int xToKeyframeTime(int x)
+			{
+				return (int) (x*timelineLength/(float)(getWidth() - 10));
+			}
+			
 			public void updateClosestKeyframe(int mouseX)
 			{
 				Keyframe closestKf = null;
@@ -1143,7 +1169,6 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 				}
 				closestKeyframe = closestKf;
 			}
-
 
 			@Override
 			public void paint(Graphics g)
