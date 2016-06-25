@@ -32,7 +32,6 @@ public class RenderObj extends RenderLiving
 {
 	static ModelObj modelObj;
 	
-	private String entity;
 	private HashMap<String, ModelObj> models;
 	
 	private static final ModelLargeShield shieldModel = new ModelLargeShield();
@@ -76,7 +75,7 @@ public class RenderObj extends RenderLiving
 	}
 	
 	@Override
-	protected void renderEquippedItems(EntityLivingBase player, float f)
+	protected void renderEquippedItems(EntityLivingBase entity, float f)
 	{
 
 //		if(Minecraft.getMinecraft() != null && Minecraft.getMinecraft().currentScreen != null && Minecraft.getMinecraft().currentScreen instanceof GuiAnimationTimeline 
@@ -92,8 +91,8 @@ public class RenderObj extends RenderLiving
 //		}
 		
 		GL11.glColor3f(1.0F, 1.0F, 1.0F);       
-		ItemStack itemstack1 = player.getHeldItem();
-		itemstack1 = new ItemStack(Blocks.cobblestone);
+		ItemStack itemstack1 = entity.getHeldItem();
+		//itemstack1 = new ItemStack(Items.wooden_sword);
 
 		float f2;
 		float f4;
@@ -101,18 +100,19 @@ public class RenderObj extends RenderLiving
 		if (itemstack1 != null)
 		{
 			GL11.glPushMatrix();
-						
-			PartObj chest = Util.getPartObjFromName("chest", modelObj.parts);
-			PartObj armUpR = Util.getPartObjFromName("armUpR", modelObj.parts);
-			PartObj armLwR = Util.getPartObjFromName("armLwR", modelObj.parts);
-
 			
-			chest.postRender(new float[]{0.0f, 0.0f, 0.0f});
-			armUpR.postRender(chest.getRotationPoint());
-			armLwR.postRender(armUpR.getRotationPoint());
+			//Post render for lower right arm.
+			PartObj armLwR = Util.getPartObjFromName("armLwR", modelObj.parts);
+			armLwR.postRender(modelObj.getEntityType());
+			GL11.glTranslatef(-0.125F, 0.2F, 0.2F);
+			
+			//Get prop rotation and translation
+			float[] propRotation = Util.getPartFromName("prop_rot", modelObj.parts).getValues();
+			float[] propTranslation = Util.getPartFromName("prop_trans", modelObj.parts).getValues();
 
-			GL11.glTranslatef(-0.125F, 0.2F, 0.1F);
-
+			//Translation implementation.
+			GL11.glTranslatef(propTranslation[0], propTranslation[1], propTranslation[2]);	
+			
 			EnumAction enumaction = null;
 
 			net.minecraftforge.client.IItemRenderer customRenderer = net.minecraftforge.client.MinecraftForgeClient.getItemRenderer(itemstack1, net.minecraftforge.client.IItemRenderer.ItemRenderType.EQUIPPED);
@@ -150,20 +150,6 @@ public class RenderObj extends RenderLiving
 				GL11.glScalef(f2, -f2, f2);
 				GL11.glRotatef(-100.0F, 1.0F, 0.0F, 0.0F);
 				GL11.glRotatef(45.0F, 0.0F, 1.0F, 0.0F);
-				//TODO prop!!
-//				GL11.glRotatef((float) (Util.getPartObjFromName("prop", modelObj.parts).getRotation(0)/Math.PI)*180.0F, -1.0F, -0.5F, 1.0F);
-//				GL11.glRotatef((float) (Util.getPartObjFromName("prop", modelObj.parts).getRotation(1)/Math.PI)*180.0F, -0.1F, 1.0F, 0.2F);
-//				GL11.glRotatef((float) (Util.getPartObjFromName("prop", modelObj.parts).getRotation(2)/Math.PI)*180.0F, 1.0F, 0.0F, 1.0F);
-				//				File file = new File(Minecraft.getMinecraft().mcDataDir, "Temp.txt");
-				//				try
-				//				{
-				//					List<String> strs = Files.readAllLines(Paths.get(file.getAbsolutePath()));
-				//					GL11.glRotatef((float) (this.mainModel.prop.rotateAngleY/Math.PI)*180.0F, Float.parseFloat(strs.get(0)), Float.parseFloat(strs.get(1)), Float.parseFloat(strs.get(2)));
-				//				}
-				//				catch (IOException e)
-				//				{
-				//					e.printStackTrace();
-				//				}
 			}
 			else
 			{
@@ -174,7 +160,13 @@ public class RenderObj extends RenderLiving
 				GL11.glRotatef(-90.0F, 1.0F, 0.0F, 0.0F);
 				GL11.glRotatef(20.0F, 0.0F, 0.0F, 1.0F);
 			}
+	
+			//Prop rotation.
+			GL11.glRotatef(propRotation[0]*180.0F, -1.0F, -0.5F, 1.0F);
+			GL11.glRotatef(propRotation[1]*180.0F, -0.1F, 1.0F, 0.2F);
+			GL11.glRotatef(propRotation[2]*180.0F, 1.0F, 0.0F, 1.0F);
 
+			
 			float f3;
 			int k;
 			float f12;
@@ -188,7 +180,7 @@ public class RenderObj extends RenderLiving
 					f3 = (float)(i >> 8 & 255) / 255.0F;
 					f4 = (float)(i & 255) / 255.0F;
 					GL11.glColor4f(f12, f3, f4, 1.0F);
-					this.renderManager.itemRenderer.renderItem(player, itemstack1, k);
+					this.renderManager.itemRenderer.renderItem(entity, itemstack1, k);
 				}
 			}
 			else
@@ -198,7 +190,7 @@ public class RenderObj extends RenderLiving
 				f12 = (float)(k >> 8 & 255) / 255.0F;
 				f3 = (float)(k & 255) / 255.0F;
 				GL11.glColor4f(f11, f12, f3, 1.0F);
-				this.renderManager.itemRenderer.renderItem(player, itemstack1, 0);
+				this.renderManager.itemRenderer.renderItem(entity, itemstack1, 0);
 			}
 
 			GL11.glPopMatrix();

@@ -53,7 +53,9 @@ import MCEntityAnimator.animation.AnimationPart;
 import MCEntityAnimator.animation.AnimationSequence;
 import MCEntityAnimator.distribution.ServerAccess;
 import MCEntityAnimator.gui.GuiEntityRenderer;
+import MCEntityAnimator.gui.GuiInventoryChooseItem;
 import MCEntityAnimator.gui.animation.FileGUI;
+import MCEntityAnimator.render.objRendering.EntityObj;
 import MCEntityAnimator.render.objRendering.parts.Part;
 import MCEntityAnimator.render.objRendering.parts.PartObj;
 
@@ -84,36 +86,7 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 
 		loadKeyframes();
 		updateAnimation();
-
-		controllerFrame = new ControllerFrame();
-		settingsFrame = new SettingsFrame();
-		timelineFrame = new TimelineFrame();
-
-		for(int i = 0; i < 3; i++)
-		{
-			JFrame frame = null;
-			switch(i)
-			{
-			case 0: frame = controllerFrame; break;
-			case 1: frame = settingsFrame; break;
-			case 2: frame = timelineFrame; break;
-			}
-			InputMap inputMap = frame.getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-			ActionMap actionMap = frame.getRootPane().getActionMap();
-
-			inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0), "spacePressed");
-			actionMap.put("spacePressed", new SpaceAction());		
-			inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_W, 0), "wPressed");
-			actionMap.put("wPressed", new WAction());
-			inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_S, 0), "sPressed");
-			actionMap.put("sPressed", new SAction());
-			inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_A, 0), "aPressed");
-			actionMap.put("aPressed", new AAction());
-			inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0), "dPressed");
-			actionMap.put("dPressed", new DAction());
-		}
-
-		timelineFrame.refresthLineColours();
+		loadFrames();
 	}
 
 	@Override
@@ -143,6 +116,39 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 		String data = horizontalPan + "," + verticalPan + "," + horizontalRotation + "," 
 				+ verticalRotation + "," + scaleModifier + "," + boolBase;
 		AnimationData.setAnimationSetup(entityName, data);
+	}
+	
+	public void loadFrames()
+	{
+		controllerFrame = new ControllerFrame();
+		settingsFrame = new SettingsFrame();
+		timelineFrame = new TimelineFrame();
+
+		for(int i = 0; i < 3; i++)
+		{
+			JFrame frame = null;
+			switch(i)
+			{
+			case 0: frame = controllerFrame; break;
+			case 1: frame = settingsFrame; break;
+			case 2: frame = timelineFrame; break;
+			}
+			InputMap inputMap = frame.getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+			ActionMap actionMap = frame.getRootPane().getActionMap();
+
+			inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0), "spacePressed");
+			actionMap.put("spacePressed", new SpaceAction());		
+			inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_W, 0), "wPressed");
+			actionMap.put("wPressed", new WAction());
+			inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_S, 0), "sPressed");
+			actionMap.put("sPressed", new SAction());
+			inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_A, 0), "aPressed");
+			actionMap.put("aPressed", new AAction());
+			inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0), "dPressed");
+			actionMap.put("dPressed", new DAction());
+		}
+
+		timelineFrame.refresthLineColours();
 	}
 
 	/**
@@ -507,11 +513,9 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 				@Override
 				public void actionPerformed(ActionEvent e) 
 				{
-					//TODO choose prop
-					//mc.displayGuiScreen(new GuiInventoryChooseItem(this, (EntityObj) entityToRender));
+					mc.displayGuiScreen(new GuiInventoryChooseItem(GuiAnimationTimelineWithFrames.this, (EntityObj) entityToRender));
 				}
 			});
-			choosePropButton.setEnabled(false);
 
 			JButton setActionPointButton = new JButton("Set Action Point");
 			setActionPointButton.addActionListener(new ActionListener()

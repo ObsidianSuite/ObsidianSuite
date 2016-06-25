@@ -1,15 +1,11 @@
 package MCEntityAnimator.render.objRendering;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -20,17 +16,14 @@ import com.google.common.collect.Maps;
 
 import MCEntityAnimator.MCEA_Main;
 import MCEntityAnimator.Util;
-import MCEntityAnimator.ZipUtils;
 import MCEntityAnimator.animation.AnimationData;
 import MCEntityAnimator.animation.AnimationParenting;
 import MCEntityAnimator.animation.PartGroupsAndNames;
 import MCEntityAnimator.render.objRendering.parts.Part;
 import MCEntityAnimator.render.objRendering.parts.PartEntityPos;
 import MCEntityAnimator.render.objRendering.parts.PartObj;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelRenderer;
-import net.minecraft.client.resources.IResource;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.ModelFormatException;
@@ -78,6 +71,8 @@ public class ModelObj extends ModelBase
 
 		parts = createPartObjList(this, model.groupObjects);
 		parts.add(new PartEntityPos(this));
+		parts.add(new Part(this, "prop_rot"));
+		parts.add(new Part(this, "prop_trans"));
 		parenting = AnimationData.getAnipar(par0Str);
 		hightlightedParts = new ArrayList<PartObj>();
 		bends = new ArrayList<Bend>();

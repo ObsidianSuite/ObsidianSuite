@@ -1,11 +1,13 @@
 package MCEntityAnimator.render.objRendering.parts;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 import org.lwjgl.opengl.GL11;
 
 import MCEntityAnimator.animation.AnimationData;
+import MCEntityAnimator.animation.AnimationParenting;
 import MCEntityAnimator.render.objRendering.Bend;
 import MCEntityAnimator.render.objRendering.ModelObj;
 import cpw.mods.fml.relauncher.Side;
@@ -191,51 +193,80 @@ public class PartObj extends Part
     }
 
     /**
-     * Allows the changing of Angles after a box has been rendered
+     * Setup rotation and translation for a GL11 matrix based on the rotation
+     * and rotation point of this part and all its parents.
+     * @param entityName - Name of the model. 
      */
     @SideOnly(Side.CLIENT)
-    public void postRender(float[] prevRotationPoint)
+    public void postRender(String entityName)
     {
+    	//Generate a list of parents: {topParent, topParent - 1,..., parent, this}/
+    	AnimationParenting anipar = AnimationData.getAnipar(entityName);
+    	List<PartObj> parts = new ArrayList<PartObj>();
+    	PartObj child = this;
+    	PartObj parent;
+    	parts.add(0, child);
+    	while((parent = anipar.getParent(child)) != null)
+    	{
+        	parts.add(0, parent);
+        	child = parent;
+    	}
+    	
+    	String s = "";
+    	for(PartObj part : parts)
+    		s = s + part.displayName + ", ";
+    	
+    	//System.out.println(s);
+    	
+    	//Translate and rotate all parts, starting with the top parent. 
+    	PartObj prevPart = null;
+    	for(PartObj p : parts)
+    	{
+    		//TODO Post render: Z formula, temporarily works for player though.
+    		//Not sure if the formulae will work for other entities.
+    		float[] currentRotPoint = p.getRotationPoint();
+    		//If prevPart is null, ie part is top parent, use 0,0,0.
+    		float[] prevRotPoint = prevPart != null ? prevPart.getRotationPoint() : new float[]{0.0F, 0.0F, 0.0F};
+    		prevPart = p;
+    		
+            float[] trans = new float[3];
+            float[] prevtrans = new float[3];
 
-        //TODO formulas for x and z, temporarily works for player though        
-        float[] trans = new float[3];
-        float[] prevtrans = new float[3];
-
-        for(int i = 0; i < 3; i++)
-        {
-            trans[i] = 0.0F;
-            if(rotationPoint[i] != 0.0f)
+            for(int i = 0; i < 3; i++)
             {
-                switch(i)
+                trans[i] = 0.0F;
+                if(currentRotPoint[i] != 0.0f)
                 {
-                case 0: /* X formula */ trans[0] = rotationPoint[0]*-0.78125f; break;
-                case 1: trans[1] = rotationPoint[1]*0.77f + 1.2f; break;
-                case 2: /* Z formula */  break;         
+                    switch(i)
+                    {
+                    case 0: trans[0] = currentRotPoint[0]*-0.78125f; break;
+                    case 1: trans[1] = currentRotPoint[1]*0.77f + 1.2f; break;
+                    case 2: /* Z formula */  break;         
+                    }
+                }
+                
+                prevtrans[i] = 0.0F;
+                if(prevRotPoint[i] != 0.0f)
+                {
+                    switch(i)
+                    {
+                    case 0: prevtrans[0] = prevRotPoint[0]*-0.78125f; break;
+                    case 1: prevtrans[1] = prevRotPoint[1]*0.77f + 1.2f; break;
+                    case 2: /* Z formula */  break;         
+                    }
                 }
             }
-            
-            prevtrans[i] = 0.0F;
-            if(prevRotationPoint[i] != 0.0f)
-            {
-                switch(i)
-                {
-                case 0: /* X formula */ prevtrans[0] = prevRotationPoint[0]*-0.78125f; break;
-                case 1: prevtrans[1] = prevRotationPoint[1]*0.77f + 1.2f; break;
-                case 2: /* Z formula */  break;         
-                }
-            }
-        }
-             
-        GL11.glTranslatef(trans[0] - prevtrans[0], trans[1] - prevtrans[1], trans[2] - prevtrans[2]);
-    
-        if (this.valueX != 0.0F)
-            GL11.glRotatef(this.valueX * (180F / (float)Math.PI), 1.0F, 0.0F, 0.0F);
-        
-        if (this.valueY != 0.0F)
-            GL11.glRotatef(-this.valueY * (180F / (float)Math.PI), 0.0F, 1.0F, 0.0F);
-        
-        if (this.valueZ != 0.0F)
-            GL11.glRotatef(-this.valueZ * (180F / (float)Math.PI), 0.0F, 0.0F, 1.0F);   
+
+            //Translate, compensating for the previous part translation.
+            GL11.glTranslatef(trans[0] - prevtrans[0], trans[1] - prevtrans[1], trans[2] - prevtrans[2]);
+            //Rotate
+            if (p.valueX != 0.0F)
+                GL11.glRotatef(p.valueX * (180F / (float)Math.PI), 1.0F, 0.0F, 0.0F);
+            if (p.valueY != 0.0F)
+                GL11.glRotatef(-p.valueY * (180F / (float)Math.PI), 0.0F, 1.0F, 0.0F);            
+            if (p.valueZ != 0.0F)
+                GL11.glRotatef(-p.valueZ * (180F / (float)Math.PI), 0.0F, 0.0F, 1.0F);   
+    	}
     }
 
 

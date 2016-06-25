@@ -18,7 +18,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 /**
  * An abstract object for tracking information about a part (limb, position of model etc).
  */
-public abstract class Part
+public class Part
 {
 	protected float valueX, valueY, valueZ;
 	protected float[] originalValues;
@@ -97,6 +97,8 @@ public abstract class Part
 		setValues(originalValues);
 	}
 
-	public abstract void move(Entity entity);
-
+	public void move(Entity entity)
+	{
+		
+	}
 }
