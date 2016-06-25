@@ -8,8 +8,10 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
@@ -151,6 +153,10 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 			actionMap.put("aPressed", new AAction());
 			inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0), "dPressed");
 			actionMap.put("dPressed", new DAction());
+			inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.CTRL_DOWN_MASK, true), "undoReleased");
+			actionMap.put("undoReleased", new UndoAction());
+			inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_Y, InputEvent.CTRL_DOWN_MASK, true), "redoReleased");
+			actionMap.put("redoReleased", new RedoAction());
 		}
 
 		timelineFrame.refresthLineColours();
@@ -161,6 +167,7 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 	 */
 	public void loadKeyframes()
 	{	
+		keyframes.clear();
 		for(AnimationPart animpart : currentAnimation.getAnimations())
 		{
 			String partName = animpart.getPart().getName();
@@ -324,8 +331,7 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 		return null;
 	}
 
-
-	protected void updateAnimation()
+	private void updateAnimation()
 	{
 		//Create new animation object if new version
 		AnimationSequence sequence = new AnimationSequence(currentAnimation.getName());
@@ -359,6 +365,7 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 			iter.next();
 			if(i > animationVersion)
 				iter.remove();
+			i++;
 		}
 		//Add new version to animation versions and update animationVersion and currentAnimation
 		animationVersions.add(sequence);
@@ -367,13 +374,51 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 		
 		//Update animation sequence in AnimationData.
 		AnimationData.addSequence(entityName, currentAnimation);
-
-		System.out.println(animationVersions);
-		System.out.println("V: " + animationVersion);
-		System.out.println(currentAnimation);
-		System.out.println("");
+	}
+	
+	private void undo()
+	{
+		if(animationVersion > 0)
+		{
+			animationVersion --;
+			System.out.println(currentAnimation);
+			currentAnimation = animationVersions.get(animationVersion);
+			System.out.println(currentAnimation);
+			AnimationData.addSequence(entityName, currentAnimation);
+			loadKeyframes();
+			refreshFrames();
+		}
+		else
+			Toolkit.getDefaultToolkit().beep();
+	}
+	
+	private void redo()
+	{
+		if(animationVersion < animationVersions.size() - 1)
+		{
+			animationVersion ++;
+			currentAnimation = animationVersions.get(animationVersion);
+			AnimationData.addSequence(entityName, currentAnimation);
+			loadKeyframes();
+			refreshFrames();
+		}
+		else
+			Toolkit.getDefaultToolkit().beep();
 	}
 
+	private void refreshFrames()
+	{
+		System.out.println(currentAnimation);
+		
+		String s = exceptionPartName;
+		exceptionPartName = "";
+		settingsFrame.updateRotationSliderValues();
+		settingsFrame.refreshButtons();
+		timelineFrame.refresthLineColours();
+		timelineFrame.repaintLines();
+		exceptionPartName = s;
+	}
+	
 	private float getLastKeyFrameTime() 
 	{
 		float lastFrameTime = 0;
@@ -417,6 +462,14 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 			break;
 		case Keyboard.KEY_D:
 			new DAction().actionPerformed(new ActionEvent(this, ActionEvent.ACTION_FIRST, ""));
+			break;
+		case Keyboard.KEY_Z:
+			if(this.isCtrlKeyDown())
+				new UndoAction().actionPerformed(new ActionEvent(this, ActionEvent.ACTION_FIRST, ""));
+			break;
+		case Keyboard.KEY_Y:
+			if(this.isCtrlKeyDown())
+				new RedoAction().actionPerformed(new ActionEvent(this, ActionEvent.ACTION_FIRST, ""));
 			break;
 		}
 		super.keyTyped(par1, par2);
@@ -880,10 +933,7 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 					double value = Double.parseDouble(typed);
 					timeSlider.setValue((int)value);
 					time = (float) value;
-					for(int i = 0; i < parts.size(); i++)
-					{
-						lines[i].repaint();
-					}
+					repaintLines();
 					settingsFrame.refreshButtons();
 				}
 			});
@@ -896,8 +946,6 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 					updateTimelineLength((int) (e.getPreciseWheelRotation()*5));
 				}
 			});
-
-
 
 			mainPanel.setLayout(new GridBagLayout());
 			GridBagConstraints c = new GridBagConstraints();
@@ -979,6 +1027,14 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 					partLabels[i].setForeground(Color.black);
 			}
 			repaint();
+		}
+		
+		private void repaintLines()
+		{
+//			for(int i = 0; i < parts.size(); i++)
+//			{
+//				lines[i].repaint();
+//			}
 		}
 
 		private class KeyframeLine extends JPanel
@@ -1243,6 +1299,24 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 			exceptionPartName = "";
 			time = time < timelineFrame.timelineLength ? time + 1 : time;
 			timelineFrame.timeSlider.setValue((int) time);
+		}
+	}
+	
+	private class UndoAction extends AbstractAction
+	{
+		@Override
+		public void actionPerformed(ActionEvent arg0) 
+		{
+			undo();		
+		}
+	}
+	
+	private class RedoAction extends AbstractAction
+	{
+		@Override
+		public void actionPerformed(ActionEvent arg0) 
+		{
+			redo();		
 		}
 	}
 
