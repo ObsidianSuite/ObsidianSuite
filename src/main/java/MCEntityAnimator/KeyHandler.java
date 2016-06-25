@@ -1,15 +1,14 @@
 package MCEntityAnimator;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.settings.KeyBinding;
-
 import org.lwjgl.input.Keyboard;
 
-import MCEntityAnimator.gui.GuiEntityList;
+import MCEntityAnimator.gui.animation.LoginGUI;
 import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.client.registry.ClientRegistry;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.InputEvent.KeyInputEvent;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.settings.KeyBinding;
 
 public class KeyHandler
 {	
@@ -42,7 +41,7 @@ public class KeyHandler
 			Minecraft mc = Minecraft.getMinecraft();
 			if (keys[0].isPressed()) 
 			{
-				mc.displayGuiScreen(new GuiEntityList());
+				new LoginGUI();
 			}
 		}
 	}

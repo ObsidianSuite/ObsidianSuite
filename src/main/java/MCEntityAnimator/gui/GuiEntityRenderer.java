@@ -31,7 +31,7 @@ public class GuiEntityRenderer extends GuiScreen
 	private final ResourceLocation texture = new ResourceLocation("mod_MCEA:gui/animation_parenting.png");
 
 	protected String entityName;
-	private EntityLivingBase entityToRender;
+	public EntityLivingBase entityToRender;
 	protected ModelObj entityModel;
 	protected List<String> parts = new ArrayList<String>();
 	protected String currentPartName, additionalHighlightPartName;
@@ -95,12 +95,21 @@ public class GuiEntityRenderer extends GuiScreen
 		}
 		
 		entityModel.clearHighlights();
-		Part currentPart = Util.getPartFromName(currentPartName, entityModel.parts);
-		Part additionalPart = Util.getPartFromName(additionalHighlightPartName, entityModel.parts);
-		if(currentPart instanceof PartObj)
-			entityModel.hightlightPart((PartObj) currentPart);
-		if(additionalPart instanceof PartObj)
-			entityModel.hightlightPart((PartObj) additionalPart);
+		
+		if(currentPartName != null)
+		{
+			Part currentPart = Util.getPartFromName(currentPartName, entityModel.parts);
+			if(currentPart instanceof PartObj)
+				entityModel.hightlightPart((PartObj) currentPart);
+		}
+		
+		if(additionalHighlightPartName != null && !additionalHighlightPartName.equals(""))
+		{
+			Part additionalPart = Util.getPartFromName(additionalHighlightPartName, entityModel.parts);
+			if(additionalPart instanceof PartObj)
+				entityModel.hightlightPart((PartObj) additionalPart);
+		}
+		
 
 		super.drawScreen(par1, par2, par3);
 	}
