@@ -59,9 +59,10 @@ public class AnimationNewGUI extends JFrame
 				String entityName = (String) entityDropDown.getSelectedItem();
 				if(!animationName.equals(""))
 				{
-					AnimationSequence sequence = new AnimationSequence(animationName);
-					if(AnimationData.addNewSequence(entityName, sequence))
+					if(AnimationData.getSequenceFromName(entityName, animationName) != null)
 					{
+						AnimationSequence sequence = new AnimationSequence(animationName);
+						AnimationData.addSequence(entityName, sequence);
 						dispose();
 						Minecraft.getMinecraft().displayGuiScreen(new GuiAnimationTimelineWithFrames(entityName, sequence));
 					}

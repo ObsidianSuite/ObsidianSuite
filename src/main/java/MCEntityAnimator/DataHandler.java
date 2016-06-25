@@ -63,7 +63,7 @@ public class DataHandler
 			for(File animationFile : getAnimationFiles(entityName))
 			{
 				AnimationSequence sequence = new AnimationSequence(entityName, getNBTFromFile(animationFile));
-				AnimationData.addNewSequence(entityName, sequence);
+				AnimationData.addSequence(entityName, sequence);
 			}
 
 		}

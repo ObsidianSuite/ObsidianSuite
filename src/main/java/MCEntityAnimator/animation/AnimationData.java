@@ -20,8 +20,8 @@ public class AnimationData
 {	
 
 	//All sequences, stances and parenting data.
-	private static Map<String, ArrayList<AnimationSequence>> sequences = Maps.newHashMap();	
-	private static Map<String, ArrayList<AnimationStance>> stances = Maps.newHashMap();	
+	private static Map<String, List<AnimationSequence>> sequences = Maps.newHashMap();	
+	private static Map<String, List<AnimationStance>> stances = Maps.newHashMap();	
 	private static Map<String, AnimationParenting> parenting = Maps.newHashMap();
 
 	//Setup for GUIs
@@ -44,63 +44,64 @@ public class AnimationData
 	}
 
 	/**
-	 * Adds a new sequence to the existing list of sequences for the entity.
-	 * @return false if there already exists a sequence of the same name (sequence won't be added in this case), true otherwise.
+	 * Adds the sequence to the list of sequences for the given entity.
+	 * Will overwrite any sequence with the same name.
 	 */
-	public static boolean addNewSequence(String entityName, AnimationSequence sequence)
+	public static void addSequence(String entityName, AnimationSequence sequence)
 	{
-		ArrayList sqs = sequences.get(entityName);
+		List<AnimationSequence> sqs = sequences.get(entityName);
 		if(sqs == null)
 			sqs = new ArrayList<AnimationSequence>();
-		if(!doesSequenceExistForEntity(sqs, sequence))
-		{
-			sqs.add(sequence);
-			sequences.put(entityName, sqs);
-			return true;
-		}
-		return false;
+		AnimationSequence existingSeq = getSequenceFromName(entityName, sequence.getName());
+		if(existingSeq != null)
+			sqs.remove(existingSeq);
+		sqs.add(sequence);
+		sequences.put(entityName, sqs);
 	}
 
-	private static boolean doesSequenceExistForEntity(ArrayList<AnimationSequence> entitySequences, AnimationSequence sequenceToCheck)
+	public static AnimationSequence getSequenceFromName(String entityName, String animationName)
 	{
-		for(AnimationSequence seq : entitySequences)
+		if(sequences.get(entityName) != null)
 		{
-			if(seq.getName().toLowerCase().equals(sequenceToCheck.getName().toLowerCase()))
+			for(AnimationSequence s : sequences.get(entityName))
 			{
-				return true;
+				if(s.getName().equals(animationName))
+				{
+					return s;
+				}
 			}
 		}
-		return false;
+		return null;
 	}
 
-	public static ArrayList<AnimationSequence> getSequences(String entityName) 
+	public static List<AnimationSequence> getSequences(String entityName) 
 	{
 		return sequences.get(entityName) == null ? new ArrayList<AnimationSequence>() : sequences.get(entityName);
 	}
 
 	public static void addNewStance(String entityName, AnimationStance stance)
 	{
-		ArrayList sts = stances.get(entityName);
-		if(sts == null){sts = new ArrayList<AnimationSequence>();}
+		List<AnimationStance> sts = stances.get(entityName);
+		if(sts == null){sts = new ArrayList<AnimationStance>();}
 		sts.add(stance);
 		stances.put(entityName, sts);
 	}
 
-	public static ArrayList<AnimationStance> getStances(String entityName) 
+	public static List<AnimationStance> getStances(String entityName) 
 	{
 		return stances.get(entityName) == null ? new ArrayList<AnimationStance>() : stances.get(entityName);
 	}
 
 	public static void deleteSequence(String entityName, AnimationSequence sequence) 
 	{
-		ArrayList<AnimationSequence> temp = sequences.get(entityName);
+		List<AnimationSequence> temp = sequences.get(entityName);
 		temp.remove(sequence);
 		sequences.put(entityName, temp);
 	}
 
 	public static void deleteStance(String entityName, AnimationStance stance) 
 	{
-		ArrayList<AnimationStance> temp = stances.get(entityName);
+		List<AnimationStance> temp = stances.get(entityName);
 		temp.remove(stance);
 		stances.put(entityName, temp);
 	}

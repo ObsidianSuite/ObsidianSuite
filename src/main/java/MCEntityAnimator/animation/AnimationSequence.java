@@ -44,11 +44,6 @@ public class AnimationSequence
 		animations.add(par0Animation);
 	}
 
-	public void clearAnimations() 
-	{
-		animations.clear();
-	}
-
 	public void setActionPoint(float time)
 	{
 		this.actionPoint = time;
