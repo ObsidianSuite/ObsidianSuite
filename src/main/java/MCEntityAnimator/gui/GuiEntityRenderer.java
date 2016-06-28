@@ -62,6 +62,8 @@ public class GuiEntityRenderer extends GuiBlack
 	protected int scaleModifier = 0, horizontalPan = 0,verticalPan = 0;
 
 	private RenderBlocks renderBlocks = new RenderBlocks();
+	
+	private List<View> views;
 
 	public GuiEntityRenderer(String entityName)
 	{
@@ -80,6 +82,8 @@ public class GuiEntityRenderer extends GuiBlack
 		}
 
 		currentPartName = parts.get(0);
+		
+		setupViews();
 	}
 
 	@Override
@@ -87,6 +91,18 @@ public class GuiEntityRenderer extends GuiBlack
 	{
 		posX = width/2;
 		posY = 5;
+	}
+	
+	private void setupViews()
+	{
+		views = new ArrayList<View>();
+		views.add(new View("Default", -314, 26, 5));
+		views.add(new View("Front", 0, 0, 7));
+		views.add(new View("Left", 90, 0, 4));
+		views.add(new View("Right", -90, 0, 6));
+		views.add(new View("Back", 180, 0, 1));
+		views.add(new View("Top", 180, 90, 8));
+		views.add(new View("Bottom ", 0, -90, 2));
 	}
 
 	public void drawScreen(int par1, int par2, float par3)
@@ -98,6 +114,8 @@ public class GuiEntityRenderer extends GuiBlack
 		if(entityToRender != null)
 		{
 			float scale = scaleModifier + 50;
+			
+			
 			if(boolBase)
 				renderGrid(posX + (width-posX-5)/2 + horizontalPan, posY + (height - 10)/2 + scaleModifier/2 + verticalPan, scale, 0.0F, 0.0F);
 			renderBase(posX + (width-posX-5)/2 + horizontalPan, posY + (height - 10)/2 + scaleModifier/2 + verticalPan, scale, 0.0F, 0.0F);
@@ -275,5 +293,41 @@ public class GuiEntityRenderer extends GuiBlack
 			GL11.glTranslatef(0.0F, 1.0F, -3.0F);
 		}
 		GL11.glPopMatrix();
+	}
+	
+	public void changeView(int numpadKey)
+	{
+		for(View v : views)
+		{
+			if(v.numpadKey == numpadKey)
+			{
+				horizontalRotation = v.horizontalRotation;
+				verticalRotation = v.verticalRotation;
+				break;
+			}
+		}
+		System.err.println("Could not change to view, numpadkey: " + numpadKey);
+	}
+	
+	private class View
+	{
+		
+		private String name;
+		private float horizontalRotation, verticalRotation;
+		private int numpadKey;
+		
+		private View(String name, float horizontalRotation, float verticalRotation, int numpadKey)
+		{
+			this.name = name;
+			this.horizontalRotation = horizontalRotation;
+			this.verticalRotation = verticalRotation;
+			this.numpadKey = numpadKey;
+		}
+		
+		public int getKey()
+		{
+			return numpadKey;
+		}
+		
 	}
 }

@@ -84,6 +84,7 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 	private boolean boolPlay;	
 	private boolean boolLoop;
 
+
 	public GuiAnimationTimelineWithFrames(String entityName, AnimationSequence animation)
 	{
 		super(entityName);
@@ -93,13 +94,14 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 		animationVersion = 0;
 		animationVersions = new ArrayList<AnimationSequence>();
 		animationVersions.add(animation);
-
+		
 		loadKeyframes();
 		loadFrames();
 		
     	((EntityObj) entityToRender).setCurrentItem(AnimationData.getAnimationItem(animation.getName()));   	
 
 	}
+
 
 	@Override
 	public void initGui()
@@ -164,6 +166,12 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 			actionMap.put("redoReleased", new RedoAction());
 			inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), "deletePressed");
 			actionMap.put("deletePressed", new DeleteAction());
+			
+			for(int j = 0; j <= 9; j++)
+			{
+				inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_NUMPAD0 + j, 0), "numpad" + j);
+				actionMap.put("numpad" + j, new ChangeViewAction(j));
+			}
 		}
 
 		timelineFrame.refresthLineColours();
@@ -481,8 +489,25 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 			break;
 		case Keyboard.KEY_DELETE:
 			new DeleteAction().actionPerformed(new ActionEvent(this, ActionEvent.ACTION_FIRST, ""));
-			break;
+			break;	
+			//LWJGL's assignment of keys for the numpad is dumb so we have to do this manually...
+		case Keyboard.KEY_NUMPAD1:
+			new ChangeViewAction(1).actionPerformed(new ActionEvent(this, ActionEvent.ACTION_FIRST, "")); break;
+		case Keyboard.KEY_NUMPAD2:
+			new ChangeViewAction(2).actionPerformed(new ActionEvent(this, ActionEvent.ACTION_FIRST, "")); break;
+		case Keyboard.KEY_NUMPAD4:
+			new ChangeViewAction(4).actionPerformed(new ActionEvent(this, ActionEvent.ACTION_FIRST, "")); break;
+		case Keyboard.KEY_NUMPAD5:
+			new ChangeViewAction(5).actionPerformed(new ActionEvent(this, ActionEvent.ACTION_FIRST, "")); break;
+		case Keyboard.KEY_NUMPAD6:
+			new ChangeViewAction(6).actionPerformed(new ActionEvent(this, ActionEvent.ACTION_FIRST, "")); break;
+		case Keyboard.KEY_NUMPAD7:
+			new ChangeViewAction(7).actionPerformed(new ActionEvent(this, ActionEvent.ACTION_FIRST, "")); break;
+		case Keyboard.KEY_NUMPAD8:
+			new ChangeViewAction(8).actionPerformed(new ActionEvent(this, ActionEvent.ACTION_FIRST, "")); break;
 		}
+
+		
 		super.keyTyped(par1, par2);
 	}
 
@@ -1352,6 +1377,24 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 		{
 			deleteKeyframe();		
 		}
+	}
+	
+	private class ChangeViewAction extends AbstractAction
+	{
+
+		private int numpadNumber;
+		
+		private ChangeViewAction(int numpadNumber)
+		{
+			this.numpadNumber = numpadNumber;
+		}
+		
+		@Override
+		public void actionPerformed(ActionEvent e)
+		{
+			changeView(numpadNumber);
+		}
+		
 	}
 	
 	private class SliderPanel extends JPanel
