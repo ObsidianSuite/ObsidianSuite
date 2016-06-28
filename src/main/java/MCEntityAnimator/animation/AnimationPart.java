@@ -86,7 +86,7 @@ public class AnimationPart
 	/**
 	 * Return true if the float array has the same values as the startPosition
 	 */
-	public boolean atStartRotation(float[] rotation) 
+	public boolean isStartPos(float[] rotation) 
 	{
 		for(int i = 0; i < 3; i++)
 		{
@@ -94,6 +94,16 @@ public class AnimationPart
 				return false;
 		}
 		return true;
+	}
+	
+	public boolean isEndPosDifferentToStartPos()
+	{
+		for(int i = 0; i < 3; i++)
+		{
+			if(startPosition[i] != endPosition[i])
+				return true;
+		}
+		return false;
 	}
 
 	public NBTBase getSaveData() 

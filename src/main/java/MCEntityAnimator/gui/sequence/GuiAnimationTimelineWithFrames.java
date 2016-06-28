@@ -39,6 +39,7 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.JTabbedPane;
@@ -55,6 +56,7 @@ import MCEntityAnimator.animation.AnimationData;
 import MCEntityAnimator.animation.AnimationPart;
 import MCEntityAnimator.animation.AnimationSequence;
 import MCEntityAnimator.distribution.ServerAccess;
+import MCEntityAnimator.gui.GuiBlack;
 import MCEntityAnimator.gui.GuiEntityRenderer;
 import MCEntityAnimator.gui.GuiInventoryChooseItem;
 import MCEntityAnimator.gui.animation.FileGUI;
@@ -65,7 +67,7 @@ import MCEntityAnimator.render.objRendering.parts.PartObj;
 public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 {
 
-	private AnimationSequence currentAnimation;
+	public AnimationSequence currentAnimation;
 	private int animationVersion;
 	private List<AnimationSequence> animationVersions;
 
@@ -82,19 +84,25 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 	private boolean boolPlay;	
 	private boolean boolLoop;
 
+
 	public GuiAnimationTimelineWithFrames(String entityName, AnimationSequence animation)
 	{
 		super(entityName);
 
 		this.currentAnimation = animation;
 		boolPlay = false;
-		animationVersion = 0;
-		animationVersions = new ArrayList<AnimationSequence>();
-		animationVersions.add(animation);
 
 		loadKeyframes();
 		loadFrames();
+
+		animationVersion = 0;
+		animationVersions = new ArrayList<AnimationSequence>();
+		updateAnimation();
+
+		((EntityObj) entityToRender).setCurrentItem(AnimationData.getAnimationItem(animation.getName()));   	
+
 	}
+
 
 	@Override
 	public void initGui()
@@ -157,6 +165,14 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 			actionMap.put("undoReleased", new UndoAction());
 			inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_Y, InputEvent.CTRL_DOWN_MASK, true), "redoReleased");
 			actionMap.put("redoReleased", new RedoAction());
+			inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), "deletePressed");
+			actionMap.put("deletePressed", new DeleteAction());
+
+			for(int j = 0; j <= 9; j++)
+			{
+				inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_NUMPAD0 + j, 0), "numpad" + j);
+				actionMap.put("numpad" + j, new ChangeViewAction(j));
+			}
 		}
 
 		timelineFrame.refresthLineColours();
@@ -177,11 +193,14 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 			Part mr = Util.getPartFromName(animpart.getPart().getName(), entityModel.parts);	
 			float[] defaults = animpart.getPart().getOriginalValues();
 			//If the movement starts at time zero, and the part isn't in its original position, add a keyframe at time zero.
-			if(animpart.getStartTime() == 0.0F && !animpart.atStartRotation(defaults))
+			if(animpart.getStartTime() == 0.0F)
 			{
-				Keyframe kf = new Keyframe(0, partName, animpart.getStartPosition());
-				partKfs.add(kf);
-				if(!animpart.getStartPosition().equals(animpart.getEndPosition()))
+				if(!animpart.isStartPos(defaults))
+				{
+					Keyframe kf = new Keyframe(0, partName, animpart.getStartPosition());
+					partKfs.add(kf);
+				}
+				if(animpart.isEndPosDifferentToStartPos() || currentAnimation.multiPartSequence(partName))
 				{
 					Keyframe kf2 = new Keyframe((int) animpart.getEndTime(), partName, animpart.getEndPosition());
 					partKfs.add(kf2);
@@ -253,8 +272,13 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 	private void addKeyframe()
 	{
 		Part part = Util.getPartFromName(currentPartName, entityModel.parts);
-		List<Keyframe> partKeyframes = keyframes.get(currentPartName);
 		Keyframe kf = new Keyframe((int) time, currentPartName, part.getValues());
+		addKeyframe(kf);
+	}
+
+	private void addKeyframe(Keyframe kf)
+	{
+		List<Keyframe> partKeyframes = keyframes.get(kf.partName);
 		boolean keyframeExists = false;
 		if(partKeyframes == null)
 			partKeyframes = new ArrayList<Keyframe>();
@@ -263,7 +287,7 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 			Keyframe keyframeToRemove = null;
 			for(Keyframe pkf : partKeyframes)
 			{
-				if(pkf.frameTime == time)
+				if(pkf.frameTime == kf.frameTime)
 					keyframeToRemove = pkf;
 			}
 			if(keyframeToRemove != null)
@@ -273,8 +297,9 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 			}
 		}
 		partKeyframes.add(kf);
-		keyframes.put(currentPartName, partKeyframes);
-		timelineFrame.repaint();
+		keyframes.put(kf.partName, partKeyframes);
+		settingsFrame.refreshButtons();
+		timelineFrame.refresthLineColours();
 		if(!keyframeExists)
 			updateAnimation();
 	}
@@ -301,8 +326,29 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 			if(keyframeRemoved)
 				updateAnimation();
 		}
+		refreshFrames();
 	}
 
+	/**
+	 * Create a new keyframe based off another keyframe.
+	 * @param kf - Keyframe to copy.
+	 * @param partName - Name of part to be copied to.
+	 */
+	private void copyKeyframe(Keyframe kf, String partName, int time)
+	{
+		if(partName.equals("entitypos") && !kf.partName.equals("entitypos"))
+			JOptionPane.showMessageDialog(timelineFrame, "Only entitypos can copy to entitypos.");
+		else if(partName.equals("prop_rot") && !kf.partName.equals("prop_rot"))
+			JOptionPane.showMessageDialog(timelineFrame, "Only prop_rot can copy to prop_rot.");
+		else if(partName.equals("prop_trans") && !kf.partName.equals("prop_trans"))
+			JOptionPane.showMessageDialog(timelineFrame, "Only prop_trans can copy to prop_trans.");
+		else if((kf.partName.equals("entitypos") || kf.partName.equals("prop_rot") || kf.partName.equals("prop_trans")) && !kf.partName.equals(partName))
+			JOptionPane.showMessageDialog(timelineFrame, kf.partName + " can only copy to itself.");
+		else
+			addKeyframe(new Keyframe(time, partName, kf.values.clone()));
+		
+	}
+	
 	private boolean keyframeExists()
 	{
 		List<Keyframe> partKeyframes = keyframes.get(currentPartName);
@@ -346,12 +392,11 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 					Keyframe prevKf = kf.getPreviousKeyframe();
 					sequence.addAnimation(new AnimationPart(prevKf.frameTime, kf.frameTime, prevKf.values, kf.values, part));
 				}
-				else
+				else if(doesPartOnlyHaveOneKeyframe(part.getName()))
 				{
 					//Used for parts that only have one keyframe and where that keyframe is at the beginning 
 					//The part will maintain that rotation throughout the whole animation.
-					if(doesPartOnlyHaveOneKeyframe(part.getName()))
-						sequence.addAnimation(new AnimationPart(0.0F, getLastKeyFrameTime(), kf.values, kf.values, part));
+					sequence.addAnimation(new AnimationPart(0.0F, getLastKeyFrameTime(), kf.values, kf.values, part));
 				}
 			}
 		}
@@ -371,19 +416,17 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 		animationVersions.add(sequence);
 		animationVersion = animationVersions.size() - 1;
 		currentAnimation = sequence;
-		
+
 		//Update animation sequence in AnimationData.
 		AnimationData.addSequence(entityName, currentAnimation);
 	}
-	
+
 	private void undo()
 	{
 		if(animationVersion > 0)
 		{
 			animationVersion --;
-			System.out.println(currentAnimation);
 			currentAnimation = animationVersions.get(animationVersion);
-			System.out.println(currentAnimation);
 			AnimationData.addSequence(entityName, currentAnimation);
 			loadKeyframes();
 			refreshFrames();
@@ -391,7 +434,7 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 		else
 			Toolkit.getDefaultToolkit().beep();
 	}
-	
+
 	private void redo()
 	{
 		if(animationVersion < animationVersions.size() - 1)
@@ -407,18 +450,12 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 	}
 
 	private void refreshFrames()
-	{
-		System.out.println(currentAnimation);
-		
-		String s = exceptionPartName;
-		exceptionPartName = "";
+	{		
 		settingsFrame.updateRotationSliderValues();
 		settingsFrame.refreshButtons();
 		timelineFrame.refresthLineColours();
-		timelineFrame.repaintLines();
-		exceptionPartName = s;
 	}
-	
+
 	private float getLastKeyFrameTime() 
 	{
 		float lastFrameTime = 0;
@@ -471,7 +508,27 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 			if(this.isCtrlKeyDown())
 				new RedoAction().actionPerformed(new ActionEvent(this, ActionEvent.ACTION_FIRST, ""));
 			break;
+		case Keyboard.KEY_DELETE:
+			new DeleteAction().actionPerformed(new ActionEvent(this, ActionEvent.ACTION_FIRST, ""));
+			break;	
+			//LWJGL's assignment of keys for the numpad is dumb so we have to do this manually...
+		case Keyboard.KEY_NUMPAD1:
+			new ChangeViewAction(1).actionPerformed(new ActionEvent(this, ActionEvent.ACTION_FIRST, "")); break;
+		case Keyboard.KEY_NUMPAD2:
+			new ChangeViewAction(2).actionPerformed(new ActionEvent(this, ActionEvent.ACTION_FIRST, "")); break;
+		case Keyboard.KEY_NUMPAD4:
+			new ChangeViewAction(4).actionPerformed(new ActionEvent(this, ActionEvent.ACTION_FIRST, "")); break;
+		case Keyboard.KEY_NUMPAD5:
+			new ChangeViewAction(5).actionPerformed(new ActionEvent(this, ActionEvent.ACTION_FIRST, "")); break;
+		case Keyboard.KEY_NUMPAD6:
+			new ChangeViewAction(6).actionPerformed(new ActionEvent(this, ActionEvent.ACTION_FIRST, "")); break;
+		case Keyboard.KEY_NUMPAD7:
+			new ChangeViewAction(7).actionPerformed(new ActionEvent(this, ActionEvent.ACTION_FIRST, "")); break;
+		case Keyboard.KEY_NUMPAD8:
+			new ChangeViewAction(8).actionPerformed(new ActionEvent(this, ActionEvent.ACTION_FIRST, "")); break;
 		}
+
+
 		super.keyTyped(par1, par2);
 	}
 
@@ -629,7 +686,7 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 				public void actionPerformed(ActionEvent e) 
 				{
 					AnimationData.deleteSequence(entityName, currentAnimation);
-					mc.displayGuiScreen(null);
+					mc.displayGuiScreen(new GuiBlack());
 					ServerAccess.gui = new FileGUI();
 
 				}
@@ -642,7 +699,7 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 				@Override
 				public void actionPerformed(ActionEvent e) 
 				{
-					mc.displayGuiScreen(null);
+					mc.displayGuiScreen(new GuiBlack());
 					ServerAccess.gui = new FileGUI();
 				}
 			});
@@ -687,7 +744,6 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 				public void actionPerformed(ActionEvent e) 
 				{
 					deleteKeyframe();
-					refreshButtons();
 				}
 			});
 
@@ -725,8 +781,8 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 			rotationPanel.add(deleteKeyframeButton, c);
 
 			JPanel renderPanel = new JPanel();
-			renderPanel.setLayout(new GridLayout(3,2));
-			for(int i = 0; i < 3; i++)
+			renderPanel.setLayout(new GridLayout(4,2));
+			for(int i = 0; i < 4; i++)
 			{
 				JCheckBox cb = new JCheckBox();
 				cb.setHorizontalAlignment(JCheckBox.RIGHT);
@@ -757,6 +813,17 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 						}
 					});
 					break;
+				case 3:
+					s = "Grid";
+					cb.addActionListener(new ActionListener()
+					{
+						public void actionPerformed(ActionEvent actionEvent) 
+						{
+							AbstractButton abstractButton = (AbstractButton) actionEvent.getSource();
+							boolGrid = abstractButton.getModel().isSelected();
+						}
+					});
+					break;
 				}
 				renderPanel.add(new JLabel(s));
 			}
@@ -775,7 +842,7 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 
 		private void updateRotationSliderValues()
 		{
-			currentAnimation.animateAll(time, entityModel, exceptionPartName);
+			currentAnimation.animateAll(time, entityModel);
 			Part part = Util.getPartFromName(currentPartName, entityModel.parts);
 			double x = part.getValue(0);
 			double y = part.getValue(1);
@@ -789,6 +856,15 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 			xRotPanel.slider.setDoubleValue(x);
 			yRotPanel.slider.setDoubleValue(y);
 			zRotPanel.slider.setDoubleValue(z);
+		}
+
+		private Double[] getSliderValues()
+		{
+			Double[] sliderVals = new Double[3];
+			sliderVals[0] = xRotPanel.slider.getScaledValue();
+			sliderVals[1] = yRotPanel.slider.getScaledValue();
+			sliderVals[2] = zRotPanel.slider.getScaledValue();
+			return getSliderValues();
 		}
 
 		private void refreshButtons()
@@ -893,7 +969,6 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 					{
 						lines[i].repaint();
 					}
-					Part part = Util.getPartFromName(currentPartName, entityModel.parts);
 					settingsFrame.updateRotationSliderValues();
 					settingsFrame.refreshButtons();
 				}
@@ -933,7 +1008,6 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 					double value = Double.parseDouble(typed);
 					timeSlider.setValue((int)value);
 					time = (float) value;
-					repaintLines();
 					settingsFrame.refreshButtons();
 				}
 			});
@@ -1028,14 +1102,6 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 			}
 			repaint();
 		}
-		
-		private void repaintLines()
-		{
-//			for(int i = 0; i < parts.size(); i++)
-//			{
-//				lines[i].repaint();
-//			}
-		}
 
 		private class KeyframeLine extends JPanel
 		{		
@@ -1055,15 +1121,21 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 					@Override
 					public void mouseClicked(MouseEvent e) 
 					{
-						if(closestKeyframe != null)
+						Keyframe kf = getExistingKeyframe();
+						if(kf != null && e.isControlDown())
+							copyKeyframe(kf, partName, xToKeyframeTime(e.getX()));
+						else if(closestKeyframe != null)
 						{
 							time = closestKeyframe.frameTime;
 							timelineFrame.timeSlider.setValue((int) time);
-							currentAnimation.animateAll(time, entityModel, exceptionPartName);
+							currentAnimation.animateAll(time, entityModel);
 							updatePart(partName);
 							settingsFrame.tabbedPane.setSelectedIndex(1);
+							settingsFrame.updateRotationSliderValues();
+							settingsFrame.refreshButtons();
 						}
 					}
+
 
 					@Override
 					public void mouseEntered(MouseEvent e) 
@@ -1099,14 +1171,15 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 						if(closestKeyframe != null)
 						{
 							int prevFrameTime = closestKeyframe.frameTime;
-							int kfx = (int)(closestKeyframe.frameTime/(float)timelineLength*(getWidth() - 10));
+							int kfx = keyframeTimeToX(prevFrameTime);
 							int dx = Math.abs(kfx - e.getX());
 							if(dx < 15)
 							{
-								int t = (int) (e.getX()*timelineLength/(float)(getWidth() - 10));
+								int t = xToKeyframeTime(e.getX());
 								if(t >= 0 && t <= 300)
 								{
 									closestKeyframe.frameTime = t;
+									timelineFrame.timeSlider.setValue(t);
 									repaint();
 								}
 								if(t != prevFrameTime)
@@ -1122,6 +1195,16 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 						repaint();
 					}			
 				});
+			}
+
+			private int keyframeTimeToX(int keyframeTime)
+			{
+				return (int)(keyframeTime/(float)timelineLength*(getWidth() - 10));
+			}
+
+			private int xToKeyframeTime(int x)
+			{
+				return (int) (x*timelineLength/(float)(getWidth() - 10));
 			}
 
 			public void updateClosestKeyframe(int mouseX)
@@ -1143,7 +1226,6 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 				}
 				closestKeyframe = closestKf;
 			}
-
 
 			@Override
 			public void paint(Graphics g)
@@ -1187,21 +1269,6 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 			this.frameTime = frameTime;		
 			this.partName = partName;
 			this.values = values;
-		}
-
-		/**
-		 * Return true if there is a keyframe for the same part that comes after this one.
-		 */
-		public boolean hasNextKeyframe() 
-		{
-			//			for(Keyframe kf : keyframes)
-			//			{
-			//				if(kf.partName.equals(partName) && kf.frameTime > frameTime)
-			//				{
-			//					return true;
-			//				}
-			//			}
-			return false;
 		}
 
 		/**
@@ -1253,9 +1320,12 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 		{
 			for(int i = 0; i < parts.size(); i++)
 			{
-				if(parts.get(i).equals(currentPartName) && i > 0)
+				if(parts.get(i).equals(currentPartName))
 				{
-					updatePart(parts.get(i-1));
+					if(i > 0)
+						updatePart(parts.get(i-1));
+					else
+						updatePart(parts.get(parts.size() - 1));
 					break;
 				}
 			}			
@@ -1269,9 +1339,12 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 		{
 			for(int i = 0; i < parts.size(); i++)
 			{
-				if(parts.get(i).equals(currentPartName) && i < parts.size() - 1)
-				{
-					updatePart(parts.get(i+1));
+				if(parts.get(i).equals(currentPartName))
+				{					
+					if(i < parts.size() - 1)
+						updatePart(parts.get(i+1));
+					else
+						updatePart(parts.get(0));
 					break;
 				}
 			}		
@@ -1301,7 +1374,7 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 			timelineFrame.timeSlider.setValue((int) time);
 		}
 	}
-	
+
 	private class UndoAction extends AbstractAction
 	{
 		@Override
@@ -1310,7 +1383,7 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 			undo();		
 		}
 	}
-	
+
 	private class RedoAction extends AbstractAction
 	{
 		@Override
@@ -1318,6 +1391,33 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 		{
 			redo();		
 		}
+	}
+
+	private class DeleteAction extends AbstractAction
+	{
+		@Override
+		public void actionPerformed(ActionEvent arg0) 
+		{
+			deleteKeyframe();		
+		}
+	}
+
+	private class ChangeViewAction extends AbstractAction
+	{
+
+		private int numpadNumber;
+
+		private ChangeViewAction(int numpadNumber)
+		{
+			this.numpadNumber = numpadNumber;
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e)
+		{
+			changeView(numpadNumber);
+		}
+
 	}
 
 	private class SliderPanel extends JPanel

@@ -2,6 +2,7 @@ package MCEntityAnimator;
 
 import org.lwjgl.input.Keyboard;
 
+import MCEntityAnimator.gui.GuiBlack;
 import MCEntityAnimator.gui.animation.LoginGUI;
 import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.client.registry.ClientRegistry;
@@ -35,12 +36,11 @@ public class KeyHandler
 	@SubscribeEvent
 	public void onKeyInput(KeyInputEvent event)
 	{
-		// 
 		if (FMLClientHandler.instance().getClient().inGameHasFocus) 
 		{
-			Minecraft mc = Minecraft.getMinecraft();
 			if (keys[0].isPressed()) 
 			{
+				Minecraft.getMinecraft().displayGuiScreen(new GuiBlack());
 				new LoginGUI();
 			}
 		}

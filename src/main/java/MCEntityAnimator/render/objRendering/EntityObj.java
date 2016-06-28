@@ -15,7 +15,6 @@ public class EntityObj extends EntityMob
 	{
 		super(world);
 		entityType = type;
-		setCurrentItem(new ItemStack(new ItemSword(ToolMaterial.WOOD)));
 	}
 
 	public void setCurrentItem(ItemStack par1ItemStack) 
