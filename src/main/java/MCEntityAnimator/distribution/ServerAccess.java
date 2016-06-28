@@ -15,34 +15,42 @@ import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.JOptionPane;
-
-import org.apache.commons.io.FileUtils;
-
 import MCEntityAnimator.MCEA_Main;
+import MCEntityAnimator.gui.animation.FileGUI;
 
 public class ServerAccess
 {
 
 	private static final String CrLf = "\r\n";
-	private static final String baseURL = "http://users.ecs.soton.ac.uk/je5g15/MCEA/upload.php?folder=";
-	public static DistributionGUI gui;
+	private static final String baseURL = "http://nthrootsoftware.com/MCEA/";
+	private static final String uploadURL = baseURL + "upload.php?folder=";
+	private static final String downloadURL = baseURL + "download.php?user=";
 
-	public static List<String> uploadAll(File file, String path) throws IOException
+	public static FileGUI gui;
+	public static String username;
+
+	public static List<String> uploadAll() throws IOException
+	{
+		output("Getting user files...", false);
+		return uploadFolder(new File(MCEA_Main.animationPath + "/data/" + username));
+	}	
+
+	private static List<String> uploadFolder(File folder) throws IOException
 	{
 		List<String> failedFiles = new ArrayList<String>();
-		String newPath = path.equals("") ? file.getName() : path + "/" + file.getName();
-		if(file.isDirectory())
+		for(File f : folder.listFiles())
 		{
-			for(File f : file.listFiles())
+			if(f.isDirectory())
+				failedFiles.addAll(uploadFolder(f));
+			else
 			{
-				failedFiles.addAll(uploadAll(f, newPath));
+				if(!uploadFile(f))
+					failedFiles.add(f.getName());
 			}
+				
 		}
-		else if(!uploadFile(file, path))
-			failedFiles.add(newPath);
 		return failedFiles;
-	}	
+	}
 
 	/**
 	 * Upload a file to the server.
@@ -50,11 +58,13 @@ public class ServerAccess
 	 * @param path Destination path on server, will for example data/path, do not start with a '/'! 
 	 * @throws IOException
 	 */
-	private static boolean uploadFile(File file, String path) throws IOException 
+	private static boolean uploadFile(File file) throws IOException 
 	{
 		output("Uploading " + file.getName() + "...", false);
 
-		URL	url = new URL(baseURL + path);
+		String parentPath = file.getParentFile().getPath().replace("\\", "/");
+		parentPath = parentPath.substring(parentPath.indexOf("/data") + 1, parentPath.length());	
+		URL	url = new URL(uploadURL + parentPath);
 
 		URLConnection connection = url.openConnection();
 		connection.setDoOutput(true);
@@ -114,10 +124,9 @@ public class ServerAccess
 		return true;
 	}
 
-	public static void downloadData() throws IOException
+	public static void downloadAll() throws IOException
 	{
-		URL url = new URL("http://users.ecs.soton.ac.uk/je5g15/MCEA/download.php");
-		HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+		HttpURLConnection connection = (HttpURLConnection) new URL(downloadURL  + username).openConnection();
 		InputStream stream;
 		if(connection.getResponseCode() == 200)
 			stream = connection.getInputStream();
@@ -126,66 +135,73 @@ public class ServerAccess
 
 		if(stream != null)
 		{
-			File dataFolder = new File(MCEA_Main.animationPath + "/data");
-			FileUtils.deleteDirectory(dataFolder);
-			
+			File homeDir = new File(MCEA_Main.animationPath);
+			if(homeDir.exists())
+				deleteDirectory(homeDir);
 			BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
 			String s;
 			while((s = reader.readLine()) != null)
 			{
 				if(!s.equals(" "))
 				{
-					//* denotes folder
-					if(s.contains("*"))
-					{
-						String folderName = s.substring(0, s.length() - 1);
-						File file = new File(MCEA_Main.animationPath + "/" + folderName);
-						file.mkdirs();
-					}
+					if(s.contains("No folder found for"))
+						output(s, true);
 					else
 					{
-						output("Downloading " + s + "...", false);
 
-						File file = new File(MCEA_Main.animationPath + "/" + s);
-						file.getParentFile().mkdirs();
-
-						URL downloadURL = new URL("http://users.ecs.soton.ac.uk/je5g15/MCEA/" + s);
-						URLConnection downloadConnection = downloadURL.openConnection();
-						InputStream is = downloadConnection.getInputStream();
-
-						long max = downloadConnection.getContentLength();
-						BufferedOutputStream fOut = new BufferedOutputStream(new FileOutputStream(file));
-						byte[] buffer = new byte[32 * 1024];
-						int bytesRead = 0;
-						int in = 0;
-						while ((bytesRead = is.read(buffer)) != -1) 
+						//* denotes folder
+						if(s.contains("*"))
 						{
-							in += bytesRead;
-							fOut.write(buffer, 0, bytesRead);
+							String folderName = s.substring(0, s.length() - 1);
+							File file = new File(MCEA_Main.animationPath + "/" + folderName);
+							file.mkdirs();
 						}
-						output(s + " downloaded", false);
-						fOut.flush();
-						fOut.close();
-						is.close();
+						else
+						{
+							output("Downloading " + s + "...", false);
+
+							File file = new File(MCEA_Main.animationPath + "/" + s);
+							file.getParentFile().mkdirs();
+
+							URL downloadURL = new URL(baseURL + s);
+							URLConnection downloadConnection = downloadURL.openConnection();
+							InputStream is = downloadConnection.getInputStream();
+
+							BufferedOutputStream fOut = new BufferedOutputStream(new FileOutputStream(file));
+							byte[] buffer = new byte[32 * 1024];
+							int bytesRead = 0;
+							while ((bytesRead = is.read(buffer)) != -1) 
+							{
+								fOut.write(buffer, 0, bytesRead);
+							}
+							output(s + " downloaded", false);
+							fOut.flush();
+							fOut.close();
+							is.close();
+						}
 					}
 				}
 
 			}
 			stream.close();
+			MCEA_Main.dataHandler.loadNBTData();
 		}
 	}
 
-	public static void output(String s, boolean bool)
+
+	public static void output(String output, boolean server)
 	{
 		if(gui != null)
-			gui.updateOutput(s, false);
+			gui.updateOutput(output, server);
+//		else
+//			System.out.println("[" + (server ? "SERVER" : "CLIENT") + "] " + output);
 	}
 
 	public static List<String> getErrors()
 	{
 		List<String> errorList = new ArrayList<String>();
-		File srcFolder = new File(MCEA_Main.animationPath + "/data");
-		for(File f : srcFolder.listFiles())
+		File sharedFolder = new File(MCEA_Main.animationPath + "/data/shared");
+		for(File f : sharedFolder.listFiles())
 		{
 			if(f.isDirectory())
 				errorList.addAll(getEntityFolderErrors(f));
@@ -196,15 +212,15 @@ public class ServerAccess
 	private static List<String> getEntityFolderErrors(File folder)
 	{
 		List<String> errorList = new ArrayList<String>();
-		boolean animationFolderExists = false;
+		boolean dataExists = false;
 		boolean textureExists = false;
 		boolean modelExists = false;
 		boolean pxyExists = false;
 
 		for(File f : folder.listFiles())
 		{
-			if(f.getName().equals("animation"))
-				animationFolderExists = true;
+			if(f.getName().contains(".data"))
+				dataExists = true;
 			else if(f.getName().contains(".png"))
 				textureExists = true;
 			else if(f.getName().contains(".obj"))
@@ -213,8 +229,8 @@ public class ServerAccess
 				pxyExists = true;
 		}
 
-		if(!animationFolderExists)
-			errorList.add("No animation folder for " + folder.getName() + ". Let Joe know about this.");
+		if(!dataExists)
+			errorList.add("No data file for " + folder.getName() + ".");
 		if(!textureExists)
 			errorList.add("No texture for " + folder.getName() + ".");
 		if(!modelExists)
@@ -223,6 +239,18 @@ public class ServerAccess
 			errorList.add("No pxy file for " + folder.getName() + ".");
 
 		return errorList;
+	}
+
+	private static void deleteDirectory(File dir)
+	{
+		for(File f : dir.listFiles())
+		{
+			if(f.isDirectory())
+				deleteDirectory(f);
+			else
+				f.delete();
+		}
+		dir.delete();	
 	}
 
 

@@ -1,15 +1,11 @@
 package MCEntityAnimator.render.objRendering;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -20,17 +16,14 @@ import com.google.common.collect.Maps;
 
 import MCEntityAnimator.MCEA_Main;
 import MCEntityAnimator.Util;
-import MCEntityAnimator.ZipUtils;
 import MCEntityAnimator.animation.AnimationData;
 import MCEntityAnimator.animation.AnimationParenting;
 import MCEntityAnimator.animation.PartGroupsAndNames;
 import MCEntityAnimator.render.objRendering.parts.Part;
 import MCEntityAnimator.render.objRendering.parts.PartEntityPos;
 import MCEntityAnimator.render.objRendering.parts.PartObj;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelRenderer;
-import net.minecraft.client.resources.IResource;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.ModelFormatException;
@@ -64,17 +57,11 @@ public class ModelObj extends ModelBase
 	public ModelObj(String par0Str)
 	{	
 		entityType = par0Str;
-		File modelFile = new File(MCEA_Main.animationPath + "/data/" + entityType + "/" + entityType + ".obj");
-		File textureFile = new File(MCEA_Main.animationPath + "/data/" + entityType + "/" + entityType + ".obj");
-		pxyFile = new File(MCEA_Main.animationPath + "/data/" + entityType + "/" + entityType + ".pxy");
+		File modelFile = new File(MCEA_Main.animationPath + "/data/shared/" + entityType + "/" + entityType + ".obj");
+		pxyFile = new File(MCEA_Main.animationPath + "/data/shared/" + entityType + "/" + entityType + ".pxy");
+		txtRL = new ResourceLocation("animation:data/shared/" + entityType + "/" + entityType + ".png");
 
-		
-		
-		//((SimpleReloadableResourceManager)Minecraft.getMinecraft().getResourceManager()).reloadResourcePack(new PXYResourcePack());
-		
-		txtRL = new ResourceLocation("animation:data/player/player.png");
 
-		
 		try 
 		{
 			model = new WavefrontObject(entityType + ".obj", new FileInputStream(modelFile));
@@ -84,6 +71,8 @@ public class ModelObj extends ModelBase
 
 		parts = createPartObjList(this, model.groupObjects);
 		parts.add(new PartEntityPos(this));
+		parts.add(new Part(this, "prop_rot"));
+		parts.add(new Part(this, "prop_trans"));
 		parenting = AnimationData.getAnipar(par0Str);
 		hightlightedParts = new ArrayList<PartObj>();
 		bends = new ArrayList<Bend>();
@@ -95,7 +84,7 @@ public class ModelObj extends ModelBase
 
 		init();
 	}
-	
+
 	public ResourceLocation getTexture()
 	{
 		return txtRL;
@@ -243,9 +232,12 @@ public class ModelObj extends ModelBase
 				}
 			}
 
-			Bend b = new Bend(child, parent);
-			bends.add(b);
-			child.setBend(b);
+			if(!child.hasBend())
+			{
+				Bend b = new Bend(child, parent);
+				bends.add(b);
+				child.setBend(b);
+			}
 
 			renderWithTexture = prevRenderWithTexture;
 		}
@@ -365,7 +357,7 @@ public class ModelObj extends ModelBase
 		}
 		return arr;
 	}
-	
+
 	public ArrayList<Part> createPartObjList(ModelObj model, ArrayList<GroupObject> groupObjects)
 	{
 		ArrayList<Part> parts = new ArrayList<Part>();

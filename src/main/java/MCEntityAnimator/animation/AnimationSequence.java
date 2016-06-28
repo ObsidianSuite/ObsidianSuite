@@ -23,6 +23,11 @@ public class AnimationSequence
 	{
 		this.animationName = par0Str;
 	}
+	
+	public AnimationSequence(String entityName, NBTTagCompound compound) 
+	{
+		this.loadData(entityName, compound);
+	}
 
 	public String getName() 
 	{
@@ -39,11 +44,6 @@ public class AnimationSequence
 		animations.add(par0Animation);
 	}
 
-	public void clearAnimations() 
-	{
-		animations.clear();
-	}
-
 	public void setActionPoint(float time)
 	{
 		this.actionPoint = time;
@@ -53,7 +53,32 @@ public class AnimationSequence
 	{
 		return actionPoint;
 	}
+	
+	/**
+	 * Return true if the given partname has two or more animation parts associated with it.
+	 */
+	public boolean multiPartSequence(String partName)
+	{
+		boolean one = false;
+		for(AnimationPart s : this.animations)
+		{
+			if(s.getPart().getName().equals(partName))
+			{
+				//If one is true, another animation part having this part name implies two or more.
+				if(one)
+					return true;
+				else
+					one = true;
+			}
+		}
+		return false;
+	}
 
+	public void animateAll(float time, ModelObj entityModel) 
+	{
+		animateAll(time, entityModel, "");
+	}
+	
 	/**
 	 * Sets all the parts of a model to their rotation at a given time.
 	 * The part with name = exceptionPartName will not be rotated.
@@ -65,8 +90,8 @@ public class AnimationSequence
 			if(!part.getName().equals(exceptionPartName))
 			{
 				AnimationPart lastAnimation = getLastAnimation(part.getName());
-				if(lastAnimation != null && time >= lastAnimation.getEndTime())
-					lastAnimation.animatePart(lastAnimation.getEndTime());
+				if(lastAnimation != null && time > lastAnimation.getEndTime())
+					lastAnimation.animatePart(lastAnimation.getEndTime() - lastAnimation.getStartTime());
 				else
 					part.setToOriginalValues();
 			}
@@ -74,9 +99,7 @@ public class AnimationSequence
 		for(AnimationPart s : this.animations)
 		{
 			if(!s.getPart().getName().equals(exceptionPartName) && time >= s.getStartTime() && time <= s.getEndTime())
-			{
 				s.animatePart(time - s.getStartTime());
-			}
 		}
 	}
 

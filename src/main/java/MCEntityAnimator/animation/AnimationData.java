@@ -3,10 +3,14 @@ package MCEntityAnimator.animation;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import com.google.common.collect.Maps;
 
 import MCEntityAnimator.render.objRendering.ModelObj;
+import net.minecraft.block.Block;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 
@@ -20,14 +24,15 @@ public class AnimationData
 {	
 
 	//All sequences, stances and parenting data.
-	private static Map<String, ArrayList<AnimationSequence>> sequences = Maps.newHashMap();	
-	private static Map<String, ArrayList<AnimationStance>> stances = Maps.newHashMap();	
+	private static Map<String, List<AnimationSequence>> sequences = Maps.newHashMap();	
+	private static Map<String, List<AnimationStance>> stances = Maps.newHashMap();	
 	private static Map<String, AnimationParenting> parenting = Maps.newHashMap();
 
 	//Setup for GUIs
 	private static Map<String, String> animationSetup = Maps.newHashMap();
 	private static Map<String, String> stanceSetup = Maps.newHashMap();
 	private static Map<String, String> parentingSetup = Maps.newHashMap();
+	private static Map<String, Integer> animationItems = Maps.newHashMap();
 
 	//List of part names and groupings. 
 	private static Map<String, PartGroupsAndNames> partGroupsAndNames = Maps.newHashMap();
@@ -44,63 +49,64 @@ public class AnimationData
 	}
 
 	/**
-	 * Adds a new sequence to the existing list of sequences for the entity.
-	 * @return false if there already exists a sequence of the same name (sequence won't be added in this case), true otherwise.
+	 * Adds the sequence to the list of sequences for the given entity.
+	 * Will overwrite any sequence with the same name.
 	 */
-	public static boolean addNewSequence(String entityName, AnimationSequence sequence)
+	public static void addSequence(String entityName, AnimationSequence sequence)
 	{
-		ArrayList sqs = sequences.get(entityName);
+		List<AnimationSequence> sqs = sequences.get(entityName);
 		if(sqs == null)
 			sqs = new ArrayList<AnimationSequence>();
-		if(!doesSequenceExistForEntity(sqs, sequence))
-		{
-			sqs.add(sequence);
-			sequences.put(entityName, sqs);
-			return true;
-		}
-		return false;
+		AnimationSequence existingSeq = getSequenceFromName(entityName, sequence.getName());
+		if(existingSeq != null)
+			sqs.remove(existingSeq);
+		sqs.add(sequence);
+		sequences.put(entityName, sqs);
 	}
 
-	private static boolean doesSequenceExistForEntity(ArrayList<AnimationSequence> entitySequences, AnimationSequence sequenceToCheck)
+	public static AnimationSequence getSequenceFromName(String entityName, String animationName)
 	{
-		for(AnimationSequence seq : entitySequences)
+		if(sequences.get(entityName) != null)
 		{
-			if(seq.getName().toLowerCase().equals(sequenceToCheck.getName().toLowerCase()))
+			for(AnimationSequence s : sequences.get(entityName))
 			{
-				return true;
+				if(s.getName().equals(animationName))
+				{
+					return s;
+				}
 			}
 		}
-		return false;
+		return null;
 	}
 
-	public static ArrayList<AnimationSequence> getSequences(String entityName) 
+	public static List<AnimationSequence> getSequences(String entityName) 
 	{
 		return sequences.get(entityName) == null ? new ArrayList<AnimationSequence>() : sequences.get(entityName);
 	}
 
 	public static void addNewStance(String entityName, AnimationStance stance)
 	{
-		ArrayList sts = stances.get(entityName);
-		if(sts == null){sts = new ArrayList<AnimationSequence>();}
+		List<AnimationStance> sts = stances.get(entityName);
+		if(sts == null){sts = new ArrayList<AnimationStance>();}
 		sts.add(stance);
 		stances.put(entityName, sts);
 	}
 
-	public static ArrayList<AnimationStance> getStances(String entityName) 
+	public static List<AnimationStance> getStances(String entityName) 
 	{
 		return stances.get(entityName) == null ? new ArrayList<AnimationStance>() : stances.get(entityName);
 	}
 
 	public static void deleteSequence(String entityName, AnimationSequence sequence) 
 	{
-		ArrayList<AnimationSequence> temp = sequences.get(entityName);
+		List<AnimationSequence> temp = sequences.get(entityName);
 		temp.remove(sequence);
 		sequences.put(entityName, temp);
 	}
 
 	public static void deleteStance(String entityName, AnimationStance stance) 
 	{
-		ArrayList<AnimationStance> temp = stances.get(entityName);
+		List<AnimationStance> temp = stances.get(entityName);
 		temp.remove(stance);
 		stances.put(entityName, temp);
 	}
@@ -154,12 +160,34 @@ public class AnimationData
 		return p;
 	}
 
+	public static ItemStack getAnimationItem(String animationName)
+	{
+		Integer id;
+		if((id = animationItems.get(animationName)) != null)
+		{
+			Item item;
+			Block block;
+			if((item = Item.getItemById(id)) != null)
+				return new ItemStack(item);
+			else if((block = Block.getBlockById(id)) != null)
+				return new ItemStack(block);
+			else
+				throw new RuntimeException("Unable to get item or block for id " + id);
+		}
+		return null;
+	}
+	
+	public static void setAnimationItem(String animationName, int id)
+	{
+		animationItems.put(animationName, id);
+	}
+	
 	public static NBTTagCompound getGUISetupTag(List<String> entities)
 	{
 		NBTTagCompound nbt = new NBTTagCompound();
 		NBTTagList entityList = new NBTTagList();
 		for(String entity : entities)
-		{
+		{ 
 			NBTTagCompound guiSetupCompound = new NBTTagCompound();
 			guiSetupCompound.setString("EntityName", entity);
 			if(animationSetup.get(entity) != null)
@@ -171,6 +199,17 @@ public class AnimationData
 			entityList.appendTag(guiSetupCompound);
 		}
 		nbt.setTag("GuiSetup", entityList);
+		
+		NBTTagList animationItemList = new NBTTagList();
+		for(Entry<String, Integer> e : animationItems.entrySet())
+		{
+			NBTTagCompound animationItem = new NBTTagCompound();
+			animationItem.setString("name", e.getKey());
+			animationItem.setInteger("id", e.getValue());
+			animationItemList.appendTag(animationItem);
+		}
+		nbt.setTag("AnimationItems", animationItemList);
+		
 		return nbt;
 	}	
 
@@ -186,6 +225,14 @@ public class AnimationData
 			setStanceSetup(entityName, guiSetupCompound.getString("ParentingSetup"));
 			setParentingSetup(entityName, guiSetupCompound.getString("StanceSetup"));
 		}
+		
+		NBTTagList animationItemList = nbt.getTagList("AnimationItems", 10);
+		for(int i = 0; i < animationItemList.tagCount(); i++)
+		{
+			NBTTagCompound animationItem = animationItemList.getCompoundTagAt(i);
+			setAnimationItem(animationItem.getString("name"), animationItem.getInteger("id"));
+		}
+		
 		System.out.println(" Done");
 	}	
 
@@ -206,65 +253,5 @@ public class AnimationData
 		PartGroupsAndNames p = partGroupsAndNames.get(entityName);
 		p.loadData(compound.getCompoundTag("GroupsAndName"), entityName);
 	}
-
-	/**
-	 * Saves all the data for animations and gui setup.
-	 */
-	public static void saveData() 
-	{
-		//			if(sequences.containsKey(entity))
-		//			{
-		//				NBTTagList sequenceList = new NBTTagList();
-		//				for(AnimationSequence sequence : sequences.get(entity))
-		//				{				
-		//					sequenceList.appendTag(sequence.getSaveData());
-		//				}		
-		//				compound.setTag(entity + "Sequences", sequenceList);		
-		//			}
-		//
-		//			//Save stances
-		//			if(stances.containsKey(entity))
-		//			{
-		//				NBTTagList stanceList = new NBTTagList();
-		//				for(AnimationStance stance : stances.get(entity))
-		//				{				
-		//					stanceList.appendTag(stance.getSaveData());
-		//				}		
-		//				compound.setTag(entity + "Stances", stanceList);		
-		//			}
-		//		}
-	}
-
-	/**
-	 * Loads all the data
-	 */
-	public static void loadData(NBTTagCompound compound) 
-	{
-		//			//Load sequences
-		//			ArrayList<AnimationSequence> sqs = new ArrayList<AnimationSequence>();
-		//			NBTTagList sequenceList = compound.getTagList(entityName + "Sequences", 10);
-		//			for(int j = 0; j < sequenceList.tagCount(); j++)
-		//			{
-		//				AnimationSequence sequence = new AnimationSequence("");
-		//				sequence.loadData(entityName, sequenceList.getCompoundTagAt(j));
-		//				sqs.add(sequence);
-		//			}
-		//			sequences.put(entityName, sqs);
-		//
-		//			//Load stances
-		//			ArrayList<AnimationStance> sts = new ArrayList<AnimationStance>();
-		//			NBTTagList stanceList = compound.getTagList(entityName + "Stances", 10);
-		//			for(int j = 0; j < stanceList.tagCount(); j++)
-		//			{
-		//				AnimationStance stance = new AnimationStance();
-		//				stance.loadData(stanceList.getCompoundTagAt(j));
-		//				sts.add(stance);
-		//			}
-		//			stances.put(entityName, sts);
-		//		}
-	}
-
-
-
 
 }

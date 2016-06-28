@@ -20,7 +20,7 @@ import javax.swing.JOptionPane;
 public class Downloader
 {
 
-	private final static String dowloadURL = "http://users.ecs.soton.ac.uk/je5g15/MCEA/MCEA_Updater.zip";
+	private final static String dowloadURL = "http://nthrootsoftware.com/MCEA/MCEA_Updater.zip";
 	private Thread worker;
 	private Updater gui;
 	
@@ -43,7 +43,6 @@ public class Downloader
 					unzip();
 					cleanup();
 					gui.setOutputText("Updater download finished!");
-					gui.beginUpdate();
 				} 
 				catch (Exception ex) 
 				{

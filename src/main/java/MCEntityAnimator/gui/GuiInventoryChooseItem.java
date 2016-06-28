@@ -1,44 +1,39 @@
 package MCEntityAnimator.gui;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.gui.inventory.GuiInventory;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
+import MCEntityAnimator.animation.AnimationData;
+import MCEntityAnimator.gui.sequence.GuiAnimationTimelineWithFrames;
 import MCEntityAnimator.render.objRendering.EntityObj;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.inventory.GuiInventory;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 
 @SideOnly(Side.CLIENT)
 public class GuiInventoryChooseItem extends GuiInventory
 {
-    /**
-     * x size of the inventory window in pixels. Defined as float, passed as int
-     */
-    private float xSize_lo;
-
-    /**
-     * y size of the inventory window in pixels. Defined as float, passed as int.
-     */
-    private float ySize_lo;
-
+    
 	private EntityPlayer player;
 	private String entityName;
-	private GuiScreen parentGui;
+	private GuiAnimationTimelineWithFrames parentGui;
 	private EntityObj entity;
 
-    public GuiInventoryChooseItem(GuiScreen par1Gui, EntityObj par2Entity)
+    public GuiInventoryChooseItem(GuiAnimationTimelineWithFrames parentGui, EntityObj entity)
     {
         super(Minecraft.getMinecraft().thePlayer);
         this.allowUserInput = true;
-        this.parentGui = par1Gui;
-        this.entity = par2Entity;
+        this.parentGui = parentGui;
+        this.entity = entity;
     }
 
-    public void setItemStack(ItemStack par1ItemStack)
+    public void setItemStack(ItemStack itemStack)
     {
-    	this.entity.setCurrentItem(par1ItemStack);   	
+    	this.entity.setCurrentItem(itemStack); 
+    	AnimationData.setAnimationItem(parentGui.currentAnimation.getName(), Item.getIdFromItem(itemStack.getItem()));
     	this.mc.displayGuiScreen(this.parentGui);
+    	this.parentGui.loadFrames();
     }
     
     /**
@@ -46,10 +41,7 @@ public class GuiInventoryChooseItem extends GuiInventory
      */
     public void updateScreen()
     {
-        if (this.mc.playerController.isInCreativeMode())
-        {
-            this.mc.displayGuiScreen(new GuiContainerChooseItem(this.mc.thePlayer, this));
-        }
+           this.mc.displayGuiScreen(new GuiContainerChooseItem(this.mc.thePlayer, this));
     }
 
     /**
@@ -58,15 +50,7 @@ public class GuiInventoryChooseItem extends GuiInventory
     public void initGui()
     {
         this.buttonList.clear();
-
-        if (this.mc.playerController.isInCreativeMode())
-        {
-            this.mc.displayGuiScreen(new GuiContainerChooseItem(this.mc.thePlayer, this));
-        }
-        else
-        {
-            super.initGui();
-        }
+        this.mc.displayGuiScreen(new GuiContainerChooseItem(this.mc.thePlayer, this));
     }
 
 }

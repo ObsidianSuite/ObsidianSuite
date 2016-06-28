@@ -3,11 +3,11 @@ package MCEntityAnimator;
 import java.util.ArrayList;
 import java.util.List;
 
+import MCEntityAnimator.render.objRendering.parts.Part;
+import MCEntityAnimator.render.objRendering.parts.PartObj;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.entity.Entity;
-import MCEntityAnimator.render.objRendering.parts.Part;
-import MCEntityAnimator.render.objRendering.parts.PartObj;
 
 public class Util 
 {
@@ -59,7 +59,7 @@ public class Util
 				return part;
 			}
 		}
-		return null;
+		throw new RuntimeException("No part found for " + name + ".");
 	}
 	
 	public static PartObj getPartObjFromName(String name, ArrayList<Part> parts) 
@@ -69,13 +69,13 @@ public class Util
 			if(p instanceof PartObj)
 			{
 				PartObj part = (PartObj) p;
-				if(part.getName().equals(name))
+				if(part.getName().equals(name) || part.getDisplayName().equals(name))
 				{
 					return part;
 				}
 			}
 		}
-		return null;
+		throw new RuntimeException("No part obj found for " + name + ".");
 	}
 	
 	public static GuiButton getButtonFromID(int id, List buttonList)

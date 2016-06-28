@@ -13,7 +13,7 @@ public class ExtendedPropertiesAnimation implements IExtendedEntityProperties
 	@Override
 	public void init(Entity entity, World world)
 	{
-		dataHandler = new DataHandler();
+		dataHandler = MCEA_Main.dataHandler;
 	}
 
 	@Override
@@ -23,8 +23,5 @@ public class ExtendedPropertiesAnimation implements IExtendedEntityProperties
 	}
 
 	@Override
-	public void loadNBTData(NBTTagCompound nbtTagCompound)
-	{
-		dataHandler.loadNBTData();
-	}
+	public void loadNBTData(NBTTagCompound nbtTagCompound){}
 }

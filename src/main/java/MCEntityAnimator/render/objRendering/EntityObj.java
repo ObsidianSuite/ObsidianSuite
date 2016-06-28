@@ -1,7 +1,9 @@
 package MCEntityAnimator.render.objRendering;
 
 import net.minecraft.entity.monster.EntityMob;
+import net.minecraft.item.Item.ToolMaterial;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemSword;
 import net.minecraft.world.World;
 
 public class EntityObj extends EntityMob
