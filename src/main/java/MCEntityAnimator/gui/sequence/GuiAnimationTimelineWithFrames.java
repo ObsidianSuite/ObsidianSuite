@@ -56,6 +56,7 @@ import MCEntityAnimator.animation.AnimationData;
 import MCEntityAnimator.animation.AnimationPart;
 import MCEntityAnimator.animation.AnimationSequence;
 import MCEntityAnimator.distribution.ServerAccess;
+import MCEntityAnimator.gui.GuiBlack;
 import MCEntityAnimator.gui.GuiEntityRenderer;
 import MCEntityAnimator.gui.GuiInventoryChooseItem;
 import MCEntityAnimator.gui.animation.FileGUI;
@@ -66,7 +67,7 @@ import MCEntityAnimator.render.objRendering.parts.PartObj;
 public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 {
 
-	private AnimationSequence currentAnimation;
+	public AnimationSequence currentAnimation;
 	private int animationVersion;
 	private List<AnimationSequence> animationVersions;
 
@@ -95,6 +96,9 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 
 		loadKeyframes();
 		loadFrames();
+		
+    	((EntityObj) entityToRender).setCurrentItem(AnimationData.getAnimationItem(animation.getName()));   	
+
 	}
 
 	@Override
@@ -158,6 +162,8 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 			actionMap.put("undoReleased", new UndoAction());
 			inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_Y, InputEvent.CTRL_DOWN_MASK, true), "redoReleased");
 			actionMap.put("redoReleased", new RedoAction());
+			inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), "deletePressed");
+			actionMap.put("deletePressed", new DeleteAction());
 		}
 
 		timelineFrame.refresthLineColours();
@@ -307,6 +313,7 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 			if(keyframeRemoved)
 				updateAnimation();
 		}
+		refreshFrames();
 	}
 
 	private boolean keyframeExists()
@@ -472,6 +479,9 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 			if(this.isCtrlKeyDown())
 				new RedoAction().actionPerformed(new ActionEvent(this, ActionEvent.ACTION_FIRST, ""));
 			break;
+		case Keyboard.KEY_DELETE:
+			new DeleteAction().actionPerformed(new ActionEvent(this, ActionEvent.ACTION_FIRST, ""));
+			break;
 		}
 		super.keyTyped(par1, par2);
 	}
@@ -630,7 +640,7 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 				public void actionPerformed(ActionEvent e) 
 				{
 					AnimationData.deleteSequence(entityName, currentAnimation);
-					mc.displayGuiScreen(null);
+					mc.displayGuiScreen(new GuiBlack());
 					ServerAccess.gui = new FileGUI();
 
 				}
@@ -643,7 +653,7 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 				@Override
 				public void actionPerformed(ActionEvent e) 
 				{
-					mc.displayGuiScreen(null);
+					mc.displayGuiScreen(new GuiBlack());
 					ServerAccess.gui = new FileGUI();
 				}
 			});
@@ -688,7 +698,6 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 				public void actionPerformed(ActionEvent e) 
 				{
 					deleteKeyframe();
-					refreshButtons();
 				}
 			});
 
@@ -1215,21 +1224,6 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 		}
 
 		/**
-		 * Return true if there is a keyframe for the same part that comes after this one.
-		 */
-		public boolean hasNextKeyframe() 
-		{
-			//			for(Keyframe kf : keyframes)
-			//			{
-			//				if(kf.partName.equals(partName) && kf.frameTime > frameTime)
-			//				{
-			//					return true;
-			//				}
-			//			}
-			return false;
-		}
-
-		/**
 		 * Gets the keyframe that comes before this one, for the same part, or a default keyframe at time zero if none exists. 
 		 */
 		private Keyframe getPreviousKeyframe()
@@ -1278,9 +1272,12 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 		{
 			for(int i = 0; i < parts.size(); i++)
 			{
-				if(parts.get(i).equals(currentPartName) && i > 0)
+				if(parts.get(i).equals(currentPartName))
 				{
-					updatePart(parts.get(i-1));
+					if(i > 0)
+						updatePart(parts.get(i-1));
+					else
+						updatePart(parts.get(parts.size() - 1));
 					break;
 				}
 			}			
@@ -1294,9 +1291,12 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 		{
 			for(int i = 0; i < parts.size(); i++)
 			{
-				if(parts.get(i).equals(currentPartName) && i < parts.size() - 1)
-				{
-					updatePart(parts.get(i+1));
+				if(parts.get(i).equals(currentPartName))
+				{					
+					if(i < parts.size() - 1)
+						updatePart(parts.get(i+1));
+					else
+						updatePart(parts.get(0));
 					break;
 				}
 			}		
@@ -1345,6 +1345,15 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 		}
 	}
 
+	private class DeleteAction extends AbstractAction
+	{
+		@Override
+		public void actionPerformed(ActionEvent arg0) 
+		{
+			deleteKeyframe();		
+		}
+	}
+	
 	private class SliderPanel extends JPanel
 	{	
 

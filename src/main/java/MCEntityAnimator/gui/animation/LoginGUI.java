@@ -115,6 +115,8 @@ public class LoginGUI extends JFrame
 		pack();
 		setVisible(true);
 		setAlwaysOnTop(true);
+		setLocationRelativeTo(null);
+
 	}
 
 	

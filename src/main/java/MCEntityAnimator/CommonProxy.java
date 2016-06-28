@@ -17,6 +17,12 @@ public class CommonProxy
 	public void registerRendering() {}
 
 
+	public void registerBlocks()
+	{
+		GameRegistry.registerBlock(MCEA_Main.Base, "Base");
+		GameRegistry.registerBlock(MCEA_Main.Grid, "Grid");
+	}
+	
 	public void registerItems()
 	{
 		GameRegistry.registerItem(MCEA_Main.Battleaxe, MCEA_Main.Battleaxe.getUnlocalizedName());

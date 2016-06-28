@@ -1,5 +1,6 @@
 package MCEntityAnimator.gui;
 
+import MCEntityAnimator.animation.AnimationData;
 import MCEntityAnimator.gui.sequence.GuiAnimationTimelineWithFrames;
 import MCEntityAnimator.render.objRendering.EntityObj;
 import cpw.mods.fml.relauncher.Side;
@@ -7,6 +8,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
 @SideOnly(Side.CLIENT)
@@ -26,9 +28,10 @@ public class GuiInventoryChooseItem extends GuiInventory
         this.entity = entity;
     }
 
-    public void setItemStack(ItemStack par1ItemStack)
+    public void setItemStack(ItemStack itemStack)
     {
-    	this.entity.setCurrentItem(par1ItemStack);   	
+    	this.entity.setCurrentItem(itemStack); 
+    	AnimationData.setAnimationItem(parentGui.currentAnimation.getName(), Item.getIdFromItem(itemStack.getItem()));
     	this.mc.displayGuiScreen(this.parentGui);
     	this.parentGui.loadFrames();
     }

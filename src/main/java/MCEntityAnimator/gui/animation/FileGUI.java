@@ -264,6 +264,7 @@ public class FileGUI extends JFrame
 		pack();
 		setVisible(true);
 		setAlwaysOnTop(true);
+		setLocationRelativeTo(null);
 		
 		outputLog.setText(outputText);
 

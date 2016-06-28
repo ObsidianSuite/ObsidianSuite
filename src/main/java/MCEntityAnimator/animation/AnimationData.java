@@ -3,10 +3,14 @@ package MCEntityAnimator.animation;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import com.google.common.collect.Maps;
 
 import MCEntityAnimator.render.objRendering.ModelObj;
+import net.minecraft.block.Block;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 
@@ -28,6 +32,7 @@ public class AnimationData
 	private static Map<String, String> animationSetup = Maps.newHashMap();
 	private static Map<String, String> stanceSetup = Maps.newHashMap();
 	private static Map<String, String> parentingSetup = Maps.newHashMap();
+	private static Map<String, Integer> animationItems = Maps.newHashMap();
 
 	//List of part names and groupings. 
 	private static Map<String, PartGroupsAndNames> partGroupsAndNames = Maps.newHashMap();
@@ -155,12 +160,34 @@ public class AnimationData
 		return p;
 	}
 
+	public static ItemStack getAnimationItem(String animationName)
+	{
+		Integer id;
+		if((id = animationItems.get(animationName)) != null)
+		{
+			Item item;
+			Block block;
+			if((item = Item.getItemById(id)) != null)
+				return new ItemStack(item);
+			else if((block = Block.getBlockById(id)) != null)
+				return new ItemStack(block);
+			else
+				throw new RuntimeException("Unable to get item or block for id " + id);
+		}
+		return null;
+	}
+	
+	public static void setAnimationItem(String animationName, int id)
+	{
+		animationItems.put(animationName, id);
+	}
+	
 	public static NBTTagCompound getGUISetupTag(List<String> entities)
 	{
 		NBTTagCompound nbt = new NBTTagCompound();
 		NBTTagList entityList = new NBTTagList();
 		for(String entity : entities)
-		{
+		{ 
 			NBTTagCompound guiSetupCompound = new NBTTagCompound();
 			guiSetupCompound.setString("EntityName", entity);
 			if(animationSetup.get(entity) != null)
@@ -172,6 +199,17 @@ public class AnimationData
 			entityList.appendTag(guiSetupCompound);
 		}
 		nbt.setTag("GuiSetup", entityList);
+		
+		NBTTagList animationItemList = new NBTTagList();
+		for(Entry<String, Integer> e : animationItems.entrySet())
+		{
+			NBTTagCompound animationItem = new NBTTagCompound();
+			animationItem.setString("name", e.getKey());
+			animationItem.setInteger("id", e.getValue());
+			animationItemList.appendTag(animationItem);
+		}
+		nbt.setTag("AnimationItems", animationItemList);
+		
 		return nbt;
 	}	
 
@@ -187,6 +225,14 @@ public class AnimationData
 			setStanceSetup(entityName, guiSetupCompound.getString("ParentingSetup"));
 			setParentingSetup(entityName, guiSetupCompound.getString("StanceSetup"));
 		}
+		
+		NBTTagList animationItemList = nbt.getTagList("AnimationItems", 10);
+		for(int i = 0; i < animationItemList.tagCount(); i++)
+		{
+			NBTTagCompound animationItem = animationItemList.getCompoundTagAt(i);
+			setAnimationItem(animationItem.getString("name"), animationItem.getInteger("id"));
+		}
+		
 		System.out.println(" Done");
 	}	
 
@@ -207,65 +253,5 @@ public class AnimationData
 		PartGroupsAndNames p = partGroupsAndNames.get(entityName);
 		p.loadData(compound.getCompoundTag("GroupsAndName"), entityName);
 	}
-
-	/**
-	 * Saves all the data for animations and gui setup.
-	 */
-	public static void saveData() 
-	{
-		//			if(sequences.containsKey(entity))
-		//			{
-		//				NBTTagList sequenceList = new NBTTagList();
-		//				for(AnimationSequence sequence : sequences.get(entity))
-		//				{				
-		//					sequenceList.appendTag(sequence.getSaveData());
-		//				}		
-		//				compound.setTag(entity + "Sequences", sequenceList);		
-		//			}
-		//
-		//			//Save stances
-		//			if(stances.containsKey(entity))
-		//			{
-		//				NBTTagList stanceList = new NBTTagList();
-		//				for(AnimationStance stance : stances.get(entity))
-		//				{				
-		//					stanceList.appendTag(stance.getSaveData());
-		//				}		
-		//				compound.setTag(entity + "Stances", stanceList);		
-		//			}
-		//		}
-	}
-
-	/**
-	 * Loads all the data
-	 */
-	public static void loadData(NBTTagCompound compound) 
-	{
-		//			//Load sequences
-		//			ArrayList<AnimationSequence> sqs = new ArrayList<AnimationSequence>();
-		//			NBTTagList sequenceList = compound.getTagList(entityName + "Sequences", 10);
-		//			for(int j = 0; j < sequenceList.tagCount(); j++)
-		//			{
-		//				AnimationSequence sequence = new AnimationSequence("");
-		//				sequence.loadData(entityName, sequenceList.getCompoundTagAt(j));
-		//				sqs.add(sequence);
-		//			}
-		//			sequences.put(entityName, sqs);
-		//
-		//			//Load stances
-		//			ArrayList<AnimationStance> sts = new ArrayList<AnimationStance>();
-		//			NBTTagList stanceList = compound.getTagList(entityName + "Stances", 10);
-		//			for(int j = 0; j < stanceList.tagCount(); j++)
-		//			{
-		//				AnimationStance stance = new AnimationStance();
-		//				stance.loadData(stanceList.getCompoundTagAt(j));
-		//				sts.add(stance);
-		//			}
-		//			stances.put(entityName, sts);
-		//		}
-	}
-
-
-
 
 }
