@@ -53,7 +53,32 @@ public class AnimationSequence
 	{
 		return actionPoint;
 	}
+	
+	/**
+	 * Return true if the given partname has two or more animation parts associated with it.
+	 */
+	public boolean multiPartSequence(String partName)
+	{
+		boolean one = false;
+		for(AnimationPart s : this.animations)
+		{
+			if(s.getPart().getName().equals(partName))
+			{
+				//If one is true, another animation part having this part name implies two or more.
+				if(one)
+					return true;
+				else
+					one = true;
+			}
+		}
+		return false;
+	}
 
+	public void animateAll(float time, ModelObj entityModel) 
+	{
+		animateAll(time, entityModel, "");
+	}
+	
 	/**
 	 * Sets all the parts of a model to their rotation at a given time.
 	 * The part with name = exceptionPartName will not be rotated.

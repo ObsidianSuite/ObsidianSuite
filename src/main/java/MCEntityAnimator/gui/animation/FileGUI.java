@@ -244,6 +244,7 @@ public class FileGUI extends JFrame
 			public void actionPerformed(ActionEvent arg0) 
 			{
 				dispose();
+				Minecraft.getMinecraft().displayGuiScreen(null);
 			}
 		});
 

@@ -52,7 +52,7 @@ public class GuiEntityRenderer extends GuiBlack
 	protected List<String> parts = new ArrayList<String>();
 	protected String currentPartName, additionalHighlightPartName;
 
-	protected boolean boolBase;
+	protected boolean boolBase, boolGrid;
 
 	private int prevMouseMoveX = 0, prevMouseMoveY = 0;
 
@@ -117,8 +117,9 @@ public class GuiEntityRenderer extends GuiBlack
 			
 			
 			if(boolBase)
+				renderBase(posX + (width-posX-5)/2 + horizontalPan, posY + (height - 10)/2 + scaleModifier/2 + verticalPan, scale, 0.0F, 0.0F);
+			if(boolGrid)
 				renderGrid(posX + (width-posX-5)/2 + horizontalPan, posY + (height - 10)/2 + scaleModifier/2 + verticalPan, scale, 0.0F, 0.0F);
-			renderBase(posX + (width-posX-5)/2 + horizontalPan, posY + (height - 10)/2 + scaleModifier/2 + verticalPan, scale, 0.0F, 0.0F);
 			renderEntityIntoGui(posX + (width-posX-5)/2 + horizontalPan, posY + (height - 10)/2 + scaleModifier/2 + verticalPan, scale, 0.0F, 0.0F, entityToRender); 
 		}
 
