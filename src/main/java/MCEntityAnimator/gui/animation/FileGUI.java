@@ -41,6 +41,7 @@ import javax.swing.tree.TreePath;
 import MCEntityAnimator.MCEA_Main;
 import MCEntityAnimator.animation.AnimationData;
 import MCEntityAnimator.animation.AnimationSequence;
+import MCEntityAnimator.distribution.SaveLoadHandler;
 import MCEntityAnimator.distribution.ServerAccess;
 import MCEntityAnimator.gui.sequence.GuiAnimationTimelineWithFrames;
 import net.minecraft.client.Minecraft;
@@ -191,13 +192,9 @@ public class FileGUI extends JFrame
 					{
 						public void run() 
 						{
-							try 
-							{
-								ServerAccess.downloadAll();
-								updateOutput("\\-------------< Download complete >-------------/", false);
-								createGUI(mainPanel, outputLog.getText());
-							} 
-							catch (IOException e) {e.printStackTrace();}
+							SaveLoadHandler.download();
+							updateOutput("\\-------------< Download complete >-------------/", false);
+							createGUI(mainPanel, outputLog.getText());
 						}
 					};
 					new Thread(downloadThread).start();
@@ -217,20 +214,17 @@ public class FileGUI extends JFrame
 				{
 					public void run() 
 					{
-						try 
+						List<String> failedFiles = SaveLoadHandler.upload();
+						if(failedFiles.isEmpty())
+							updateOutput("\\--------------< Upload complete >-------------/", false);
+						else
 						{
-							List<String> failedFiles = ServerAccess.uploadAll();
-							if(failedFiles.isEmpty())
-								updateOutput("\\--------------< Upload complete >-------------/", false);
-							else
-							{
-								updateOutput("\\--------< Upload finished, some errors >--------/", false);
-								String s = "Upload failed for these files:\n";
-								for(String failedFile : failedFiles)
-									s += "   - " + failedFile + "\n";
-								showUploadErrorPopup(s);
-							}
-						} catch (IOException e) {e.printStackTrace();}
+							updateOutput("\\--------< Upload finished, some errors >--------/", false);
+							String s = "Upload failed for these files:\n";
+							for(String failedFile : failedFiles)
+								s += "   - " + failedFile + "\n";
+							showUploadErrorPopup(s);
+						}
 					}
 				};
 				new Thread(uploadThread).start();

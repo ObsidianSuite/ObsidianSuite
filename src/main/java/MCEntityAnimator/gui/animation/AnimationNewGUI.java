@@ -16,9 +16,9 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import MCEntityAnimator.DataHandler;
 import MCEntityAnimator.animation.AnimationData;
 import MCEntityAnimator.animation.AnimationSequence;
+import MCEntityAnimator.distribution.DataHandler;
 import MCEntityAnimator.distribution.ServerAccess;
 import MCEntityAnimator.gui.sequence.GuiAnimationTimelineWithFrames;
 import net.minecraft.client.Minecraft;
@@ -78,15 +78,7 @@ public class AnimationNewGUI extends JFrame
 			@Override
 			public void actionPerformed(ActionEvent e) 
 			{
-				try 
-				{
-					ServerAccess.downloadAll();
-					ServerAccess.gui = new FileGUI();
-				} 
-				catch (IOException e1) 
-				{
-					e1.printStackTrace();
-				}
+				ServerAccess.gui = new FileGUI();
 			}
 		});
 		

@@ -20,6 +20,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 
+import MCEntityAnimator.distribution.SaveLoadHandler;
 import MCEntityAnimator.distribution.ServerAccess;
 
 public class LoginGUI extends JFrame
@@ -81,16 +82,9 @@ public class LoginGUI extends JFrame
 				if(Arrays.equals(passwordField.getPassword(), password))
 				{
 					dispose();
-					try 
-					{
-						ServerAccess.username = username;
-						ServerAccess.downloadAll();
-						ServerAccess.gui = new FileGUI();
-					} 
-					catch (IOException e1) 
-					{
-						e1.printStackTrace();
-					}
+					ServerAccess.username = username;
+					SaveLoadHandler.download();
+					ServerAccess.gui = new FileGUI();
 				}
 				else
 					JOptionPane.showMessageDialog(mainPanel, "Incorrect password.");

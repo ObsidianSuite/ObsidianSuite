@@ -55,6 +55,7 @@ import MCEntityAnimator.Util;
 import MCEntityAnimator.animation.AnimationData;
 import MCEntityAnimator.animation.AnimationPart;
 import MCEntityAnimator.animation.AnimationSequence;
+import MCEntityAnimator.distribution.SaveLoadHandler;
 import MCEntityAnimator.distribution.ServerAccess;
 import MCEntityAnimator.gui.GuiBlack;
 import MCEntityAnimator.gui.GuiEntityRenderer;
@@ -223,14 +224,7 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 		controllerFrame.dispose();
 		settingsFrame.dispose();
 		timelineFrame.dispose();
-		try 
-		{
-			ServerAccess.uploadAll();
-		} 
-		catch (IOException e)
-		{
-			e.printStackTrace();
-		}
+		SaveLoadHandler.upload();
 	}
 
 	public void drawScreen(int par1, int par2, float par3)
