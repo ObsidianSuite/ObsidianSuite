@@ -21,7 +21,7 @@ public class ExtendedPropertiesAnimation implements IExtendedEntityProperties
 	@Override
 	public void saveNBTData(NBTTagCompound nbtTagCompound)
 	{
-		if(ServerAccess.username != null && ServerAccess.username.equals(""))
+		if(ServerAccess.username != null && !ServerAccess.username.equals(""))
 			SaveLoadHandler.upload();
 	}
 

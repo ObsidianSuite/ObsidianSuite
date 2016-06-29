@@ -70,6 +70,7 @@ public class AnimationData
 		{
 			for(AnimationSequence s : sequences.get(entityName))
 			{
+				System.out.println(s.getName());
 				if(s.getName().equals(animationName))
 				{
 					return s;
@@ -82,6 +83,17 @@ public class AnimationData
 	public static List<AnimationSequence> getSequences(String entityName) 
 	{
 		return sequences.get(entityName) == null ? new ArrayList<AnimationSequence>() : sequences.get(entityName);
+	}
+	
+	public static boolean sequenceExists(String entityName, String animationName)
+	{
+		List<AnimationSequence> seqs = getSequences(entityName);
+		for(AnimationSequence seq : seqs)
+		{
+			if(seq.getName().equals(animationName))
+				return true;
+		}
+		return false;
 	}
 
 	public static void addNewStance(String entityName, AnimationStance stance)

@@ -237,6 +237,7 @@ public class FileGUI extends JFrame
 			@Override
 			public void actionPerformed(ActionEvent arg0) 
 			{
+				ServerAccess.username = "";
 				dispose();
 				Minecraft.getMinecraft().displayGuiScreen(null);
 			}

@@ -59,7 +59,7 @@ public class AnimationNewGUI extends JFrame
 				String entityName = (String) entityDropDown.getSelectedItem();
 				if(!animationName.equals(""))
 				{
-					if(AnimationData.getSequenceFromName(entityName, animationName) != null)
+					if(!AnimationData.sequenceExists(entityName, animationName))
 					{
 						AnimationSequence sequence = new AnimationSequence(animationName);
 						AnimationData.addSequence(entityName, sequence);
@@ -78,6 +78,7 @@ public class AnimationNewGUI extends JFrame
 			@Override
 			public void actionPerformed(ActionEvent e) 
 			{
+				dispose();
 				ServerAccess.gui = new FileGUI();
 			}
 		});
