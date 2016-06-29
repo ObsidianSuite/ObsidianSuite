@@ -650,7 +650,7 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 			super("Settings");
 
 			JPanel generalPanel = new JPanel();
-			generalPanel.setLayout(new GridLayout(4,1));
+			generalPanel.setLayout(new GridLayout(5,1));
 
 			JButton choosePropButton = new JButton("Choose Right Hand Item");
 			choosePropButton.addActionListener(new ActionListener()
@@ -659,6 +659,16 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 				public void actionPerformed(ActionEvent e) 
 				{
 					mc.displayGuiScreen(new GuiInventoryChooseItem(GuiAnimationTimelineWithFrames.this, (EntityObj) entityToRender));
+				}
+			});
+			
+			JButton emptyHandButton = new JButton("Empty Right Hand Item");
+			emptyHandButton.addActionListener(new ActionListener()
+			{
+				@Override
+				public void actionPerformed(ActionEvent e) 
+				{
+					((EntityObj) entityToRender).setCurrentItem(null); 
 				}
 			});
 
@@ -699,6 +709,7 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 			});
 
 			generalPanel.add(choosePropButton);
+			generalPanel.add(emptyHandButton);
 			generalPanel.add(setActionPointButton);
 			generalPanel.add(deleteButton);
 			generalPanel.add(backButton);
