@@ -55,6 +55,7 @@ import MCEntityAnimator.Util;
 import MCEntityAnimator.animation.AnimationData;
 import MCEntityAnimator.animation.AnimationPart;
 import MCEntityAnimator.animation.AnimationSequence;
+import MCEntityAnimator.distribution.SaveLoadHandler;
 import MCEntityAnimator.distribution.ServerAccess;
 import MCEntityAnimator.gui.GuiBlack;
 import MCEntityAnimator.gui.GuiEntityRenderer;
@@ -63,6 +64,7 @@ import MCEntityAnimator.gui.animation.FileGUI;
 import MCEntityAnimator.render.objRendering.EntityObj;
 import MCEntityAnimator.render.objRendering.parts.Part;
 import MCEntityAnimator.render.objRendering.parts.PartObj;
+import net.minecraft.item.Item;
 
 public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 {
@@ -223,14 +225,7 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 		controllerFrame.dispose();
 		settingsFrame.dispose();
 		timelineFrame.dispose();
-		try 
-		{
-			ServerAccess.uploadAll();
-		} 
-		catch (IOException e)
-		{
-			e.printStackTrace();
-		}
+		SaveLoadHandler.upload();
 	}
 
 	public void drawScreen(int par1, int par2, float par3)
@@ -656,7 +651,7 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 			super("Settings");
 
 			JPanel generalPanel = new JPanel();
-			generalPanel.setLayout(new GridLayout(4,1));
+			generalPanel.setLayout(new GridLayout(5,1));
 
 			JButton choosePropButton = new JButton("Choose Right Hand Item");
 			choosePropButton.addActionListener(new ActionListener()
@@ -665,6 +660,17 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 				public void actionPerformed(ActionEvent e) 
 				{
 					mc.displayGuiScreen(new GuiInventoryChooseItem(GuiAnimationTimelineWithFrames.this, (EntityObj) entityToRender));
+				}
+			});
+			
+			JButton emptyHandButton = new JButton("Empty Right Hand Item");
+			emptyHandButton.addActionListener(new ActionListener()
+			{
+				@Override
+				public void actionPerformed(ActionEvent e) 
+				{
+			    	AnimationData.setAnimationItem(currentAnimation.getName(), -1);
+					((EntityObj) entityToRender).setCurrentItem(null); 
 				}
 			});
 
@@ -705,6 +711,7 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 			});
 
 			generalPanel.add(choosePropButton);
+			generalPanel.add(emptyHandButton);
 			generalPanel.add(setActionPointButton);
 			generalPanel.add(deleteButton);
 			generalPanel.add(backButton);

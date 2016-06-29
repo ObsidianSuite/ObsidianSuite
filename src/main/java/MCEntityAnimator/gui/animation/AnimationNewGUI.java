@@ -16,9 +16,9 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import MCEntityAnimator.DataHandler;
 import MCEntityAnimator.animation.AnimationData;
 import MCEntityAnimator.animation.AnimationSequence;
+import MCEntityAnimator.distribution.DataHandler;
 import MCEntityAnimator.distribution.ServerAccess;
 import MCEntityAnimator.gui.sequence.GuiAnimationTimelineWithFrames;
 import net.minecraft.client.Minecraft;
@@ -59,7 +59,7 @@ public class AnimationNewGUI extends JFrame
 				String entityName = (String) entityDropDown.getSelectedItem();
 				if(!animationName.equals(""))
 				{
-					if(AnimationData.getSequenceFromName(entityName, animationName) != null)
+					if(!AnimationData.sequenceExists(entityName, animationName))
 					{
 						AnimationSequence sequence = new AnimationSequence(animationName);
 						AnimationData.addSequence(entityName, sequence);
@@ -78,15 +78,8 @@ public class AnimationNewGUI extends JFrame
 			@Override
 			public void actionPerformed(ActionEvent e) 
 			{
-				try 
-				{
-					ServerAccess.downloadAll();
-					ServerAccess.gui = new FileGUI();
-				} 
-				catch (IOException e1) 
-				{
-					e1.printStackTrace();
-				}
+				dispose();
+				ServerAccess.gui = new FileGUI();
 			}
 		});
 		
