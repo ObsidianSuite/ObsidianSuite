@@ -64,6 +64,7 @@ import MCEntityAnimator.gui.animation.FileGUI;
 import MCEntityAnimator.render.objRendering.EntityObj;
 import MCEntityAnimator.render.objRendering.parts.Part;
 import MCEntityAnimator.render.objRendering.parts.PartObj;
+import net.minecraft.item.Item;
 
 public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 {
@@ -668,6 +669,7 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 				@Override
 				public void actionPerformed(ActionEvent e) 
 				{
+			    	AnimationData.setAnimationItem(currentAnimation.getName(), -1);
 					((EntityObj) entityToRender).setCurrentItem(null); 
 				}
 			});

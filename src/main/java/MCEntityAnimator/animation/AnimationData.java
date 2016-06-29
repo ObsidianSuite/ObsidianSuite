@@ -70,7 +70,6 @@ public class AnimationData
 		{
 			for(AnimationSequence s : sequences.get(entityName))
 			{
-				System.out.println(s.getName());
 				if(s.getName().equals(animationName))
 				{
 					return s;
@@ -175,7 +174,7 @@ public class AnimationData
 	public static ItemStack getAnimationItem(String animationName)
 	{
 		Integer id;
-		if((id = animationItems.get(animationName)) != null)
+		if((id = animationItems.get(animationName)) != null && id != -1)
 		{
 			Item item;
 			Block block;
