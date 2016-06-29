@@ -184,7 +184,6 @@ public class ServerAccess
 
 			}
 			stream.close();
-			MCEA_Main.dataHandler.loadNBTData();
 		}
 	}
 

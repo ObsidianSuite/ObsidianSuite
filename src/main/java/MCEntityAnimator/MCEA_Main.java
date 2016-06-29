@@ -4,6 +4,7 @@ import java.io.File;
 
 import MCEntityAnimator.block.BlockBase;
 import MCEntityAnimator.block.BlockGrid;
+import MCEntityAnimator.distribution.DataHandler;
 import MCEntityAnimator.item.ItemWeapon;
 import MCEntityAnimator.render.objRendering.TextureUtil;
 import cpw.mods.fml.common.FMLCommonHandler;
@@ -22,7 +23,7 @@ public class MCEA_Main
 	
 	public static final String homePath = Minecraft.getMinecraft().mcDataDir.getAbsolutePath();
 	public static final String animationPath = homePath + "/animation";
-	public static final String version = "3.6";
+	public static final String version = "3.6.1";
 	public static final DataHandler dataHandler = new DataHandler();
 
 	

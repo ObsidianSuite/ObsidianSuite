@@ -83,6 +83,17 @@ public class AnimationData
 	{
 		return sequences.get(entityName) == null ? new ArrayList<AnimationSequence>() : sequences.get(entityName);
 	}
+	
+	public static boolean sequenceExists(String entityName, String animationName)
+	{
+		List<AnimationSequence> seqs = getSequences(entityName);
+		for(AnimationSequence seq : seqs)
+		{
+			if(seq.getName().equals(animationName))
+				return true;
+		}
+		return false;
+	}
 
 	public static void addNewStance(String entityName, AnimationStance stance)
 	{
@@ -163,7 +174,7 @@ public class AnimationData
 	public static ItemStack getAnimationItem(String animationName)
 	{
 		Integer id;
-		if((id = animationItems.get(animationName)) != null)
+		if((id = animationItems.get(animationName)) != null && id != -1)
 		{
 			Item item;
 			Block block;

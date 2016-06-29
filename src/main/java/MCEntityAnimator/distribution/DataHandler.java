@@ -1,4 +1,4 @@
-package MCEntityAnimator;
+package MCEntityAnimator.distribution;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -8,9 +8,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import MCEntityAnimator.MCEA_Main;
 import MCEntityAnimator.animation.AnimationData;
 import MCEntityAnimator.animation.AnimationSequence;
-import MCEntityAnimator.distribution.ServerAccess;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
 
@@ -33,12 +33,6 @@ public class DataHandler
 				for(AnimationSequence s : AnimationData.getSequences(entityName))
 					writeNBTToFile(s.getSaveData(), getAnimationFile(entityName, s.getName()));
 			}
-
-			try 
-			{
-				ServerAccess.uploadAll();
-			} 
-			catch (IOException e) {e.printStackTrace();}
 		}
 	}
 
