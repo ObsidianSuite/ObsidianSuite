@@ -31,8 +31,12 @@ public class ServerAccess
 
 	public static List<String> uploadAll() throws IOException
 	{
-		output("Getting user files...", false);
-		return uploadFolder(new File(MCEA_Main.animationPath + "/data/" + username));
+		File file;
+		if(username.equals("root"))
+			file = new File(MCEA_Main.animationPath + "/data/shared");
+		else
+			file = new File(MCEA_Main.animationPath + "/data/" + username);
+		return uploadFolder(file);
 	}	
 
 	private static List<String> uploadFolder(File folder) throws IOException
