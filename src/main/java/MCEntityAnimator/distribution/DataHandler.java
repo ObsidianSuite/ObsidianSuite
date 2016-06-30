@@ -108,7 +108,9 @@ public class DataHandler
 	private static List<File> getAnimationFiles(String entityName)
 	{
 		List<File> animationFiles = new ArrayList<File>();
+		System.out.println(entityName);
 		File animationFolder = new File(MCEA_Main.animationPath + "/data/" + ServerAccess.username + "/" + entityName);
+		animationFolder.mkdir();
 		for(File f : animationFolder.listFiles())
 			animationFiles.add(f);
 		return animationFiles;
