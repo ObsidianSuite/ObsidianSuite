@@ -11,6 +11,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
@@ -43,6 +44,7 @@ import MCEntityAnimator.animation.AnimationData;
 import MCEntityAnimator.animation.AnimationSequence;
 import MCEntityAnimator.distribution.SaveLoadHandler;
 import MCEntityAnimator.distribution.ServerAccess;
+import MCEntityAnimator.gui.GuiPartSetup;
 import MCEntityAnimator.gui.sequence.GuiAnimationTimelineWithFrames;
 import net.minecraft.client.Minecraft;
 
@@ -261,7 +263,7 @@ public class FileGUI extends JFrame
 		setVisible(true);
 		setAlwaysOnTop(true);
 		setLocationRelativeTo(null);
-		
+
 		outputLog.setText(outputText);
 
 		addWindowListener(new WindowAdapter() 
@@ -314,7 +316,32 @@ public class FileGUI extends JFrame
 
 		for(String s : ServerAccess.getErrors())
 		{
-			errorPanel.add(new JLabel(s));
+			final JLabel label = new JLabel(s);
+			if(label.getText().contains("No data file"))
+			{
+				final String entityName = label.getText().substring(17, label.getText().length() - 1);
+				label.setForeground(Color.decode("#0000FF"));
+				label.addMouseListener(new MouseListener()
+				{
+
+					@Override
+					public void mouseClicked(MouseEvent arg0) {initModelSetup(entityName);}
+
+					@Override
+					public void mouseEntered(MouseEvent arg0) {label.setForeground(Color.decode("#00CCFF"));}
+
+					@Override
+					public void mouseExited(MouseEvent arg0) {label.setForeground(Color.decode("#0000FF"));}
+
+					@Override
+					public void mousePressed(MouseEvent arg0) {}
+
+					@Override
+					public void mouseReleased(MouseEvent arg0) {}
+
+				});
+			}
+			errorPanel.add(label);
 		}
 
 		return errorPanel;
@@ -374,23 +401,34 @@ public class FileGUI extends JFrame
 		{
 			int length = tp.getPathCount();
 			boolean enabled = false;
-			if(length == 4)
+			if(length == 4 && !tp.getPathComponent(1).toString().equals("shared"))
 			{
-				if(!tp.getPathComponent(1).toString().equals("shared"))
+				animationToEdit = tp.getPathComponent(3).toString();
+				if(!animationToEdit.equals("EMPTY!"))
 				{
-					animationToEdit = tp.getPathComponent(3).toString();
-					if(!animationToEdit.equals("EMPTY!"))
-					{
-						enabled = true;
-						animationToEdit = animationToEdit.substring(0, animationToEdit.indexOf("."));
-						entityToEdit = tp.getPathComponent(2).toString();
-					}
+					enabled = true;
+					animationToEdit = animationToEdit.substring(0, animationToEdit.indexOf("."));
+					entityToEdit = tp.getPathComponent(2).toString();
 				}
-				else
-					JOptionPane.showMessageDialog(this, "Permission denied, must be root user.");
+			}
+			else if(length == 3 && tp.getPathComponent(1).toString().equals("shared"))
+			{
+				initModelSetup(tp.getPathComponent(2).toString());
 			}
 			editButton.setEnabled(enabled);
 		}
+	}
+
+	private void initModelSetup(String entityName)
+	{
+		if(ServerAccess.username.equals("root"))
+			if(JOptionPane.showConfirmDialog(FileGUI.this, "Setup model for " + entityName + "?", "Setup Model", JOptionPane.YES_NO_OPTION) == 0)
+			{
+				Minecraft.getMinecraft().displayGuiScreen(new GuiPartSetup(entityName));
+				FileGUI.this.dispose();
+			}
+			else
+				JOptionPane.showMessageDialog(FileGUI.this, "Permission denied, must be root user.");
 	}
 
 }

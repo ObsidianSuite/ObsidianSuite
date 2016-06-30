@@ -23,15 +23,19 @@ public class DataHandler
 		{
 			List<String> entityNames = getEntities();
 			//GUI
-			writeNBTToFile(AnimationData.getGUISetupTag(entityNames), getGUIFile());
+			if(!ServerAccess.username.equals("root"))			
+				writeNBTToFile(AnimationData.getGUISetupTag(entityNames), getGUIFile());
 			//Entity data
 			for(String entityName : entityNames)
 			{
 				//Parenting and part names
 				writeNBTToFile(AnimationData.getEntityDataTag(entityName), getEntityDataFile(entityName));
 				//Sequences
-				for(AnimationSequence s : AnimationData.getSequences(entityName))
-					writeNBTToFile(s.getSaveData(), getAnimationFile(entityName, s.getName()));
+				if(!ServerAccess.username.equals("root"))			
+				{
+					for(AnimationSequence s : AnimationData.getSequences(entityName))
+						writeNBTToFile(s.getSaveData(), getAnimationFile(entityName, s.getName()));
+				}
 			}
 		}
 	}
@@ -53,13 +57,16 @@ public class DataHandler
 			if(entityDataFile.exists())
 				AnimationData.loadEntityData(entityName, getNBTFromFile(entityDataFile));
 
-			//Sequences
-			for(File animationFile : getAnimationFiles(entityName))
-			{
-				AnimationSequence sequence = new AnimationSequence(entityName, getNBTFromFile(animationFile));
-				AnimationData.addSequence(entityName, sequence);
-			}
 
+			if(!ServerAccess.username.equals("root"))
+			{
+				//Sequences
+				for(File animationFile : getAnimationFiles(entityName))
+				{
+					AnimationSequence sequence = new AnimationSequence(entityName, getNBTFromFile(animationFile));
+					AnimationData.addSequence(entityName, sequence);
+				}
+			}
 		}
 	}
 
@@ -108,12 +115,14 @@ public class DataHandler
 	private static List<File> getAnimationFiles(String entityName)
 	{
 		List<File> animationFiles = new ArrayList<File>();
+		System.out.println(entityName);
 		File animationFolder = new File(MCEA_Main.animationPath + "/data/" + ServerAccess.username + "/" + entityName);
+		animationFolder.mkdir();
 		for(File f : animationFolder.listFiles())
 			animationFiles.add(f);
 		return animationFiles;
 	}
-	
+
 	private static File getAnimationFile(String entityName, String animationName)
 	{
 		return new File(MCEA_Main.animationPath + "/data/" + ServerAccess.username + "/" + entityName + "/" + animationName + ".data");
