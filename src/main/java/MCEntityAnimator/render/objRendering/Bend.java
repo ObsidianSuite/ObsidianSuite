@@ -141,7 +141,7 @@ public class Bend extends GroupObject
 			}
 		}
 
-		parent.updateDefaultTextureCoordinates();
+		parent.setDefaultTCsToCurrentTCs();
 
 	}
 
@@ -182,7 +182,7 @@ public class Bend extends GroupObject
 			}
 		}
 
-		child.updateDefaultTextureCoordinates();
+		child.setDefaultTCsToCurrentTCs();
 
 	}
 
@@ -215,7 +215,7 @@ public class Bend extends GroupObject
 		{
 			f.textureCoordinates = preBendTextureCoords.get(f);
 		}
-		part.updateDefaultTextureCoordinates();
+		part.setDefaultTCsToCurrentTCs();
 	}
 
 
