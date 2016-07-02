@@ -19,6 +19,7 @@ import MCEntityAnimator.Util;
 import MCEntityAnimator.animation.AnimationData;
 import MCEntityAnimator.animation.AnimationParenting;
 import MCEntityAnimator.animation.PartGroupsAndNames;
+import MCEntityAnimator.render.objRendering.bend.BendNew;
 import MCEntityAnimator.render.objRendering.parts.Part;
 import MCEntityAnimator.render.objRendering.parts.PartEntityPos;
 import MCEntityAnimator.render.objRendering.parts.PartObj;
@@ -36,7 +37,7 @@ public class ModelObj extends ModelBase
 	private String entityType;
 	public WavefrontObject model;
 	public ArrayList<Part> parts;
-	private ArrayList<Bend> bends;
+	private ArrayList<BendNew> bends;
 	private AnimationParenting parenting;
 	public PartGroupsAndNames groupsAndNames;
 	private Map<PartObj, float[]> defaults;
@@ -75,7 +76,7 @@ public class ModelObj extends ModelBase
 		parts.add(new Part(this, "prop_trans"));
 		parenting = AnimationData.getAnipar(par0Str);
 		hightlightedParts = new ArrayList<PartObj>();
-		bends = new ArrayList<Bend>();
+		bends = new ArrayList<BendNew>();
 		defaults = Maps.newHashMap();
 		loadFromFile();
 		renderWithTexture = true;
@@ -234,7 +235,7 @@ public class ModelObj extends ModelBase
 
 			if(!child.hasBend())
 			{
-				Bend b = new Bend(child, parent);
+				BendNew b = new BendNew(parent, child);
 				bends.add(b);
 				child.setBend(b);
 			}
@@ -245,7 +246,7 @@ public class ModelObj extends ModelBase
 	}
 
 
-	public void removeBend(Bend bend) 
+	public void removeBend(BendNew bend) 
 	{
 		bends.remove(bend);
 	}
@@ -326,7 +327,7 @@ public class ModelObj extends ModelBase
 				p.move(entity);
 		}
 
-		for(Bend bend : this.bends)
+		for(BendNew bend : this.bends)
 		{
 			bend.render();
 		}

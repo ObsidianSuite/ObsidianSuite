@@ -11,6 +11,7 @@ import MCEntityAnimator.animation.AnimationData;
 import MCEntityAnimator.animation.AnimationParenting;
 import MCEntityAnimator.render.objRendering.Bend;
 import MCEntityAnimator.render.objRendering.ModelObj;
+import MCEntityAnimator.render.objRendering.bend.BendNew;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.entity.Entity;
@@ -31,7 +32,7 @@ public class PartObj extends Part
     private Map<Face, TextureCoordinate[]> defaultTextureCoords;
 
     private boolean visible;
-    private Bend bend = null;
+    private BendNew bend = null;
     public GroupObject groupObj;
     private String displayName;
 
@@ -90,7 +91,7 @@ public class PartObj extends Part
         visible = bool;
     }
 
-    public void setBend(Bend b)
+    public void setBend(BendNew b)
     {
         bend = b;
     }
