@@ -21,13 +21,15 @@ public class BezierCurve
 	
 	private Vertex a1, a2, b1, b2, c;
 	private BezierGroupObj groupObj;
+	private float[] rotation;
 	
-	public BezierCurve(Vertex a1, Vertex a2, Vertex b1, Vertex b2)
+	public BezierCurve(Vertex a1, Vertex a2, Vertex b1, Vertex b2, float[] rotation)
 	{
 		this.a1 = a1;
 		this.a2 = a2;
 		this.b1 = b1;
 		this.b2 = b2;
+		this.rotation = rotation;
 		setupCVertex();
 	}
 	
@@ -41,12 +43,12 @@ public class BezierCurve
 		{
 			//TODO initially just working with x rotation (so use y and z from vertex)
 			//(1-t)^2 * a2 + 2(1-t)t * c + t^2 * b2 
-			float x = 0.0F;
+			float x = (1 - t)*(1 - t)*a2.x + 2*(1-t)*t*c.x + t*t*b2.x;
 			float y = (1 - t)*(1 - t)*a2.y + 2*(1-t)*t*c.y + t*t*b2.y;
 			float z = (1 - t)*(1 - t)*a2.z + 2*(1-t)*t*c.z + t*t*b2.z;
-			//System.out.println(t);
+			
 			//groupObj.render();
-			return new Vertex(a2.x,y,z);
+			return new Vertex(x,y,z);
 		}
 		throw new RuntimeException("Cannot get point on bezier curve for t value " + t + ". Outside of valid range (0 to 1).");
 	}
@@ -56,42 +58,74 @@ public class BezierCurve
 	 */
 	private void setupCVertex()
 	{
-		float ma = getGradient(a1, a2);
-		float mb = getGradient(b1, b2);
-				
-		//System.out.println(ma);
+		Point p;
+		if(Math.abs(rotation[0]) >= Math.abs(rotation[2]))
+		{
+			Point p1 = new Point(a1.z, a1.y);
+			Point q1 = new Point(a2.z, a2.y);
+			Point p2 = new Point(b1.z, b1.y);
+			Point q2 = new Point(b2.z, b2.y);
+			p = getIntersection(p1, q1, p2, q2);
+		}
+		else if(Math.abs(rotation[2]) > Math.abs(rotation[0]))
+		{
+			Point p1 = new Point(a1.x, a1.y);
+			Point q1 = new Point(a2.x, a2.y);
+			Point p2 = new Point(b1.x, b1.y);
+			Point q2 = new Point(b2.x, b2.y);
+			p = getIntersection(p1, q1, p2, q2);
+		}
+		else
+		{
+			p = new Point(a2.x, b2.y);
+		}
+
+		//System.out.println(p.y);
 		
-		float ca = getIntersect(a1, ma);
-		float cb = getIntersect(b1, mb);
-		float z = (cb - ca)/(ma - mb);
-		float y = ma*z+ca;
-						
-		if(Double.isNaN(y))
-			y = (a2.y + b2.y)/2.0F;		
-		if(Double.isNaN(z))
-			z = (a2.z + b2.z)/2.0F;
-		
-		c = new Vertex(a2.x, y, z);
+		c = new Vertex(a2.x, p.y, a2.z);
 		
 		groupObj = new BezierGroupObj(new Vertex[]{a2,b2,c});
 	}
 	
-	//TODO initially just working with x rotation (so use y and z from vertex)
+	/**
+	 * Return the Point at which line l (line containing p1 and q1)
+	 * and line m (line containing p2 and q2 meet).
+	 * @return
+	 */
+	private Point getIntersection(Point p1, Point q1, Point p2, Point q2)
+	{
+		float l_grad = getGradient(p1, q1);
+		float m_grad = getGradient(p2, q2);
+		
+		float l_int = getIntersect(p1, l_grad);
+		float m_int = getIntersect(p2, m_grad);
+		
+		float x,y;
+		
+		//System.out.println(m_grad);
+		if(Double.isInfinite(l_grad))
+			x = p1.x;
+		else
+			x = (m_int - l_int)/(l_grad - m_grad);
+		y = m_grad*x + m_int;
+
+		return new Point(x,y);
+	}
+		
 	/**
 	 * Calculate gradient using m=deltay/deltax. 
 	 */
-	private float getGradient(Vertex p, Vertex q)
+	private float getGradient(Point p, Point q)
 	{
-		return (p.y - q.y)/(p.z - q.z);
+		return (p.y - q.y)/(p.x - q.x);
 	}
 	
-	//TODO initially just working with x rotation (so use y and z from vertex)
 	/**
 	 * Calculate intersect using c=y-mx
 	 */
-	private float getIntersect(Vertex p, float m)
+	private float getIntersect(Point p, float gradient)
 	{
-		return p.y - m*p.z;
+		return p.y - gradient*p.x;
 	}
 	
 	
@@ -105,8 +139,17 @@ public class BezierCurve
 			f.vertices = vertices;
 			this.faces.add(f);
 		}
+	}
+	
+	private class Point
+	{
+		float x,y;
 		
-		
+		private Point(float x, float y)
+		{
+			this.x = x;
+			this.y = y;
+		}
 	}
 
 

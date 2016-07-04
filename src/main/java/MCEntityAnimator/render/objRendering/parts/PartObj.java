@@ -196,6 +196,12 @@ public class PartObj extends Part
     {
         updateTextureCoordinates(highlight, main);
 
+        TextureCoordinate tc = new TextureCoordinate(0.0F, 0.0F); 
+        for(Face f : groupObj.faces)
+        {
+        	f.textureCoordinates = new TextureCoordinate[]{tc, tc, tc};
+        }
+        
         GL11.glPushMatrix();
         move(entity);
         if(visible)

@@ -28,6 +28,8 @@ public class BendPart extends GroupObject
 		
 		this.glDrawingMode = 4;
 		
+		boolean upsideDown = bottomVertices[0].y > topVertices[0].y;
+		
 		for(int i = 0; i < 4; i++)
 		{
 			int j = i == 3 ? 0 : i + 1;
@@ -38,15 +40,18 @@ public class BendPart extends GroupObject
 			Face f = new Face();
 			f.vertices = new Vertex[]{vA, vB, vC};
 			faces.add(f);
-			
-			f.faceNormal = f.calculateFaceNormal();
-			
+
 			Vertex vD = topVertices[j];
 			Vertex vE = bottomVertices[i];
 			Vertex vF = bottomVertices[j];
 			Face g = new Face();
 			g.vertices = new Vertex[]{vD, vE, vF};
 			faces.add(g);
+			
+			//Flip face normal if upside parenting
+			Vertex faceNormal = upsideDown ? g.calculateFaceNormal() : f.calculateFaceNormal();
+			f.faceNormal = faceNormal;
+			g.faceNormal = faceNormal;
 		}
 	}
 

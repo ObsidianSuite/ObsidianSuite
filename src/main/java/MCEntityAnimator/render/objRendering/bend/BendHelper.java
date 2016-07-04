@@ -1,6 +1,7 @@
 package MCEntityAnimator.render.objRendering.bend;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -69,26 +70,40 @@ public class BendHelper
 	 * only change in one dimension from the previous vertex.
 	 * FIXME This assumes all vertices have the same y value, so we are only comparing x and z values. 
 	 * Example: http://imgur.com/awsGX4f
-	 * Since this is relative, the starting vertex is arbitrary. 
+	 * Start from the vertex with the greatest x and z values.  
 	 */
 	public static Vertex[] orderVerticesRelative(Vertex[] vertices)
 	{
 		Vertex[] orderedVertices = new Vertex[vertices.length];
-		Vertex startingVertex = vertices[0];
-		orderedVertices[0] = startingVertex;
-		for(int i = 1; i < 4; i++)
+		Vertex startingVertex = vertices[0];//copyVertex(vertices[0]);
+		for(int a = 1; a < 4; a++)
 		{
+			if(vertices[a].x >= startingVertex.x && vertices[a].z >= startingVertex.z)
+				startingVertex = copyVertex(vertices[a]);
+		}
+		orderedVertices[0] = startingVertex;
+		for(int i = 0; i < 4; i++)
+		{
+			
 			Vertex v = vertices[i];
+			if(v.x == -0.259169F)
+				v.x = -0.25917F;
 			if(v.x != startingVertex.x && v.z == startingVertex.z)
 				orderedVertices[1] = v;
 			else if(v.x != startingVertex.x && v.z != startingVertex.z)
 				orderedVertices[2] = v;
-			else
+			else if(v.x == startingVertex.x && v.z != startingVertex.z)
 				orderedVertices[3] = v;
 		}
+		outputVertexArray(orderedVertices, "Relative ordered vertices");
 		return orderedVertices;
 	}
 
+	public static Vertex copyVertex(Vertex v)
+	{
+		return new Vertex(v.x, v.y, v.z);
+	}
+	
 	/**
 	 * Orders the vertices based with the ones closest to the target on coming first.
 	 */

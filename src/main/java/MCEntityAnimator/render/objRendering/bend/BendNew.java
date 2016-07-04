@@ -29,17 +29,15 @@ public class BendNew
 
 	//The percentage of the parent and child part which remains after the bend is made.
 	//So the length of the parts is reduced to 60%
-	private static final float sizeReduction = 0.6F;
+	private static final float sizeReduction = 0.1F;
 
 	//The list of segments of the bend. These are the actual group objects that are rendered.
 	private List<BendPart> bendParts;
 	//The number of bend parents the bend is made up of.
-	private static final int bendSplit = 11;
+	private static final int bendSplit = 50;
 
 	public BendNew(PartObj parent, PartObj child)
 	{
-		System.out.println("Creating bend obj");
-
 		this.parent = parent;
 		this.child = child;
 
@@ -96,7 +94,7 @@ public class BendNew
 
 
 	public void render()
-	{
+	{		
 		//These are absolute vertex reference taking into rotation into account.
 		Vertex[] topFarVertices = new Vertex[parentFarVertices.length];
 		Vertex[] topNearVertices = new Vertex[parentNearVertices.length];
@@ -191,7 +189,7 @@ public class BendNew
 		for(int i = 0; i < bottomNearVertices.length; i++)
 		{
 			//System.out.println( bottomNearVertices[i].z + "," + bottomFarVertices[i].z);
-			BezierCurve curve = new BezierCurve(topFarVertices[i], topNearVertices[i], bottomFarVertices[i], bottomNearVertices[i]);
+			BezierCurve curve = new BezierCurve(topFarVertices[i], topNearVertices[i], bottomFarVertices[i], bottomNearVertices[i], child.getValues());
 			curves[i] = curve;
 		}
 		return curves;
