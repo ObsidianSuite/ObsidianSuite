@@ -119,8 +119,8 @@ public class BezierCurve
 	 */
 	public void render()
 	{
-		if(groupObj != null)
-			groupObj.render();
+//		if(groupObj != null)
+//			groupObj.render();
 	}
 
 	/**

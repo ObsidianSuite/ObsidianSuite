@@ -194,6 +194,9 @@ public class PartObj extends Part
 
     public void render(Entity entity, boolean highlight, boolean main) 
     {
+    	groupObj.glDrawingMode = 4;
+
+    	
         updateTextureCoordinates(highlight, main);
 
         TextureCoordinate tc = new TextureCoordinate(0.0F, 0.0F); 

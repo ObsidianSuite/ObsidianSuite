@@ -28,13 +28,16 @@ public class BendNew
 	PartObj child;
 
 	//The percentage of the parent and child part which remains after the bend is made.
-	//So the length of the parts is reduced to 60%
-	private static final float sizeReduction = 0.1F;
+	//So the length of the parts is reduced to 20%
+	private static final float sizeReduction = 0.2F;
 
 	//The list of segments of the bend. These are the actual group objects that are rendered.
 	private List<BendPart> bendParts;
 	//The number of bend parents the bend is made up of.
-	private static final int bendSplit = 50;
+	private static final int bendSplit = 20;
+
+	//True if the parent is below the child.
+	private boolean inverted;
 
 	public BendNew(PartObj parent, PartObj child)
 	{
@@ -59,6 +62,8 @@ public class BendNew
 		parentNearVertices = BendHelper.alignVertices(parentFarVertices, parentNearVertices);
 		childNearVertices = BendHelper.alignVertices(parentNearVertices, childNearVertices);
 		childFarVertices = BendHelper.alignVertices(childNearVertices, childFarVertices);
+
+		inverted = childFarVertices[0].y > parentFarVertices[0].y;
 
 		shortenParts();
 
@@ -100,7 +105,7 @@ public class BendNew
 		Vertex[] topNearVertices = new Vertex[parentNearVertices.length];
 		Vertex[] bottomNearVertices = new Vertex[childNearVertices.length];
 		Vertex[] bottomFarVertices = new Vertex[childFarVertices.length];
-				
+
 		//Set top far and near vertices to rotation compensated parent far and near vertices.
 		//Do all this before compensating for parent rotation.
 		for(int i = 0; i < parentFarVertices.length; i++)
@@ -111,7 +116,7 @@ public class BendNew
 			v = parentNearVertices[i];
 			topNearVertices[i] = new Vertex(v.x, v.y, v.z);
 		}
-				
+
 		//Set top far and near vertices to rotation compensated child far and near vertices.
 		for(int i = 0; i < childNearVertices.length; i++)
 		{	
@@ -126,26 +131,26 @@ public class BendNew
 
 		//Generate curves.
 		BezierCurve[] curves = generateBezierCurves(topFarVertices, topNearVertices, bottomNearVertices, bottomFarVertices);
-		
+
 		//Top of first part is topNearVertices.
 		Vertex[] bendPartTop = topNearVertices;
-		
+
 		//Update bends
 		for(int i = 0; i < bendSplit; i++)
 		{
-			if(bendParts.size() == i)
-				bendParts.add(new BendPart());
-			
 			//Generate part bottom.
 			Vertex[] bendPartBottom = generatePartBottom(curves,(float)(i+1)/bendSplit);
 			//Update bend.
-			bendParts.get(i).updateVertices(bendPartTop, bendPartBottom);
+			if(inverted)
+				bendParts.get(i).updateVertices(bendPartBottom, bendPartTop);
+			else
+				bendParts.get(i).updateVertices(bendPartTop, bendPartBottom);
 			//Top of next part is bottom of this part.
 			bendPartTop = bendPartBottom;
 		}
-		
+
 		GL11.glPushMatrix();
-		
+
 		AnimationParenting anipar = AnimationData.getAnipar(parent.modelObj.getEntityType());
 		List<PartObj> parents = new ArrayList<PartObj>();
 		PartObj p = child;
@@ -154,20 +159,20 @@ public class BendNew
 			p = anipar.getParent(p);
 			parents.add(0, p);
 		}
-		
+
 		for(PartObj q : parents)
 			compensatePartRotation(q);
-		
+
 		for(int i = 0; i < bendSplit; i++)
 			bendParts.get(i).render();
 
 		for(BezierCurve c : curves)
 			c.render();
-		
+
 		GL11.glPopMatrix();
 
 	}
-	
+
 	/**
 	 * Adjust a glMatrix for a partObj p.
 	 */

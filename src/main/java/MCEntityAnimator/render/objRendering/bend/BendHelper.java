@@ -118,7 +118,11 @@ public class BendHelper
 			orderedVerticesArray[i] = orderedVertices.get(i).getVertex();
 		return orderedVerticesArray;
 	}
-
+	
+	public static boolean verticesEqual(Vertex v, Vertex w)
+	{
+		return v.x == w.x && v.y == w.y && v.z == w.z;
+	}
 
 	public static float getDistanceBetweenVertices(Vertex v, Vertex w)
 	{
