@@ -328,7 +328,6 @@ public class Bend extends GroupObject
 		{
 			for(int i = 0; i < 4; i++)
 			{
-				//b1
 				Vertex endPoint = new Vertex(baseX[i], childMainVertices.get(0).y, baseZ[i]);
 				rotateVertex(endPoint, child.getValues(), new float[]{-child.getRotationPoint(0), -child.getRotationPoint(1), -child.getRotationPoint(2)});
 
@@ -339,7 +338,11 @@ public class Bend extends GroupObject
 
 				if(child.getValue(0) != 0.0F || child.getValue(2) != 0.0F)
 				{
-					//b2
+					//end point = b2.
+					//additional point = b1.
+					//base x and z = a2.x and a2.z
+					//child.getRotationPoint(1) = default y.
+					
 					Vertex additionalPoint = new Vertex(baseX[i], childMainVertices.get(0).y - 1, baseZ[i]);
 					rotateVertex(additionalPoint, child.getValues(), new float[]{-child.getRotationPoint(0), -child.getRotationPoint(1), -child.getRotationPoint(2)});
 					float p1 = endPoint.z;

@@ -100,12 +100,7 @@ public class BendNew
 		Vertex[] topNearVertices = new Vertex[parentNearVertices.length];
 		Vertex[] bottomNearVertices = new Vertex[childNearVertices.length];
 		Vertex[] bottomFarVertices = new Vertex[childFarVertices.length];
-
-		//Load anipar
-		AnimationParenting anipar = AnimationData.getAnipar(parent.modelObj.getEntityType());
-		
-		GL11.glPushMatrix();
-		
+				
 		//Set top far and near vertices to rotation compensated parent far and near vertices.
 		//Do all this before compensating for parent rotation.
 		for(int i = 0; i < parentFarVertices.length; i++)
@@ -116,9 +111,7 @@ public class BendNew
 			v = parentNearVertices[i];
 			topNearVertices[i] = new Vertex(v.x, v.y, v.z);
 		}
-		
-		//Compensate for parent rotation.
-		
+				
 		//Set top far and near vertices to rotation compensated child far and near vertices.
 		for(int i = 0; i < childNearVertices.length; i++)
 		{	
@@ -147,11 +140,29 @@ public class BendNew
 			Vertex[] bendPartBottom = generatePartBottom(curves,(float)(i+1)/bendSplit);
 			//Update bend.
 			bendParts.get(i).updateVertices(bendPartTop, bendPartBottom);
-			//Render bend
-			bendParts.get(i).render();
 			//Top of next part is bottom of this part.
 			bendPartTop = bendPartBottom;
 		}
+		
+		GL11.glPushMatrix();
+		
+		AnimationParenting anipar = AnimationData.getAnipar(parent.modelObj.getEntityType());
+		List<PartObj> parents = new ArrayList<PartObj>();
+		PartObj p = child;
+		while(anipar.hasParent(p))
+		{
+			p = anipar.getParent(p);
+			parents.add(0, p);
+		}
+		
+		for(PartObj q : parents)
+			compensatePartRotation(q);
+		
+		for(int i = 0; i < bendSplit; i++)
+			bendParts.get(i).render();
+
+		for(BezierCurve c : curves)
+			c.render();
 		
 		GL11.glPopMatrix();
 
@@ -175,7 +186,7 @@ public class BendNew
 		for(int i = 0; i < bottomNearVertices.length; i++)
 		{
 			//System.out.println( bottomNearVertices[i].z + "," + bottomFarVertices[i].z);
-			BezierCurve curve = new BezierCurve(topFarVertices[i], topNearVertices[i], bottomFarVertices[i], bottomNearVertices[i], child.getValues(), centreOfBend.y);
+			BezierCurve curve = new BezierCurve(topNearVertices[i], bottomFarVertices[i], bottomNearVertices[i], child.getValues(), centreOfBend.y);
 			curves[i] = curve;
 		}
 		return curves;
