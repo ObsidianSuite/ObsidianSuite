@@ -22,14 +22,17 @@ public class BezierCurve
 	private Vertex a1, a2, b1, b2, c;
 	private BezierGroupObj groupObj;
 	private float[] rotation;
+	private float defaultY;
 	
-	public BezierCurve(Vertex a1, Vertex a2, Vertex b1, Vertex b2, float[] rotation)
+	public BezierCurve(Vertex a1, Vertex a2, Vertex b1, Vertex b2, float[] rotation, float defaultY)
 	{
 		this.a1 = a1;
 		this.a2 = a2;
 		this.b1 = b1;
 		this.b2 = b2;
+
 		this.rotation = rotation;
+		this.defaultY = defaultY;
 		setupCVertex();
 	}
 	
@@ -47,7 +50,7 @@ public class BezierCurve
 			float y = (1 - t)*(1 - t)*a2.y + 2*(1-t)*t*c.y + t*t*b2.y;
 			float z = (1 - t)*(1 - t)*a2.z + 2*(1-t)*t*c.z + t*t*b2.z;
 			
-			//groupObj.render();
+			groupObj.render();
 			return new Vertex(x,y,z);
 		}
 		throw new RuntimeException("Cannot get point on bezier curve for t value " + t + ". Outside of valid range (0 to 1).");
@@ -59,7 +62,7 @@ public class BezierCurve
 	private void setupCVertex()
 	{
 		Point p;
-		if(Math.abs(rotation[0]) >= Math.abs(rotation[2]))
+		if(Math.abs(rotation[0]) > Math.abs(rotation[2]))
 		{
 			Point p1 = new Point(a1.z, a1.y);
 			Point q1 = new Point(a2.z, a2.y);
@@ -77,10 +80,18 @@ public class BezierCurve
 		}
 		else
 		{
-			p = new Point(a2.x, b2.y);
+			p = new Point(a2.x, (a2.y + b2.y)/2);
 		}
+		
+		if(p.y > a1.y)
+		{
+			p.y = a1.y;
+//			System.out.println("A: " + a1.y);
+//
+		}
+		
+//		System.out.println(p.y);
 
-		//System.out.println(p.y);
 		
 		c = new Vertex(a2.x, p.y, a2.z);
 		

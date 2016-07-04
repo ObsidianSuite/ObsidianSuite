@@ -37,6 +37,8 @@ public class BendPart extends GroupObject
 			Vertex vA = topVertices[i];
 			Vertex vB = topVertices[j];
 			Vertex vC = bottomVertices[i];
+//			if(!Double.isNaN(vA.y))
+//				BendHelper.outputVertex(vA);
 			Face f = new Face();
 			f.vertices = new Vertex[]{vA, vB, vC};
 			faces.add(f);

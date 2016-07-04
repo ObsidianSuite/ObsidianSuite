@@ -105,28 +105,16 @@ public class BendNew
 		AnimationParenting anipar = AnimationData.getAnipar(parent.modelObj.getEntityType());
 		
 		GL11.glPushMatrix();
-			
-		//Compensate for any parts above parent in parent's hierarchy. 
-		PartObj p = parent;
-		while(anipar.hasParent(p))
-		{
-			p = anipar.getParent(p);
-			compensatePartRotation(p);
-		}
-		
 		
 		//Set top far and near vertices to rotation compensated parent far and near vertices.
 		//Do all this before compensating for parent rotation.
-		Vertex parentRotPoint = new Vertex(-parent.getRotationPoint(0), -parent.getRotationPoint(1), -parent.getRotationPoint(2));
 		for(int i = 0; i < parentFarVertices.length; i++)
 		{
 			Vertex v = parentFarVertices[i];
 			topFarVertices[i] = new Vertex(v.x, v.y, v.z);
-			BendHelper.rotateVertex(topFarVertices[i], parent.getValues(), parentRotPoint);
 
 			v = parentNearVertices[i];
 			topNearVertices[i] = new Vertex(v.x, v.y, v.z);
-			BendHelper.rotateVertex(topNearVertices[i], parent.getValues(), parentRotPoint);
 		}
 		
 		//Compensate for parent rotation.
@@ -137,12 +125,10 @@ public class BendNew
 			Vertex v = childNearVertices[i];
 			bottomNearVertices[i] = new Vertex(v.x, v.y, v.z);
 			BendHelper.rotateVertex(bottomNearVertices[i], child.getValues(), centreOfBend);
-			BendHelper.rotateVertex(bottomNearVertices[i], parent.getValues(), parentRotPoint);
 
 			v = childFarVertices[i];
 			bottomFarVertices[i] = new Vertex(v.x, v.y, v.z);
 			BendHelper.rotateVertex(bottomFarVertices[i], child.getValues(), centreOfBend);
-			BendHelper.rotateVertex(bottomFarVertices[i], parent.getValues(), parentRotPoint);
 		}
 
 		//Generate curves.
@@ -189,7 +175,7 @@ public class BendNew
 		for(int i = 0; i < bottomNearVertices.length; i++)
 		{
 			//System.out.println( bottomNearVertices[i].z + "," + bottomFarVertices[i].z);
-			BezierCurve curve = new BezierCurve(topFarVertices[i], topNearVertices[i], bottomFarVertices[i], bottomNearVertices[i], child.getValues());
+			BezierCurve curve = new BezierCurve(topFarVertices[i], topNearVertices[i], bottomFarVertices[i], bottomNearVertices[i], child.getValues(), centreOfBend.y);
 			curves[i] = curve;
 		}
 		return curves;
