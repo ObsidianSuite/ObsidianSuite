@@ -6,33 +6,25 @@ import net.minecraftforge.client.model.obj.GroupObject;
 import net.minecraftforge.client.model.obj.Vertex;
 
 /**
- * Used for calculations involving quadratic bezier curves.
- * The curve is generated using five points: a1,a2,b1,b2 and c.
- * Diagram: http://imgur.com/a12AkGs
+ * Used for calculations involving cubic bezier curves.
+ * The curve is generated using six points: a1,a2,b1,b2,c1 and c2.
+ * Diagram: http://imgur.com/C5JOrRB
  * a1 to a2 and b1 to b2 are straight lines respectively.
- * c is the control point, which resides on the intersection of the
- * lines a1,a2 and b1,b2. 
+ * c1 and c2 are control points. c1 lies on the same line as
+ * a1 and a2, c2, on the line containing b1 and b2.
  * The curve is actually drawn between a2 and b2.
- * Since c is the intersection, we can calculate it, so only need
- * the points a1,a2,b1 and b2 to form the curve. 
+ * c1 and c2 can be calculated from a1,a2,b1 and b2.
  * 
- * This is the concept in 2D space, however it gets more complex in 3D space 
- * as you aren't guaranteed an intercept.
- * Currently, this is a simplified version that works for 3D space.
- * It makes the assumption that the line a1 to a2 has direction vector (0,1,0)
- *  - ie the part is vertical. This works for the player model, however, 
- *  	more complex models where the parts are not vertically aligned will require more work.
- *  As a1 and a2 are vertically aligned, we currently only need to use the single point a
- *  in our calculations (a=a2).
+ * c1 and c2 are always the same distance from a2 (1.2*difference in a2.y and defaulty)
  *  
- *  This also has a debugging feature, which renders a mesh between a,b2 and c.
- *  Very useful to see where the bezier point is.
+ *  This also has a debugging feature, which renders a mesh between a,b2 and c1/c2.
+ *  Very useful to see where the control points are.
  */
 
 public class BezierCurve 
 {
 
-	private Vertex a, b1, b2, c;
+	private Vertex a1, a2, b1, b2, c1, c2;
 	//Rotation of the child part
 	private float[] rotation;
 	//Y value of the rotation point.
@@ -40,60 +32,48 @@ public class BezierCurve
 	//Group obj used for rendering the bezier point (debugging).
 	private BezierGroupObj groupObj;
 
-	public BezierCurve(Vertex a, Vertex b1, Vertex b2, float[] rotation, float defaultY)
+	private boolean inverted;
+
+	public BezierCurve(Vertex a1, Vertex a2, Vertex b1, Vertex b2, float[] rotation, float defaultY)
 	{
-		this.a = a;
+		this.a1 = a1;
+		this.a2 = a2;
 		this.b1 = b1;
 		this.b2 = b2;
 		this.rotation = rotation;
 		this.defaultY = defaultY;
-		setupCVertex();
+		this.inverted = a1.y < defaultY;
+		setupControlVertices();
 	}
 
 	/**
-	 * Generate the cVertex based on other variables.
+	 * Setup c1 and c2.
 	 */
-	private void setupCVertex()
+	private void setupControlVertices()
 	{
-		//Bezier x,y and z are the values of c.x,c.y and c.z.
-		//Bezier x and z are always the same as a.x and a.z - only because the parts are aligned vertically.
-		//Initially, bezierY is set to defaultY and will remain at that value unless 
-		//  the x and/or z rotation aren't equal to zero.
-		float bezierX = a.x;
-		float bezierY = defaultY;
-		float bezierZ = a.z;
+		//Line l1: v1 = p1 + t*d1.
+		Vec3 p1 = Vec3.createVectorHelper(a1.x, a1.y, a1.z);
+		Vec3 d1 = getDirectionVector(a1, a2);
+		//Line l2: v2 = p2 + u*d2.
+		Vec3 p2 = Vec3.createVectorHelper(b1.x, b1.y, b1.z);
+		Vec3 d2 = getDirectionVector(b1, b2);
 
-		//If child part is rotated in x and or z, calculate new bezierY.
-		if(rotation[0] != 0.0F || rotation[2] != 0.0F)
-		{
-			float newBezierY = getBezierY();
+		//S is the scalar value that will produce the vertex (a2.x, defaultY, a2.z).
+		//Control points work best if they are slightly further away, so multiply scalar by 1.2.
+		double s = (defaultY - a1.y)/d1.yCoord;
+		double s1 = s*1.2F;
+		double s2 = s*1.2F;
 
-			//For extreme rotations, newBezierY will produce weird and wonderful bends.
-			//Therefore these checks are used to keep it within bounds:
-			//Child below parent.
-			if(defaultY < a.y)
-			{
-				if(newBezierY > a.y)
-					newBezierY = defaultY;
-				if(newBezierY < a.y + 2*(defaultY - a.y))
-					newBezierY = a.y + 2*(defaultY - a.y);
-			}
-			//Child above parent
-			else
-			{
-				if(newBezierY < a.y)
-					newBezierY = defaultY;
-				if(newBezierY > a.y + 2*(defaultY - a.y))
-					newBezierY = a.y + 2*(defaultY - a.y);
-			}
+		//Point on line1 = p1 + scalar*d1
+		//Point on line2 = p2 + scalar*d2
+		Vec3 cl1 = p1.addVector(d1.xCoord*s1, d1.yCoord*s1, d1.zCoord*s1);
+		Vec3 cl2 = p2.addVector(d2.xCoord*s2, d2.yCoord*s2, d2.zCoord*s2);
 
-			bezierY = newBezierY;
-		}
+		//Convert to vertex.
+		c1 = new Vertex((float)cl1.xCoord, (float)cl1.yCoord, (float)cl1.zCoord);
+		c2 = new Vertex((float)cl2.xCoord, (float)cl2.yCoord, (float)cl2.zCoord);		
 
-
-		//Setup c and group obj.
-		c = new Vertex(bezierX, bezierY, bezierZ);
-		groupObj = new BezierGroupObj(new Vertex[]{a,b2,c});
+		groupObj = new BezierGroupObj();
 	}
 
 	/**
@@ -101,62 +81,37 @@ public class BezierCurve
 	 * @param t - A value between 0 and 1. 0 will give the point a, 1 gives the point b2, and anywhere inbetween gives a point of the curve.
 	 */
 	public Vertex getVertexOnCurve(float t)
-	{
+	{		
 		if(t >= 0 && t <= 1)
 		{
-			//(1-t)^2 * a + 2(1-t)t * c + t^2 * b2 
-			float x = (1 - t)*(1 - t)*a.x + 2*(1-t)*t*c.x + t*t*b2.x;
-			float y = (1 - t)*(1 - t)*a.y + 2*(1-t)*t*c.y + t*t*b2.y;
-			float z = (1 - t)*(1 - t)*a.z + 2*(1-t)*t*c.z + t*t*b2.z;
+			//(1-t)^3*a + 3(1-t)^2*t*c1 + 3(1-t)*t^2*c2 + t^3*b2 
+			float x = cube(1-t)*a2.x + 3*square(1-t)*t*c1.x + 3*(1-t)*square(t)*c2.x + cube(t)*b2.x;
+			float y = cube(1-t)*a2.y + 3*square(1-t)*t*c1.y + 3*(1-t)*square(t)*c2.y + cube(t)*b2.y;
+			float z = cube(1-t)*a2.z + 3*square(1-t)*t*c1.z + 3*(1-t)*square(t)*c2.z + cube(t)*b2.z;
 
 			return new Vertex(x,y,z);
 		}
 		throw new RuntimeException("Cannot get point on bezier curve for t value " + t + ". Outside of valid range (0 to 1).");
 	}
 
+	private float square(float f)
+	{
+		return f*f;
+	}
+
+	private float cube(float f)
+	{
+		return f*f*f;
+	}
+
+
 	/**
 	 * Renders a mesh between a,b2 and c.
 	 */
 	public void render()
 	{
-//		if(groupObj != null)
-//			groupObj.render();
-	}
-
-	/**
-	 * Calculate the bezier y value based on points a,b1 and b2.
-	 * Uses two lines - l1: v1 = a + t*d1 (d1 = (0,1,0) - assuming vertical alignment: line of parent)
-	 * 				  - l2: v2 = b1 + s*d2 (d2 = direction vector between b2 and b1 : line of child)
-	 * The value returned is the y value of the point on l1 that is closest to the point on l2.
-	 * If only rotated in x or z, this will be an intercept.
-	 * If rotated in both, it will not be.
-	 * Formula used is here: https://en.wikipedia.org/wiki/Skew_lines#Nearest_Points
-	 */
-	private float getBezierY()
-	{
-		//Line l1: v1 = p1 + t*d1.
-		Vec3 p1 = Vec3.createVectorHelper(a.x, a.y, a.z);
-		Vec3 d1 = Vec3.createVectorHelper(0,1,0);
-		//Line l2: v2 = p2 + s*d2.
-		Vec3 p2 = Vec3.createVectorHelper(b1.x, b1.y, b1.z);
-		Vec3 d2 = getDirectionVector(b1, b2);
-
-		//n = perpendicular to l1 and l2.
-		Vec3 n = d1.crossProduct(d2);
-
-		//n2 = d2 cross n - translations of line 2 along n.
-		Vec3 n2 = d2.crossProduct(n);
-
-		//Dif = p2 - p1
-		Vec3 dif = p1.subtract(p2);
-
-		//Scalar = dif.n2/d1.n2
-		double scalar = dif.dotProduct(n2)/d1.dotProduct(n2);
-
-		//Closest point on line 1 = p1 + scalar*d1
-		Vec3 closestLine1 = p1.addVector(d1.xCoord*scalar, d1.yCoord*scalar, d1.zCoord*scalar);
-
-		return (float) closestLine1.yCoord;
+		if(groupObj != null)
+			groupObj.render();
 	}
 
 	/**
@@ -175,12 +130,15 @@ public class BezierCurve
 	private class BezierGroupObj extends GroupObject
 	{
 
-		private BezierGroupObj(Vertex[] vertices)
+		private BezierGroupObj()
 		{
 			super("", 2);
 			Face f = new Face();
-			f.vertices = vertices;
+			f.vertices = new Vertex[]{a2,b2,c1};
 			this.faces.add(f);
+			Face g = new Face();
+			g.vertices = new Vertex[]{a2,b2,c2};
+			this.faces.add(g);
 		}
 	}
 

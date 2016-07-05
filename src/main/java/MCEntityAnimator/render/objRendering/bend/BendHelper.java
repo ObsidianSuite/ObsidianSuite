@@ -75,16 +75,15 @@ public class BendHelper
 	public static Vertex[] orderVerticesRelative(Vertex[] vertices)
 	{
 		Vertex[] orderedVertices = new Vertex[vertices.length];
-		Vertex startingVertex = vertices[0];//copyVertex(vertices[0]);
+		Vertex startingVertex = vertices[0];
 		for(int a = 1; a < 4; a++)
 		{
 			if(vertices[a].x >= startingVertex.x && vertices[a].z >= startingVertex.z)
-				startingVertex = copyVertex(vertices[a]);
+				startingVertex = vertices[a];
 		}
 		orderedVertices[0] = startingVertex;
 		for(int i = 0; i < 4; i++)
 		{
-			
 			Vertex v = vertices[i];
 			if(v.x == -0.259169F)
 				v.x = -0.25917F;
@@ -95,17 +94,11 @@ public class BendHelper
 			else if(v.x == startingVertex.x && v.z != startingVertex.z)
 				orderedVertices[3] = v;
 		}
-		outputVertexArray(orderedVertices, "Relative ordered vertices");
 		return orderedVertices;
-	}
-
-	public static Vertex copyVertex(Vertex v)
-	{
-		return new Vertex(v.x, v.y, v.z);
 	}
 	
 	/**
-	 * Orders the vertices based with the ones closest to the target on coming first.
+	 * Orders the vertices with the ones closest to the target coming first.
 	 */
 	public static Vertex[] orderVerticesOnDistance(Vertex[] vertices, Vertex target)
 	{
@@ -118,12 +111,10 @@ public class BendHelper
 			orderedVerticesArray[i] = orderedVertices.get(i).getVertex();
 		return orderedVerticesArray;
 	}
-	
-	public static boolean verticesEqual(Vertex v, Vertex w)
-	{
-		return v.x == w.x && v.y == w.y && v.z == w.z;
-	}
 
+	/**
+	 * Returns the distance between v and w. Order doesn't matter.
+	 */
 	public static float getDistanceBetweenVertices(Vertex v, Vertex w)
 	{
 		float dx = v.x - w.x;

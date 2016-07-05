@@ -10,12 +10,10 @@ public class BendPart extends GroupObject
 	//Sets of four vertices for the top and bottom of the sections.
 	private Vertex[] topVertices;
 	private Vertex[] bottomVertices;
-	private Vertex[] prevFaceNormal;
 	
 	public BendPart()
 	{
-		super("", 2);
-		prevFaceNormal = new Vertex[4];
+		super("", 4);
 	}
 	
 	/**
@@ -27,9 +25,7 @@ public class BendPart extends GroupObject
 		this.topVertices = topVertices;
 		this.bottomVertices = bottomVertices;
 		this.faces.clear();
-		
-		this.glDrawingMode = 4;
-						
+								
 		for(int i = 0; i < 4; i++)
 		{
 			int j = i == 3 ? 0 : i + 1;

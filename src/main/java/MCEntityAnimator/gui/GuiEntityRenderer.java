@@ -94,8 +94,7 @@ public class GuiEntityRenderer extends GuiBlack
 	{
 		super.drawScreen(par1, par2, par3);
 		
-		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-
+		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);		
 		if(entityToRender != null)
 		{
 			float scale = scaleModifier + 50;
