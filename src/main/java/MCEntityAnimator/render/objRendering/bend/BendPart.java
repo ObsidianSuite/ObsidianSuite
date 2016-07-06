@@ -1,5 +1,6 @@
 package MCEntityAnimator.render.objRendering.bend;
 
+import MCEntityAnimator.render.objRendering.bend.UVMap.PartUVMap;
 import net.minecraftforge.client.model.obj.Face;
 import net.minecraftforge.client.model.obj.GroupObject;
 import net.minecraftforge.client.model.obj.Vertex;
@@ -20,7 +21,7 @@ public class BendPart extends GroupObject
 	 * Update the top and bottom vertices.
 	 * Also generates the faces represented by these vertices.
 	 */
-	public void updateVertices(Vertex[] topVertices, Vertex[] bottomVertices)
+	public void updateVertices(Vertex[] topVertices, Vertex[] bottomVertices, PartUVMap uvMap)
 	{
 		this.topVertices = topVertices;
 		this.bottomVertices = bottomVertices;
@@ -43,10 +44,13 @@ public class BendPart extends GroupObject
 			Face g = new Face();
 			g.vertices = new Vertex[]{vD, vE, vF};
 			faces.add(g);
-			
+						
 			Vertex faceNormal =  f.calculateFaceNormal();
 			f.faceNormal = faceNormal;
 			g.faceNormal = faceNormal;
+			
+			uvMap.setupFaceTextureCoordinates(f);
+			uvMap.setupFaceTextureCoordinates(g);
 		}
 	}
 

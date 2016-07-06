@@ -1,18 +1,15 @@
 package MCEntityAnimator.render.objRendering.bend;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.lwjgl.opengl.GL11;
 
 import MCEntityAnimator.animation.AnimationData;
 import MCEntityAnimator.animation.AnimationParenting;
-import MCEntityAnimator.render.objRendering.bend.UVMap.UVMap;
+import MCEntityAnimator.render.objRendering.bend.UVMap.PartUVMap;
 import MCEntityAnimator.render.objRendering.parts.PartObj;
-import net.minecraftforge.client.model.obj.Face;
-import net.minecraftforge.client.model.obj.TextureCoordinate;
+import net.minecraft.world.gen.structure.StructureVillagePieces.Well;
 import net.minecraftforge.client.model.obj.Vertex;
 import scala.actors.threadpool.Arrays;
 
@@ -39,10 +36,13 @@ public class BendNew
 	//The list of segments of the bend. These are the actual group objects that are rendered.
 	private List<BendPart> bendParts;
 	//The number of bend parents the bend is made up of.
+	//Min 5, max 40
 	private static final int bendSplit = 20;
 
 	//True if the parent is below the child.
 	private boolean inverted;
+	
+	private PartUVMap uvMap;
 	
 	public BendNew(PartObj parent, PartObj child)
 	{
@@ -51,7 +51,7 @@ public class BendNew
 
 		centreOfBend = new Vertex(-child.getRotationPoint(0), -child.getRotationPoint(1), -child.getRotationPoint(2));
 		bendParts = new ArrayList<BendPart>();
-		
+		uvMap = new PartUVMap(parent);
 		
 
 		//Get near and far vertices for parent and child.
@@ -73,31 +73,16 @@ public class BendNew
 		//Setup inverted variable.
 		inverted = childFarVertices[0].y > parentFarVertices[0].y;
 
+		//TODO
+		//Shorten parent textures as well
+		//Only set texture coords of bend parts once.
+		
+		
+		
 		shortenParts();
 
 		for(int i = 0; i < bendSplit; i++)
 			bendParts.add(new BendPart());
-		
-		
-		
-		//XXX UV Map testing
-		Vertex[] vs = new Vertex[4];
-		vs[0] = new Vertex(0.0F, 0.0F, 0.0F);
-		vs[1] = new Vertex(1.0F, 0.0F, 0.0F);
-		vs[2] = new Vertex(1.0F, 1.0F, 0.0F);
-		vs[3] = new Vertex(0.0F, 1.0F, 0.0F);
-
-		TextureCoordinate[] tcs = new TextureCoordinate[4];
-		tcs[0] = new TextureCoordinate(0.0F, 0.0F);
-		tcs[1] = new TextureCoordinate(0.1F, 0.0F);
-		tcs[2] = new TextureCoordinate(0.1F, 0.5F);
-		tcs[3] = new TextureCoordinate(0.0F, 0.5F);
-		
-		UVMap uvmap = new UVMap(vs, tcs);
-		Vertex testVertex = new Vertex(0.5F, 0.5F);
-		//Expected value - (0.05F, 0.25F)
-		TextureCoordinate testTC = uvmap.getTextureCoordinateFromVertex(testVertex);
-		System.out.println("TC - (" + testTC.u + "," + testTC.v + ")");
 	}
 
 	/**
@@ -166,13 +151,17 @@ public class BendNew
 		//Update bends
 		for(int i = 0; i < bendSplit; i++)
 		{
+			
+			if(i > bendParts.size() - 1)
+				bendParts.add(new BendPart());
+			
 			//Generate part bottom.
 			Vertex[] bendPartBottom = generatePartBottom(curves,(float)(i+1)/bendSplit);
 			//Update bend, swap top and bottom vertices if part is inverted.
 			if(inverted)
-				bendParts.get(i).updateVertices(bendPartBottom, bendPartTop);
+				bendParts.get(i).updateVertices(bendPartBottom, bendPartTop, uvMap);
 			else
-				bendParts.get(i).updateVertices(bendPartTop, bendPartBottom);
+				bendParts.get(i).updateVertices(bendPartTop, bendPartBottom, uvMap);
 			//Top of next part is bottom of this part.
 			bendPartTop = bendPartBottom;
 		}

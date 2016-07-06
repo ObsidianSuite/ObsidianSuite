@@ -31,7 +31,7 @@ public class BendHelper
 					boolean add = true;
 					for(Vertex w : partVertices)
 					{
-						if(v.x == w.x && v.y == w.y && v.z == w.z)
+						if(areVerticesEqual(v, w))
 						{
 							add = false;
 							break;
@@ -177,6 +177,11 @@ public class BendHelper
 		float rz = z;
 		return new float[]{rx, ry, rz};
 	}	
+	
+	public static boolean areVerticesEqual(Vertex v, Vertex w)
+	{
+		return v.x == w.x && v.y == w.y && v.z == w.z;
+	}
 		
 	public static void outputVertexArray(Vertex[] ver, String vertexName)
 	{

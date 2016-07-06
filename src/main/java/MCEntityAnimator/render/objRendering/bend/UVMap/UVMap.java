@@ -1,6 +1,7 @@
 package MCEntityAnimator.render.objRendering.bend.UVMap;
 
 import MCEntityAnimator.render.objRendering.bend.BendHelper;
+import net.minecraftforge.client.model.obj.Face;
 import net.minecraftforge.client.model.obj.TextureCoordinate;
 import net.minecraftforge.client.model.obj.Vertex;
 
@@ -10,82 +11,70 @@ import net.minecraftforge.client.model.obj.Vertex;
 public class UVMap 
 {
 	
-	//Vertices[0] corresponds to textureCoordinate[0].
-	//Order topLeft, topRight, bottomRight, bottomLeft.
-	private Point[] points;
-	private TextureCoordinate[] textureCoordinate;
+	//p1 corresponds to tc1 etc.
+	private Point p1, p2;
+	private TextureCoordinate tc1, tc2;
 	
 	//True if the x coords are the ones that change along with y, z if not.
 	private boolean xDominant;
 	
-	public UVMap(Vertex[] vertices, TextureCoordinate[] textureCoordinate)
+	public UVMap(Vertex v1, Vertex v2, TextureCoordinate tc1, TextureCoordinate tc2, boolean xDominant)
 	{
-		this.textureCoordinate = textureCoordinate;
-				
-		//Work out if x or z dominant.
-		//DeltaX and deltaZ represent the total difference in the 
-		//respective dimensions in comparison to one of the points (which point is arbitrary).
-		//The greater delta is the dominant dimension.
-		//One of these values should be zero, but due to minor differences in values it 
-		//may be slightly above zero, hence using the total difference as opposed to looking
-		//for one that equals zero.
-		float deltaX = 0.0F;
-		float deltaZ = 0.0F;
-		Vertex comparisonVertex = vertices[0];
-		for(Vertex v : vertices)
+		this.tc1 = tc1;
+		this.tc2 = tc2;
+		this.xDominant = xDominant;
+
+		//Setup points based on xDominant.
+		p1 = new Point(xDominant ? v1.x : v1.z, v1.y);
+		p2 = new Point(xDominant ? v2.x : v2.z, v2.y);
+	}
+	
+	public void setupFaceTextureCoordinates(Face f)
+	{
+		f.textureCoordinates = new TextureCoordinate[3];
+		for(int i = 0; i < 3; i++)
 		{
-			deltaX += Math.abs(comparisonVertex.x - v.x);
-			deltaZ += Math.abs(comparisonVertex.z - v.z);
-		}
-		xDominant = deltaX > deltaZ;
-		
-		//Setup points - abstraction of vertices, where point.x = vertex.x or vertex.z, depending
-		//on which of x and z is dominant. point.y = vertex.y
-		//Since order of vertices is undisturbed, order of points is the same as vertices.
-		points = new Point[vertices.length];
-		for(int i = 0; i < vertices.length; i++)
-		{
-			Vertex v = vertices[i];
-			float pX = xDominant ? v.x : v.z;
-			float pY = v.y;
-			Point p = new Point(pX, pY);
-			points[i] = p;
+			Vertex v = f.vertices[i];
+			f.textureCoordinates[i] = getTextureCoordinateForVertex(v);
 		}
 	}
 	
 	/**
 	 * Get the texture coordinate for this vertex.
 	 * Calculates the proportional difference between this vertex and
-	 * the top left vertex, then uses that proportion to get the
-	 * texture u and v relative to the top left texture coordinate.
+	 * v1, then uses that proportion to get the
+	 * texture u and v relative to tc1.
 	 */
-	public TextureCoordinate getTextureCoordinateFromVertex(Vertex v)
+	private TextureCoordinate getTextureCoordinateForVertex(Vertex v)
 	{
-		//Top left.
-		Point controlPoint = points[0];
-		
 		//Take xDominant into account.
 		float x = xDominant ? v.x : v.z;
 		float y = v.y;
 		
+		if(v.y > 1.0F && (y > p1.y || y > p2.y))
+		{
+			//System.out.println(p1.y + ", " + p2.y + ", " + y);
+		}
+		
+
+		
 		//Calculate difference between v and control point.
-		float dX = x - controlPoint.x;
-		float dY = y - controlPoint.x;
+		float dX = x - p1.x;
+		float dY = y - p1.y;
 		
 		//Convert differences to proportion. Should be between 0 and 1. 
-		float pX = dX/(points[1].x - controlPoint.x);
-		float pY = dY/(points[3].y - controlPoint.y);
+		float pX = dX/(p2.x - p1.x);
+		float pY = dY/(p2.y - p1.y);
 		
 		//Calculate texture coords. Top left coord + proportion*total texture difference.
-		float texU = textureCoordinate[0].u + pX*(textureCoordinate[1].u - textureCoordinate[0].u);
-		float texV = textureCoordinate[0].v + pY*(textureCoordinate[3].v - textureCoordinate[0].v);
+		float texU = tc1.u + pX*(tc2.u - tc1.u);
+		float texV = tc1.v + pY*(tc2.v - tc1.v);
 		
 		return new TextureCoordinate(texU, texV);
 	}
 	
 	private class Point
-	{
-		
+	{	
 		private float x,y;
 		
 		private Point(float x, float y)
