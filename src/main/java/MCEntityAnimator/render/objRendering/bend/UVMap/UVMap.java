@@ -12,7 +12,7 @@ public class UVMap
 	
 	//Vertices[0] corresponds to textureCoordinate[0].
 	//Order topLeft, topRight, bottomRight, bottomLeft.
-	private Vertex[] vertices;
+	private Point[] points;
 	private TextureCoordinate[] textureCoordinate;
 	
 	//True if the x coords are the ones that change along with y, z if not.
@@ -20,11 +20,8 @@ public class UVMap
 	
 	public UVMap(Vertex[] vertices, TextureCoordinate[] textureCoordinate)
 	{
-		this.vertices = vertices;
 		this.textureCoordinate = textureCoordinate;
-		
-		BendHelper.outputVertexArray(vertices, "Test");
-		
+				
 		//Work out if x or z dominant.
 		//DeltaX and deltaZ represent the total difference in the 
 		//respective dimensions in comparison to one of the points (which point is arbitrary).
@@ -42,13 +39,60 @@ public class UVMap
 		}
 		xDominant = deltaX > deltaZ;
 		
-		System.out.println("dX: " + deltaX);
-		System.out.println("dZ: " + deltaZ);
-		System.out.println(xDominant);
+		//Setup points - abstraction of vertices, where point.x = vertex.x or vertex.z, depending
+		//on which of x and z is dominant. point.y = vertex.y
+		//Since order of vertices is undisturbed, order of points is the same as vertices.
+		points = new Point[vertices.length];
+		for(int i = 0; i < vertices.length; i++)
+		{
+			Vertex v = vertices[i];
+			float pX = xDominant ? v.x : v.z;
+			float pY = v.y;
+			Point p = new Point(pX, pY);
+			points[i] = p;
+		}
 	}
 	
-	private void getTextureCoordinateFromVertex(Vertex v)
+	/**
+	 * Get the texture coordinate for this vertex.
+	 * Calculates the proportional difference between this vertex and
+	 * the top left vertex, then uses that proportion to get the
+	 * texture u and v relative to the top left texture coordinate.
+	 */
+	public TextureCoordinate getTextureCoordinateFromVertex(Vertex v)
 	{
+		//Top left.
+		Point controlPoint = points[0];
+		
+		//Take xDominant into account.
+		float x = xDominant ? v.x : v.z;
+		float y = v.y;
+		
+		//Calculate difference between v and control point.
+		float dX = x - controlPoint.x;
+		float dY = y - controlPoint.x;
+		
+		//Convert differences to proportion. Should be between 0 and 1. 
+		float pX = dX/(points[1].x - controlPoint.x);
+		float pY = dY/(points[3].y - controlPoint.y);
+		
+		//Calculate texture coords. Top left coord + proportion*total texture difference.
+		float texU = textureCoordinate[0].u + pX*(textureCoordinate[1].u - textureCoordinate[0].u);
+		float texV = textureCoordinate[0].v + pY*(textureCoordinate[3].v - textureCoordinate[0].v);
+		
+		return new TextureCoordinate(texU, texV);
+	}
+	
+	private class Point
+	{
+		
+		private float x,y;
+		
+		private Point(float x, float y)
+		{
+			this.x = x;
+			this.y = y;
+		}
 		
 	}
 

@@ -61,8 +61,8 @@ public class BezierCurve
 		//S is the scalar value that will produce the vertex (a2.x, defaultY, a2.z).
 		//Control points work best if they are slightly further away, so multiply scalar by 1.2.
 		double s = (defaultY - a1.y)/d1.yCoord;
-		double s1 = s*1.2F;
-		double s2 = s*1.2F;
+		double s1 = s*1.3F;
+		double s2 = s*1.3F;
 
 		//Point on line1 = p1 + scalar*d1
 		//Point on line2 = p2 + scalar*d2
@@ -110,8 +110,8 @@ public class BezierCurve
 	 */
 	public void render()
 	{
-		if(groupObj != null)
-			groupObj.render();
+//		if(groupObj != null)
+//			groupObj.render();
 	}
 
 	/**

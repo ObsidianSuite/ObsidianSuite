@@ -1,18 +1,19 @@
 package MCEntityAnimator.render.objRendering.bend;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import MCEntityAnimator.render.objRendering.parts.PartObj;
 import net.minecraftforge.client.model.obj.Face;
+import net.minecraftforge.client.model.obj.TextureCoordinate;
 import net.minecraftforge.client.model.obj.Vertex;
 
 public class BendHelper 
 {
-
-
+	
+	
 	/**
 	 * Returns the set of eight vertices for this part. 
 	 * Removes duplicate vertices.
@@ -75,6 +76,8 @@ public class BendHelper
 	public static Vertex[] orderVerticesRelative(Vertex[] vertices)
 	{
 		Vertex[] orderedVertices = new Vertex[vertices.length];
+		
+		//Get starting vertex  - greatest x and z.
 		Vertex startingVertex = vertices[0];
 		for(int a = 1; a < 4; a++)
 		{
@@ -82,11 +85,11 @@ public class BendHelper
 				startingVertex = vertices[a];
 		}
 		orderedVertices[0] = startingVertex;
+		
+		
 		for(int i = 0; i < 4; i++)
 		{
 			Vertex v = vertices[i];
-			if(v.x == -0.259169F)
-				v.x = -0.25917F;
 			if(v.x != startingVertex.x && v.z == startingVertex.z)
 				orderedVertices[1] = v;
 			else if(v.x != startingVertex.x && v.z != startingVertex.z)
@@ -173,9 +176,8 @@ public class BendHelper
 		float ry = (float) (x*Math.sin(angle) + y*Math.cos(angle));
 		float rz = z;
 		return new float[]{rx, ry, rz};
-	}
-	
-	
+	}	
+		
 	public static void outputVertexArray(Vertex[] ver, String vertexName)
 	{
 		System.out.println("--" + vertexName + "--");

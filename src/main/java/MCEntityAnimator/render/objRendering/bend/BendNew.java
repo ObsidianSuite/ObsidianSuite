@@ -1,7 +1,9 @@
 package MCEntityAnimator.render.objRendering.bend;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.lwjgl.opengl.GL11;
 
@@ -10,6 +12,7 @@ import MCEntityAnimator.animation.AnimationParenting;
 import MCEntityAnimator.render.objRendering.bend.UVMap.UVMap;
 import MCEntityAnimator.render.objRendering.parts.PartObj;
 import net.minecraftforge.client.model.obj.Face;
+import net.minecraftforge.client.model.obj.TextureCoordinate;
 import net.minecraftforge.client.model.obj.Vertex;
 import scala.actors.threadpool.Arrays;
 
@@ -40,7 +43,7 @@ public class BendNew
 
 	//True if the parent is below the child.
 	private boolean inverted;
-
+	
 	public BendNew(PartObj parent, PartObj child)
 	{
 		this.parent = parent;
@@ -48,6 +51,8 @@ public class BendNew
 
 		centreOfBend = new Vertex(-child.getRotationPoint(0), -child.getRotationPoint(1), -child.getRotationPoint(2));
 		bendParts = new ArrayList<BendPart>();
+		
+		
 
 		//Get near and far vertices for parent and child.
 		Vertex[] allParentVertices = BendHelper.getPartVertices(parent);
@@ -73,22 +78,26 @@ public class BendNew
 		for(int i = 0; i < bendSplit; i++)
 			bendParts.add(new BendPart());
 		
-		for(Face f : child.groupObj.faces)
-		{
-			float deltaY = 0.0F;
-			Vertex compV = f.vertices[0];
-			for(Vertex v : f.vertices)
-			{
-				deltaY += Math.abs(compV.y - v.y);
-			}
-			System.out.println(deltaY);
-			if(deltaY != 0.0F)	
-			{
-				new UVMap(f.vertices, f.textureCoordinates);
-				break;
-			}
-		}
 		
+		
+		//XXX UV Map testing
+		Vertex[] vs = new Vertex[4];
+		vs[0] = new Vertex(0.0F, 0.0F, 0.0F);
+		vs[1] = new Vertex(1.0F, 0.0F, 0.0F);
+		vs[2] = new Vertex(1.0F, 1.0F, 0.0F);
+		vs[3] = new Vertex(0.0F, 1.0F, 0.0F);
+
+		TextureCoordinate[] tcs = new TextureCoordinate[4];
+		tcs[0] = new TextureCoordinate(0.0F, 0.0F);
+		tcs[1] = new TextureCoordinate(0.1F, 0.0F);
+		tcs[2] = new TextureCoordinate(0.1F, 0.5F);
+		tcs[3] = new TextureCoordinate(0.0F, 0.5F);
+		
+		UVMap uvmap = new UVMap(vs, tcs);
+		Vertex testVertex = new Vertex(0.5F, 0.5F);
+		//Expected value - (0.05F, 0.25F)
+		TextureCoordinate testTC = uvmap.getTextureCoordinateFromVertex(testVertex);
+		System.out.println("TC - (" + testTC.u + "," + testTC.v + ")");
 	}
 
 	/**
