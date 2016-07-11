@@ -1,13 +1,16 @@
 package MCEntityAnimator.gui;
 
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Callable;
 
+import org.lwjgl.BufferUtils;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
+import org.lwjgl.util.glu.GLU;
 
 import MCEntityAnimator.MCEA_Main;
 import MCEntityAnimator.Util;
@@ -17,31 +20,13 @@ import MCEntityAnimator.render.objRendering.RenderObj;
 import MCEntityAnimator.render.objRendering.parts.Part;
 import MCEntityAnimator.render.objRendering.parts.PartObj;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockStone;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.renderer.texture.TextureMap;
-import net.minecraft.crash.CrashReport;
-import net.minecraft.crash.CrashReportCategory;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.init.Blocks;
-import net.minecraft.inventory.Slot;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumChatFormatting;
-import net.minecraft.util.IIcon;
-import net.minecraft.util.MathHelper;
-import net.minecraft.util.ReportedException;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.client.ForgeHooksClient;
 
 public class GuiEntityRenderer extends GuiBlack
 {
@@ -109,8 +94,7 @@ public class GuiEntityRenderer extends GuiBlack
 	{
 		super.drawScreen(par1, par2, par3);
 		
-		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-
+		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);		
 		if(entityToRender != null)
 		{
 			float scale = scaleModifier + 50;

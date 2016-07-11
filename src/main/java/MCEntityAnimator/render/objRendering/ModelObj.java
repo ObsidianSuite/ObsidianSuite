@@ -19,6 +19,7 @@ import MCEntityAnimator.Util;
 import MCEntityAnimator.animation.AnimationData;
 import MCEntityAnimator.animation.AnimationParenting;
 import MCEntityAnimator.animation.PartGroupsAndNames;
+import MCEntityAnimator.render.objRendering.bend.Bend;
 import MCEntityAnimator.render.objRendering.parts.Part;
 import MCEntityAnimator.render.objRendering.parts.PartEntityPos;
 import MCEntityAnimator.render.objRendering.parts.PartObj;
@@ -234,7 +235,7 @@ public class ModelObj extends ModelBase
 
 			if(!child.hasBend())
 			{
-				Bend b = new Bend(child, parent);
+				Bend b = new Bend(parent, child);
 				bends.add(b);
 				child.setBend(b);
 			}

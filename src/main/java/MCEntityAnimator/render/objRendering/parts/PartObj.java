@@ -1,21 +1,26 @@
 package MCEntityAnimator.render.objRendering.parts;
 
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.lwjgl.opengl.GL11;
 
 import MCEntityAnimator.animation.AnimationData;
 import MCEntityAnimator.animation.AnimationParenting;
-import MCEntityAnimator.render.objRendering.Bend;
 import MCEntityAnimator.render.objRendering.ModelObj;
+import MCEntityAnimator.render.objRendering.bend.BendHelper;
+import MCEntityAnimator.render.objRendering.bend.Bend;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.entity.Entity;
 import net.minecraftforge.client.model.obj.Face;
 import net.minecraftforge.client.model.obj.GroupObject;
 import net.minecraftforge.client.model.obj.TextureCoordinate;
+import net.minecraftforge.client.model.obj.Vertex;
 
 /**
  * One partObj for each 'part' of the model.
@@ -25,8 +30,9 @@ public class PartObj extends Part
 {
     private float[] rotationPoint;
     private boolean showModel;
-
-    private HashMap<Face, TextureCoordinate[]> defaultTextureCoords;
+    
+    //XXX
+    private Map<Face, TextureCoordinate[]> defaultTextureCoords;
 
     private boolean visible;
     private Bend bend = null;
@@ -39,7 +45,7 @@ public class PartObj extends Part
         this.groupObj = groupObj;
         this.displayName = getName();
         defaultTextureCoords = new HashMap<Face, TextureCoordinate[]>();
-        updateDefaultTextureCoordinates();
+        setDefaultTCsToCurrentTCs();
         visible = true;
     }
 
@@ -109,7 +115,12 @@ public class PartObj extends Part
     //         Rendering and Rotating
     //------------------------------------------
 
-    public void updateDefaultTextureCoordinates()
+    /**
+     * Stores the current texture coordinates in default texture coords.
+     * This is required in case a bend is removed, then the texture coords can be restored.
+     * XXX
+     */
+    public void setDefaultTCsToCurrentTCs()
     {
         for(Face f : groupObj.faces)
         {
@@ -132,6 +143,11 @@ public class PartObj extends Part
         }
     }
 
+    /**
+     * Change the texture coordinates if the part is highlighted or the main part.
+     * TODO PartObj: Main highlight vs normal highlight.
+     * XXX
+     */
     public void updateTextureCoordinates(boolean highlight, boolean main)
     {
         float u = 0.0F;
@@ -181,8 +197,8 @@ public class PartObj extends Part
 
     public void render(Entity entity, boolean highlight, boolean main) 
     {
-        updateTextureCoordinates(highlight, main);
-
+        //updateTextureCoordinates(highlight, main);
+        
         GL11.glPushMatrix();
         move(entity);
         if(visible)
@@ -211,13 +227,7 @@ public class PartObj extends Part
         	parts.add(0, parent);
         	child = parent;
     	}
-    	
-    	String s = "";
-    	for(PartObj part : parts)
-    		s = s + part.displayName + ", ";
-    	
-    	//System.out.println(s);
-    	
+    	    	
     	//Translate and rotate all parts, starting with the top parent. 
     	PartObj prevPart = null;
     	for(PartObj p : parts)
