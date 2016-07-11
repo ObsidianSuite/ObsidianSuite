@@ -1,18 +1,17 @@
 package MCEntityAnimator.render.objRendering.bend;
 
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import MCEntityAnimator.render.objRendering.parts.PartObj;
 import net.minecraftforge.client.model.obj.Face;
-import net.minecraftforge.client.model.obj.TextureCoordinate;
 import net.minecraftforge.client.model.obj.Vertex;
 
 public class BendHelper 
-{
-	
+{	
 	
 	/**
 	 * Returns the set of eight vertices for this part. 
@@ -180,19 +179,22 @@ public class BendHelper
 	
 	public static boolean areVerticesEqual(Vertex v, Vertex w)
 	{
-		return v.x == w.x && v.y == w.y && v.z == w.z;
+		float dX = Math.abs(v.x - w.x);
+		float dY = Math.abs(v.y - w.y);
+		float dZ = Math.abs(v.z - w.z);
+		return dX < 0.01 && dY < 0.01 && dZ < 0.01;
 	}
 		
 	public static void outputVertexArray(Vertex[] ver, String vertexName)
 	{
 		System.out.println("--" + vertexName + "--");
 		for(Vertex v : ver)
-			outputVertex(v);
+			System.out.println(getVertexAsString(v));
 	}
 	
-	public static void outputVertex(Vertex v)
+	public static String getVertexAsString(Vertex v)
 	{
-		System.out.println(v.x + ", " + v.y + ", " + v.z);
+		return v.x + ", " + v.y + ", " + v.z;
 	}
 
 }

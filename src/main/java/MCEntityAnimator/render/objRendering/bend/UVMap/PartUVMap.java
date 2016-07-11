@@ -49,11 +49,33 @@ public class PartUVMap
 		}
 	}
 	
+	public void adjustPartTextureCoordinates()
+	{
+		for(Face f : part.groupObj.faces)
+		{
+			if(isVerticalFace(f))
+			{
+				setupFaceTextureCoordinates(f);
+			}
+		}
+	}
+	
 	public void setupFaceTextureCoordinates(Face f)
 	{
 		Vertex closestNormal = getClosestNormal(f.faceNormal);
-		UVMap map = normalToUV.get(closestNormal);
-		map.setupFaceTextureCoordinates(f);
+		UVMap map = null;
+		for(Vertex v : normalToUV.keySet())
+		{
+			if(BendHelper.areVerticesEqual(v,closestNormal))
+			{
+				map = normalToUV.get(v);
+				break;
+			}
+		}
+		if(map != null)
+			map.setupFaceTextureCoordinates(f);
+		else
+			System.out.println("No map for normal: " + BendHelper.getVertexAsString(closestNormal));
 	}
 	
 	private boolean isVerticalFace(Face f)
@@ -135,7 +157,7 @@ public class PartUVMap
 		Vertex closestNormal = getClosestNormal(f.faceNormal);
 		for(Face g : part.groupObj.faces)
 		{
-			if(!g.equals(f) && BendHelper.areVerticesEqual(g.faceNormal, closestNormal))
+			if(!g.faceNormal.equals(closestNormal) && BendHelper.areVerticesEqual(g.faceNormal, closestNormal))
 				return g;
 		}
 		throw new RuntimeException("No face found with same normal: " + f.faceNormal);

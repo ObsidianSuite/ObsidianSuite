@@ -50,14 +50,7 @@ public class UVMap
 		//Take xDominant into account.
 		float x = xDominant ? v.x : v.z;
 		float y = v.y;
-		
-		if(v.y > 1.0F && (y > p1.y || y > p2.y))
-		{
-			//System.out.println(p1.y + ", " + p2.y + ", " + y);
-		}
-		
-
-		
+				
 		//Calculate difference between v and control point.
 		float dX = x - p1.x;
 		float dY = y - p1.y;
@@ -69,7 +62,7 @@ public class UVMap
 		//Calculate texture coords. Top left coord + proportion*total texture difference.
 		float texU = tc1.u + pX*(tc2.u - tc1.u);
 		float texV = tc1.v + pY*(tc2.v - tc1.v);
-		
+				
 		return new TextureCoordinate(texU, texV);
 	}
 	

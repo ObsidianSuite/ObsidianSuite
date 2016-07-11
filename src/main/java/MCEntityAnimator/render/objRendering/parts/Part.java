@@ -1,19 +1,7 @@
 package MCEntityAnimator.render.objRendering.parts;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-
-import net.minecraft.entity.Entity;
-import net.minecraftforge.client.model.obj.Face;
-import net.minecraftforge.client.model.obj.GroupObject;
-import net.minecraftforge.client.model.obj.TextureCoordinate;
-
-import org.lwjgl.opengl.GL11;
-
-import MCEntityAnimator.render.objRendering.Bend;
 import MCEntityAnimator.render.objRendering.ModelObj;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraft.entity.Entity;
 
 /**
  * An abstract object for tracking information about a part (limb, position of model etc).

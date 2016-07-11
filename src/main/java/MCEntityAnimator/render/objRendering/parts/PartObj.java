@@ -1,5 +1,7 @@
 package MCEntityAnimator.render.objRendering.parts;
 
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -9,15 +11,16 @@ import org.lwjgl.opengl.GL11;
 
 import MCEntityAnimator.animation.AnimationData;
 import MCEntityAnimator.animation.AnimationParenting;
-import MCEntityAnimator.render.objRendering.Bend;
 import MCEntityAnimator.render.objRendering.ModelObj;
-import MCEntityAnimator.render.objRendering.bend.BendNew;
+import MCEntityAnimator.render.objRendering.bend.BendHelper;
+import MCEntityAnimator.render.objRendering.bend.Bend;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.entity.Entity;
 import net.minecraftforge.client.model.obj.Face;
 import net.minecraftforge.client.model.obj.GroupObject;
 import net.minecraftforge.client.model.obj.TextureCoordinate;
+import net.minecraftforge.client.model.obj.Vertex;
 
 /**
  * One partObj for each 'part' of the model.
@@ -27,12 +30,12 @@ public class PartObj extends Part
 {
     private float[] rotationPoint;
     private boolean showModel;
-
+    
     //XXX
     private Map<Face, TextureCoordinate[]> defaultTextureCoords;
 
     private boolean visible;
-    private BendNew bend = null;
+    private Bend bend = null;
     public GroupObject groupObj;
     private String displayName;
 
@@ -91,7 +94,7 @@ public class PartObj extends Part
         visible = bool;
     }
 
-    public void setBend(BendNew b)
+    public void setBend(Bend b)
     {
         bend = b;
     }
