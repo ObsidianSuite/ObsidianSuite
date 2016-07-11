@@ -23,7 +23,7 @@ import MCEntityAnimator.Util;
 import MCEntityAnimator.animation.AnimationData;
 import MCEntityAnimator.distribution.ServerAccess;
 import MCEntityAnimator.gui.animation.FileGUI;
-import MCEntityAnimator.render.objRendering.Bend;
+import MCEntityAnimator.render.objRendering.bend.Bend;
 import MCEntityAnimator.render.objRendering.parts.Part;
 import MCEntityAnimator.render.objRendering.parts.PartObj;
 import net.minecraft.client.Minecraft;
