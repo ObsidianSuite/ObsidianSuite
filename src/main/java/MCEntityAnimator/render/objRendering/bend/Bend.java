@@ -58,12 +58,19 @@ public class Bend
 		//Get near and far vertices for parent and child.
 		Vertex[] allParentVertices = BendHelper.getPartVertices(parent);
 		allParentVertices = BendHelper.orderVerticesOnDistance(allParentVertices, centreOfBend);
-		parentNearVertices = (Vertex[]) Arrays.copyOfRange(allParentVertices, 0, 4);
-		parentFarVertices = (Vertex[]) Arrays.copyOfRange(allParentVertices, 4, 8);
 		Vertex[] allChildVertices = BendHelper.getPartVertices(child);
 		allChildVertices = BendHelper.orderVerticesOnDistance(allChildVertices, centreOfBend);
-		childNearVertices = (Vertex[]) Arrays.copyOfRange(allChildVertices, 0, 4);
-		childFarVertices = (Vertex[]) Arrays.copyOfRange(allChildVertices, 4, 8);
+		parentNearVertices = new Vertex[4];
+		parentFarVertices = new Vertex[4];
+		childNearVertices = new Vertex[4];
+		childFarVertices = new Vertex[4];
+		for(int i = 0; i < 4; i++)
+		{
+			parentNearVertices[i] = allParentVertices[i];
+			parentFarVertices[i] = allParentVertices[i+4];
+			childNearVertices[i] = allChildVertices[i];
+			childFarVertices[i] = allChildVertices[i+4];
+		}
 
 		//Match vertices, starting from parentFar, working down towards childFar.
 		parentFarVertices = BendHelper.orderVerticesRelative(parentFarVertices);
