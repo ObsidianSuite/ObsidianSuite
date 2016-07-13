@@ -214,11 +214,13 @@ public class Bend
 			//Generate part bottom.
 			Vertex[] bendPartBottom = generatePartBottom(curves,(float)(i+1)/bendSplit);
 
+			boolean highlight = i < bendSplit/2 ? parent.modelObj.isPartHighlighted(parent) : child.modelObj.isPartHighlighted(child);
+			
 			//Update bend, swap top and bottom vertices if part is inverted.
 			if(inverted)
-				bendParts.get(i).updateVertices(bendPartBottom, bendPartTop);
+				bendParts.get(i).updateVertices(bendPartBottom, bendPartTop, highlight);
 			else
-				bendParts.get(i).updateVertices(bendPartTop, bendPartBottom);
+				bendParts.get(i).updateVertices(bendPartTop, bendPartBottom, highlight);
 			//Top of next part is bottom of this part.
 			bendPartTop = bendPartBottom;
 		}
@@ -291,6 +293,9 @@ public class Bend
 		return vertices;
 	}
 
+    /**
+     * * TODO implement bend removal.
+     */
 	public void remove()
 	{
 

@@ -23,7 +23,7 @@ public class MCEA_Main
 	
 	public static final String homePath = Minecraft.getMinecraft().mcDataDir.getAbsolutePath();
 	public static final String animationPath = homePath + "/animation";
-	public static final String version = "3.7.1";
+	public static final String version = "3.7.2";
 	public static final DataHandler dataHandler = new DataHandler();
 
 	
