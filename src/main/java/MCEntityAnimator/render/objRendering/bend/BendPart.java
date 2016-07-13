@@ -11,11 +11,11 @@ import net.minecraftforge.client.model.obj.Vertex;
 
 public class BendPart extends GroupObject
 {
-	
+
 	//Sets of four vertices for the top and bottom of the sections.
 	private Vertex[] faceNormals;
 	private List<TextureCoordinate[]> faceTextureCoords;
-	
+
 	public BendPart(Vertex[] topVertices, Vertex[] bottomVertices, PartUVMap uvMap, boolean inverted)
 	{
 		super("", 4);
@@ -23,15 +23,15 @@ public class BendPart extends GroupObject
 		faceTextureCoords = new ArrayList<TextureCoordinate[]>();
 		setupVertices(topVertices, bottomVertices, uvMap, inverted);
 	}
-	
+
 	private void setupVertices(Vertex[] topVertices, Vertex[] bottomVertices, PartUVMap uvMap, boolean inverted)
 	{
 		this.faces.clear();
-								
+
 		for(int i = 0; i < 4; i++)
 		{
 			int j = i == 3 ? 0 : i + 1;
-			
+
 			Vertex vA = topVertices[j];
 			Vertex vB = bottomVertices[j];
 			Vertex vC = topVertices[i];
@@ -45,32 +45,32 @@ public class BendPart extends GroupObject
 			Face g = new Face();
 			g.vertices = new Vertex[]{vD, vE, vF};
 			faces.add(g);
-						
+
 			Vertex faceNormal = inverted ? g.calculateFaceNormal() : f.calculateFaceNormal();
 			f.faceNormal = faceNormal;
 			g.faceNormal = faceNormal;
 			faceNormals[i] = faceNormal;
-			
+
 			uvMap.setupFaceTextureCoordinates(f);
 			uvMap.setupFaceTextureCoordinates(g);
-			
+
 			faceTextureCoords.add(f.textureCoordinates);
 			faceTextureCoords.add(g.textureCoordinates);
 		}
 	}
-	
+
 	/**
 	 * Update the top and bottom vertices.
 	 * Also generates the faces represented by these vertices.
 	 */
-	public void updateVertices(Vertex[] topVertices, Vertex[] bottomVertices)
+	public void updateVertices(Vertex[] topVertices, Vertex[] bottomVertices, boolean highlighted)
 	{
 		this.faces.clear();
-								
+
 		for(int i = 0; i < 4; i++)
 		{
 			int j = i == 3 ? 0 : i + 1;
-			
+
 			Vertex vA = topVertices[j];
 			Vertex vB = bottomVertices[j];
 			Vertex vC = topVertices[i];
@@ -84,12 +84,21 @@ public class BendPart extends GroupObject
 			Face g = new Face();
 			g.vertices = new Vertex[]{vD, vE, vF};
 			faces.add(g);
-						
+
 			f.faceNormal = faceNormals[i];
 			g.faceNormal = faceNormals[i];
-			
-			f.textureCoordinates = faceTextureCoords.get(i*2);
-			g.textureCoordinates = faceTextureCoords.get(i*2 + 1);
+
+			if(highlighted)
+			{
+				TextureCoordinate cd = new TextureCoordinate(0.0F, 0.0F, 0.0F);
+				f.textureCoordinates = new TextureCoordinate[]{cd, cd, cd};
+				g.textureCoordinates = new TextureCoordinate[]{cd, cd, cd};
+			}
+			else
+			{
+				f.textureCoordinates = faceTextureCoords.get(i*2);
+				g.textureCoordinates = faceTextureCoords.get(i*2 + 1);
+			}
 		}
 	}
 

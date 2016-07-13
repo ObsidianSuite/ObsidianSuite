@@ -197,7 +197,7 @@ public class PartObj extends Part
 
     public void render(Entity entity, boolean highlight, boolean main) 
     {
-        //updateTextureCoordinates(highlight, main);
+        updateTextureCoordinates(highlight, main);
         
         GL11.glPushMatrix();
         move(entity);
