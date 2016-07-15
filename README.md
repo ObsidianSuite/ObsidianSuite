@@ -20,9 +20,10 @@
 3. Final commit on working branch - 'bump version'
 4. Tag on working branch.
 5. Merge working branch with master/dev.
-6. Push changes to repo.
-7. Export mod (gradlew build) and add to exports folder.
-8. Edit the history and version files on server.
-9. Add new version to server.
-10. Zip new version to MCEA_Updater.zip.
-11. Check it works!
+6. Delete working branch.
+7. Push changes to repo (including tag).
+8. Export mod (gradlew build) and add to exports folder.
+9. Edit the history and version files on server.
+10. Add new version to server.
+11. Zip new version to MCEA_Updater.zip.
+12. Check it works!
