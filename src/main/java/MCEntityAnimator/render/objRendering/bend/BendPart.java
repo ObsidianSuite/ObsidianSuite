@@ -13,18 +13,18 @@ public class BendPart extends GroupObject
 {
 
 	//Sets of four vertices for the top and bottom of the sections.
-	private Vertex[] faceNormals;
 	private List<TextureCoordinate[]> faceTextureCoords;
+	private boolean inverted;
 
 	public BendPart(Vertex[] topVertices, Vertex[] bottomVertices, PartUVMap uvMap, boolean inverted)
 	{
 		super("", 4);
-		faceNormals = new Vertex[4];
+		this.inverted = inverted;
 		faceTextureCoords = new ArrayList<TextureCoordinate[]>();
-		setupVertices(topVertices, bottomVertices, uvMap, inverted);
+		setupVertices(topVertices, bottomVertices, uvMap);
 	}
 
-	private void setupVertices(Vertex[] topVertices, Vertex[] bottomVertices, PartUVMap uvMap, boolean inverted)
+	private void setupVertices(Vertex[] topVertices, Vertex[] bottomVertices, PartUVMap uvMap)
 	{
 		this.faces.clear();
 
@@ -49,7 +49,6 @@ public class BendPart extends GroupObject
 			Vertex faceNormal = inverted ? g.calculateFaceNormal() : f.calculateFaceNormal();
 			f.faceNormal = faceNormal;
 			g.faceNormal = faceNormal;
-			faceNormals[i] = faceNormal;
 
 			uvMap.setupFaceTextureCoordinates(f);
 			uvMap.setupFaceTextureCoordinates(g);
@@ -85,8 +84,9 @@ public class BendPart extends GroupObject
 			g.vertices = new Vertex[]{vD, vE, vF};
 			faces.add(g);
 
-			f.faceNormal = faceNormals[i];
-			g.faceNormal = faceNormals[i];
+			Vertex faceNormal = inverted ? g.calculateFaceNormal() : f.calculateFaceNormal();
+			f.faceNormal = faceNormal;
+			g.faceNormal = faceNormal;
 
 			if(highlighted)
 			{
