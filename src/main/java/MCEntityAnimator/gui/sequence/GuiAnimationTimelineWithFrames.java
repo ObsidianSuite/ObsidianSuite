@@ -1434,39 +1434,16 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 
 		private SliderPanel(String name, int min, int max, int value, float delta, int majorSpacing)
 		{
-			JLabel label = new JLabel(name);
-
-			final JTextField textField = new JTextField(3);
-			textField.setText(Integer.toString(value));
+			final JLabel valueLabel = new JLabel(Integer.toString(value));
+			valueLabel.setPreferredSize(new Dimension(30, 10));
+			
 			slider = new JDoubleSlider(min, max, value, (int) (1/delta), majorSpacing);
 			slider.addChangeListener(new ChangeListener()
 			{
 				@Override
 				public void stateChanged(ChangeEvent e) 
 				{
-					textField.setText(df.format(slider.getScaledValue()));
-				}
-			});
-			textField.addKeyListener(new KeyAdapter()
-			{
-				@Override
-				public void keyReleased(KeyEvent ke) 
-				{
-					String typed = textField.getText();
-					slider.setValue(0);
-					Double d;
-					try
-					{
-						d = Double.parseDouble(typed);
-					}
-					catch(NumberFormatException e)
-					{
-						return;
-					}
-					double value = d*slider.scale;
-					boolean prev = slider.shouldUpdate;
-					slider.shouldUpdate = true;
-					slider.setValue((int)value);
+					valueLabel.setText(Double.toString(slider.getScaledValue()));
 				}
 			});
 
@@ -1475,18 +1452,19 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 			c.gridx = 0;
 			c.gridy = 0;
 			c.weightx = 1;
-			add(label, c);
+			add(new JLabel(name), c);
 
-			c.weightx = 0;
+			c.weightx = 2;
 			c.gridy = 1;
 			c.gridwidth = 2;
 			add(slider, c);
-
+			
 			c.gridx = 1;
 			c.gridy = 0;
 			c.gridwidth = 1;
+			c.weightx = 1;
 			c.insets = new Insets(0, 0, 0, 20);
-			add(textField, c);
+			add(valueLabel, c);
 		}
 	}
 
@@ -1507,6 +1485,8 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 				labels.put(scale*i, new JLabel(Integer.toString(i)));
 			}
 
+			int width = (int) ((this.getMaximum() - this.getMinimum())*1.5F);
+			this.setPreferredSize(new Dimension(width, 50));
 			this.setLabelTable(labels);
 			this.setPaintLabels(true);
 		}
@@ -1518,7 +1498,10 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 
 		public void setDoubleValue(double d)
 		{
-			setValue((int) (d*this.scale));
+			System.out.println("Set value: " + d);
+			System.out.println("Set value: " + d*this.scale);
+			System.out.println("Set value: " + Math.round(d*this.scale));
+			setValue((int) Math.round(d*this.scale));
 		}
 	}
 }

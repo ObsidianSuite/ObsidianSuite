@@ -37,6 +37,7 @@ public class AnimationPart
 		this.endTime = endTime;
 		this.startPosition = startPos;
 		this.endPosition = endPos;
+		
 		for(int i = 0; i < 3; i++)
 		{
 			float dT = endTime - startTime;
@@ -54,7 +55,7 @@ public class AnimationPart
 		float x = startPosition[0] + time*movement[0];
 		float y = startPosition[1] + time*movement[1];
 		float z = startPosition[2] + time*movement[2];
-				
+		
 		part.setValues(new float[]{x, y, z});
 	}
 
