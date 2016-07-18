@@ -53,7 +53,8 @@ public class AnimationParenting
 		List<PartObj> list = parentingMap.get(parent);
 		if(list == null)
 			list = new ArrayList<PartObj>();
-		list.add(child);
+		if(!list.contains(child))
+			list.add(child);
 		parentingMap.put(parent, list);
 	}
 
