@@ -36,7 +36,7 @@ public class RenderObj extends RenderLiving
 	
 	private static final ModelLargeShield shieldModel = new ModelLargeShield();
 	private static final ResourceLocation shieldTexture = new ResourceLocation("mod_pxy:textures/models/L_shield.png");
-	private static final ResourceLocation defaultTexture = new ResourceLocation("mod_mcea:objModels/default.png"); 
+	private static final ResourceLocation defaultTexture = new ResourceLocation("mod_MCEA:default_model_texture.png"); 
 	private ResourceLocation properTexture;
 	
 	public RenderObj() 

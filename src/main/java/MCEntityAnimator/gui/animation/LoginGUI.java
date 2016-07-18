@@ -35,7 +35,7 @@ public class LoginGUI extends JFrame
 	
 	private static final char[] joePassword = "dabigjoe".toCharArray();
 	private static final char[] kurtPassword = "projectxykurt".toCharArray();
-	private static final char[] rootPassword = "root".toCharArray();
+	private static final char[] rootPassword = "iamroot".toCharArray();
 	private JPasswordField passwordField;
 	
 	public LoginGUI()
@@ -107,6 +107,7 @@ public class LoginGUI extends JFrame
 		
 		setContentPane(mainPanel);
 		pack();
+		setResizable(false);
 		setVisible(true);
 		setAlwaysOnTop(true);
 		setLocationRelativeTo(null);

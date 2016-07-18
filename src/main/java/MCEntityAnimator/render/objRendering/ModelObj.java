@@ -18,7 +18,7 @@ import MCEntityAnimator.MCEA_Main;
 import MCEntityAnimator.Util;
 import MCEntityAnimator.animation.AnimationData;
 import MCEntityAnimator.animation.AnimationParenting;
-import MCEntityAnimator.animation.PartGroupsAndNames;
+import MCEntityAnimator.animation.PartGroups;
 import MCEntityAnimator.render.objRendering.bend.Bend;
 import MCEntityAnimator.render.objRendering.parts.Part;
 import MCEntityAnimator.render.objRendering.parts.PartEntityPos;
@@ -39,7 +39,7 @@ public class ModelObj extends ModelBase
 	public ArrayList<Part> parts;
 	private ArrayList<Bend> bends;
 	private AnimationParenting parenting;
-	public PartGroupsAndNames groupsAndNames;
+	public PartGroups partGroups;
 	private Map<PartObj, float[]> defaults;
 
 	private PartObj mainHighlight = null;
@@ -51,7 +51,7 @@ public class ModelObj extends ModelBase
 	private final ResourceLocation txtRL;
 	private final File pxyFile;
 
-	public boolean renderWithTexture;
+	public final boolean renderWithTexture;
 
 	private boolean partSetupComplete;
 
@@ -60,6 +60,10 @@ public class ModelObj extends ModelBase
 		entityType = par0Str;
 		File modelFile = new File(MCEA_Main.animationPath + "/data/shared/" + entityType + "/" + entityType + ".obj");
 		pxyFile = new File(MCEA_Main.animationPath + "/data/shared/" + entityType + "/" + entityType + ".pxy");
+		
+		
+		File textureFile = new File(MCEA_Main.animationPath + "/data/shared/" + entityType + "/" + entityType + ".png");
+		renderWithTexture = textureFile.exists();
 		txtRL = new ResourceLocation("animation:data/shared/" + entityType + "/" + entityType + ".png");
 
 
@@ -79,9 +83,8 @@ public class ModelObj extends ModelBase
 		bends = new ArrayList<Bend>();
 		defaults = Maps.newHashMap();
 		loadFromFile();
-		renderWithTexture = true;
 		partSetupComplete = true;
-		groupsAndNames = AnimationData.getPartGroupsAndNames(entityType, this);
+		partGroups = AnimationData.getPartGroups(entityType, this);
 
 		init();
 	}
@@ -221,9 +224,6 @@ public class ModelObj extends ModelBase
 	{
 		if(addBend)
 		{			
-			boolean prevRenderWithTexture = renderWithTexture;
-			renderWithTexture = true;
-
 			for(Part p : this.parts)
 			{
 				if(p instanceof PartObj)
@@ -239,8 +239,6 @@ public class ModelObj extends ModelBase
 				bends.add(b);
 				child.setBend(b);
 			}
-
-			renderWithTexture = prevRenderWithTexture;
 		}
 		parenting.addParenting(parent, child);
 	}

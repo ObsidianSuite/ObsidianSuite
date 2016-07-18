@@ -23,17 +23,15 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 
 /**
- * Model parts can have names assigned to them as blender gives them names like part.001.
- * Parts can also be grouped together, eg upper and lower arm -> arm.
- * The order of the parts is also flexible.
+ * Parts can be grouped together, eg upper and lower arm -> arm.
  */
-public class PartGroupsAndNames 
+public class PartGroups 
 {
 	private ModelObj model;
 	//A mapping of group names to a list of parts in that group.
 	private Map<String, List<PartObj>> groups;
 	
-	public PartGroupsAndNames(ModelObj modelObj)
+	public PartGroups(ModelObj modelObj)
 	{
 		this.model = modelObj;
 		
@@ -152,14 +150,14 @@ public class PartGroupsAndNames
 			partCompound.setString("Group", getPartGroup(part));
 			partList.appendTag(partCompound);
 		}
-		nbtToReturn.setTag("GroupsAndNames", partList);
+		nbtToReturn.setTag("Groups", partList);
 		nbtToReturn.setString("PartOrder", model.getPartOrderAsString());
 		return nbtToReturn;
 	}
 	
 	public void loadData(NBTTagCompound compound, String entityName) 
 	{	
-		NBTTagList partList = compound.getTagList("GroupsAndNames", 10);
+		NBTTagList partList = compound.getTagList("Groups", 10);
 		EntityObj entity = new EntityObj(Minecraft.getMinecraft().theWorld, entityName);
 		if(entity != null)
 		{
