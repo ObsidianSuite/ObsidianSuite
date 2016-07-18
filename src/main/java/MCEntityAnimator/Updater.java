@@ -161,6 +161,7 @@ public class Updater
 			setContentPane(mainPanel);
 			pack();
 			setLocationRelativeTo(null);
+			setResizable(false);
 			setVisible(true);
 			setAlwaysOnTop(true);
 		}

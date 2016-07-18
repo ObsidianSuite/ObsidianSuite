@@ -261,6 +261,7 @@ public class FileGUI extends JFrame
 		setContentPane(mainPanel);
 		pack();
 		setVisible(true);
+		setResizable(false);
 		setAlwaysOnTop(true);
 		setLocationRelativeTo(null);
 

@@ -41,6 +41,7 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JSlider;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
@@ -618,6 +619,7 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 			pack();
 			setAlwaysOnTop(true);
 			setLocation(50, 50);
+			setResizable(false);
 			setVisible(true);
 		}
 
@@ -845,6 +847,7 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 			setAlwaysOnTop(true);
 			setLocation(50, 200);
 			setVisible(true);
+			setResizable(false);
 		}
 
 		private void updateRotationSliderValues()
@@ -1052,14 +1055,6 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 				c.weighty = 0;
 				c.insets = new Insets(0, 0, 0, 0);
 				c.fill = GridBagConstraints.HORIZONTAL;
-				//TODO keyframe line part selection boxes
-				//				JComboBox<String> partDropDown = new JComboBox<String>();
-				//				for(String partName : parts)
-				//				{
-				//					partDropDown.addItem(partName);
-				//				}
-				//				partDropDown.setSelectedIndex(i);
-				//				mainPanel.add(partDropDown, c);
 
 				JLabel partLabel = new JLabel(Util.getDisplayName(parts.get(i), entityModel.parts));
 				partLabels[i] = partLabel;
@@ -1073,11 +1068,15 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 				mainPanel.add(lines[i], c);
 			}
 
-			setContentPane(mainPanel);
+			JScrollPane scrollPane = new JScrollPane(mainPanel);
+			scrollPane.setPreferredSize(new Dimension(700,400));
+			scrollPane.setWheelScrollingEnabled(false);
+			setContentPane(scrollPane);
 			pack();
 			setAlwaysOnTop(true);
-			setLocation(50, 600);
+			setLocation(50, 520);
 			setVisible(true);
+			setResizable(false);
 		}
 
 		private void updateTimelineLength(int delta)

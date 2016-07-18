@@ -42,8 +42,6 @@ public class DataHandler
 
 	public void loadNBTData()
 	{	
-		System.out.println("----------- Loading animation data -----------");
-
 		List<String> entityNames = getEntities();
 		//GUI
 		File guiDataFile = getGUIFile();
@@ -70,6 +68,9 @@ public class DataHandler
 		}
 	}
 
+	/**
+	 * Write an NBTTagCompound to a file.
+	 */
 	private static void writeNBTToFile(NBTTagCompound nbt, File file)
 	{
 		try 
@@ -80,6 +81,9 @@ public class DataHandler
 		catch (IOException e) {e.printStackTrace();}
 	}
 
+	/**
+	 * Read an NBTTagCompound from a file.
+	 */
 	private static NBTTagCompound getNBTFromFile(File file)
 	{
 		try 
@@ -90,6 +94,9 @@ public class DataHandler
 		catch (IOException e) {throw new RuntimeException(e);}
 	}
 
+	/**
+	 * Get the list of entities available for animation. Searches the /data/shared folder.
+	 */
 	public static List<String> getEntities()
 	{
 		List<String> entities = new ArrayList<String>();
