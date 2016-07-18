@@ -618,6 +618,7 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 			pack();
 			setAlwaysOnTop(true);
 			setLocation(50, 50);
+			setResizable(false);
 			setVisible(true);
 		}
 
@@ -845,6 +846,7 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 			setAlwaysOnTop(true);
 			setLocation(50, 200);
 			setVisible(true);
+			setResizable(false);
 		}
 
 		private void updateRotationSliderValues()
@@ -1078,6 +1080,7 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 			setAlwaysOnTop(true);
 			setLocation(50, 600);
 			setVisible(true);
+			setResizable(false);
 		}
 
 		private void updateTimelineLength(int delta)

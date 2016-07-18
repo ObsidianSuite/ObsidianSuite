@@ -145,11 +145,12 @@ public class GuiPartSetup extends GuiEntityRenderer
 			c.gridy = 6;
 			c.gridwidth = 2;
 			mainPanel.add(saveAndExitButton, c);
-
+			
 			setContentPane(mainPanel);
 			pack();
+			setResizable(false);
 			setAlwaysOnTop(true);
-			setLocation(10, 10);
+			setLocation(5, 35);
 			setVisible(true);
 		}
 
@@ -173,6 +174,7 @@ public class GuiPartSetup extends GuiEntityRenderer
 		{
 			for(PartPanel p : partPanels)
 				partMainPanel.add(p);
+			updateGroupComboBoxes();
 		}
 
 		/**

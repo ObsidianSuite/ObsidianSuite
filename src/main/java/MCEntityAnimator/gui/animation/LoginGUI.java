@@ -107,6 +107,7 @@ public class LoginGUI extends JFrame
 		
 		setContentPane(mainPanel);
 		pack();
+		setResizable(false);
 		setVisible(true);
 		setAlwaysOnTop(true);
 		setLocationRelativeTo(null);

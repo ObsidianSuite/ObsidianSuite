@@ -249,6 +249,7 @@ public class GuiAnimationParenting extends GuiEntityRenderer
 			pack();
 			setAlwaysOnTop(true);
 			setLocation(50, 50);
+			setResizable(false);
 			setVisible(true);
 		}
 
@@ -280,6 +281,7 @@ public class GuiAnimationParenting extends GuiEntityRenderer
 			pack();
 			setAlwaysOnTop(true);
 			setLocation(50, 150);
+			setResizable(false);
 			setVisible(true);
 		}
 		

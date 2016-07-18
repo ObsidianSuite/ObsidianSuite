@@ -110,6 +110,7 @@ public class AnimationNewGUI extends JFrame
 		setContentPane(mainPanel);
 		pack();
 		setVisible(true);
+		setResizable(false);
 		setAlwaysOnTop(true);
 		setLocationRelativeTo(null);
 
