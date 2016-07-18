@@ -150,11 +150,20 @@ public class PartObj extends Part
 	 */
 	public void updateTextureCoordinates(boolean highlight, boolean main)
 	{		
-		TextureCoordinate texCo = highlight ? new TextureCoordinate(0.0F, 0.0F): new TextureCoordinate(0.5F, 0.5F);
-		TextureCoordinate[] coords = new TextureCoordinate[]{texCo, texCo, texCo};
-								
+		TextureCoordinate texCo1 = new TextureCoordinate(0.0F, 0.0F);
+		TextureCoordinate[] coordsHighlight = new TextureCoordinate[]{texCo1, texCo1, texCo1};
+		TextureCoordinate texCo2 = new TextureCoordinate(0.5F, 0.5F);
+		TextureCoordinate[] coordsNormal = new TextureCoordinate[]{texCo2, texCo2, texCo2};
+
 		for(Face f : groupObj.faces)
-			f.textureCoordinates = modelObj.renderWithTexture ? defaultTextureCoords.get(f) : coords;
+		{
+			if(highlight)
+				f.textureCoordinates = coordsHighlight;
+			else if(modelObj.renderWithTexture)
+				f.textureCoordinates = defaultTextureCoords.get(f);
+			else
+				f.textureCoordinates = coordsNormal;	
+		}
 	}
 
 	public void render(Entity entity, boolean highlight, boolean main) 
