@@ -27,20 +27,19 @@ import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
-import MCEntityAnimator.animation.PartGroupsAndNames;
-import MCEntityAnimator.render.objRendering.parts.Part;
+import MCEntityAnimator.animation.PartGroups;
 import MCEntityAnimator.render.objRendering.parts.PartObj;
 
 public class GuiPartSetup extends GuiEntityRenderer
 {
 
-	private PartGroupsAndNames groupsAndNames;
+	private PartGroups partGroups;
 	private SetupFrame setupFrame;
 
 	public GuiPartSetup(String entityName) 
 	{
 		super(entityName);		
-		groupsAndNames = entityModel.groupsAndNames;
+		partGroups = entityModel.partGroups;
 		setupFrame = new SetupFrame();
 	}
 
@@ -69,7 +68,7 @@ public class GuiPartSetup extends GuiEntityRenderer
 			GridBagConstraints c = new GridBagConstraints();
 
 			//Init variables
-			currentGroups = groupsAndNames.getGroupListAsString();
+			currentGroups = partGroups.getGroupListAsString();
 			groupComboBoxes = new ArrayList<JComboBox>();
 			partPanels = new ArrayList<PartPanel>();
 			//Add a part panel for each part.
@@ -86,8 +85,8 @@ public class GuiPartSetup extends GuiEntityRenderer
 				@Override
 				public void actionPerformed(ActionEvent arg0) 
 				{		
-					groupsAndNames.addGroup(groupNameTextField.getText());
-					currentGroups = groupsAndNames.getGroupListAsString();
+					partGroups.addGroup(groupNameTextField.getText());
+					currentGroups = partGroups.getGroupListAsString();
 					currentGroupsLabel.setText(currentGroups);
 					updateGroupComboBoxes();
 				}
@@ -218,7 +217,7 @@ public class GuiPartSetup extends GuiEntityRenderer
 				}
 			}
 			if(moved != 0)
-				groupsAndNames.changeOrder(movingPanel.part, moved == 1);
+				partGroups.changeOrder(movingPanel.part, moved == 1);
 			
 			//Update and redraw.
 			partPanels = newOrder;
@@ -274,7 +273,7 @@ public class GuiPartSetup extends GuiEntityRenderer
 				JComboBox box = new JComboBox();
 				box.setPreferredSize(new Dimension(200,20));
 				box.addActionListener(new GroupDropDownActionListener(part));
-				box.setSelectedItem(groupsAndNames.getPartGroup(part));
+				box.setSelectedItem(partGroups.getPartGroup(part));
 				groupComboBoxes.add(box);
 				add(box, c);
 
@@ -380,8 +379,8 @@ public class GuiPartSetup extends GuiEntityRenderer
 			for(int i = 0; i < entityModel.getPartObjs().size(); i++)
 			{
 				PartObj part = entityModel.getPartObjs().get(i);
-				groupComboBoxes.get(i).setModel(new DefaultComboBoxModel(groupsAndNames.getGroupListAsArray()));
-				groupComboBoxes.get(i).setSelectedItem(groupsAndNames.getPartGroup(part));
+				groupComboBoxes.get(i).setModel(new DefaultComboBoxModel(partGroups.getGroupListAsArray()));
+				groupComboBoxes.get(i).setSelectedItem(partGroups.getPartGroup(part));
 			}
 		}
 
@@ -423,7 +422,7 @@ public class GuiPartSetup extends GuiEntityRenderer
 			@Override
 			public void actionPerformed(ActionEvent e) 
 			{
-				groupsAndNames.setPartGroup((String) ((JComboBox) e.getSource()).getSelectedItem(), part);
+				partGroups.setPartGroup((String) ((JComboBox) e.getSource()).getSelectedItem(), part);
 			}
 		}
 	}

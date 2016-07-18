@@ -18,7 +18,7 @@ import MCEntityAnimator.MCEA_Main;
 import MCEntityAnimator.Util;
 import MCEntityAnimator.animation.AnimationData;
 import MCEntityAnimator.animation.AnimationParenting;
-import MCEntityAnimator.animation.PartGroupsAndNames;
+import MCEntityAnimator.animation.PartGroups;
 import MCEntityAnimator.render.objRendering.bend.Bend;
 import MCEntityAnimator.render.objRendering.parts.Part;
 import MCEntityAnimator.render.objRendering.parts.PartEntityPos;
@@ -39,7 +39,7 @@ public class ModelObj extends ModelBase
 	public ArrayList<Part> parts;
 	private ArrayList<Bend> bends;
 	private AnimationParenting parenting;
-	public PartGroupsAndNames groupsAndNames;
+	public PartGroups partGroups;
 	private Map<PartObj, float[]> defaults;
 
 	private PartObj mainHighlight = null;
@@ -84,7 +84,7 @@ public class ModelObj extends ModelBase
 		defaults = Maps.newHashMap();
 		loadFromFile();
 		partSetupComplete = true;
-		groupsAndNames = AnimationData.getPartGroupsAndNames(entityType, this);
+		partGroups = AnimationData.getPartGroups(entityType, this);
 
 		init();
 	}

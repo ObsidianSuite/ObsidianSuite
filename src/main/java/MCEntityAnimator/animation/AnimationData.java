@@ -35,7 +35,7 @@ public class AnimationData
 	private static Map<String, Integer> animationItems = Maps.newHashMap();
 
 	//List of part names and groupings. 
-	private static Map<String, PartGroupsAndNames> partGroupsAndNames = Maps.newHashMap();
+	private static Map<String, PartGroups> partGroups= Maps.newHashMap();
 
 	/**
 	 * Get the animation parenting that applies to this model.
@@ -162,12 +162,12 @@ public class AnimationData
 		return parentingSetup.get(entityName);
 	}
 
-	public static PartGroupsAndNames getPartGroupsAndNames(String entityName, ModelObj model)
+	public static PartGroups getPartGroups(String entityName, ModelObj model)
 	{
-		if(partGroupsAndNames.containsKey(entityName) && partGroupsAndNames.get(entityName) != null)
-			return partGroupsAndNames.get(entityName);
-		PartGroupsAndNames p = new PartGroupsAndNames(model);
-		partGroupsAndNames.put(entityName, p);
+		if(partGroups.containsKey(entityName) && partGroups.get(entityName) != null)
+			return partGroups.get(entityName);
+		PartGroups p = new PartGroups(model);
+		partGroups.put(entityName, p);
 		return p;
 	}
 
@@ -251,8 +251,8 @@ public class AnimationData
 	{
 		NBTTagCompound compound = new NBTTagCompound();
 		compound.setTag("Parenting", getAnipar(entityName).getSaveData(entityName));
-		if(partGroupsAndNames.get(entityName) != null)
-			compound.setTag("GroupsAndName", partGroupsAndNames.get(entityName).getSaveData(entityName));
+		if(partGroups.get(entityName) != null)
+			compound.setTag("Groups", partGroups.get(entityName).getSaveData(entityName));
 		return compound;
 	}
 
@@ -261,8 +261,8 @@ public class AnimationData
 		AnimationParenting anipar = getAnipar(entityName);
 		anipar.loadData(compound.getCompoundTag("Parenting"), entityName);
 
-		PartGroupsAndNames p = partGroupsAndNames.get(entityName);
-		p.loadData(compound.getCompoundTag("GroupsAndName"), entityName);
+		PartGroups p = partGroups.get(entityName);
+		p.loadData(compound.getCompoundTag("Groups"), entityName);
 	}
 
 }
