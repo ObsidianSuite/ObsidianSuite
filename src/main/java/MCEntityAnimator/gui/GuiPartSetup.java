@@ -57,7 +57,6 @@ public class GuiPartSetup extends GuiEntityRenderer
 		private JPanel mainPanel, partMainPanel;
 		//List of panels - one per part.
 		private List<PartPanel> partPanels;
-		private List<JComboBox> groupComboBoxes;
 
 		public SetupFrame()
 		{
@@ -69,7 +68,6 @@ public class GuiPartSetup extends GuiEntityRenderer
 
 			//Init variables
 			currentGroups = partGroups.getGroupListAsString();
-			groupComboBoxes = new ArrayList<JComboBox>();
 			partPanels = new ArrayList<PartPanel>();
 			//Add a part panel for each part.
 			for(PartObj p : entityModel.getPartObjs())
@@ -242,6 +240,9 @@ public class GuiPartSetup extends GuiEntityRenderer
 					}
 					newOrder.add(p);
 				}
+				p.drawUpperInsert = false;
+				p.drawLowerInsert = false;
+				p.repaint();
 			}
 			
 			//Add moving panel if not added yet (last panel).
@@ -252,17 +253,16 @@ public class GuiPartSetup extends GuiEntityRenderer
 			 * Determine if order has been changed.
 			 * moved int = 1 if up, 0 if still and -1 if down.
 			 */
-			int moved = 0;
+			int oldPos = 0;
+			int newPos = 0;
 			for(int i = 0; i < partPanels.size(); i++)
 			{
-				if(!partPanels.get(i).equals(newOrder.get(i)))
-				{
-					moved = newOrder.get(i).equals(movingPanel) ? 1 : -1;
-					break;
-				}
+				if(partPanels.get(i).equals(movingPanel))
+					oldPos = i;
+				if(newOrder.get(i).equals(movingPanel))
+					newPos = i;
 			}
-			if(moved != 0)
-				partGroups.changeOrder(movingPanel.part, moved == 1);
+			partGroups.changeOrder(movingPanel.part, newPos - oldPos);
 			
 			//Update and redraw.
 			partPanels = newOrder;
@@ -279,8 +279,8 @@ public class GuiPartSetup extends GuiEntityRenderer
 		{
 			
 			private PartObj part;
-
 			private boolean drawUpperInsert = false, drawLowerInsert = false;
+			private JComboBox box;
 			
 			private PartPanel(final PartObj part)
 			{
@@ -307,11 +307,10 @@ public class GuiPartSetup extends GuiEntityRenderer
 
 				c.gridx = 2;
 				c.weightx = 0;
-				JComboBox box = new JComboBox();
+				box = new JComboBox();
 				box.setPreferredSize(new Dimension(200,20));
 				box.addActionListener(new GroupDropDownActionListener(part));
 				box.setSelectedItem(partGroups.getPartGroup(part));
-				groupComboBoxes.add(box);
 				add(box, c);
 
 				c.weightx = 0;
@@ -383,7 +382,10 @@ public class GuiPartSetup extends GuiEntityRenderer
 					public void mouseClicked(MouseEvent arg0) {}
 
 					@Override
-					public void mouseEntered(MouseEvent arg0) {}
+					public void mouseEntered(MouseEvent arg0) 
+					{
+						currentPartName = partPanel.part.getName();
+					}
 
 					@Override
 					public void mouseExited(MouseEvent arg0) {}
@@ -434,11 +436,10 @@ public class GuiPartSetup extends GuiEntityRenderer
 
 		private void updateGroupComboBoxes()
 		{
-			for(int i = 0; i < entityModel.getPartObjs().size(); i++)
+			for(PartPanel p : partPanels)
 			{
-				PartObj part = entityModel.getPartObjs().get(i);
-				groupComboBoxes.get(i).setModel(new DefaultComboBoxModel(partGroups.getGroupListAsArray()));
-				groupComboBoxes.get(i).setSelectedItem(partGroups.getPartGroup(part));
+				p.box.setModel(new DefaultComboBoxModel(partGroups.getGroupListAsArray()));
+				p.box.setSelectedItem(partGroups.getPartGroup(p.part));
 			}
 		}
 
