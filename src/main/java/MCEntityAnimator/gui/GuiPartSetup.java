@@ -337,6 +337,7 @@ public class GuiPartSetup extends GuiEntityRenderer
 					@Override
 					public void mousePressed(MouseEvent arg0) 
 					{
+						System.out.println("Mouse pressed");
 						partPanel.setBorder(BorderFactory.createLineBorder(Color.red));
 						partPanel.repaint();
 					}
@@ -344,6 +345,7 @@ public class GuiPartSetup extends GuiEntityRenderer
 					@Override
 					public void mouseReleased(MouseEvent arg0) 
 					{
+						System.out.println("Mouse released");
 						partPanel.setBorder(BorderFactory.createLineBorder(Color.black));
 						partPanel.repaint();
 					}
@@ -354,6 +356,7 @@ public class GuiPartSetup extends GuiEntityRenderer
 					@Override
 					public void mouseDragged(MouseEvent e) 
 					{
+						System.out.println("Mouse dragging");
 						int abs = partPanel.getY() + e.getY();			
 						recalculateOrder(partPanel, abs);
 					}
