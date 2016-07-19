@@ -25,5 +25,5 @@
 8. Export mod (gradlew build) and add to exports folder.
 9. Edit the history and version files on server.
 10. Add new version to server.
-11. Zip new version to MCEA_Updater.zip.
+11. Zip new version to MCEA_Latest.zip.
 12. Check it works!
