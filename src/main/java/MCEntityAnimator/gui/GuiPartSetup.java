@@ -57,7 +57,6 @@ public class GuiPartSetup extends GuiEntityRenderer
 		private JPanel mainPanel, partMainPanel;
 		//List of panels - one per part.
 		private List<PartPanel> partPanels;
-		private List<JComboBox> groupComboBoxes;
 
 		public SetupFrame()
 		{
@@ -69,7 +68,6 @@ public class GuiPartSetup extends GuiEntityRenderer
 
 			//Init variables
 			currentGroups = partGroups.getGroupListAsString();
-			groupComboBoxes = new ArrayList<JComboBox>();
 			partPanels = new ArrayList<PartPanel>();
 			//Add a part panel for each part.
 			for(PartObj p : entityModel.getPartObjs())
@@ -176,6 +174,49 @@ public class GuiPartSetup extends GuiEntityRenderer
 				partMainPanel.add(p);
 			updateGroupComboBoxes();
 		}
+		
+		/**
+		 * Remove the part panels.
+		 */
+		private void removePartPanels()
+		{
+			for(PartPanel p : partPanels)
+				partMainPanel.remove(p);
+		}
+
+		private void showInsertPoint(PartPanel movingPanel, int mouseY)
+		{
+			PartPanel lowerPanel = null, upperPanel = null;
+			boolean flag = false;
+			for(PartPanel p : partPanels)
+			{
+				p.drawLowerInsert = false;
+				p.drawUpperInsert = false;
+				if(p.getCentreY() < mouseY)
+					lowerPanel = p;
+				else if(!flag)
+				{
+					upperPanel = p;
+					flag = true;
+				}
+				p.revalidate();
+				p.repaint();
+			}
+
+			if(lowerPanel != null)
+			{
+				lowerPanel.drawLowerInsert = true;
+				lowerPanel.revalidate();
+				lowerPanel.repaint();
+			}
+
+			if(upperPanel != null)
+			{
+				upperPanel.drawUpperInsert = true;
+				upperPanel.revalidate();
+				upperPanel.repaint();
+			}
+		}
 
 		/**
 		 * Recalculate the order of the part panels.
@@ -184,7 +225,7 @@ public class GuiPartSetup extends GuiEntityRenderer
 		 * @param mouseY - the absolute y coordinate of the mouse
 		 */
 		private void recalculateOrder(PartPanel movingPanel, int mouseY)
-		{
+		{			
 			//Get new order of panels.
 			List<PartPanel> newOrder = new ArrayList<PartPanel>();
 			boolean movingAdded = false;
@@ -199,6 +240,9 @@ public class GuiPartSetup extends GuiEntityRenderer
 					}
 					newOrder.add(p);
 				}
+				p.drawUpperInsert = false;
+				p.drawLowerInsert = false;
+				p.repaint();
 			}
 			
 			//Add moving panel if not added yet (last panel).
@@ -209,33 +253,22 @@ public class GuiPartSetup extends GuiEntityRenderer
 			 * Determine if order has been changed.
 			 * moved int = 1 if up, 0 if still and -1 if down.
 			 */
-			int moved = 0;
+			int oldPos = 0;
+			int newPos = 0;
 			for(int i = 0; i < partPanels.size(); i++)
 			{
-				if(!partPanels.get(i).equals(newOrder.get(i)))
-				{
-					moved = newOrder.get(i).equals(movingPanel) ? 1 : -1;
-					break;
-				}
+				if(partPanels.get(i).equals(movingPanel))
+					oldPos = i;
+				if(newOrder.get(i).equals(movingPanel))
+					newPos = i;
 			}
-			if(moved != 0)
-				partGroups.changeOrder(movingPanel.part, moved == 1);
+			partGroups.changeOrder(movingPanel.part, newPos - oldPos);
 			
 			//Update and redraw.
 			partPanels = newOrder;
 			removePartPanels();
 			addPartPanels();
 			mainPanel.revalidate();
-			mainPanel.repaint();
-		}
-
-		/**
-		 * REmove the part panels.
-		 */
-		private void removePartPanels()
-		{
-			for(PartPanel p : partPanels)
-				partMainPanel.remove(p);
 		}
 
 		/**
@@ -246,7 +279,9 @@ public class GuiPartSetup extends GuiEntityRenderer
 		{
 			
 			private PartObj part;
-
+			private boolean drawUpperInsert = false, drawLowerInsert = false;
+			private JComboBox box;
+			
 			private PartPanel(final PartObj part)
 			{
 				this.part = part;
@@ -272,11 +307,10 @@ public class GuiPartSetup extends GuiEntityRenderer
 
 				c.gridx = 2;
 				c.weightx = 0;
-				JComboBox box = new JComboBox();
+				box = new JComboBox();
 				box.setPreferredSize(new Dimension(200,20));
 				box.addActionListener(new GroupDropDownActionListener(part));
 				box.setSelectedItem(partGroups.getPartGroup(part));
-				groupComboBoxes.add(box);
 				add(box, c);
 
 				c.weightx = 0;
@@ -312,6 +346,25 @@ public class GuiPartSetup extends GuiEntityRenderer
 			{
 				return getY() + getHeight()/2;
 			}
+			
+			@Override
+			public void paint(Graphics g)
+			{			
+				super.paint(g);
+				g.setColor(Color.BLUE);
+				if(drawUpperInsert)
+				{
+					g.drawLine(0, 1, getWidth(), 1);
+					for(int i = 0; i < 10; i++)
+						g.drawLine(this.getWidth() - (10 - i), i + 1, this.getWidth(), i + 1);
+				}
+				if(drawLowerInsert)
+				{
+					g.drawLine(0, this.getHeight() - 1, getWidth(), this.getHeight() - 1);
+					for(int i = 0; i < 10; i++)
+						g.drawLine(this.getWidth() - i, this.getHeight() - (10 - i), this.getWidth(), this.getHeight() - (10 - i));
+				}
+			}
 		}
 
 		/**
@@ -329,7 +382,10 @@ public class GuiPartSetup extends GuiEntityRenderer
 					public void mouseClicked(MouseEvent arg0) {}
 
 					@Override
-					public void mouseEntered(MouseEvent arg0) {}
+					public void mouseEntered(MouseEvent arg0) 
+					{
+						currentPartName = partPanel.part.getName();
+					}
 
 					@Override
 					public void mouseExited(MouseEvent arg0) {}
@@ -342,8 +398,10 @@ public class GuiPartSetup extends GuiEntityRenderer
 					}
 
 					@Override
-					public void mouseReleased(MouseEvent arg0) 
+					public void mouseReleased(MouseEvent e) 
 					{
+						int abs = partPanel.getY() + e.getY();			
+						recalculateOrder(partPanel, abs);
 						partPanel.setBorder(BorderFactory.createLineBorder(Color.black));
 						partPanel.repaint();
 					}
@@ -355,7 +413,7 @@ public class GuiPartSetup extends GuiEntityRenderer
 					public void mouseDragged(MouseEvent e) 
 					{
 						int abs = partPanel.getY() + e.getY();			
-						recalculateOrder(partPanel, abs);
+						showInsertPoint(partPanel, abs);
 					}
 
 					@Override
@@ -378,11 +436,10 @@ public class GuiPartSetup extends GuiEntityRenderer
 
 		private void updateGroupComboBoxes()
 		{
-			for(int i = 0; i < entityModel.getPartObjs().size(); i++)
+			for(PartPanel p : partPanels)
 			{
-				PartObj part = entityModel.getPartObjs().get(i);
-				groupComboBoxes.get(i).setModel(new DefaultComboBoxModel(partGroups.getGroupListAsArray()));
-				groupComboBoxes.get(i).setSelectedItem(partGroups.getPartGroup(part));
+				p.box.setModel(new DefaultComboBoxModel(partGroups.getGroupListAsArray()));
+				p.box.setSelectedItem(partGroups.getPartGroup(p.part));
 			}
 		}
 

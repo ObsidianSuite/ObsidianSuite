@@ -115,7 +115,7 @@ public class PartGroups
 		return "Default";
 	}
 	
-	public void changeOrder(Part part, boolean up)
+	public void changeOrder(Part part, int change)
 	{
 		int currentPos = 0;
 		for(int i = 0; i < model.parts.size(); i++)
@@ -124,17 +124,14 @@ public class PartGroups
 				currentPos = i;
 		}
 		boolean flag = true;
-		if(currentPos == 0 && up)
+		if(currentPos == 0 && change < 0)
 			flag = false;
-		if(currentPos == model.parts.size() - 1 && !up)
+		if(currentPos == model.parts.size() - 1 && change > 0)
 			flag = false;
 		if(flag)
 		{				
 			model.parts.remove(part);
-			if(up)
-				model.parts.add(currentPos - 1, part);
-			else
-				model.parts.add(currentPos + 1, part);
+			model.parts.add(currentPos + change, part);
 		}
 	}
 	
