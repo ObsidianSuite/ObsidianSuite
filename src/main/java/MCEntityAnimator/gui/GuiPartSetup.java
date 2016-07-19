@@ -184,7 +184,7 @@ public class GuiPartSetup extends GuiEntityRenderer
 		 * @param mouseY - the absolute y coordinate of the mouse
 		 */
 		private void recalculateOrder(PartPanel movingPanel, int mouseY)
-		{
+		{			
 			//Get new order of panels.
 			List<PartPanel> newOrder = new ArrayList<PartPanel>();
 			boolean movingAdded = false;
@@ -226,11 +226,10 @@ public class GuiPartSetup extends GuiEntityRenderer
 			removePartPanels();
 			addPartPanels();
 			mainPanel.revalidate();
-			mainPanel.repaint();
 		}
 
 		/**
-		 * REmove the part panels.
+		 * Remove the part panels.
 		 */
 		private void removePartPanels()
 		{
@@ -337,15 +336,15 @@ public class GuiPartSetup extends GuiEntityRenderer
 					@Override
 					public void mousePressed(MouseEvent arg0) 
 					{
-						System.out.println("Mouse pressed");
 						partPanel.setBorder(BorderFactory.createLineBorder(Color.red));
 						partPanel.repaint();
 					}
 
 					@Override
-					public void mouseReleased(MouseEvent arg0) 
+					public void mouseReleased(MouseEvent e) 
 					{
-						System.out.println("Mouse released");
+						int abs = partPanel.getY() + e.getY();			
+						recalculateOrder(partPanel, abs);
 						partPanel.setBorder(BorderFactory.createLineBorder(Color.black));
 						partPanel.repaint();
 					}
@@ -356,9 +355,7 @@ public class GuiPartSetup extends GuiEntityRenderer
 					@Override
 					public void mouseDragged(MouseEvent e) 
 					{
-						System.out.println("Mouse dragging");
-						int abs = partPanel.getY() + e.getY();			
-						recalculateOrder(partPanel, abs);
+
 					}
 
 					@Override
