@@ -176,6 +176,49 @@ public class GuiPartSetup extends GuiEntityRenderer
 				partMainPanel.add(p);
 			updateGroupComboBoxes();
 		}
+		
+		/**
+		 * Remove the part panels.
+		 */
+		private void removePartPanels()
+		{
+			for(PartPanel p : partPanels)
+				partMainPanel.remove(p);
+		}
+
+		private void showInsertPoint(PartPanel movingPanel, int mouseY)
+		{
+			PartPanel lowerPanel = null, upperPanel = null;
+			boolean flag = false;
+			for(PartPanel p : partPanels)
+			{
+				p.drawLowerInsert = false;
+				p.drawUpperInsert = false;
+				if(p.getCentreY() < mouseY)
+					lowerPanel = p;
+				else if(!flag)
+				{
+					upperPanel = p;
+					flag = true;
+				}
+				p.revalidate();
+				p.repaint();
+			}
+
+			if(lowerPanel != null)
+			{
+				lowerPanel.drawLowerInsert = true;
+				lowerPanel.revalidate();
+				lowerPanel.repaint();
+			}
+
+			if(upperPanel != null)
+			{
+				upperPanel.drawUpperInsert = true;
+				upperPanel.revalidate();
+				upperPanel.repaint();
+			}
+		}
 
 		/**
 		 * Recalculate the order of the part panels.
@@ -229,15 +272,6 @@ public class GuiPartSetup extends GuiEntityRenderer
 		}
 
 		/**
-		 * Remove the part panels.
-		 */
-		private void removePartPanels()
-		{
-			for(PartPanel p : partPanels)
-				partMainPanel.remove(p);
-		}
-
-		/**
 		 * A JPanel that contains controls for editing a part.
 		 * Border turns red when selected.
 		 */
@@ -246,6 +280,8 @@ public class GuiPartSetup extends GuiEntityRenderer
 			
 			private PartObj part;
 
+			private boolean drawUpperInsert = false, drawLowerInsert = false;
+			
 			private PartPanel(final PartObj part)
 			{
 				this.part = part;
@@ -311,6 +347,25 @@ public class GuiPartSetup extends GuiEntityRenderer
 			{
 				return getY() + getHeight()/2;
 			}
+			
+			@Override
+			public void paint(Graphics g)
+			{			
+				super.paint(g);
+				g.setColor(Color.BLUE);
+				if(drawUpperInsert)
+				{
+					g.drawLine(0, 1, getWidth(), 1);
+					for(int i = 0; i < 10; i++)
+						g.drawLine(this.getWidth() - (10 - i), i + 1, this.getWidth(), i + 1);
+				}
+				if(drawLowerInsert)
+				{
+					g.drawLine(0, this.getHeight() - 1, getWidth(), this.getHeight() - 1);
+					for(int i = 0; i < 10; i++)
+						g.drawLine(this.getWidth() - i, this.getHeight() - (10 - i), this.getWidth(), this.getHeight() - (10 - i));
+				}
+			}
 		}
 
 		/**
@@ -355,7 +410,8 @@ public class GuiPartSetup extends GuiEntityRenderer
 					@Override
 					public void mouseDragged(MouseEvent e) 
 					{
-
+						int abs = partPanel.getY() + e.getY();			
+						showInsertPoint(partPanel, abs);
 					}
 
 					@Override
