@@ -1497,9 +1497,6 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 
 		public void setDoubleValue(double d)
 		{
-			System.out.println("Set value: " + d);
-			System.out.println("Set value: " + d*this.scale);
-			System.out.println("Set value: " + Math.round(d*this.scale));
 			setValue((int) Math.round(d*this.scale));
 		}
 	}
