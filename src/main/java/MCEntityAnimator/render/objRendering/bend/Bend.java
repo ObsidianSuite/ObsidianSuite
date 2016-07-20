@@ -9,9 +9,7 @@ import MCEntityAnimator.animation.AnimationData;
 import MCEntityAnimator.animation.AnimationParenting;
 import MCEntityAnimator.render.objRendering.bend.UVMap.PartUVMap;
 import MCEntityAnimator.render.objRendering.parts.PartObj;
-import net.minecraftforge.client.model.obj.Face;
 import net.minecraftforge.client.model.obj.Vertex;
-import scala.actors.threadpool.Arrays;
 
 public class Bend 
 {
@@ -308,11 +306,17 @@ public class Bend
 		//Get near and far vertices for parent and child.
 		Vertex[] allParentVertices = BendHelper.getPartVertices(parent);
 		allParentVertices = BendHelper.orderVerticesOnDistance(allParentVertices, centreOfBend);
-		Vertex[] parentNearVertices = (Vertex[]) Arrays.copyOfRange(allParentVertices, 0, 4);
 		Vertex[] allChildVertices = BendHelper.getPartVertices(child);
 		allChildVertices = BendHelper.orderVerticesOnDistance(allChildVertices, centreOfBend);
-		Vertex[] childNearVertices = (Vertex[]) Arrays.copyOfRange(allChildVertices, 0, 4);
-
+		
+		Vertex[] parentNearVertices = new Vertex[4];
+		Vertex[] childNearVertices = new Vertex[4];
+		for(int i = 0; i < 4; i++)
+		{
+			parentNearVertices[i] = allParentVertices[i];
+			childNearVertices[i] = allChildVertices[i];
+		}
+		
 		//Match vertices, starting from parentFar, working down towards childFar.
 		
 		parentNearVertices = BendHelper.orderVerticesRelative(parentNearVertices);
