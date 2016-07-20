@@ -314,6 +314,7 @@ public class Bend
 		Vertex[] childNearVertices = (Vertex[]) Arrays.copyOfRange(allChildVertices, 0, 4);
 
 		//Match vertices, starting from parentFar, working down towards childFar.
+		
 		parentNearVertices = BendHelper.orderVerticesRelative(parentNearVertices);
 		childNearVertices = BendHelper.alignVertices(parentNearVertices, childNearVertices);
 
