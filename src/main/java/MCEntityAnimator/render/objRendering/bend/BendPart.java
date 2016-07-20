@@ -36,14 +36,14 @@ public class BendPart extends GroupObject
 			Vertex vB = bottomVertices[j];
 			Vertex vC = topVertices[i];
 			Face f = new Face();
-			f.vertices = new Vertex[]{vA, vB, vC};
+			f.vertices = new Vertex[]{vC, vB, vA};
 			faces.add(f);
 
 			Vertex vD = bottomVertices[i];
 			Vertex vE = topVertices[i];
 			Vertex vF = bottomVertices[j];
 			Face g = new Face();
-			g.vertices = new Vertex[]{vD, vE, vF};
+			g.vertices = new Vertex[]{vF, vE, vD};
 			faces.add(g);
 
 			Vertex faceNormal = inverted ? g.calculateFaceNormal() : f.calculateFaceNormal();
@@ -74,14 +74,14 @@ public class BendPart extends GroupObject
 			Vertex vB = bottomVertices[j];
 			Vertex vC = topVertices[i];
 			Face f = new Face();
-			f.vertices = new Vertex[]{vA, vB, vC};
+			f.vertices = new Vertex[]{vC, vB, vA};
 			faces.add(f);
 
 			Vertex vD = bottomVertices[i];
 			Vertex vE = topVertices[i];
 			Vertex vF = bottomVertices[j];
 			Face g = new Face();
-			g.vertices = new Vertex[]{vD, vE, vF};
+			g.vertices = new Vertex[]{vF, vE, vD};
 			faces.add(g);
 
 			Vertex faceNormal = inverted ? g.calculateFaceNormal() : f.calculateFaceNormal();

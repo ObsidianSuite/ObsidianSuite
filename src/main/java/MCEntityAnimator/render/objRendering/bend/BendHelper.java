@@ -74,7 +74,7 @@ public class BendHelper
 	 */
 	public static Vertex[] orderVerticesRelative(Vertex[] vertices)
 	{
-		Vertex[] orderedVertices = new Vertex[vertices.length];
+		Vertex[] relativeVertices = new Vertex[vertices.length];
 		
 		//Get starting vertex  - greatest x and z.
 		Vertex startingVertex = vertices[0];
@@ -83,20 +83,17 @@ public class BendHelper
 			if(vertices[a].x >= startingVertex.x && vertices[a].z >= startingVertex.z)
 				startingVertex = vertices[a];
 		}
-		orderedVertices[0] = startingVertex;
+		relativeVertices[0] = startingVertex;
 		
+		//Order all vertices on distance to starting vertex (obviously starting vertex will be orderedVertices[0]).
+		Vertex[] orderedVertices = orderVerticesOnDistance(vertices, startingVertex);
 		
-		for(int i = 0; i < 4; i++)
-		{
-			Vertex v = vertices[i];
-			if(v.x != startingVertex.x && v.z == startingVertex.z)
-				orderedVertices[1] = v;
-			else if(v.x != startingVertex.x && v.z != startingVertex.z)
-				orderedVertices[2] = v;
-			else if(v.x == startingVertex.x && v.z != startingVertex.z)
-				orderedVertices[3] = v;
-		}
-		return orderedVertices;
+		//1 = closest, 2 = furtherest away, 3 = second closest (1 and 3 can swap)
+		relativeVertices[1] = orderedVertices[1];
+		relativeVertices[2] = orderedVertices[3];
+		relativeVertices[3] = orderedVertices[2];
+		
+		return relativeVertices;
 	}
 	
 	/**
@@ -194,7 +191,8 @@ public class BendHelper
 	
 	public static String getVertexAsString(Vertex v)
 	{
-		return v.x + ", " + v.y + ", " + v.z;
+		String s = v != null ? v.x + ", " + v.y + ", " + v.z : "null";
+		return s;
 	}
 
 }
