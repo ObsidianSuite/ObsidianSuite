@@ -106,12 +106,13 @@ public class RenderObj extends RenderLiving
 			armLwR.postRender(modelObj.getEntityType());
 			GL11.glTranslatef(-0.125F, 0.2F, 0.2F);
 			
-			//Get prop rotation and translation
+			//Prop rotation and translation
 			float[] propRotation = Util.getPartFromName("prop_rot", modelObj.parts).getValues();
 			float[] propTranslation = Util.getPartFromName("prop_trans", modelObj.parts).getValues();
-
-			//Translation implementation.
 			GL11.glTranslatef(propTranslation[0], propTranslation[1], propTranslation[2]);	
+			GL11.glRotatef(propRotation[0]*180.0F, 1.0F, 0.0F, 0.0F);
+			GL11.glRotatef(propRotation[1]*180.0F, 0.0F, 1.0F, 0.0F);
+			GL11.glRotatef(propRotation[2]*180.0F, 0.0F, 0.0F, 1.0F);
 			
 			EnumAction enumaction = null;
 
@@ -160,12 +161,6 @@ public class RenderObj extends RenderLiving
 				GL11.glRotatef(-90.0F, 1.0F, 0.0F, 0.0F);
 				GL11.glRotatef(20.0F, 0.0F, 0.0F, 1.0F);
 			}
-	
-			//Prop rotation.
-			GL11.glRotatef(propRotation[0]*180.0F, -1.0F, -0.5F, 1.0F);
-			GL11.glRotatef(propRotation[1]*180.0F, -0.1F, 1.0F, 0.2F);
-			GL11.glRotatef(propRotation[2]*180.0F, 1.0F, 0.0F, 1.0F);
-
 			
 			float f3;
 			int k;
