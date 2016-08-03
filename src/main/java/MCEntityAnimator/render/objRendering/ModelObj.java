@@ -23,8 +23,11 @@ import MCEntityAnimator.render.objRendering.bend.Bend;
 import MCEntityAnimator.render.objRendering.parts.Part;
 import MCEntityAnimator.render.objRendering.parts.PartEntityPos;
 import MCEntityAnimator.render.objRendering.parts.PartObj;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelRenderer;
+import net.minecraft.client.renderer.OpenGlHelper;
+import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.ModelFormatException;
@@ -60,8 +63,8 @@ public class ModelObj extends ModelBase
 		entityType = par0Str;
 		File modelFile = new File(MCEA_Main.animationPath + "/data/shared/" + entityType + "/" + entityType + ".obj");
 		pxyFile = new File(MCEA_Main.animationPath + "/data/shared/" + entityType + "/" + entityType + ".pxy");
-		
-		
+
+
 		File textureFile = new File(MCEA_Main.animationPath + "/data/shared/" + entityType + "/" + entityType + ".png");
 		renderWithTexture = textureFile.exists();
 		txtRL = new ResourceLocation("animation:data/shared/" + entityType + "/" + entityType + ".png");
@@ -273,11 +276,14 @@ public class ModelObj extends ModelBase
 	/**
 	 * Add a part to be highlighted
 	 */
-	public void hightlightPart(PartObj part)
+	public void hightlightPart(PartObj part, boolean main)
 	{
 		if(part != null)
 		{
-			this.hightlightedParts.add(part);
+			if(main)
+				mainHighlight = part;
+			else
+				hightlightedParts.add(part);
 		}
 	}
 
@@ -311,6 +317,9 @@ public class ModelObj extends ModelBase
 		GL11.glRotatef(initRotFix, 1.0F, 0.0F, 0.0F);
 		GL11.glTranslatef(0.0F, offsetFixY, 0.0F);
 
+		for(Bend bend : this.bends)
+			bend.render();
+
 		for(Part p : this.parts) 
 		{
 			if(p instanceof PartObj)
@@ -325,9 +334,20 @@ public class ModelObj extends ModelBase
 				p.move(entity);
 		}
 
-		for(Bend bend : this.bends)
+		if(mainHighlight != null)
 		{
-			bend.render();
+			for(Part p : this.parts)
+			{
+				if(p instanceof PartObj)
+				{
+					PartObj part = (PartObj) p;
+					if(isMainHighlight(part))
+					{
+						part.renderRotationAxis();
+						break;
+					}
+				}
+			}
 		}
 
 		GL11.glPopMatrix();

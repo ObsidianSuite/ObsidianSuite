@@ -7,8 +7,11 @@ import org.lwjgl.opengl.GL11;
 
 import MCEntityAnimator.animation.AnimationData;
 import MCEntityAnimator.animation.AnimationParenting;
+import MCEntityAnimator.render.objRendering.RenderObj;
 import MCEntityAnimator.render.objRendering.bend.UVMap.PartUVMap;
 import MCEntityAnimator.render.objRendering.parts.PartObj;
+import net.minecraft.client.Minecraft;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.obj.Vertex;
 
 public class Bend 
@@ -211,14 +214,12 @@ public class Bend
 
 			//Generate part bottom.
 			Vertex[] bendPartBottom = generatePartBottom(curves,(float)(i+1)/bendSplit);
-
-			boolean highlight = i < bendSplit/2 ? parent.modelObj.isPartHighlighted(parent) : child.modelObj.isPartHighlighted(child);
 			
 			//Update bend, swap top and bottom vertices if part is inverted.
 			if(inverted)
-				bendParts.get(i).updateVertices(bendPartBottom, bendPartTop, highlight);
+				bendParts.get(i).updateVertices(bendPartBottom, bendPartTop);
 			else
-				bendParts.get(i).updateVertices(bendPartTop, bendPartBottom, highlight);
+				bendParts.get(i).updateVertices(bendPartTop, bendPartBottom);
 			//Top of next part is bottom of this part.
 			bendPartTop = bendPartBottom;
 		}
@@ -241,7 +242,13 @@ public class Bend
 
 		//Actually render all the bend parts.
 		for(int i = 0; i < bendSplit; i++)
+		{
+			ResourceLocation texture = parent.modelObj.getTexture();
+			if(i < bendSplit/2 ? parent.modelObj.isPartHighlighted(parent) : child.modelObj.isPartHighlighted(child))
+				texture = RenderObj.defaultTexture;
+			Minecraft.getMinecraft().getTextureManager().bindTexture(texture);	
 			bendParts.get(i).render();
+		}
 
 		//Render curve (debug only).
 		for(BezierCurve c : curves)

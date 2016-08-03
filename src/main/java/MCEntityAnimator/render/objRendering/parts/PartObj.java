@@ -1,7 +1,5 @@
 package MCEntityAnimator.render.objRendering.parts;
 
-import java.math.RoundingMode;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -12,15 +10,18 @@ import org.lwjgl.opengl.GL11;
 import MCEntityAnimator.animation.AnimationData;
 import MCEntityAnimator.animation.AnimationParenting;
 import MCEntityAnimator.render.objRendering.ModelObj;
-import MCEntityAnimator.render.objRendering.bend.BendHelper;
+import MCEntityAnimator.render.objRendering.RenderObj;
 import MCEntityAnimator.render.objRendering.bend.Bend;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.OpenGlHelper;
+import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.entity.Entity;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.obj.Face;
 import net.minecraftforge.client.model.obj.GroupObject;
 import net.minecraftforge.client.model.obj.TextureCoordinate;
-import net.minecraftforge.client.model.obj.Vertex;
 
 /**
  * One partObj for each 'part' of the model.
@@ -165,15 +166,20 @@ public class PartObj extends Part
 				f.textureCoordinates = coordsNormal;	
 		}
 	}
-
+	
 	public void render(Entity entity, boolean highlight, boolean main) 
 	{
 		updateTextureCoordinates(highlight, main);
-
+		
 		GL11.glPushMatrix();
+		ResourceLocation texture = modelObj.getTexture();
+		if(highlight)
+			texture = RenderObj.defaultTexture;
+		Minecraft.getMinecraft().getTextureManager().bindTexture(texture);		
 		move(entity);
 		if(visible)
 			groupObj.render();
+		
 		GL11.glPopMatrix();
 	}
 
@@ -274,5 +280,67 @@ public class PartObj extends Part
 		}
 	}
 
+	public void renderRotationAxis()
+	{
+		GL11.glPushMatrix();
+		
+		//Generate a list of parents: {topParent, topParent - 1,..., parent, this}/
+		AnimationParenting anipar = AnimationData.getAnipar(modelObj.getEntityType());
+		List<PartObj> parts = new ArrayList<PartObj>();
+		PartObj child = this;
+		PartObj parent;
+		parts.add(0, child);
+		while((parent = anipar.getParent(child)) != null)
+		{
+			parts.add(0, parent);
+			child = parent;
+		}
+		
+		
+		float[] currentTrans = new float[]{0.0F, 0.0F, 0.0F};		
+		for(PartObj p : parts)
+		{
+			GL11.glTranslatef(-p.getRotationPoint(0) + currentTrans[0], -p.getRotationPoint(1) + currentTrans[1], -p.getRotationPoint(2) + currentTrans[2]);
+			currentTrans = p.getRotationPoint();
+			GL11.glRotated((p.valueX - p.originalValues[0])/Math.PI*180.0F, 1.0F, 0.0F, 0.0F);
+			GL11.glRotated((p.valueY - p.originalValues[1])/Math.PI*180.0F, 0.0F, 1.0F, 0.0F);
+			GL11.glRotated((p.valueZ - p.originalValues[2])/Math.PI*180.0F, 0.0F, 0.0F, 1.0F);
+		}
+		
+		
+		
+		GL11.glEnable(GL11.GL_BLEND);
+		GL11.glDisable(GL11.GL_DEPTH_TEST);
+        OpenGlHelper.glBlendFunc(770, 771, 1, 0);
+        GL11.glLineWidth(2.0F);
+        GL11.glDisable(GL11.GL_TEXTURE_2D);
+        GL11.glDepthMask(false);
+		
+		Tessellator tessellator = Tessellator.instance;
+		
+		tessellator.startDrawing(1);
+		tessellator.setColorOpaque_I(0xFF0000);
+		tessellator.addVertex(0,0,0);
+		tessellator.addVertex(1,0,0);
+		tessellator.draw();
+
+		tessellator.startDrawing(1);
+		tessellator.setColorOpaque_I(0x00FF00);
+		tessellator.addVertex(0,0,0);
+		tessellator.addVertex(0,1,0);
+		tessellator.draw();
+		
+		tessellator.startDrawing(1);
+		tessellator.setColorOpaque_I(0x0000FF);
+		tessellator.addVertex(0,0,0);
+		tessellator.addVertex(0,0,1);
+		tessellator.draw();
+
+        GL11.glDepthMask(true);
+		GL11.glEnable(GL11.GL_DEPTH_TEST);
+        GL11.glEnable(GL11.GL_TEXTURE_2D);
+        GL11.glDisable(GL11.GL_BLEND);
+		GL11.glPopMatrix();
+	}
 
 }

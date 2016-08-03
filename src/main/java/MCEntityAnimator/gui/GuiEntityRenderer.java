@@ -113,14 +113,14 @@ public class GuiEntityRenderer extends GuiBlack
 		{
 			Part currentPart = Util.getPartFromName(currentPartName, entityModel.parts);
 			if(currentPart instanceof PartObj)
-				entityModel.hightlightPart((PartObj) currentPart);
+				entityModel.hightlightPart((PartObj) currentPart, true);
 		}
 
 		if(additionalHighlightPartName != null && !additionalHighlightPartName.equals(""))
 		{
 			Part additionalPart = Util.getPartFromName(additionalHighlightPartName, entityModel.parts);
 			if(additionalPart instanceof PartObj)
-				entityModel.hightlightPart((PartObj) additionalPart);
+				entityModel.hightlightPart((PartObj) additionalPart, false);
 		}
 	}
 
