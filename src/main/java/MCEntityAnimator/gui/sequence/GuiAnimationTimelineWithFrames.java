@@ -51,6 +51,7 @@ import javax.swing.event.ChangeListener;
 import javax.swing.plaf.basic.BasicComboBoxRenderer;
 
 import org.lwjgl.input.Keyboard;
+import org.lwjgl.opengl.Display;
 
 import MCEntityAnimator.Util;
 import MCEntityAnimator.animation.AnimationData;
@@ -618,7 +619,7 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 			setContentPane(mainPanel);
 			pack();
 			setAlwaysOnTop(true);
-			setLocation(50, 50);
+			setLocation(Display.getX() + 50, Display.getY() + 50);
 			setResizable(false);
 			setVisible(true);
 		}
@@ -845,7 +846,7 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 			setContentPane(tabbedPane);
 			pack();
 			setAlwaysOnTop(true);
-			setLocation(50, 200);
+			setLocation(Display.getX() + 50, Display.getY() + 200);
 			setVisible(true);
 			setResizable(false);
 		}
@@ -1074,7 +1075,8 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 			setContentPane(scrollPane);
 			pack();
 			setAlwaysOnTop(true);
-			setLocation(50, 520);
+			setLocation(Display.getX() + 50, Display.getY() + 520);
+
 			setVisible(true);
 			setResizable(false);
 		}

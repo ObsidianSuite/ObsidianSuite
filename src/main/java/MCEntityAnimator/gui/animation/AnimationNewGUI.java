@@ -16,6 +16,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import org.lwjgl.opengl.Display;
+
 import MCEntityAnimator.animation.AnimationData;
 import MCEntityAnimator.animation.AnimationSequence;
 import MCEntityAnimator.distribution.DataHandler;
@@ -113,6 +115,7 @@ public class AnimationNewGUI extends JFrame
 		setResizable(false);
 		setAlwaysOnTop(true);
 		setLocationRelativeTo(null);
+		setLocation(Display.getX() + Display.getWidth()/2 - this.getWidth()/2, Display.getY() + Display.getHeight()/2 - this.getHeight()/2);
 
 	}
 	
