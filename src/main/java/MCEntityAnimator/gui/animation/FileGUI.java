@@ -39,6 +39,8 @@ import javax.swing.text.DefaultCaret;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
+import org.lwjgl.opengl.Display;
+
 import MCEntityAnimator.MCEA_Main;
 import MCEntityAnimator.animation.AnimationData;
 import MCEntityAnimator.animation.AnimationSequence;
@@ -263,7 +265,7 @@ public class FileGUI extends JFrame
 		setVisible(true);
 		setResizable(false);
 		setAlwaysOnTop(true);
-		setLocationRelativeTo(null);
+		setLocation(Display.getX() + Display.getWidth()/2 - this.getWidth()/2, Display.getY() + Display.getHeight()/2 - this.getHeight()/2);
 
 		outputLog.setText(outputText);
 
