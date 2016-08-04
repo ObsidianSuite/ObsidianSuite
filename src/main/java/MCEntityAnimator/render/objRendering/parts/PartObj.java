@@ -1,9 +1,18 @@
 package MCEntityAnimator.render.objRendering.parts;
 
+import java.awt.GridLayout;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.FloatBuffer;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 
 import org.lwjgl.opengl.GL11;
 
@@ -19,6 +28,7 @@ import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Vec3;
 import net.minecraftforge.client.model.obj.Face;
 import net.minecraftforge.client.model.obj.GroupObject;
 import net.minecraftforge.client.model.obj.TextureCoordinate;
@@ -30,6 +40,8 @@ import net.minecraftforge.client.model.obj.TextureCoordinate;
 public class PartObj extends Part
 {
 	private float[] rotationPoint;
+	private float axisRotX, axisRotY, axisRotZ;
+	private float prevAxisRotX, prevAxisRotY, prevAxisRotZ;
 	private boolean showModel;
 
 	//XXX
@@ -39,6 +51,7 @@ public class PartObj extends Part
 	private Bend bend = null;
 	public GroupObject groupObj;
 	private String displayName;
+	private FloatBuffer rotationMatrix;
 
 	public PartObj(ModelObj modelObject, GroupObject groupObj) 
 	{
@@ -48,6 +61,13 @@ public class PartObj extends Part
 		defaultTextureCoords = new HashMap<Face, TextureCoordinate[]>();
 		setDefaultTCsToCurrentTCs();
 		visible = true;
+		setupRotationMatrix();
+		axisRotX = originalValues[0];
+		axisRotY = originalValues[1];
+		axisRotZ = originalValues[2];
+		prevAxisRotX = axisRotX;
+		prevAxisRotY = axisRotY;
+		prevAxisRotZ = axisRotZ;
 	}
 
 	//------------------------------------------
@@ -112,6 +132,29 @@ public class PartObj extends Part
 		bend = null;
 	}
 
+	private void setupRotationMatrix()
+	{
+		float[] rotationMatrixF = new float[]{1,0,0,0,
+				0,1,0,0,
+				0,0,1,0,
+				0,0,0,1};
+		ByteBuffer vbb = ByteBuffer.allocateDirect(rotationMatrixF.length*4);
+		vbb.order(ByteOrder.nativeOrder());
+		rotationMatrix = vbb.asFloatBuffer();
+		rotationMatrix.put(rotationMatrixF);
+		rotationMatrix.position(0);
+	}
+	
+	public void setAxisRotation(int axis, float rot)
+	{
+		switch(axis)
+		{
+		case 0: axisRotX = rot; break;
+		case 1: axisRotY = rot; break;
+		case 2: axisRotZ = rot; break;
+		}
+	}
+
 	//------------------------------------------
 	//         Rendering and Rotating
 	//------------------------------------------
@@ -166,11 +209,11 @@ public class PartObj extends Part
 				f.textureCoordinates = coordsNormal;	
 		}
 	}
-	
+
 	public void render(Entity entity, boolean highlight, boolean main) 
 	{
 		updateTextureCoordinates(highlight, main);
-		
+
 		GL11.glPushMatrix();
 		ResourceLocation texture = modelObj.getTexture();
 		if(highlight)
@@ -179,7 +222,6 @@ public class PartObj extends Part
 		move(entity);
 		if(visible)
 			groupObj.render();
-		
 		GL11.glPopMatrix();
 	}
 
@@ -245,28 +287,15 @@ public class PartObj extends Part
 			//Translate, compensating for the previous part translation.
 			GL11.glTranslatef(trans[0] - prevtrans[0], trans[1] - prevtrans[1], trans[2] - prevtrans[2]);
 			//Rotate
-			if (p.valueX != 0.0F)
-				GL11.glRotatef(p.valueX * (180F / (float)Math.PI), 1.0F, 0.0F, 0.0F);
-			if (p.valueY != 0.0F)
-				GL11.glRotatef(-p.valueY * (180F / (float)Math.PI), 0.0F, 1.0F, 0.0F);            
-			if (p.valueZ != 0.0F)
-				GL11.glRotatef(-p.valueZ * (180F / (float)Math.PI), 0.0F, 0.0F, 1.0F);   
+			p.applyRotation(); 
 		}
 	}
-
 
 	@Override
 	public void move(Entity entity)
 	{
-		//Translate part to centre
 		GL11.glTranslatef(-rotationPoint[0], -rotationPoint[1], -rotationPoint[2]);
-
-		//Rotate
-		GL11.glRotated((valueX - originalValues[0])/Math.PI*180.0F, 1.0F, 0.0F, 0.0F);
-		GL11.glRotated((valueY - originalValues[1])/Math.PI*180.0F, 0.0F, 1.0F, 0.0F);
-		GL11.glRotated((valueZ - originalValues[2])/Math.PI*180.0F, 0.0F, 0.0F, 1.0F);
-
-		//Translate to original position
+		applyRotation();
 		GL11.glTranslatef(rotationPoint[0], rotationPoint[1], rotationPoint[2]);    
 
 		//Do for children - rotation for parent compensated for!
@@ -280,66 +309,145 @@ public class PartObj extends Part
 		}
 	}
 
+	public void applyRotation()
+	{
+		updateRotationMatrix();
+
+		double absY = Math.asin(rotationMatrix.get(8));
+		double absX = Math.asin(-rotationMatrix.get(9)/Math.cos(absY));
+		double absZ = Math.asin(-rotationMatrix.get(4)/Math.cos(absY));
+
+		double absXA = Math.PI - absX;
+		double absYA = Math.PI - absY;
+		double absZA = Math.PI - absZ;
+
+
+		boolean exit = false;
+		double x=0.0F,y=0.0F,z=0.0F;
+		for(int i = 0; i < 2; i++)
+		{
+			x = i == 0 ? absX : absXA;
+			for(int j = 0; j < 2; j++)
+			{
+				y = j == 0 ? absY : absYA;
+				for(int k = 0; k < 2; k++)
+				{
+					z = k == 0 ? absZ : absZA;
+					boolean pass = true;
+					//System.out.println("Try new");
+					for(int l = 0; l < 16; l++)
+					{
+						if(l < 11 && l != 3 && l != 7)
+						{
+							double t = 0;
+							switch(l)
+							{
+							case 0: t = Math.cos(y)*Math.cos(z); break;
+							case 1: t = Math.cos(x)*Math.sin(z)+Math.sin(x)*Math.sin(y)*Math.cos(z); break;
+							case 2: t = Math.sin(x)*Math.sin(z)-Math.cos(x)*Math.sin(y)*Math.cos(z); break;
+							case 4: t = -Math.cos(y)*Math.sin(z); break;
+							case 5: t = Math.cos(x)*Math.cos(z)-Math.sin(x)*Math.sin(y)*Math.sin(z); break;
+							case 6: t = Math.sin(x)*Math.cos(z)+Math.cos(x)*Math.sin(y)*Math.sin(z); break;
+							case 8: t = Math.sin(y); break;
+							case 9: t = -Math.cos(y)*Math.sin(x); break;
+							case 10: t = Math.cos(y)*Math.cos(x); break;
+							}
+							if(Math.abs(t - rotationMatrix.get(l)) > 0.1)
+							{
+								pass = false;
+								break;
+							}
+
+						}
+					}
+					if(pass)
+					{
+						exit = true;
+						break;
+					}
+				}
+				if(exit)
+					break;
+			}
+			if(exit)
+				break;
+		}
+		if(!exit)
+		{
+			System.out.println("No solution found..");
+			System.out.println("   " + valueX + "," + valueY + "," + valueZ);
+		}
+
+		valueX = (float) x;
+		valueY = (float) y;
+		valueZ = (float) z;
+		
+		GL11.glRotatef((float) (valueX/Math.PI*180.0F), 1.0F, 0.0F, 0.0F);
+		GL11.glRotatef((float) (valueY/Math.PI*180.0F), 0.0F, 1.0F, 0.0F);
+		GL11.glRotatef((float) (valueZ/Math.PI*180.0F), 0.0F, 0.0F, 1.0F);
+	}
+
+	public void updateRotationMatrix()
+	{
+		float rotX = (float) ((axisRotX - prevAxisRotX)/Math.PI*180.0F);
+		float rotY = (float) ((axisRotY - prevAxisRotY)/Math.PI*180.0F);
+		float rotZ = (float) ((axisRotZ - prevAxisRotZ)/Math.PI*180.0F);
+
+		GL11.glPushMatrix();
+		GL11.glLoadIdentity();
+		GL11.glMultMatrix(rotationMatrix);
+		GL11.glRotated(rotX, 1.0F, 0.0F, 0.0F);
+		GL11.glRotated(rotY, 0.0F, 1.0F, 0.0F);
+		GL11.glRotated(rotZ, 0.0F, 0.0F, 1.0F);
+		GL11.glGetFloat(GL11.GL_MODELVIEW_MATRIX, rotationMatrix);
+		GL11.glPopMatrix();
+
+		prevAxisRotX = axisRotX;
+		prevAxisRotY = axisRotY;
+		prevAxisRotZ = axisRotZ;
+
+	}
+
 	public void renderRotationAxis()
 	{
+		Vec3 origin = Vec3.createVectorHelper(0.0F, 0.0F, 0.0F);
+
+		Vec3 xVec = Vec3.createVectorHelper(1.0F, 0.0F, 0.0F);
+		Vec3 yVec = Vec3.createVectorHelper(0.0F, 1.0F, 0.0F);
+		Vec3 zVec = Vec3.createVectorHelper(0.0F, 0.0F, 1.0F);
+
 		GL11.glPushMatrix();
-		
-		//Generate a list of parents: {topParent, topParent - 1,..., parent, this}/
-		AnimationParenting anipar = AnimationData.getAnipar(modelObj.getEntityType());
-		List<PartObj> parts = new ArrayList<PartObj>();
-		PartObj child = this;
-		PartObj parent;
-		parts.add(0, child);
-		while((parent = anipar.getParent(child)) != null)
-		{
-			parts.add(0, parent);
-			child = parent;
-		}
-		
-		
-		float[] currentTrans = new float[]{0.0F, 0.0F, 0.0F};		
-		for(PartObj p : parts)
-		{
-			GL11.glTranslatef(-p.getRotationPoint(0) + currentTrans[0], -p.getRotationPoint(1) + currentTrans[1], -p.getRotationPoint(2) + currentTrans[2]);
-			currentTrans = p.getRotationPoint();
-			GL11.glRotated((p.valueX - p.originalValues[0])/Math.PI*180.0F, 1.0F, 0.0F, 0.0F);
-			GL11.glRotated((p.valueY - p.originalValues[1])/Math.PI*180.0F, 0.0F, 1.0F, 0.0F);
-			GL11.glRotated((p.valueZ - p.originalValues[2])/Math.PI*180.0F, 0.0F, 0.0F, 1.0F);
-		}
-		
-		
-		
+		GL11.glTranslatef(-rotationPoint[0], -rotationPoint[1], -rotationPoint[2]);
+		GL11.glMultMatrix(rotationMatrix);
+		drawLine(origin, xVec, 0xFF0000);
+		drawLine(origin, yVec, 0x00FF00);
+		drawLine(origin, zVec, 0x0000FF);
+		GL11.glPopMatrix();
+	}
+
+	//XXX
+	private void drawLine(Vec3 p1, Vec3 p2, int color)
+	{
+		GL11.glPushMatrix();
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
-        OpenGlHelper.glBlendFunc(770, 771, 1, 0);
-        GL11.glLineWidth(2.0F);
-        GL11.glDisable(GL11.GL_TEXTURE_2D);
-        GL11.glDepthMask(false);
-		
+		OpenGlHelper.glBlendFunc(770, 771, 1, 0);
+		GL11.glLineWidth(2.0F);
+		GL11.glDisable(GL11.GL_TEXTURE_2D);
+		GL11.glDepthMask(false);
+
 		Tessellator tessellator = Tessellator.instance;
-		
-		tessellator.startDrawing(1);
-		tessellator.setColorOpaque_I(0xFF0000);
-		tessellator.addVertex(0,0,0);
-		tessellator.addVertex(1,0,0);
-		tessellator.draw();
 
 		tessellator.startDrawing(1);
-		tessellator.setColorOpaque_I(0x00FF00);
-		tessellator.addVertex(0,0,0);
-		tessellator.addVertex(0,1,0);
-		tessellator.draw();
-		
-		tessellator.startDrawing(1);
-		tessellator.setColorOpaque_I(0x0000FF);
-		tessellator.addVertex(0,0,0);
-		tessellator.addVertex(0,0,1);
+		tessellator.setColorOpaque_I(color);
+		tessellator.addVertex(p1.xCoord,p1.yCoord,p1.zCoord);
+		tessellator.addVertex(p2.xCoord,p2.yCoord,p2.zCoord);
 		tessellator.draw();
 
-        GL11.glDepthMask(true);
+		GL11.glDepthMask(true);
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
-        GL11.glEnable(GL11.GL_TEXTURE_2D);
-        GL11.glDisable(GL11.GL_BLEND);
+		GL11.glEnable(GL11.GL_TEXTURE_2D);
+		GL11.glDisable(GL11.GL_BLEND);
 		GL11.glPopMatrix();
 	}
 

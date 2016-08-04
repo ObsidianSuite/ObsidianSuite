@@ -317,9 +317,6 @@ public class ModelObj extends ModelBase
 		GL11.glRotatef(initRotFix, 1.0F, 0.0F, 0.0F);
 		GL11.glTranslatef(0.0F, offsetFixY, 0.0F);
 
-		for(Bend bend : this.bends)
-			bend.render();
-
 		for(Part p : this.parts) 
 		{
 			if(p instanceof PartObj)
@@ -333,6 +330,9 @@ public class ModelObj extends ModelBase
 			else
 				p.move(entity);
 		}
+		
+		for(Bend bend : this.bends)
+			bend.render();
 
 		if(mainHighlight != null)
 		{

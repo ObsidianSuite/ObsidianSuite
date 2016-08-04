@@ -262,8 +262,12 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 		Part part = Util.getPartFromName(currentPartName, entityModel.parts);
 		//Negative for some reason - makes more sense when rotating..
 		if(part instanceof PartObj)
+		{
 			value = (float) (-value*Math.PI);
-		part.setValue(dim, (float) value);
+			((PartObj) part).setAxisRotation(dim, (float) value);
+		}
+		else
+			part.setValue(dim, (float) value);
 	}
 
 	private void addKeyframe()
