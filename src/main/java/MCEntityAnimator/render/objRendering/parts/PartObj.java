@@ -11,12 +11,14 @@ import org.lwjgl.opengl.GL11;
 
 import MCEntityAnimator.animation.AnimationData;
 import MCEntityAnimator.animation.AnimationParenting;
+import MCEntityAnimator.render.MathHelper;
 import MCEntityAnimator.render.objRendering.ModelObj;
 import MCEntityAnimator.render.objRendering.bend.BendHelper;
 import MCEntityAnimator.render.objRendering.bend.Bend;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.entity.Entity;
+import net.minecraft.util.Vec3;
 import net.minecraftforge.client.model.obj.Face;
 import net.minecraftforge.client.model.obj.GroupObject;
 import net.minecraftforge.client.model.obj.TextureCoordinate;
@@ -109,6 +111,20 @@ public class PartObj extends Part
 		modelObj.removeBend(bend);
 		bend.remove();
 		bend = null;
+	}
+
+	//----------------------------------------------------------------
+	// 							 Selection
+	//----------------------------------------------------------------
+
+	public boolean testRay(Vec3 p0, Vec3 p1)
+	{
+		for(Face f : groupObj.faces)
+		{
+			if(MathHelper.rayIntersectsFace(p0, p1, f))
+				return true;
+		}
+		return false;	
 	}
 
 	//------------------------------------------

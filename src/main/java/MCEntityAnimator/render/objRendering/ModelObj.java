@@ -27,7 +27,9 @@ import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Vec3;
 import net.minecraftforge.client.model.ModelFormatException;
+import net.minecraftforge.client.model.obj.Face;
 import net.minecraftforge.client.model.obj.GroupObject;
 import net.minecraftforge.client.model.obj.WavefrontObject;
 
@@ -265,7 +267,26 @@ public class ModelObj extends ModelBase
 	{				
 		super.setRotationAngles(f, f1, f2, f3, f4, f5, entity);
 	}
-
+	
+	//----------------------------------------------------------------
+	// 							 Selection
+	//----------------------------------------------------------------
+	
+	public List<PartObj> testRay(Vec3 p0, Vec3 p1)
+	{
+		List<PartObj> intersectedParts = new ArrayList<PartObj>();
+		for(Part part : parts)
+		{
+			if(part instanceof PartObj)
+			{
+				PartObj p = (PartObj) part;
+				if(p.testRay(p0,p1))
+					intersectedParts.add(p);
+			}
+		}
+		return intersectedParts;
+	}
+	
 	//----------------------------------------------------------------
 	// 							Highlighting
 	//----------------------------------------------------------------
