@@ -11,13 +11,13 @@ import MCEntityAnimator.animation.AnimationData;
 import MCEntityAnimator.animation.AnimationParenting;
 import MCEntityAnimator.render.MathHelper;
 import MCEntityAnimator.render.objRendering.ModelObj;
+import MCEntityAnimator.render.objRendering.RayTrace;
 import MCEntityAnimator.render.objRendering.bend.Bend;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.Vec3;
 import net.minecraftforge.client.model.obj.Face;
 import net.minecraftforge.client.model.obj.GroupObject;
 import net.minecraftforge.client.model.obj.TextureCoordinate;
@@ -115,21 +115,41 @@ public class PartObj extends Part
 	// 							 Selection
 	//----------------------------------------------------------------
 
+	public void moveForAllParts()
+	{
+		AnimationParenting anipar = AnimationData.getAnipar(modelObj.getEntityType());
+		List<PartObj> parts = new ArrayList<PartObj>();
+		PartObj child = this;
+		PartObj parent;
+		parts.add(0, child);
+		while((parent = anipar.getParent(child)) != null)
+		{
+			parts.add(0, parent);
+			child = parent;
+		}
+		
+		for(PartObj p : parts)
+			p.move();
+	}
+	
 	/**
 	 * Test to see if a ray insects with this part.
 	 * @param p0 - Point on ray.
 	 * @param p1 - Another point on ray.
 	 * @return - Minimum distance from p0 to part, null if no intersect exists.
 	 */
-	public Double testRay(Vec3 p0, Vec3 p1)
-	{
+	public Double testRay()
+	{		
+		GL11.glPushMatrix();
+		moveForAllParts();
 		Double min = null;
 		for(Face f : groupObj.faces)
 		{
-			Double d = MathHelper.rayIntersectsFace(p0, p1, f);
+			Double d = MathHelper.rayIntersectsFace(RayTrace.getRayTrace(), f);
 			if(d != null && (min == null || d < min))
 				min = d;
 		}
+		GL11.glPopMatrix();
 		return min;	
 	}
 
@@ -205,14 +225,20 @@ public class PartObj extends Part
 		}
 	}
 
-	public void render(Entity entity) 
+	public void render() 
 	{
-
 		GL11.glPushMatrix();
-		move(entity);
+		move();
 		updateTextureCoordinates();
 		if(visible)
 			groupObj.render();
+		//Do for children - rotation for parent compensated for!
+		List<PartObj> children = AnimationData.getAnipar(modelObj.getEntityType()).getChildren(this);
+		if(children != null)
+		{
+			for(PartObj child : children)
+				child.render();  
+		}
 		GL11.glPopMatrix();
 		Minecraft.getMinecraft().getTextureManager().bindTexture(modelObj.getTexture());		
 	}
@@ -223,10 +249,10 @@ public class PartObj extends Part
 	 * @param entityName - Name of the model. 
 	 */
 	@SideOnly(Side.CLIENT)
-	public void postRender(String entityName)
+	public void postRender()
 	{
 		//Generate a list of parents: {topParent, topParent - 1,..., parent, this}/
-		AnimationParenting anipar = AnimationData.getAnipar(entityName);
+		AnimationParenting anipar = AnimationData.getAnipar(modelObj.getEntityType());
 		List<PartObj> parts = new ArrayList<PartObj>();
 		PartObj child = this;
 		PartObj parent;
@@ -289,8 +315,7 @@ public class PartObj extends Part
 	}
 
 
-	@Override
-	public void move(Entity entity)
+	public void move()
 	{
 		//Translate part to centre
 		GL11.glTranslatef(-rotationPoint[0], -rotationPoint[1], -rotationPoint[2]);
@@ -302,14 +327,6 @@ public class PartObj extends Part
 
 		//Translate to original position
 		GL11.glTranslatef(rotationPoint[0], rotationPoint[1], rotationPoint[2]);    
-
-		//Do for children - rotation for parent compensated for!
-		List<PartObj> children = AnimationData.getAnipar(modelObj.getEntityType()).getChildren(this);
-		if(children != null)
-		{
-			for(PartObj child : children)
-				child.render(entity);  
-		}
 	}
 
 

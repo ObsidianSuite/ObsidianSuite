@@ -85,8 +85,4 @@ public class Part
 		setValues(originalValues);
 	}
 
-	public void move(Entity entity)
-	{
-		
-	}
 }

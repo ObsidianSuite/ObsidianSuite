@@ -275,7 +275,7 @@ public class ModelObj extends ModelBase
 	// 							 Selection
 	//----------------------------------------------------------------
 	
-	public PartObj testRay(Vec3 p0, Vec3 p1)
+	public PartObj testRay()
 	{
 		PartObj closestPart = null;
 		Double min = null;
@@ -284,7 +284,7 @@ public class ModelObj extends ModelBase
 			if(part instanceof PartObj)
 			{
 				PartObj p = (PartObj) part;
-				Double d = p.testRay(p0, p1);
+				Double d = p.testRay();
 				if(d != null && (min == null || d < min))
 				{
 					closestPart = p;
@@ -294,13 +294,13 @@ public class ModelObj extends ModelBase
 		}
 		for(Bend bend : bends)
 		{
-			Double d = bend.testRayChild(p0, p1);
+			Double d = bend.testRayChild();
 			if(d != null && (min == null || d < min))
 			{
 				closestPart = bend.child;
 				min = d;
 			}
-			Double d2 = bend.testRayParent(p0, p1);
+			Double d2 = bend.testRayParent();
 			if(d2 != null && (min == null || d2 < min))
 			{
 				closestPart = bend.parent;
@@ -368,10 +368,10 @@ public class ModelObj extends ModelBase
 			{
 				PartObj part = (PartObj) p;
 				if(!parenting.hasParent(part))
-					part.render(entity);
+					part.render();
 			}
-			else
-				p.move(entity);
+			else if(p instanceof PartEntityPos)
+				((PartEntityPos) p).move(entity);
 		}
 
 		for(Bend bend : this.bends)
@@ -380,8 +380,6 @@ public class ModelObj extends ModelBase
 		}
 
 		GL11.glPopMatrix();
-
-		//TODO rendering with different textures - for highlighting parts but also for rendering with actual textures.
 	}
 
 	//----------------------------------------------------------------

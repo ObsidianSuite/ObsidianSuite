@@ -14,7 +14,6 @@ public class PartEntityPos extends Part
 		super(mObj, "entitypos");
 	}
 
-	@Override
 	public void move(Entity entity) 
 	{
 		entity.posX = valueX;
