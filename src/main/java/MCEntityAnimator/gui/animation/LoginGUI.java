@@ -20,6 +20,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 
+import org.lwjgl.opengl.Display;
+
 import MCEntityAnimator.distribution.SaveLoadHandler;
 import MCEntityAnimator.distribution.ServerAccess;
 
@@ -110,7 +112,7 @@ public class LoginGUI extends JFrame
 		setResizable(false);
 		setVisible(true);
 		setAlwaysOnTop(true);
-		setLocationRelativeTo(null);
+		setLocation(Display.getX() + Display.getWidth()/2 - this.getWidth()/2, Display.getY() + Display.getHeight()/2 - this.getHeight()/2);
 
 	}
 
