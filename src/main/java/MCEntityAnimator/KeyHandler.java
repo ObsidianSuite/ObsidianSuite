@@ -15,10 +15,10 @@ import net.minecraft.client.settings.KeyBinding;
 public class KeyHandler
 {	
 	/** Key descriptions; use a language file to localize the description later */
-	private static final String[] keyNames = {"Animation Gui","Test GUI"};
+	private static final String[] keyNames = {"Animation Gui"};
 	
 	/** Default key values */
-	private static final int[] keyValues = {Keyboard.KEY_R,Keyboard.KEY_T};
+	private static final int[] keyValues = {Keyboard.KEY_R};
 	private final KeyBinding[] keys;
 	
 	public KeyHandler() 
@@ -44,10 +44,6 @@ public class KeyHandler
 				Minecraft.getMinecraft().displayGuiScreen(new GuiBlack());
 				new LoginGUI();
 			}
-		}
-		if (keys[1].isPressed()) 
-		{
-			Minecraft.getMinecraft().displayGuiScreen(new GuiEntityRenderer("player"));
 		}
 	}
 }
