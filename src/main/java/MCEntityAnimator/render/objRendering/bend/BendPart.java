@@ -3,7 +3,10 @@ package MCEntityAnimator.render.objRendering.bend;
 import java.util.ArrayList;
 import java.util.List;
 
+import MCEntityAnimator.render.objRendering.ModelObj;
 import MCEntityAnimator.render.objRendering.bend.UVMap.PartUVMap;
+import net.minecraft.client.Minecraft;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.obj.Face;
 import net.minecraftforge.client.model.obj.GroupObject;
 import net.minecraftforge.client.model.obj.TextureCoordinate;
@@ -62,7 +65,7 @@ public class BendPart extends GroupObject
 	 * Update the top and bottom vertices.
 	 * Also generates the faces represented by these vertices.
 	 */
-	public void updateVertices(Vertex[] topVertices, Vertex[] bottomVertices, boolean highlighted)
+	public void updateVertices(Vertex[] topVertices, Vertex[] bottomVertices)
 	{
 		this.faces.clear();
 
@@ -87,18 +90,39 @@ public class BendPart extends GroupObject
 			Vertex faceNormal = inverted ? g.calculateFaceNormal() : f.calculateFaceNormal();
 			f.faceNormal = faceNormal;
 			g.faceNormal = faceNormal;
-
-			if(highlighted)
-			{
-				TextureCoordinate cd = new TextureCoordinate(0.0F, 0.0F, 0.0F);
-				f.textureCoordinates = new TextureCoordinate[]{cd, cd, cd};
-				g.textureCoordinates = new TextureCoordinate[]{cd, cd, cd};
-			}
+		}
+	}
+	
+	/**
+	 * Change the texture coordinates and texture if the part is highlighted.
+	 */
+	public void updateTextureCoordinates(boolean mainHighlight, boolean otherHighlight, ModelObj modelObj)
+	{		
+		boolean useHighlightCoords = true;
+		ResourceLocation texture;
+		TextureCoordinate[] highlightCoords = new TextureCoordinate[]{
+				new TextureCoordinate(0.0F, 0.0F), 
+				new TextureCoordinate(0.5F, 0.0F), 
+				new TextureCoordinate(0.0F, 0.5F)};
+		if(mainHighlight)
+			texture = ModelObj.pinkResLoc;
+		else if(otherHighlight)
+			texture = ModelObj.whiteResLoc;
+		else
+		{
+			texture = modelObj.getTexture();
+			useHighlightCoords = false;
+		}
+			
+		Minecraft.getMinecraft().getTextureManager().bindTexture(texture);		
+		
+		for(int i = 0; i < 8; i++)
+		{
+			Face f = faces.get(i);
+			if(useHighlightCoords)
+				f.textureCoordinates = highlightCoords;
 			else
-			{
-				f.textureCoordinates = faceTextureCoords.get(i*2);
-				g.textureCoordinates = faceTextureCoords.get(i*2 + 1);
-			}
+				f.textureCoordinates = faceTextureCoords.get(i);
 		}
 	}
 

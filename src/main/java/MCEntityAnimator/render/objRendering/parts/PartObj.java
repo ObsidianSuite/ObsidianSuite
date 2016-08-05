@@ -12,10 +12,11 @@ import MCEntityAnimator.animation.AnimationParenting;
 import MCEntityAnimator.render.MathHelper;
 import MCEntityAnimator.render.objRendering.ModelObj;
 import MCEntityAnimator.render.objRendering.bend.Bend;
-import MCEntityAnimator.render.objRendering.bend.BendPart;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Vec3;
 import net.minecraftforge.client.model.obj.Face;
 import net.minecraftforge.client.model.obj.GroupObject;
@@ -164,38 +165,56 @@ public class PartObj extends Part
 		}
 	}
 
+	public void updateTextureCoordinates()
+	{	
+		updateTextureCoordinates(modelObj.isMainHighlight(this), modelObj.isPartHighlighted(this), true);
+	}
+	
 	/**
-	 * Change the texture coordinates if the part is highlighted or the main part.
-	 * TODO PartObj: Main highlight vs normal highlight.
-	 * XXX
+	 * Change the texture coordinates and texture if the part is highlighted.
 	 */
-	public void updateTextureCoordinates(boolean highlight, boolean main)
+	public void updateTextureCoordinates(boolean mainHighlight, boolean otherHighlight, boolean bindTexture)
 	{		
-		TextureCoordinate texCo1 = new TextureCoordinate(0.0F, 0.0F);
-		TextureCoordinate[] coordsHighlight = new TextureCoordinate[]{texCo1, texCo1, texCo1};
-		TextureCoordinate texCo2 = new TextureCoordinate(0.5F, 0.5F);
-		TextureCoordinate[] coordsNormal = new TextureCoordinate[]{texCo2, texCo2, texCo2};
+		boolean useHighlightCoords = true;
+		ResourceLocation texture;
+		TextureCoordinate[] highlightCoords = new TextureCoordinate[]{
+				new TextureCoordinate(0.0F, 0.0F), 
+				new TextureCoordinate(0.5F, 0.0F), 
+				new TextureCoordinate(0.0F, 0.5F)};
+		if(mainHighlight)
+			texture = ModelObj.pinkResLoc;
+		else if(otherHighlight)
+			texture = ModelObj.whiteResLoc;
+		else
+		{
+			texture = modelObj.getTexture();
+			useHighlightCoords = false;
+		}
+		
+		//System.out.println(this.getDisplayName() + " " + texture);
 
+		if(bindTexture)
+			Minecraft.getMinecraft().getTextureManager().bindTexture(texture);		
+		
 		for(Face f : groupObj.faces)
 		{
-			if(highlight)
-				f.textureCoordinates = coordsHighlight;
-			else if(modelObj.renderWithTexture)
-				f.textureCoordinates = defaultTextureCoords.get(f);
+			if(useHighlightCoords)
+				f.textureCoordinates = highlightCoords;
 			else
-				f.textureCoordinates = coordsNormal;	
+				f.textureCoordinates = defaultTextureCoords.get(f);
 		}
 	}
 
-	public void render(Entity entity, boolean highlight, boolean main) 
+	public void render(Entity entity) 
 	{
-		updateTextureCoordinates(highlight, main);
 
 		GL11.glPushMatrix();
 		move(entity);
+		updateTextureCoordinates();
 		if(visible)
 			groupObj.render();
 		GL11.glPopMatrix();
+		Minecraft.getMinecraft().getTextureManager().bindTexture(modelObj.getTexture());		
 	}
 
 	/**
@@ -289,9 +308,7 @@ public class PartObj extends Part
 		if(children != null)
 		{
 			for(PartObj child : children)
-			{
-				child.render(entity, modelObj.isPartHighlighted(child), modelObj.isMainHighlight(child));
-			}   
+				child.render(entity);  
 		}
 	}
 

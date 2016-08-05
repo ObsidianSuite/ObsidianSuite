@@ -164,7 +164,7 @@ public class GuiEntityRenderer extends GuiBlack
 		entityModel.clearHighlights();
 		PartObj p = entityModel.testRay(v, w);
 		if(p != null)
-			entityModel.hightlightPart(p);
+			entityModel.hightlightPart(p, false);
 		
 
 		//		System.out.println(String.format("Near: %f,%f,%f", posNear.get(0), posNear.get(1), posNear.get(2)));

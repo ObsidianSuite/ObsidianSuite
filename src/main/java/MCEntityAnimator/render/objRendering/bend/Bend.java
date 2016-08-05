@@ -268,13 +268,11 @@ public class Bend
 			//Generate part bottom.
 			Vertex[] bendPartBottom = generatePartBottom(curves,(float)(i+1)/bendSplit);
 
-			boolean highlight = i < bendSplit/2 ? parent.modelObj.isPartHighlighted(parent) : child.modelObj.isPartHighlighted(child);
-
 			//Update bend, swap top and bottom vertices if part is inverted.
 			if(inverted)
-				bendParts.get(i).updateVertices(bendPartBottom, bendPartTop, highlight);
+				bendParts.get(i).updateVertices(bendPartBottom, bendPartTop);
 			else
-				bendParts.get(i).updateVertices(bendPartTop, bendPartBottom, highlight);
+				bendParts.get(i).updateVertices(bendPartTop, bendPartBottom);
 			//Top of next part is bottom of this part.
 			bendPartTop = bendPartBottom;
 		}
@@ -297,7 +295,13 @@ public class Bend
 
 		//Actually render all the bend parts.
 		for(int i = 0; i < bendSplit; i++)
-			bendParts.get(i).render();
+		{
+			BendPart part = bendParts.get(i);
+			boolean mainHighlight = i < bendSplit/2 ? parent.modelObj.isMainHighlight(parent) : child.modelObj.isMainHighlight(child);
+			boolean otherHighlight = i < bendSplit/2 ? parent.modelObj.isPartHighlighted(parent) : child.modelObj.isPartHighlighted(child);
+			part.updateTextureCoordinates(mainHighlight, otherHighlight, parent.modelObj);
+			part.render();
+		}
 
 		//Render curve (debug only).
 		for(BezierCurve c : curves)
