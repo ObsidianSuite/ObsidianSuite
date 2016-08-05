@@ -24,9 +24,11 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.util.Vec3;
 
 public class GuiEntityRenderer extends GuiBlack
 {
@@ -47,8 +49,10 @@ public class GuiEntityRenderer extends GuiBlack
 	protected int scaleModifier = 0, horizontalPan = 0,verticalPan = 0;
 
 	private RenderBlocks renderBlocks = new RenderBlocks();
-	
+
 	private List<View> views;
+
+	private float[] posNear=new float[]{0F,0F,0F},posFar=new float[]{0F,0F,0F};
 
 	public GuiEntityRenderer(String entityName)
 	{
@@ -67,7 +71,7 @@ public class GuiEntityRenderer extends GuiBlack
 		}
 
 		currentPartName = parts.get(0);
-		
+
 		setupViews();
 	}
 
@@ -77,7 +81,7 @@ public class GuiEntityRenderer extends GuiBlack
 		posX = width/2;
 		posY = 5;
 	}
-	
+
 	private void setupViews()
 	{
 		views = new ArrayList<View>();
@@ -93,13 +97,13 @@ public class GuiEntityRenderer extends GuiBlack
 	public void drawScreen(int par1, int par2, float par3)
 	{
 		super.drawScreen(par1, par2, par3);
-		
+
 		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);		
 		if(entityToRender != null)
 		{
 			float scale = scaleModifier + 50;
-			
-			
+
+
 			if(boolBase)
 				renderBase(posX + (width-posX-5)/2 + horizontalPan, posY + (height - 10)/2 + scaleModifier/2 + verticalPan, scale, 0.0F, 0.0F);
 			if(boolGrid)
@@ -107,22 +111,96 @@ public class GuiEntityRenderer extends GuiBlack
 			renderEntityIntoGui(posX + (width-posX-5)/2 + horizontalPan, posY + (height - 10)/2 + scaleModifier/2 + verticalPan, scale, 0.0F, 0.0F, entityToRender); 
 		}
 
-		entityModel.clearHighlights();
-
-		if(currentPartName != null)
-		{
-			Part currentPart = Util.getPartFromName(currentPartName, entityModel.parts);
-			if(currentPart instanceof PartObj)
-				entityModel.hightlightPart((PartObj) currentPart);
-		}
-
-		if(additionalHighlightPartName != null && !additionalHighlightPartName.equals(""))
-		{
-			Part additionalPart = Util.getPartFromName(additionalHighlightPartName, entityModel.parts);
-			if(additionalPart instanceof PartObj)
-				entityModel.hightlightPart((PartObj) additionalPart);
-		}
+//		entityModel.clearHighlights();
+//
+//		if(currentPartName != null)
+//		{
+//			Part currentPart = Util.getPartFromName(currentPartName, entityModel.parts);
+//			if(currentPart instanceof PartObj)
+//				entityModel.hightlightPart((PartObj) currentPart);
+//		}
+//
+//		if(additionalHighlightPartName != null && !additionalHighlightPartName.equals(""))
+//		{
+//			Part additionalPart = Util.getPartFromName(additionalHighlightPartName, entityModel.parts);
+//			if(additionalPart instanceof PartObj)
+//				entityModel.hightlightPart((PartObj) additionalPart);
+//		}
 	}
+
+	@Override
+	protected void mouseClicked(int x, int y, int i) 
+	{
+		super.mouseClicked(x, y, i);
+	}
+
+
+	private void processUnProjectClick() 
+	{
+
+		FloatBuffer model = BufferUtils.createFloatBuffer(16);
+		FloatBuffer projection = BufferUtils.createFloatBuffer(16);
+		IntBuffer viewport = BufferUtils.createIntBuffer(16);
+
+		GL11.glGetFloat(GL11.GL_MODELVIEW_MATRIX, model);
+		GL11.glGetFloat(GL11.GL_PROJECTION_MATRIX, projection);
+		GL11.glGetInteger(GL11.GL_VIEWPORT, viewport);
+		
+		FloatBuffer posNearBuffer = BufferUtils.createFloatBuffer(3);
+		FloatBuffer posFarBuffer = BufferUtils.createFloatBuffer(3);
+
+		GLU.gluUnProject(Mouse.getX(), Mouse.getY(), 0.0F, model, projection, viewport, posNearBuffer);
+		GLU.gluUnProject(Mouse.getX(), Mouse.getY(), 1.0F, model, projection, viewport, posFarBuffer);
+
+		for(int i = 0; i < 3; i++)
+		{
+			posNear[i] = posNearBuffer.get(i);
+			posFar[i] = posFarBuffer.get(i);
+		}
+
+		Vec3 v = Vec3.createVectorHelper(posNear[0], posNear[1], posNear[2]);
+		Vec3 w = Vec3.createVectorHelper(posFar[0], posFar[1], posFar[2]);
+		
+		entityModel.clearHighlights();
+		PartObj p = entityModel.testRay(v, w);
+		if(p != null)
+			entityModel.hightlightPart(p);
+		
+
+		//		System.out.println(String.format("Near: %f,%f,%f", posNear.get(0), posNear.get(1), posNear.get(2)));
+		//		System.out.println(String.format("Far: %f,%f,%f", posFar.get(0), posFar.get(1), posFar.get(2)));		
+
+		//Vec3 vec = Vec3.createVectorHelper(posNear.get(0) - posFar.get(0), posNear.get(1) - posFar.get(1), posNear.get(2) - posFar.get(2));
+		//System.out.println(vec);
+
+		OpenGlHelper.setActiveTexture(OpenGlHelper.lightmapTexUnit);
+		GL11.glDisable(GL11.GL_TEXTURE_2D);
+		OpenGlHelper.setActiveTexture(OpenGlHelper.defaultTexUnit);
+
+		GL11.glEnable(GL11.GL_BLEND);
+		OpenGlHelper.glBlendFunc(770, 771, 1, 0);
+		GL11.glColor4f(0.0F, 0.0F, 0.0F, 0.4F);
+		GL11.glLineWidth(2.0F);
+		GL11.glDisable(GL11.GL_TEXTURE_2D);
+		GL11.glDepthMask(false);
+
+		Tessellator tessellator = Tessellator.instance;
+		tessellator.startDrawing(1);
+		tessellator.setColorOpaque_I(0xFFFFFF);
+		tessellator.addVertex(posNear[0], posNear[1], posNear[2]);
+		tessellator.addVertex(posFar[0], posFar[1], posFar[2]);
+		//		System.out.println(String.format("%f, %f, %f", posFar.get(0)/10F, posFar.get(1)/10F, posFar.get(2)/10F));
+		//		System.out.println(String.format("%f, %f, %f", posNear.get(0)/10F, posNear.get(1)/10F, posNear.get(2)/10F));
+		//		tessellator.addVertex(2.7F, 0.18F, 1.6F);
+		//		tessellator.addVertex(-4.5F,-1.0F,-0.7F);
+		tessellator.draw();
+
+		GL11.glDepthMask(true);
+		GL11.glEnable(GL11.GL_TEXTURE_2D);
+		GL11.glDisable(GL11.GL_BLEND);
+
+	}
+
 
 	@Override
 	protected void mouseClickMove(int x, int y, int par2, long par3Long) 
@@ -199,6 +277,7 @@ public class GuiEntityRenderer extends GuiBlack
 		GL11.glTranslated(par5EntityLivingBase.posX, par5EntityLivingBase.posY, par5EntityLivingBase.posZ);
 		RenderManager.instance.playerViewY = 180.0F;
 		RenderManager.instance.renderEntityWithPosYaw(par5EntityLivingBase, 0.0D, 0.0D, 0.0D, 0.0F, 1.0F);
+		processUnProjectClick();
 		GL11.glPopMatrix();
 		RenderHelper.disableStandardItemLighting();
 		GL11.glDisable(GL12.GL_RESCALE_NORMAL);
@@ -207,11 +286,11 @@ public class GuiEntityRenderer extends GuiBlack
 		OpenGlHelper.setActiveTexture(OpenGlHelper.defaultTexUnit);
 		GL11.glDisable(GL11.GL_COLOR_MATERIAL);
 	}
-	
+
 	private void renderBase(int xPos, int yPos, float scale, float rotX, float rotY)
 	{
 		GL11.glPushMatrix();
-		
+
 		GL11.glTranslatef(xPos, yPos, 200.0F);
 		GL11.glScalef(-scale, scale, scale);
 
@@ -220,10 +299,10 @@ public class GuiEntityRenderer extends GuiBlack
 
 		GL11.glRotatef(-((float)Math.atan((double)(rotY / 40.0F))) * 20.0F + verticalRotation , 1.0F, 0.0F, 0.0F);
 		GL11.glRotatef(((float)Math.atan((double)(rotX / 40.0F))) * 20.0F + horizontalRotation, 0.0F, -1.0F, 0.0F);
-		
+
 
 		mc.getTextureManager().bindTexture(TextureMap.locationBlocksTexture);
-		
+
 		GL11.glTranslatef(-1.0F, -0.5F, -1.0F);
 		for(int x = 0; x < 3; x++)
 		{
@@ -241,13 +320,13 @@ public class GuiEntityRenderer extends GuiBlack
 
 		GL11.glPopMatrix();
 	}
-	
-	
+
+
 
 	private void renderGrid(int xPos, int yPos, float scale, float rotX, float rotY)
 	{
 		GL11.glPushMatrix();
-		
+
 		GL11.glTranslatef(xPos, yPos, 200.0F);
 		GL11.glScalef(-scale, scale, scale);
 
@@ -256,12 +335,12 @@ public class GuiEntityRenderer extends GuiBlack
 
 		GL11.glRotatef(-((float)Math.atan((double)(rotY / 40.0F))) * 20.0F + verticalRotation , 1.0F, 0.0F, 0.0F);
 		GL11.glRotatef(((float)Math.atan((double)(rotX / 40.0F))) * 20.0F + horizontalRotation, 0.0F, -1.0F, 0.0F);
-		
+
 
 		mc.getTextureManager().bindTexture(TextureMap.locationBlocksTexture);
-		
+
 		GL11.glTranslatef(-1.0F, 0.5F, -1.0F);
-		
+
 		for(int z = 0; z < 3; z++)
 		{
 			for(int x = 0; x < 3; x++)
@@ -279,7 +358,7 @@ public class GuiEntityRenderer extends GuiBlack
 		}
 		GL11.glPopMatrix();
 	}
-	
+
 	public void changeView(int numpadKey)
 	{
 		for(View v : views)
@@ -293,14 +372,14 @@ public class GuiEntityRenderer extends GuiBlack
 		}
 		System.err.println("Could not change to view, numpadkey: " + numpadKey);
 	}
-	
+
 	private class View
 	{
-		
+
 		private String name;
 		private float horizontalRotation, verticalRotation;
 		private int numpadKey;
-		
+
 		private View(String name, float horizontalRotation, float verticalRotation, int numpadKey)
 		{
 			this.name = name;
@@ -308,11 +387,11 @@ public class GuiEntityRenderer extends GuiBlack
 			this.verticalRotation = verticalRotation;
 			this.numpadKey = numpadKey;
 		}
-		
+
 		public int getKey()
 		{
 			return numpadKey;
 		}
-		
+
 	}
 }

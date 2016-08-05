@@ -1,7 +1,5 @@
 package MCEntityAnimator.render.objRendering.parts;
 
-import java.math.RoundingMode;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -11,16 +9,17 @@ import org.lwjgl.opengl.GL11;
 
 import MCEntityAnimator.animation.AnimationData;
 import MCEntityAnimator.animation.AnimationParenting;
+import MCEntityAnimator.render.MathHelper;
 import MCEntityAnimator.render.objRendering.ModelObj;
-import MCEntityAnimator.render.objRendering.bend.BendHelper;
 import MCEntityAnimator.render.objRendering.bend.Bend;
+import MCEntityAnimator.render.objRendering.bend.BendPart;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.entity.Entity;
+import net.minecraft.util.Vec3;
 import net.minecraftforge.client.model.obj.Face;
 import net.minecraftforge.client.model.obj.GroupObject;
 import net.minecraftforge.client.model.obj.TextureCoordinate;
-import net.minecraftforge.client.model.obj.Vertex;
 
 /**
  * One partObj for each 'part' of the model.
@@ -109,6 +108,28 @@ public class PartObj extends Part
 		modelObj.removeBend(bend);
 		bend.remove();
 		bend = null;
+	}
+
+	//----------------------------------------------------------------
+	// 							 Selection
+	//----------------------------------------------------------------
+
+	/**
+	 * Test to see if a ray insects with this part.
+	 * @param p0 - Point on ray.
+	 * @param p1 - Another point on ray.
+	 * @return - Minimum distance from p0 to part, null if no intersect exists.
+	 */
+	public Double testRay(Vec3 p0, Vec3 p1)
+	{
+		Double min = null;
+		for(Face f : groupObj.faces)
+		{
+			Double d = MathHelper.rayIntersectsFace(p0, p1, f);
+			if(d != null && (min == null || d < min))
+				min = d;
+		}
+		return min;	
 	}
 
 	//------------------------------------------

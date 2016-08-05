@@ -3,6 +3,7 @@ package MCEntityAnimator;
 import org.lwjgl.input.Keyboard;
 
 import MCEntityAnimator.gui.GuiBlack;
+import MCEntityAnimator.gui.GuiEntityRenderer;
 import MCEntityAnimator.gui.animation.LoginGUI;
 import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.client.registry.ClientRegistry;

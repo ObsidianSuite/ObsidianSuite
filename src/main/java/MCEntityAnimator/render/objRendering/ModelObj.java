@@ -27,7 +27,9 @@ import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Vec3;
 import net.minecraftforge.client.model.ModelFormatException;
+import net.minecraftforge.client.model.obj.Face;
 import net.minecraftforge.client.model.obj.GroupObject;
 import net.minecraftforge.client.model.obj.WavefrontObject;
 
@@ -265,7 +267,46 @@ public class ModelObj extends ModelBase
 	{				
 		super.setRotationAngles(f, f1, f2, f3, f4, f5, entity);
 	}
-
+	
+	//----------------------------------------------------------------
+	// 							 Selection
+	//----------------------------------------------------------------
+	
+	public PartObj testRay(Vec3 p0, Vec3 p1)
+	{
+		PartObj closestPart = null;
+		Double min = null;
+		for(Part part : parts)
+		{
+			if(part instanceof PartObj)
+			{
+				PartObj p = (PartObj) part;
+				Double d = p.testRay(p0, p1);
+				if(d != null && (min == null || d < min))
+				{
+					closestPart = p;
+					min = d;
+				}
+			}
+		}
+		for(Bend bend : bends)
+		{
+			Double d = bend.testRayChild(p0, p1);
+			if(d != null && (min == null || d < min))
+			{
+				closestPart = bend.child;
+				min = d;
+			}
+			Double d2 = bend.testRayParent(p0, p1);
+			if(d2 != null && (min == null || d2 < min))
+			{
+				closestPart = bend.parent;
+				min = d2;
+			}
+		}
+		return closestPart;
+	}
+	
 	//----------------------------------------------------------------
 	// 							Highlighting
 	//----------------------------------------------------------------
