@@ -51,6 +51,8 @@ public class GuiEntityRenderer extends GuiBlack
 	private RenderBlocks renderBlocks = new RenderBlocks();
 
 	private List<View> views;
+	
+	private boolean clickSelection = false;
 
 	public GuiEntityRenderer(String entityName)
 	{
@@ -111,12 +113,12 @@ public class GuiEntityRenderer extends GuiBlack
 
 		entityModel.clearHighlights();
 
-//		if(currentPartName != null)
-//		{
-//			Part currentPart = Util.getPartFromName(currentPartName, entityModel.parts);
-//			if(currentPart instanceof PartObj)
-//				entityModel.hightlightPart((PartObj) currentPart, true);
-//		}
+		if(currentPartName != null)
+		{
+			Part currentPart = Util.getPartFromName(currentPartName, entityModel.parts);
+			if(currentPart instanceof PartObj)
+				entityModel.hightlightPart((PartObj) currentPart, true);
+		}
 
 		if(additionalHighlightPartName != null && !additionalHighlightPartName.equals(""))
 		{
@@ -130,6 +132,7 @@ public class GuiEntityRenderer extends GuiBlack
 	protected void mouseClicked(int x, int y, int i) 
 	{
 		super.mouseClicked(x, y, i);
+		clickSelection = true;
 	}
 
 	@Override
@@ -209,7 +212,14 @@ public class GuiEntityRenderer extends GuiBlack
 		RenderManager.instance.renderEntityWithPosYaw(par5EntityLivingBase, 0.0D, 0.0D, 0.0D, 0.0F, 1.0F);
 		PartObj p = entityModel.testRay();
 		if(p != null)
+		{
 			additionalHighlightPartName = p.getName();
+			if(clickSelection)
+			{
+				currentPartName = p.getName();
+				clickSelection = false;
+			}
+		}
 		else
 			additionalHighlightPartName = "";
 		GL11.glPopMatrix();
