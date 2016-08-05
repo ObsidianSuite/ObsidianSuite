@@ -162,7 +162,8 @@ public class GuiEntityRenderer extends GuiBlack
 		Vec3 w = Vec3.createVectorHelper(posFar[0], posFar[1], posFar[2]);
 		
 		entityModel.clearHighlights();
-		for(PartObj p : entityModel.testRay(v, w))
+		PartObj p = entityModel.testRay(v, w);
+		if(p != null)
 			entityModel.hightlightPart(p);
 		
 

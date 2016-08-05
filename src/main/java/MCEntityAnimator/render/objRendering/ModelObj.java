@@ -272,19 +272,39 @@ public class ModelObj extends ModelBase
 	// 							 Selection
 	//----------------------------------------------------------------
 	
-	public List<PartObj> testRay(Vec3 p0, Vec3 p1)
+	public PartObj testRay(Vec3 p0, Vec3 p1)
 	{
-		List<PartObj> intersectedParts = new ArrayList<PartObj>();
+		PartObj closestPart = null;
+		Double min = null;
 		for(Part part : parts)
 		{
 			if(part instanceof PartObj)
 			{
 				PartObj p = (PartObj) part;
-				if(p.testRay(p0,p1))
-					intersectedParts.add(p);
+				Double d = p.testRay(p0, p1);
+				if(d != null && (min == null || d < min))
+				{
+					closestPart = p;
+					min = d;
+				}
 			}
 		}
-		return intersectedParts;
+		for(Bend bend : bends)
+		{
+			Double d = bend.testRayChild(p0, p1);
+			if(d != null && (min == null || d < min))
+			{
+				closestPart = bend.child;
+				min = d;
+			}
+			Double d2 = bend.testRayParent(p0, p1);
+			if(d2 != null && (min == null || d2 < min))
+			{
+				closestPart = bend.parent;
+				min = d2;
+			}
+		}
+		return closestPart;
 	}
 	
 	//----------------------------------------------------------------
