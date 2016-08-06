@@ -51,7 +51,7 @@ public class GuiEntityRenderer extends GuiBlack
 	private RenderBlocks renderBlocks = new RenderBlocks();
 
 	private List<View> views;
-	
+
 	public GuiEntityRenderer(String entityName)
 	{
 		super();
@@ -190,7 +190,7 @@ public class GuiEntityRenderer extends GuiBlack
 		scaleModifier += Mouse.getEventDWheel()/40;
 		super.handleMouseInput();
 	}
-	
+
 	public void processRay(PartObj raySelection)
 	{
 		if(raySelection != null)
@@ -218,6 +218,16 @@ public class GuiEntityRenderer extends GuiBlack
 		RenderManager.instance.playerViewY = 180.0F;
 		RenderManager.instance.renderEntityWithPosYaw(par5EntityLivingBase, 0.0D, 0.0D, 0.0D, 0.0F, 1.0F);
 		processRay(entityModel.testRay());
+		if(currentPartName != null && !currentPartName.equals(""))
+		{
+			Part currentPart = Util.getPartFromName(currentPartName, entityModel.parts);
+			if(currentPart instanceof PartObj)
+			{
+				Double d = ((PartObj) currentPart).testRotationRay();
+				if(d != null)
+					System.out.println(d);
+			}
+		}
 		GL11.glPopMatrix();
 		RenderHelper.disableStandardItemLighting();
 		GL11.glDisable(GL12.GL_RESCALE_NORMAL);

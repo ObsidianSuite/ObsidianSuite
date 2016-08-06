@@ -1,12 +1,17 @@
 package MCEntityAnimator.render;
 
+import org.lwjgl.opengl.GL11;
+
 import MCEntityAnimator.render.objRendering.RayTrace;
+import MCEntityAnimator.render.objRendering.parts.PartObj;
 import net.minecraft.util.Vec3;
 import net.minecraftforge.client.model.obj.Face;
 
 public class MathHelper 
 {
 
+	private static float rotationWheelWidth = 0.005F;
+	
 	/**
 	 * Calculate intersection between ray and face.
 	 * @param p0 - Point on ray.
@@ -30,6 +35,17 @@ public class MathHelper
 		double s = (u.dotProduct(v)*w.dotProduct(v)-v.dotProduct(v)*w.dotProduct(u))/dn;
 		double t = (u.dotProduct(v)*w.dotProduct(u)-u.dotProduct(u)*w.dotProduct(v))/dn;
 		if(s>=0 && t>=0 && s+t<=1)
+			return ray.p0.distanceTo(pI);
+		return null;
+	}
+	
+	public static Double rayIntersectsRotationWheel(RayTrace ray, Vec3 p, Vec3 n)
+	{
+		Vec3 pI = getRayPlaneIntersection(ray,p,n);
+		if(pI == null)
+			return null;
+		double d = pI.distanceTo(p);
+		if(d > PartObj.rotationWheelRadius - rotationWheelWidth && d < PartObj.rotationWheelRadius + rotationWheelWidth)
 			return ray.p0.distanceTo(pI);
 		return null;
 	}

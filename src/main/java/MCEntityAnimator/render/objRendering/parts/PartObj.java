@@ -38,6 +38,8 @@ public class PartObj extends Part
 	private float prevAxisRotX, prevAxisRotY, prevAxisRotZ;
 	private boolean showModel;
 
+	public static final float rotationWheelRadius = 0.5F;
+	
 	//XXX
 	private Map<Face, TextureCoordinate[]> defaultTextureCoords;
 
@@ -183,6 +185,7 @@ public class PartObj extends Part
 		Double min = null;
 		for(Face f : groupObj.faces)
 		{
+			//System.out.println(groupObj.faces.get(0).vertices[0].x + ", " + groupObj.faces.get(0).vertices[0].y + ", " + groupObj.faces.get(0).vertices[0].z);
 			Double d = MathHelper.rayIntersectsFace(RayTrace.getRayTrace(), f);
 			if(d != null && (min == null || d < min))
 				min = d;
@@ -191,6 +194,29 @@ public class PartObj extends Part
 		return min;	
 	}
 
+	public Double testRotationRay()
+	{
+		GL11.glPushMatrix();
+		moveForAllParts();
+		Double min = null;
+		Vec3 p = Vec3.createVectorHelper(-rotationPoint[0], -rotationPoint[1], -rotationPoint[2]);
+		for(int i = 0; i < 3; i++)
+		{
+			Vec3 n = null;
+			switch(i)
+			{
+			case 0: n = Vec3.createVectorHelper(1, 0, 0); break;
+			case 1: n = Vec3.createVectorHelper(0, 1, 0); break;
+			case 2: n = Vec3.createVectorHelper(0, 0, 1); break;
+			}
+			Double d = MathHelper.rayIntersectsRotationWheel(RayTrace.getRayTrace(), p, n);
+			if(d != null && (min == null || d < min))
+				min = d;
+		}
+		GL11.glPopMatrix();
+		return min;	
+	}
+	
 	//------------------------------------------
 	//         Rendering and Rotating
 	//------------------------------------------
@@ -465,9 +491,9 @@ public class PartObj extends Part
 		drawLine(Vec3.createVectorHelper(0.0F, -0.05F, 0.0F), Vec3.createVectorHelper(0.0F, 0.05F, 0.0F), 0xFFFFFF);
 		drawLine(Vec3.createVectorHelper(0.0F, 0.0F, -0.05F), Vec3.createVectorHelper(0.0F, 0.0F, 0.05F), 0xFFFFFF);
 		
-		drawCircle(origin, 0.5F, 0, 1.0F, 0.0F, 0.0F);
-		drawCircle(origin, 0.5F, 1, 0.0F, 1.0F, 0.0F);
-		drawCircle(origin, 0.5F, 2, 0.0F, 0.0F, 1.0F);
+		drawCircle(origin, rotationWheelRadius, 0, 1.0F, 0.0F, 0.0F);
+		drawCircle(origin, rotationWheelRadius, 1, 0.0F, 1.0F, 0.0F);
+		drawCircle(origin, rotationWheelRadius, 2, 0.0F, 0.0F, 1.0F);
 		GL11.glPopMatrix();
 	}
 
