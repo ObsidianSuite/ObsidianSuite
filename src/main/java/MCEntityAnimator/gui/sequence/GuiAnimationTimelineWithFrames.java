@@ -2,6 +2,7 @@ package MCEntityAnimator.gui.sequence;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.GridBagConstraints;
@@ -253,7 +254,7 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 		}
 		
 		this.currentAnimation.animateAll(time, entityModel, exceptionPartName);
-
+		
 		super.drawScreen(par1, par2, par3);
 	}
 

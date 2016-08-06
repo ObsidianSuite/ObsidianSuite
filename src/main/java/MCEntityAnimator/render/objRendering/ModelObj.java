@@ -360,7 +360,7 @@ public class ModelObj extends ModelBase
 	public void render(Entity entity, float time, float distance, float loop, float lookY, float lookX, float scale) 
 	{		
 		super.render(entity, time, distance, loop, lookY, lookX, scale);
-
+		
 		GL11.glPushMatrix();
 		GL11.glRotatef(initRotFix, 1.0F, 0.0F, 0.0F);
 		GL11.glTranslatef(0.0F, offsetFixY, 0.0F);

@@ -457,19 +457,68 @@ public class PartObj extends Part
 	{
 		Vec3 origin = Vec3.createVectorHelper(0.0F, 0.0F, 0.0F);
 
-		Vec3 xVec = Vec3.createVectorHelper(1.0F, 0.0F, 0.0F);
-		Vec3 yVec = Vec3.createVectorHelper(0.0F, 1.0F, 0.0F);
-		Vec3 zVec = Vec3.createVectorHelper(0.0F, 0.0F, 1.0F);
-
 		GL11.glPushMatrix();
 		GL11.glTranslatef(-rotationPoint[0], -rotationPoint[1], -rotationPoint[2]);
 		GL11.glMultMatrix(rotationMatrix);
-		drawLine(origin, xVec, 0xFF0000);
-		drawLine(origin, yVec, 0x00FF00);
-		drawLine(origin, zVec, 0x0000FF);
+		
+		drawLine(Vec3.createVectorHelper(-0.05F, 0.0F, 0.0F), Vec3.createVectorHelper(0.05F, 0.0F, 0.0F), 0xFFFFFF);
+		drawLine(Vec3.createVectorHelper(0.0F, -0.05F, 0.0F), Vec3.createVectorHelper(0.0F, 0.05F, 0.0F), 0xFFFFFF);
+		drawLine(Vec3.createVectorHelper(0.0F, 0.0F, -0.05F), Vec3.createVectorHelper(0.0F, 0.0F, 0.05F), 0xFFFFFF);
+		
+		drawCircle(origin, 0.5F, 0, 1.0F, 0.0F, 0.0F);
+		drawCircle(origin, 0.5F, 1, 0.0F, 1.0F, 0.0F);
+		drawCircle(origin, 0.5F, 2, 0.0F, 0.0F, 1.0F);
 		GL11.glPopMatrix();
 	}
 
+	/**
+	 * Draw a circle in the x,y or z plane. 
+	 * @param c - Centre of circle.
+	 * @param r - Radius of circle.
+	 * @param plane - 0,1,2 for x,y and z.
+	 * @param red - red colour (0 - 1F)
+	 * @param green - green colour (0 - 1F)
+	 * @param blue - blue colour (0 - 1F)
+	 */
+	private void drawCircle(Vec3 c, double r, int plane, double red, double green, double blue)
+	{		
+		GL11.glPushMatrix();
+		GL11.glEnable(GL11.GL_BLEND);
+		GL11.glDisable(GL11.GL_DEPTH_TEST);
+		GL11.glColor3d(red, green, blue);
+		GL11.glLineWidth(3.0F);
+		GL11.glDisable(GL11.GL_TEXTURE_2D);
+		GL11.glDepthMask(false);
+		GL11.glBegin(GL11.GL_LINE_LOOP);
+		for(int i = 0; i < 360; i++)
+		{
+			double rad = i/180F*Math.PI;
+			double x = c.xCoord,y = c.yCoord,z = c.zCoord;
+			switch(plane)
+			{
+			case 0:
+				y = c.yCoord + r*Math.sin(rad);
+				z = c.zCoord + r*Math.cos(rad);
+				break;
+			case 1:
+				x = c.xCoord + r*Math.sin(rad);
+				z = c.zCoord + r*Math.cos(rad);
+				break;
+			case 2:
+				x = c.xCoord + r*Math.sin(rad);
+				y = c.yCoord + r*Math.cos(rad);
+				break;
+			}
+			GL11.glVertex3d(x,y,z);
+		}
+		GL11.glEnd();
+		GL11.glDepthMask(true);
+		GL11.glEnable(GL11.GL_DEPTH_TEST);
+		GL11.glEnable(GL11.GL_TEXTURE_2D);
+		GL11.glDisable(GL11.GL_BLEND);
+		GL11.glPopMatrix();
+	}
+	
 	//XXX
 	private void drawLine(Vec3 p1, Vec3 p2, int color)
 	{
