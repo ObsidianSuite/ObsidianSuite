@@ -16,6 +16,7 @@ import MCEntityAnimator.MCEA_Main;
 import MCEntityAnimator.Util;
 import MCEntityAnimator.render.objRendering.EntityObj;
 import MCEntityAnimator.render.objRendering.ModelObj;
+import MCEntityAnimator.render.objRendering.RayTrace;
 import MCEntityAnimator.render.objRendering.RenderObj;
 import MCEntityAnimator.render.objRendering.parts.Part;
 import MCEntityAnimator.render.objRendering.parts.PartObj;
@@ -27,6 +28,7 @@ import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.util.Vec3;
 
 public class GuiEntityRenderer extends GuiBlack
 {
@@ -47,9 +49,9 @@ public class GuiEntityRenderer extends GuiBlack
 	protected int scaleModifier = 0, horizontalPan = 0,verticalPan = 0;
 
 	private RenderBlocks renderBlocks = new RenderBlocks();
-	
-	private List<View> views;
 
+	private List<View> views;
+	
 	public GuiEntityRenderer(String entityName)
 	{
 		super();
@@ -67,7 +69,7 @@ public class GuiEntityRenderer extends GuiBlack
 		}
 
 		currentPartName = parts.get(0);
-		
+
 		setupViews();
 	}
 
@@ -77,7 +79,7 @@ public class GuiEntityRenderer extends GuiBlack
 		posX = width/2;
 		posY = 5;
 	}
-	
+
 	private void setupViews()
 	{
 		views = new ArrayList<View>();
@@ -93,13 +95,13 @@ public class GuiEntityRenderer extends GuiBlack
 	public void drawScreen(int par1, int par2, float par3)
 	{
 		super.drawScreen(par1, par2, par3);
-		
+
 		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);		
 		if(entityToRender != null)
 		{
 			float scale = scaleModifier + 50;
-			
-			
+
+
 			if(boolBase)
 				renderBase(posX + (width-posX-5)/2 + horizontalPan, posY + (height - 10)/2 + scaleModifier/2 + verticalPan, scale, 0.0F, 0.0F);
 			if(boolGrid)
@@ -109,7 +111,7 @@ public class GuiEntityRenderer extends GuiBlack
 
 		entityModel.clearHighlights();
 
-		if(currentPartName != null)
+		if(currentPartName != null && !currentPartName.equals(""))
 		{
 			Part currentPart = Util.getPartFromName(currentPartName, entityModel.parts);
 			if(currentPart instanceof PartObj)
@@ -122,6 +124,14 @@ public class GuiEntityRenderer extends GuiBlack
 			if(additionalPart instanceof PartObj)
 				entityModel.hightlightPart((PartObj) additionalPart, false);
 		}
+	}
+
+	@Override
+	protected void mouseClicked(int x, int y, int i) 
+	{
+		super.mouseClicked(x, y, i);
+		if(additionalHighlightPartName != null && !additionalHighlightPartName.equals(""))
+			currentPartName = additionalHighlightPartName;
 	}
 
 	@Override
@@ -180,6 +190,14 @@ public class GuiEntityRenderer extends GuiBlack
 		scaleModifier += Mouse.getEventDWheel()/40;
 		super.handleMouseInput();
 	}
+	
+	public void processRay(PartObj raySelection)
+	{
+		if(raySelection != null)
+			additionalHighlightPartName = raySelection.getName();
+		else
+			additionalHighlightPartName = "";
+	}
 
 	/**
 	 * Renders an entity into a gui. Parameters - xpos, ypos, scale, rotx, roty, entity.
@@ -199,6 +217,7 @@ public class GuiEntityRenderer extends GuiBlack
 		GL11.glTranslated(par5EntityLivingBase.posX, par5EntityLivingBase.posY, par5EntityLivingBase.posZ);
 		RenderManager.instance.playerViewY = 180.0F;
 		RenderManager.instance.renderEntityWithPosYaw(par5EntityLivingBase, 0.0D, 0.0D, 0.0D, 0.0F, 1.0F);
+		processRay(entityModel.testRay());
 		GL11.glPopMatrix();
 		RenderHelper.disableStandardItemLighting();
 		GL11.glDisable(GL12.GL_RESCALE_NORMAL);
@@ -207,11 +226,11 @@ public class GuiEntityRenderer extends GuiBlack
 		OpenGlHelper.setActiveTexture(OpenGlHelper.defaultTexUnit);
 		GL11.glDisable(GL11.GL_COLOR_MATERIAL);
 	}
-	
+
 	private void renderBase(int xPos, int yPos, float scale, float rotX, float rotY)
 	{
 		GL11.glPushMatrix();
-		
+
 		GL11.glTranslatef(xPos, yPos, 200.0F);
 		GL11.glScalef(-scale, scale, scale);
 
@@ -220,10 +239,10 @@ public class GuiEntityRenderer extends GuiBlack
 
 		GL11.glRotatef(-((float)Math.atan((double)(rotY / 40.0F))) * 20.0F + verticalRotation , 1.0F, 0.0F, 0.0F);
 		GL11.glRotatef(((float)Math.atan((double)(rotX / 40.0F))) * 20.0F + horizontalRotation, 0.0F, -1.0F, 0.0F);
-		
+
 
 		mc.getTextureManager().bindTexture(TextureMap.locationBlocksTexture);
-		
+
 		GL11.glTranslatef(-1.0F, -0.5F, -1.0F);
 		for(int x = 0; x < 3; x++)
 		{
@@ -241,13 +260,13 @@ public class GuiEntityRenderer extends GuiBlack
 
 		GL11.glPopMatrix();
 	}
-	
-	
+
+
 
 	private void renderGrid(int xPos, int yPos, float scale, float rotX, float rotY)
 	{
 		GL11.glPushMatrix();
-		
+
 		GL11.glTranslatef(xPos, yPos, 200.0F);
 		GL11.glScalef(-scale, scale, scale);
 
@@ -256,12 +275,12 @@ public class GuiEntityRenderer extends GuiBlack
 
 		GL11.glRotatef(-((float)Math.atan((double)(rotY / 40.0F))) * 20.0F + verticalRotation , 1.0F, 0.0F, 0.0F);
 		GL11.glRotatef(((float)Math.atan((double)(rotX / 40.0F))) * 20.0F + horizontalRotation, 0.0F, -1.0F, 0.0F);
-		
+
 
 		mc.getTextureManager().bindTexture(TextureMap.locationBlocksTexture);
-		
+
 		GL11.glTranslatef(-1.0F, 0.5F, -1.0F);
-		
+
 		for(int z = 0; z < 3; z++)
 		{
 			for(int x = 0; x < 3; x++)
@@ -279,7 +298,7 @@ public class GuiEntityRenderer extends GuiBlack
 		}
 		GL11.glPopMatrix();
 	}
-	
+
 	public void changeView(int numpadKey)
 	{
 		for(View v : views)
@@ -293,14 +312,14 @@ public class GuiEntityRenderer extends GuiBlack
 		}
 		System.err.println("Could not change to view, numpadkey: " + numpadKey);
 	}
-	
+
 	private class View
 	{
-		
+
 		private String name;
 		private float horizontalRotation, verticalRotation;
 		private int numpadKey;
-		
+
 		private View(String name, float horizontalRotation, float verticalRotation, int numpadKey)
 		{
 			this.name = name;
@@ -308,11 +327,11 @@ public class GuiEntityRenderer extends GuiBlack
 			this.verticalRotation = verticalRotation;
 			this.numpadKey = numpadKey;
 		}
-		
+
 		public int getKey()
 		{
 			return numpadKey;
 		}
-		
+
 	}
 }

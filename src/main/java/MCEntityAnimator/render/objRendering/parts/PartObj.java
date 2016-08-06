@@ -1,32 +1,26 @@
 package MCEntityAnimator.render.objRendering.parts;
 
-import java.awt.GridLayout;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-
 import org.lwjgl.opengl.GL11;
 
 import MCEntityAnimator.animation.AnimationData;
 import MCEntityAnimator.animation.AnimationParenting;
+import MCEntityAnimator.render.MathHelper;
 import MCEntityAnimator.render.objRendering.ModelObj;
-import MCEntityAnimator.render.objRendering.RenderObj;
+import MCEntityAnimator.render.objRendering.RayTrace;
 import MCEntityAnimator.render.objRendering.bend.Bend;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Vec3;
 import net.minecraftforge.client.model.obj.Face;
@@ -154,6 +148,48 @@ public class PartObj extends Part
 		case 2: axisRotZ = rot; break;
 		}
 	}
+	
+	//----------------------------------------------------------------
+	// 							 Selection
+	//----------------------------------------------------------------
+
+	public void moveForAllParts()
+	{
+		AnimationParenting anipar = AnimationData.getAnipar(modelObj.getEntityType());
+		List<PartObj> parts = new ArrayList<PartObj>();
+		PartObj child = this;
+		PartObj parent;
+		parts.add(0, child);
+		while((parent = anipar.getParent(child)) != null)
+		{
+			parts.add(0, parent);
+			child = parent;
+		}
+		
+		for(PartObj p : parts)
+			p.move();
+	}
+	
+	/**
+	 * Test to see if a ray insects with this part.
+	 * @param p0 - Point on ray.
+	 * @param p1 - Another point on ray.
+	 * @return - Minimum distance from p0 to part, null if no intersect exists.
+	 */
+	public Double testRay()
+	{		
+		GL11.glPushMatrix();
+		moveForAllParts();
+		Double min = null;
+		for(Face f : groupObj.faces)
+		{
+			Double d = MathHelper.rayIntersectsFace(RayTrace.getRayTrace(), f);
+			if(d != null && (min == null || d < min))
+				min = d;
+		}
+		GL11.glPopMatrix();
+		return min;	
+	}
 
 	//------------------------------------------
 	//         Rendering and Rotating
@@ -187,42 +223,62 @@ public class PartObj extends Part
 		}
 	}
 
+	public void updateTextureCoordinates()
+	{	
+		updateTextureCoordinates(modelObj.isMainHighlight(this), modelObj.isPartHighlighted(this), true);
+	}
+	
 	/**
-	 * Change the texture coordinates if the part is highlighted or the main part.
-	 * TODO PartObj: Main highlight vs normal highlight.
-	 * XXX
+	 * Change the texture coordinates and texture if the part is highlighted.
 	 */
-	public void updateTextureCoordinates(boolean highlight, boolean main)
+	public void updateTextureCoordinates(boolean mainHighlight, boolean otherHighlight, boolean bindTexture)
 	{		
-		TextureCoordinate texCo1 = new TextureCoordinate(0.0F, 0.0F);
-		TextureCoordinate[] coordsHighlight = new TextureCoordinate[]{texCo1, texCo1, texCo1};
-		TextureCoordinate texCo2 = new TextureCoordinate(0.5F, 0.5F);
-		TextureCoordinate[] coordsNormal = new TextureCoordinate[]{texCo2, texCo2, texCo2};
+		boolean useHighlightCoords = true;
+		ResourceLocation texture;
+		TextureCoordinate[] highlightCoords = new TextureCoordinate[]{
+				new TextureCoordinate(0.0F, 0.0F), 
+				new TextureCoordinate(0.5F, 0.0F), 
+				new TextureCoordinate(0.0F, 0.5F)};
+		if(mainHighlight)
+			texture = ModelObj.pinkResLoc;
+		else if(otherHighlight)
+			texture = ModelObj.whiteResLoc;
+		else
+		{
+			texture = modelObj.getTexture();
+			useHighlightCoords = false;
+		}
+		
+		//System.out.println(this.getDisplayName() + " " + texture);
 
+		if(bindTexture)
+			Minecraft.getMinecraft().getTextureManager().bindTexture(texture);		
+		
 		for(Face f : groupObj.faces)
 		{
-			if(highlight)
-				f.textureCoordinates = coordsHighlight;
-			else if(modelObj.renderWithTexture)
-				f.textureCoordinates = defaultTextureCoords.get(f);
+			if(useHighlightCoords)
+				f.textureCoordinates = highlightCoords;
 			else
-				f.textureCoordinates = coordsNormal;	
+				f.textureCoordinates = defaultTextureCoords.get(f);
 		}
 	}
 
-	public void render(Entity entity, boolean highlight, boolean main) 
+	public void render() 
 	{
-		updateTextureCoordinates(highlight, main);
-
 		GL11.glPushMatrix();
-		ResourceLocation texture = modelObj.getTexture();
-		if(highlight)
-			texture = RenderObj.defaultTexture;
-		Minecraft.getMinecraft().getTextureManager().bindTexture(texture);		
-		move(entity);
+		move();
+		updateTextureCoordinates();
 		if(visible)
 			groupObj.render();
+		//Do for children - rotation for parent compensated for!
+		List<PartObj> children = AnimationData.getAnipar(modelObj.getEntityType()).getChildren(this);
+		if(children != null)
+		{
+			for(PartObj child : children)
+				child.render();  
+		}
 		GL11.glPopMatrix();
+		Minecraft.getMinecraft().getTextureManager().bindTexture(modelObj.getTexture());		
 	}
 
 	/**
@@ -231,10 +287,10 @@ public class PartObj extends Part
 	 * @param entityName - Name of the model. 
 	 */
 	@SideOnly(Side.CLIENT)
-	public void postRender(String entityName)
+	public void postRender()
 	{
 		//Generate a list of parents: {topParent, topParent - 1,..., parent, this}/
-		AnimationParenting anipar = AnimationData.getAnipar(entityName);
+		AnimationParenting anipar = AnimationData.getAnipar(modelObj.getEntityType());
 		List<PartObj> parts = new ArrayList<PartObj>();
 		PartObj child = this;
 		PartObj parent;
@@ -291,22 +347,11 @@ public class PartObj extends Part
 		}
 	}
 
-	@Override
-	public void move(Entity entity)
+	public void move()
 	{
 		GL11.glTranslatef(-rotationPoint[0], -rotationPoint[1], -rotationPoint[2]);
 		applyRotation();
 		GL11.glTranslatef(rotationPoint[0], rotationPoint[1], rotationPoint[2]);    
-
-		//Do for children - rotation for parent compensated for!
-		List<PartObj> children = AnimationData.getAnipar(modelObj.getEntityType()).getChildren(this);
-		if(children != null)
-		{
-			for(PartObj child : children)
-			{
-				child.render(entity, modelObj.isPartHighlighted(child), modelObj.isMainHighlight(child));
-			}   
-		}
 	}
 
 	public void applyRotation()

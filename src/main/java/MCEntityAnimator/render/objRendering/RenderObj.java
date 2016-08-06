@@ -36,7 +36,7 @@ public class RenderObj extends RenderLiving
 	
 	private static final ModelLargeShield shieldModel = new ModelLargeShield();
 	private static final ResourceLocation shieldTexture = new ResourceLocation("mod_pxy:textures/models/L_shield.png");
-	public static final ResourceLocation defaultTexture = new ResourceLocation("mod_MCEA:default_model_texture.png"); 
+	private static final ResourceLocation defaultTexture = new ResourceLocation("mod_mcea:defaultModelTextures/grey.png");
 	private ResourceLocation properTexture;
 	
 	public RenderObj() 
@@ -48,7 +48,7 @@ public class RenderObj extends RenderLiving
 	@Override
 	protected ResourceLocation getEntityTexture(Entity entity) 
 	{
-		return getModel(((EntityObj) entity).getType()).renderWithTexture ? properTexture : defaultTexture;
+		return getModel(((EntityObj) entity).getType()).textureExists ? properTexture : defaultTexture;
 	}
 
 	public void updateModel(String entityType)
@@ -103,7 +103,7 @@ public class RenderObj extends RenderLiving
 			
 			//Post render for lower right arm.
 			PartObj armLwR = Util.getPartObjFromName("armLwR", modelObj.parts);
-			armLwR.postRender(modelObj.getEntityType());
+			armLwR.postRender();
 			GL11.glTranslatef(-0.125F, 0.2F, 0.2F);
 			
 			//Prop rotation and translation
