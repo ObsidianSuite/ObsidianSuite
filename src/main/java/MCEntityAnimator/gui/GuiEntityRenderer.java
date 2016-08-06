@@ -52,8 +52,6 @@ public class GuiEntityRenderer extends GuiBlack
 
 	private List<View> views;
 	
-	private boolean clickSelection = false;
-
 	public GuiEntityRenderer(String entityName)
 	{
 		super();
@@ -113,7 +111,7 @@ public class GuiEntityRenderer extends GuiBlack
 
 		entityModel.clearHighlights();
 
-		if(currentPartName != null)
+		if(currentPartName != null && !currentPartName.equals(""))
 		{
 			Part currentPart = Util.getPartFromName(currentPartName, entityModel.parts);
 			if(currentPart instanceof PartObj)
@@ -132,7 +130,8 @@ public class GuiEntityRenderer extends GuiBlack
 	protected void mouseClicked(int x, int y, int i) 
 	{
 		super.mouseClicked(x, y, i);
-		clickSelection = true;
+		if(additionalHighlightPartName != null && !additionalHighlightPartName.equals(""))
+			currentPartName = additionalHighlightPartName;
 	}
 
 	@Override
@@ -191,6 +190,14 @@ public class GuiEntityRenderer extends GuiBlack
 		scaleModifier += Mouse.getEventDWheel()/40;
 		super.handleMouseInput();
 	}
+	
+	public void processRay(PartObj raySelection)
+	{
+		if(raySelection != null)
+			additionalHighlightPartName = raySelection.getName();
+		else
+			additionalHighlightPartName = "";
+	}
 
 	/**
 	 * Renders an entity into a gui. Parameters - xpos, ypos, scale, rotx, roty, entity.
@@ -210,18 +217,7 @@ public class GuiEntityRenderer extends GuiBlack
 		GL11.glTranslated(par5EntityLivingBase.posX, par5EntityLivingBase.posY, par5EntityLivingBase.posZ);
 		RenderManager.instance.playerViewY = 180.0F;
 		RenderManager.instance.renderEntityWithPosYaw(par5EntityLivingBase, 0.0D, 0.0D, 0.0D, 0.0F, 1.0F);
-		PartObj p = entityModel.testRay();
-		if(p != null)
-		{
-			additionalHighlightPartName = p.getName();
-			if(clickSelection)
-			{
-				currentPartName = p.getName();
-				clickSelection = false;
-			}
-		}
-		else
-			additionalHighlightPartName = "";
+		processRay(entityModel.testRay());
 		GL11.glPopMatrix();
 		RenderHelper.disableStandardItemLighting();
 		GL11.glDisable(GL12.GL_RESCALE_NORMAL);
