@@ -10,6 +10,8 @@ import java.util.Map;
 
 import org.lwjgl.opengl.GL11;
 
+import com.sun.org.apache.xpath.internal.operations.Variable;
+
 import MCEntityAnimator.animation.AnimationData;
 import MCEntityAnimator.animation.AnimationParenting;
 import MCEntityAnimator.render.MathHelper;
@@ -39,6 +41,7 @@ public class PartObj extends Part
 	private boolean showModel;
 
 	public static final float rotationWheelRadius = 0.5F;
+	public Integer rotationWheelPlaneHighlight;
 	
 	//XXX
 	private Map<Face, TextureCoordinate[]> defaultTextureCoords;
@@ -194,11 +197,12 @@ public class PartObj extends Part
 		return min;	
 	}
 
-	public Double testRotationRay()
+	public Integer testRotationRay()
 	{
 		GL11.glPushMatrix();
 		moveForAllParts();
 		Double min = null;
+		Integer dim = null;
 		Vec3 p = Vec3.createVectorHelper(-rotationPoint[0], -rotationPoint[1], -rotationPoint[2]);
 		for(int i = 0; i < 3; i++)
 		{
@@ -211,10 +215,13 @@ public class PartObj extends Part
 			}
 			Double d = MathHelper.rayIntersectsRotationWheel(RayTrace.getRayTrace(), p, n);
 			if(d != null && (min == null || d < min))
+			{
 				min = d;
+				dim = i;
+			}
 		}
 		GL11.glPopMatrix();
-		return min;	
+		return dim;	
 	}
 	
 	//------------------------------------------
@@ -491,9 +498,20 @@ public class PartObj extends Part
 		drawLine(Vec3.createVectorHelper(0.0F, -0.05F, 0.0F), Vec3.createVectorHelper(0.0F, 0.05F, 0.0F), 0xFFFFFF);
 		drawLine(Vec3.createVectorHelper(0.0F, 0.0F, -0.05F), Vec3.createVectorHelper(0.0F, 0.0F, 0.05F), 0xFFFFFF);
 		
-		drawCircle(origin, rotationWheelRadius, 0, 1.0F, 0.0F, 0.0F);
-		drawCircle(origin, rotationWheelRadius, 1, 0.0F, 1.0F, 0.0F);
-		drawCircle(origin, rotationWheelRadius, 2, 0.0F, 0.0F, 1.0F);
+		int colour = 0xFFFFFF;
+		for(int i = 0; i < 3; i++)
+		{
+			switch(i)
+			{
+			case 0: colour = 0xFF0000; break;
+			case 1: colour = 0x00FF00; break;
+			case 2: colour = 0x0000FF; break;
+			}
+			if(rotationWheelPlaneHighlight != null && rotationWheelPlaneHighlight == i)
+				drawCircle(origin, rotationWheelRadius, i, colour, 4.0F, 1.0F);
+			else
+				drawCircle(origin, rotationWheelRadius, i, colour, 3.0F, 0.4F);
+		}	
 		GL11.glPopMatrix();
 	}
 
@@ -506,13 +524,14 @@ public class PartObj extends Part
 	 * @param green - green colour (0 - 1F)
 	 * @param blue - blue colour (0 - 1F)
 	 */
-	private void drawCircle(Vec3 c, double r, int plane, double red, double green, double blue)
+	private void drawCircle(Vec3 c, double r, int plane, int colour, float width, float alpha)
 	{		
 		GL11.glPushMatrix();
 		GL11.glEnable(GL11.GL_BLEND);
-		GL11.glDisable(GL11.GL_DEPTH_TEST);
-		GL11.glColor3d(red, green, blue);
-		GL11.glLineWidth(3.0F);
+		GL11.glDisable(GL11.GL_DEPTH_TEST);		
+		float[] rgb = MathHelper.intToRGB(colour);
+		GL11.glColor4f(rgb[0], rgb[1], rgb[2], alpha);
+		GL11.glLineWidth(width);
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glDepthMask(false);
 		GL11.glBegin(GL11.GL_LINE_LOOP);

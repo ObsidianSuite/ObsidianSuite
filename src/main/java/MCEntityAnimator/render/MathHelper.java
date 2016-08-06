@@ -10,7 +10,7 @@ import net.minecraftforge.client.model.obj.Face;
 public class MathHelper 
 {
 
-	private static float rotationWheelWidth = 0.005F;
+	private static float rotationWheelWidth = 0.1F;
 	
 	/**
 	 * Calculate intersection between ray and face.
@@ -75,6 +75,23 @@ public class MathHelper
 	public static Vec3 scale(Vec3 v, double scale)
 	{
 		return Vec3.createVectorHelper(v.xCoord*scale, v.yCoord*scale, v.zCoord*scale);
+	}
+	
+	public static float[] intToRGB(int color)
+	{
+		//System.out.println(color);
+		float[] rgb = new float[3];
+		long blue = color%256;
+		color = color/256;
+		long green = color%256;
+		color = color/256;
+		long red = color%256;
+				
+		rgb[0] = red/255F;
+		rgb[1] = green/255F;
+		rgb[2] = blue/255F;
+		
+		return rgb;
 	}
 	
 }

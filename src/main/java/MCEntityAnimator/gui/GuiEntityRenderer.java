@@ -191,8 +191,9 @@ public class GuiEntityRenderer extends GuiBlack
 		super.handleMouseInput();
 	}
 
-	public void processRay(PartObj raySelection)
+	public void processRay()
 	{
+		PartObj raySelection = entityModel.testRay();
 		if(raySelection != null)
 			additionalHighlightPartName = raySelection.getName();
 		else
@@ -217,17 +218,7 @@ public class GuiEntityRenderer extends GuiBlack
 		GL11.glTranslated(par5EntityLivingBase.posX, par5EntityLivingBase.posY, par5EntityLivingBase.posZ);
 		RenderManager.instance.playerViewY = 180.0F;
 		RenderManager.instance.renderEntityWithPosYaw(par5EntityLivingBase, 0.0D, 0.0D, 0.0D, 0.0F, 1.0F);
-		processRay(entityModel.testRay());
-		if(currentPartName != null && !currentPartName.equals(""))
-		{
-			Part currentPart = Util.getPartFromName(currentPartName, entityModel.parts);
-			if(currentPart instanceof PartObj)
-			{
-				Double d = ((PartObj) currentPart).testRotationRay();
-				if(d != null)
-					System.out.println(d);
-			}
-		}
+		processRay();
 		GL11.glPopMatrix();
 		RenderHelper.disableStandardItemLighting();
 		GL11.glDisable(GL12.GL_RESCALE_NORMAL);
