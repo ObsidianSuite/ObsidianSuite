@@ -16,6 +16,7 @@ import MCEntityAnimator.MCEA_Main;
 import MCEntityAnimator.Util;
 import MCEntityAnimator.render.objRendering.EntityObj;
 import MCEntityAnimator.render.objRendering.ModelObj;
+import MCEntityAnimator.render.objRendering.RayTrace;
 import MCEntityAnimator.render.objRendering.RenderObj;
 import MCEntityAnimator.render.objRendering.parts.Part;
 import MCEntityAnimator.render.objRendering.parts.PartObj;
@@ -24,7 +25,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.entity.EntityLivingBase;
@@ -51,9 +51,7 @@ public class GuiEntityRenderer extends GuiBlack
 	private RenderBlocks renderBlocks = new RenderBlocks();
 
 	private List<View> views;
-
-	private float[] posNear=new float[]{0F,0F,0F},posFar=new float[]{0F,0F,0F};
-
+	
 	public GuiEntityRenderer(String entityName)
 	{
 		super();
@@ -111,96 +109,30 @@ public class GuiEntityRenderer extends GuiBlack
 			renderEntityIntoGui(posX + (width-posX-5)/2 + horizontalPan, posY + (height - 10)/2 + scaleModifier/2 + verticalPan, scale, 0.0F, 0.0F, entityToRender); 
 		}
 
-//		entityModel.clearHighlights();
-//
-//		if(currentPartName != null)
-//		{
-//			Part currentPart = Util.getPartFromName(currentPartName, entityModel.parts);
-//			if(currentPart instanceof PartObj)
-//				entityModel.hightlightPart((PartObj) currentPart);
-//		}
-//
-//		if(additionalHighlightPartName != null && !additionalHighlightPartName.equals(""))
-//		{
-//			Part additionalPart = Util.getPartFromName(additionalHighlightPartName, entityModel.parts);
-//			if(additionalPart instanceof PartObj)
-//				entityModel.hightlightPart((PartObj) additionalPart);
-//		}
+		entityModel.clearHighlights();
+
+		if(currentPartName != null && !currentPartName.equals(""))
+		{
+			Part currentPart = Util.getPartFromName(currentPartName, entityModel.parts);
+			if(currentPart instanceof PartObj)
+				entityModel.hightlightPart((PartObj) currentPart, true);
+		}
+
+		if(additionalHighlightPartName != null && !additionalHighlightPartName.equals(""))
+		{
+			Part additionalPart = Util.getPartFromName(additionalHighlightPartName, entityModel.parts);
+			if(additionalPart instanceof PartObj)
+				entityModel.hightlightPart((PartObj) additionalPart, false);
+		}
 	}
 
 	@Override
 	protected void mouseClicked(int x, int y, int i) 
 	{
 		super.mouseClicked(x, y, i);
+		if(additionalHighlightPartName != null && !additionalHighlightPartName.equals(""))
+			currentPartName = additionalHighlightPartName;
 	}
-
-
-	private void processUnProjectClick() 
-	{
-
-		FloatBuffer model = BufferUtils.createFloatBuffer(16);
-		FloatBuffer projection = BufferUtils.createFloatBuffer(16);
-		IntBuffer viewport = BufferUtils.createIntBuffer(16);
-
-		GL11.glGetFloat(GL11.GL_MODELVIEW_MATRIX, model);
-		GL11.glGetFloat(GL11.GL_PROJECTION_MATRIX, projection);
-		GL11.glGetInteger(GL11.GL_VIEWPORT, viewport);
-		
-		FloatBuffer posNearBuffer = BufferUtils.createFloatBuffer(3);
-		FloatBuffer posFarBuffer = BufferUtils.createFloatBuffer(3);
-
-		GLU.gluUnProject(Mouse.getX(), Mouse.getY(), 0.0F, model, projection, viewport, posNearBuffer);
-		GLU.gluUnProject(Mouse.getX(), Mouse.getY(), 1.0F, model, projection, viewport, posFarBuffer);
-
-		for(int i = 0; i < 3; i++)
-		{
-			posNear[i] = posNearBuffer.get(i);
-			posFar[i] = posFarBuffer.get(i);
-		}
-
-		Vec3 v = Vec3.createVectorHelper(posNear[0], posNear[1], posNear[2]);
-		Vec3 w = Vec3.createVectorHelper(posFar[0], posFar[1], posFar[2]);
-		
-		entityModel.clearHighlights();
-		PartObj p = entityModel.testRay(v, w);
-		if(p != null)
-			entityModel.hightlightPart(p);
-		
-
-		//		System.out.println(String.format("Near: %f,%f,%f", posNear.get(0), posNear.get(1), posNear.get(2)));
-		//		System.out.println(String.format("Far: %f,%f,%f", posFar.get(0), posFar.get(1), posFar.get(2)));		
-
-		//Vec3 vec = Vec3.createVectorHelper(posNear.get(0) - posFar.get(0), posNear.get(1) - posFar.get(1), posNear.get(2) - posFar.get(2));
-		//System.out.println(vec);
-
-		OpenGlHelper.setActiveTexture(OpenGlHelper.lightmapTexUnit);
-		GL11.glDisable(GL11.GL_TEXTURE_2D);
-		OpenGlHelper.setActiveTexture(OpenGlHelper.defaultTexUnit);
-
-		GL11.glEnable(GL11.GL_BLEND);
-		OpenGlHelper.glBlendFunc(770, 771, 1, 0);
-		GL11.glColor4f(0.0F, 0.0F, 0.0F, 0.4F);
-		GL11.glLineWidth(2.0F);
-		GL11.glDisable(GL11.GL_TEXTURE_2D);
-		GL11.glDepthMask(false);
-
-		Tessellator tessellator = Tessellator.instance;
-		tessellator.startDrawing(1);
-		tessellator.setColorOpaque_I(0xFFFFFF);
-		tessellator.addVertex(posNear[0], posNear[1], posNear[2]);
-		tessellator.addVertex(posFar[0], posFar[1], posFar[2]);
-		//		System.out.println(String.format("%f, %f, %f", posFar.get(0)/10F, posFar.get(1)/10F, posFar.get(2)/10F));
-		//		System.out.println(String.format("%f, %f, %f", posNear.get(0)/10F, posNear.get(1)/10F, posNear.get(2)/10F));
-		//		tessellator.addVertex(2.7F, 0.18F, 1.6F);
-		//		tessellator.addVertex(-4.5F,-1.0F,-0.7F);
-		tessellator.draw();
-
-		GL11.glDepthMask(true);
-		GL11.glEnable(GL11.GL_TEXTURE_2D);
-		GL11.glDisable(GL11.GL_BLEND);
-
-	}
-
 
 	@Override
 	protected void mouseClickMove(int x, int y, int par2, long par3Long) 
@@ -258,6 +190,14 @@ public class GuiEntityRenderer extends GuiBlack
 		scaleModifier += Mouse.getEventDWheel()/40;
 		super.handleMouseInput();
 	}
+	
+	public void processRay(PartObj raySelection)
+	{
+		if(raySelection != null)
+			additionalHighlightPartName = raySelection.getName();
+		else
+			additionalHighlightPartName = "";
+	}
 
 	/**
 	 * Renders an entity into a gui. Parameters - xpos, ypos, scale, rotx, roty, entity.
@@ -277,7 +217,7 @@ public class GuiEntityRenderer extends GuiBlack
 		GL11.glTranslated(par5EntityLivingBase.posX, par5EntityLivingBase.posY, par5EntityLivingBase.posZ);
 		RenderManager.instance.playerViewY = 180.0F;
 		RenderManager.instance.renderEntityWithPosYaw(par5EntityLivingBase, 0.0D, 0.0D, 0.0D, 0.0F, 1.0F);
-		processUnProjectClick();
+		processRay(entityModel.testRay());
 		GL11.glPopMatrix();
 		RenderHelper.disableStandardItemLighting();
 		GL11.glDisable(GL12.GL_RESCALE_NORMAL);

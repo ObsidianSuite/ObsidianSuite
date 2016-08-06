@@ -8,6 +8,7 @@ import org.lwjgl.opengl.GL11;
 import MCEntityAnimator.animation.AnimationData;
 import MCEntityAnimator.animation.AnimationParenting;
 import MCEntityAnimator.render.MathHelper;
+import MCEntityAnimator.render.objRendering.RayTrace;
 import MCEntityAnimator.render.objRendering.bend.UVMap.PartUVMap;
 import MCEntityAnimator.render.objRendering.parts.PartObj;
 import net.minecraft.util.Vec3;
@@ -191,33 +192,41 @@ public class Bend
 	/**
 	 * Test to see if a ray insects with the parent part of the bend.
 	 */
-	public Double testRayParent(Vec3 p0, Vec3 p1)
+	public Double testRayParent()
 	{
-		return testRay(p0,p1,getParentBendParts());
+		GL11.glPushMatrix();
+		move();
+		Double t = testRay(RayTrace.getRayTrace(),getParentBendParts());
+		GL11.glPopMatrix();
+		return t;
 	}
-	
+
 	/**
 	 * Test to see if a ray insects with the child part of the bend.
 	 */
-	public Double testRayChild(Vec3 p0, Vec3 p1)
+	public Double testRayChild()
 	{
-		return testRay(p0,p1,getChildBendParts());
+		GL11.glPushMatrix();
+		move();
+		Double t = testRay(RayTrace.getRayTrace(),getChildBendParts());
+		GL11.glPopMatrix();
+		return t;
 	}
-	
+
 	/**
 	 * Test to see if a ray insects with the parts of the bend.
 	 * @param p0 - Point on ray.
 	 * @param p1 - Another point on ray.
 	 * @return - Minimum distance from p0 to part, null if no intersect exists.
 	 */
-	private Double testRay(Vec3 p0, Vec3 p1, List<BendPart> bendParts)
+	private Double testRay(RayTrace ray, List<BendPart> bendParts)
 	{
 		Double min = null;
 		for(BendPart bendPart : bendParts)
 		{
 			for(Face f : bendPart.faces)
 			{
-				Double d = MathHelper.rayIntersectsFace(p0, p1, f);
+				Double d = MathHelper.rayIntersectsFace(ray, f);
 				if(d != null && (min == null || d < min))
 					min = d;
 			}
@@ -225,8 +234,8 @@ public class Bend
 		return min;	
 	}
 
-	public void render()
-	{		
+	public void move()
+	{
 		//These are absolute vertex reference taking into rotation into account.
 		Vertex[] topFarVertices = new Vertex[parentFarVertices.length];
 		Vertex[] topNearVertices = new Vertex[parentNearVertices.length];
@@ -268,18 +277,14 @@ public class Bend
 			//Generate part bottom.
 			Vertex[] bendPartBottom = generatePartBottom(curves,(float)(i+1)/bendSplit);
 
-			boolean highlight = i < bendSplit/2 ? parent.modelObj.isPartHighlighted(parent) : child.modelObj.isPartHighlighted(child);
-
 			//Update bend, swap top and bottom vertices if part is inverted.
 			if(inverted)
-				bendParts.get(i).updateVertices(bendPartBottom, bendPartTop, highlight);
+				bendParts.get(i).updateVertices(bendPartBottom, bendPartTop);
 			else
-				bendParts.get(i).updateVertices(bendPartTop, bendPartBottom, highlight);
+				bendParts.get(i).updateVertices(bendPartTop, bendPartBottom);
 			//Top of next part is bottom of this part.
 			bendPartTop = bendPartBottom;
 		}
-
-		GL11.glPushMatrix();
 
 		//Get all parents that need compensating for.
 		AnimationParenting anipar = AnimationData.getAnipar(parent.modelObj.getEntityType());
@@ -294,17 +299,25 @@ public class Bend
 		//Compensate for all parents.
 		for(PartObj q : parents)
 			compensatePartRotation(q);
+	}
+
+	public void render()
+	{	
+		GL11.glPushMatrix();
+
+		move();
 
 		//Actually render all the bend parts.
 		for(int i = 0; i < bendSplit; i++)
-			bendParts.get(i).render();
-
-		//Render curve (debug only).
-		for(BezierCurve c : curves)
-			c.render();
+		{
+			BendPart part = bendParts.get(i);
+			boolean mainHighlight = i < bendSplit/2 ? parent.modelObj.isMainHighlight(parent) : child.modelObj.isMainHighlight(child);
+			boolean otherHighlight = i < bendSplit/2 ? parent.modelObj.isPartHighlighted(parent) : child.modelObj.isPartHighlighted(child);
+			part.updateTextureCoordinates(mainHighlight, otherHighlight, parent.modelObj);
+			part.render();
+		}
 
 		GL11.glPopMatrix();
-
 	}
 
 	/**
