@@ -128,9 +128,9 @@ public class BendHelper
 	{
 		float[] vector = new float[]{v.x - rotationPoint.x, v.y - rotationPoint.y, v.z - rotationPoint.z};
 		
-		v.x = vector[0]*rotationMatrix.get(0) + vector[1]*rotationMatrix.get(1) + vector[2]*rotationMatrix.get(2) + rotationPoint.x;
-		v.y = vector[0]*rotationMatrix.get(4) + vector[1]*rotationMatrix.get(5) + vector[2]*rotationMatrix.get(6) + rotationPoint.y;
-		v.z = vector[0]*rotationMatrix.get(8) + vector[1]*rotationMatrix.get(9) + vector[2]*rotationMatrix.get(10) + rotationPoint.z;
+		v.x = vector[0]*rotationMatrix.get(0) + vector[1]*rotationMatrix.get(4) + vector[2]*rotationMatrix.get(8) + rotationPoint.x;
+		v.y = vector[0]*rotationMatrix.get(1) + vector[1]*rotationMatrix.get(5) + vector[2]*rotationMatrix.get(9) + rotationPoint.y;
+		v.z = vector[0]*rotationMatrix.get(2) + vector[1]*rotationMatrix.get(6) + vector[2]*rotationMatrix.get(10) + rotationPoint.z;
 	}
 
 	/**
