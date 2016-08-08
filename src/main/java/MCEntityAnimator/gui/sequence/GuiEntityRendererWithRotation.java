@@ -238,6 +238,7 @@ public class GuiEntityRendererWithRotation extends GuiEntityRenderer
 
 	private void updatePartValues(double value, int dim)
 	{
+		System.out.println(value);
 		Part part = Util.getPartFromName(currentPartName, entityModel.parts);
 		//Negative for some reason - makes more sense when rotating..
 		if(part instanceof PartObj)

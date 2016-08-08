@@ -2,7 +2,6 @@ package MCEntityAnimator.gui.sequence;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.GridBagConstraints;
@@ -20,7 +19,6 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
-import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -32,6 +30,7 @@ import java.util.Map;
 import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
 import javax.swing.ActionMap;
+import javax.swing.BoxLayout;
 import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -61,15 +60,11 @@ import MCEntityAnimator.animation.AnimationSequence;
 import MCEntityAnimator.distribution.SaveLoadHandler;
 import MCEntityAnimator.distribution.ServerAccess;
 import MCEntityAnimator.gui.GuiBlack;
-import MCEntityAnimator.gui.GuiEntityRenderer;
-import MCEntityAnimator.gui.GuiInventoryChooseItem;
 import MCEntityAnimator.gui.animation.FileGUI;
 import MCEntityAnimator.render.objRendering.EntityObj;
 import MCEntityAnimator.render.objRendering.parts.Part;
-import MCEntityAnimator.render.objRendering.parts.PartObj;
-import net.minecraft.item.Item;
 
-public class GuiAnimationTimelineWithFrames extends GuiEntityRendererWithRotation
+public class GuiAnimationTimeline extends GuiEntityRendererWithRotation
 {
 
 	public AnimationSequence currentAnimation;
@@ -79,9 +74,7 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRendererWithRotatio
 	private DecimalFormat df = new DecimalFormat("#.##");
 	private float time = 0.0F;
 	private float timeIncrement = 1.0F;
-	private ControllerFrame controllerFrame;
 	private TimelineFrame timelineFrame;
-	private SettingsFrame settingsFrame;
 	protected Map<String, List<Keyframe>> keyframes = new HashMap<String, List<Keyframe>>();
 
 	private String exceptionPartName = "";
@@ -90,7 +83,7 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRendererWithRotatio
 	private boolean boolLoop;
 
 
-	public GuiAnimationTimelineWithFrames(String entityName, AnimationSequence animation)
+	public GuiAnimationTimeline(String entityName, AnimationSequence animation)
 	{
 		super(entityName);
 
@@ -140,44 +133,33 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRendererWithRotatio
 
 	public void loadFrames()
 	{
-		controllerFrame = new ControllerFrame();
-		settingsFrame = new SettingsFrame();
 		timelineFrame = new TimelineFrame();
 
-		for(int i = 0; i < 3; i++)
+		JFrame frame = timelineFrame;
+		InputMap inputMap = frame.getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+		ActionMap actionMap = frame.getRootPane().getActionMap();
+
+		inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0), "spacePressed");
+		actionMap.put("spacePressed", new SpaceAction());		
+		inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_W, 0), "wPressed");
+		actionMap.put("wPressed", new WAction());
+		inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_S, 0), "sPressed");
+		actionMap.put("sPressed", new SAction());
+		inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_A, 0), "aPressed");
+		actionMap.put("aPressed", new AAction());
+		inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0), "dPressed");
+		actionMap.put("dPressed", new DAction());
+		inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.CTRL_DOWN_MASK, true), "undoReleased");
+		actionMap.put("undoReleased", new UndoAction());
+		inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_Y, InputEvent.CTRL_DOWN_MASK, true), "redoReleased");
+		actionMap.put("redoReleased", new RedoAction());
+		inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), "deletePressed");
+		actionMap.put("deletePressed", new DeleteAction());
+
+		for(int j = 0; j <= 9; j++)
 		{
-			JFrame frame = null;
-			switch(i)
-			{
-			case 0: frame = controllerFrame; break;
-			case 1: frame = settingsFrame; break;
-			case 2: frame = timelineFrame; break;
-			}
-			InputMap inputMap = frame.getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-			ActionMap actionMap = frame.getRootPane().getActionMap();
-
-			inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0), "spacePressed");
-			actionMap.put("spacePressed", new SpaceAction());		
-			inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_W, 0), "wPressed");
-			actionMap.put("wPressed", new WAction());
-			inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_S, 0), "sPressed");
-			actionMap.put("sPressed", new SAction());
-			inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_A, 0), "aPressed");
-			actionMap.put("aPressed", new AAction());
-			inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0), "dPressed");
-			actionMap.put("dPressed", new DAction());
-			inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.CTRL_DOWN_MASK, true), "undoReleased");
-			actionMap.put("undoReleased", new UndoAction());
-			inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_Y, InputEvent.CTRL_DOWN_MASK, true), "redoReleased");
-			actionMap.put("redoReleased", new RedoAction());
-			inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), "deletePressed");
-			actionMap.put("deletePressed", new DeleteAction());
-
-			for(int j = 0; j <= 9; j++)
-			{
-				inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_NUMPAD0 + j, 0), "numpad" + j);
-				actionMap.put("numpad" + j, new ChangeViewAction(j));
-			}
+			inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_NUMPAD0 + j, 0), "numpad" + j);
+			actionMap.put("numpad" + j, new ChangeViewAction(j));
 		}
 
 		timelineFrame.refresthLineColours();
@@ -225,13 +207,11 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRendererWithRotatio
 	{
 
 		saveSetup();
-		controllerFrame.dispose();
-		settingsFrame.dispose();
 		timelineFrame.dispose();
 		SaveLoadHandler.upload();
 	}
 
-	
+
 	public void drawScreen(int par1, int par2, float par3)
 	{		
 		if(boolPlay)
@@ -245,17 +225,16 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRendererWithRotatio
 				else
 				{
 					boolPlay = false;
-					controllerFrame.updatePlayPauseButton();
+					timelineFrame.updatePlayPauseButton();
 					time = currentAnimation.getTotalTime();
 				}
 			}
 			timelineFrame.timeSlider.setValue((int) time);
 			timelineFrame.repaint();
-			settingsFrame.repaint();
 		}
-		
-		//this.currentAnimation.animateAll(time, entityModel, exceptionPartName);
-		
+
+		this.currentAnimation.animateAll(time, entityModel, exceptionPartName);
+
 		super.drawScreen(par1, par2, par3);
 	}
 
@@ -288,7 +267,6 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRendererWithRotatio
 		}
 		partKeyframes.add(kf);
 		keyframes.put(kf.partName, partKeyframes);
-		settingsFrame.refreshButtons();
 		timelineFrame.refresthLineColours();
 		if(!keyframeExists)
 			updateAnimation();
@@ -336,9 +314,9 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRendererWithRotatio
 			JOptionPane.showMessageDialog(timelineFrame, kf.partName + " can only copy to itself.");
 		else
 			addKeyframe(new Keyframe(time, partName, kf.values.clone()));
-		
+
 	}
-	
+
 	private boolean keyframeExists()
 	{
 		List<Keyframe> partKeyframes = keyframes.get(currentPartName);
@@ -441,8 +419,6 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRendererWithRotatio
 
 	private void refreshFrames()
 	{		
-		settingsFrame.updateRotationSliderValues();
-		settingsFrame.refreshButtons();
 		timelineFrame.refresthLineColours();
 	}
 
@@ -525,25 +501,36 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRendererWithRotatio
 	private void updatePart(String newPartName)
 	{
 		currentPartName = newPartName;
-		controllerFrame.updatePartDropDown();
-		controllerFrame.repaint();
 		Part part = Util.getPartFromName(currentPartName, entityModel.parts);
-		settingsFrame.updateRotationSliderValues();
 		timelineFrame.refresthLineColours();
-		settingsFrame.refreshButtons();
 	}
 
-	private class ControllerFrame extends JFrame
+	private class TimelineFrame extends JFrame
 	{
-		JButton playPauseButton;
-		JComboBox<String> partDropDown;
+		KeyframeLine[] lines;
+		JSlider timeSlider;
+		int timelineLength = 100;
+		int timelineLengthMax = 300;
+		int timelineLengthMin = 50;
 		JPanel mainPanel;
+		JLabel[] partLabels;
+		JButton playPauseButton;
 
-		private ControllerFrame()
+		private TimelineFrame()
 		{
-			super("Controls");
+			super("Timeline");
+
+			final KeyframeLine[] lines = new KeyframeLine[parts.size()];
+			for(int i = 0; i < parts.size(); i++)
+			{
+				lines[i] = new KeyframeLine(parts.get(i));
+			}
+
 
 			mainPanel = new JPanel();
+
+			JPanel optionsPanel = new JPanel();
+			optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
 
 			playPauseButton = new JButton("Play");
 			playPauseButton.setPreferredSize(new Dimension(100,50));
@@ -558,142 +545,7 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRendererWithRotatio
 					updatePlayPauseButton();
 				}
 			});
-
-			final SliderPanel animationSpeedSliderPanel = new SliderPanel("Animation Speed", 0, 3, 1, 0.01F, 1); 
-			animationSpeedSliderPanel.slider.addChangeListener(new ChangeListener()
-			{
-				@Override
-				public void stateChanged(ChangeEvent e) 
-				{
-					timeIncrement = (float) animationSpeedSliderPanel.slider.getScaledValue();
-				}
-			});
-
-			partDropDown = new JComboBox<String>();
-			for(String s : parts)
-			{
-				partDropDown.addItem(s);
-			}
-			partDropDown.setRenderer(new BasicComboBoxRenderer()
-			{
-				public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) 
-				{
-					if (isSelected) 
-					{
-						setBackground(list.getSelectionBackground());
-						setForeground(list.getSelectionForeground());
-						if (index > -1) 
-							additionalHighlightPartName = parts.get(index);
-					} 
-					else 
-					{
-						setBackground(list.getBackground());
-						setForeground(list.getForeground());
-					}
-					setFont(list.getFont());
-					setText((value == null) ? "" : Util.getDisplayName(value.toString(), entityModel.parts));
-					return this;
-				}
-			});
-
-			partDropDown.addActionListener(new ActionListener()
-			{
-				@Override
-				public void actionPerformed(ActionEvent e) 
-				{
-					updatePart((String) ((JComboBox<String>) e.getSource()).getSelectedItem());
-				}
-			});
-
-			mainPanel.add(playPauseButton);
-			mainPanel.add(animationSpeedSliderPanel);
-			mainPanel.add(partDropDown);
-
-			setContentPane(mainPanel);
-			pack();
-			setAlwaysOnTop(true);
-			setLocation(Display.getX() + 50, Display.getY() + 50);
-			setResizable(false);
-			setVisible(true);
-		}
-
-		private void updatePlayPauseButton()
-		{
-			playPauseButton.setText(boolPlay ? "Pause" : "Play");
-			pack();
-		}
-
-		private void updatePartDropDown()
-		{
-			for(int i = 0; i < partDropDown.getItemCount(); i++)
-			{
-				if(partDropDown.getItemAt(i).equals(currentPartName))
-				{
-					partDropDown.setSelectedIndex(i);
-					break;
-				}
-			}
-		}
-	}
-
-	private class SettingsFrame extends JFrame
-	{
-		SliderPanel xRotPanel, yRotPanel, zRotPanel;
-		JTabbedPane tabbedPane;
-		JButton addKeyframeButton, deleteKeyframeButton;
-
-		private SettingsFrame()
-		{
-			super("Settings");
-
-			JPanel generalPanel = new JPanel();
-			generalPanel.setLayout(new GridLayout(5,1));
-
-			JButton choosePropButton = new JButton("Choose Right Hand Item");
-			choosePropButton.addActionListener(new ActionListener()
-			{
-				@Override
-				public void actionPerformed(ActionEvent e) 
-				{
-					mc.displayGuiScreen(new GuiInventoryChooseItem(GuiAnimationTimelineWithFrames.this, (EntityObj) entityToRender));
-				}
-			});
-			
-			JButton emptyHandButton = new JButton("Empty Right Hand Item");
-			emptyHandButton.addActionListener(new ActionListener()
-			{
-				@Override
-				public void actionPerformed(ActionEvent e) 
-				{
-			    	AnimationData.setAnimationItem(currentAnimation.getName(), -1);
-					((EntityObj) entityToRender).setCurrentItem(null); 
-				}
-			});
-
-			JButton setActionPointButton = new JButton("Set Action Point");
-			setActionPointButton.addActionListener(new ActionListener()
-			{
-				@Override
-				public void actionPerformed(ActionEvent e) 
-				{
-					//TODO action point
-				}
-			});
-			setActionPointButton.setEnabled(false);
-
-			JButton deleteButton = new JButton("Delete Animation");
-			deleteButton.addActionListener(new ActionListener()
-			{
-				@Override
-				public void actionPerformed(ActionEvent e) 
-				{
-					AnimationData.deleteSequence(entityName, currentAnimation);
-					mc.displayGuiScreen(new GuiBlack());
-					ServerAccess.gui = new FileGUI();
-
-				}
-			});
-			deleteButton.setEnabled(false);
+			optionsPanel.add(playPauseButton);
 
 			JButton backButton = new JButton("Back");
 			backButton.addActionListener(new ActionListener()
@@ -705,257 +557,32 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRendererWithRotatio
 					ServerAccess.gui = new FileGUI();
 				}
 			});
+			optionsPanel.add(backButton);
 
-			generalPanel.add(choosePropButton);
-			generalPanel.add(emptyHandButton);
-			generalPanel.add(setActionPointButton);
-			generalPanel.add(deleteButton);
-			generalPanel.add(backButton);
+			JButton choosePropButton = new JButton("Choose Right Hand Item");
+			//			choosePropButton.addActionListener(new ActionListener()
+			//			{
+			//				@Override
+			//				public void actionPerformed(ActionEvent e) 
+			//				{
+			//					mc.displayGuiScreen(new GuiInventoryChooseItem(GuiAnimationTimelineWithFrames.this, (EntityObj) entityToRender));
+			//				}
+			//			});
+			optionsPanel.add(choosePropButton);
 
-			JPanel rotationPanel = new JPanel();
-			rotationPanel.setLayout(new GridBagLayout());
-			xRotPanel = new SliderPanel("X Rotation", -1, 1, 0, 0.01F, 1);
-			RotationSliderListener xRotListener = new RotationSliderListener(0);
-			xRotPanel.slider.addChangeListener(xRotListener);
-			xRotPanel.slider.addMouseListener(xRotListener);
-
-			yRotPanel = new SliderPanel("Y Rotation", -1, 1, 0, 0.01F, 1);
-			RotationSliderListener yRotListener = new RotationSliderListener(1);
-			yRotPanel.slider.addChangeListener(yRotListener);
-			yRotPanel.slider.addMouseListener(yRotListener);
-
-			zRotPanel = new SliderPanel("Z Rotation", -1, 1, 0, 0.01F, 1);
-			RotationSliderListener zRotListener = new RotationSliderListener(2);
-			zRotPanel.slider.addChangeListener(zRotListener);
-			zRotPanel.slider.addMouseListener(zRotListener);
-
-			addKeyframeButton = new JButton("Add keyframe");
-			addKeyframeButton.addActionListener(new ActionListener()
+			JButton emptyHandButton = new JButton("Empty Right Hand Item");
+			emptyHandButton.addActionListener(new ActionListener()
 			{
 				@Override
 				public void actionPerformed(ActionEvent e) 
 				{
-					addKeyframe();
-					refreshButtons();
+					AnimationData.setAnimationItem(currentAnimation.getName(), -1);
+					((EntityObj) entityToRender).setCurrentItem(null); 
 				}
 			});
+			optionsPanel.add(emptyHandButton);
 
-			deleteKeyframeButton = new JButton("Delete keyframe");
-			deleteKeyframeButton.addActionListener(new ActionListener()
-			{
-				@Override
-				public void actionPerformed(ActionEvent e) 
-				{
-					deleteKeyframe();
-				}
-			});
-
-
-
-			GridBagConstraints c = new GridBagConstraints();
-			c.fill = GridBagConstraints.BOTH;
-			c.gridx = 0;
-			c.gridy = 0;
-			c.gridwidth = 1;			
-			c.gridy = 0;
-			c.weightx = 1;
-			c.insets = new Insets(0,0,10,0);
-
-			c.gridx = 0;
-			c.gridy = 1;
-			c.gridwidth = 2;	
-			c.insets = new Insets(0,0,0,0);
-			rotationPanel.add(xRotPanel, c);
-
-			c.gridy = 2;
-			rotationPanel.add(yRotPanel, c);
-
-			c.gridy = 3;
-			c.insets = new Insets(0,0,10,0);
-			rotationPanel.add(zRotPanel, c);
-
-
-			c.gridy = 4;
-			c.gridwidth = 1;
-			c.insets = new Insets(0,0,0,0);
-			rotationPanel.add(addKeyframeButton, c);
-
-			c.gridx = 1;
-			rotationPanel.add(deleteKeyframeButton, c);
-
-			JPanel renderPanel = new JPanel();
-			renderPanel.setLayout(new GridLayout(4,2));
-			for(int i = 0; i < 4; i++)
-			{
-				JCheckBox cb = new JCheckBox();
-				cb.setHorizontalAlignment(JCheckBox.RIGHT);
-				renderPanel.add(cb);
-				String s = "";
-				switch(i)
-				{
-				case 0: 
-					s = "Loop"; 
-					cb.addActionListener(new ActionListener()
-					{
-						public void actionPerformed(ActionEvent actionEvent) 
-						{
-							AbstractButton abstractButton = (AbstractButton) actionEvent.getSource();
-							boolLoop = abstractButton.getModel().isSelected();
-						}
-					});
-					break;
-				case 1: s = "Shield"; break; //TODO shield??
-				case 2: 
-					s = "Base";
-					cb.addActionListener(new ActionListener()
-					{
-						public void actionPerformed(ActionEvent actionEvent) 
-						{
-							AbstractButton abstractButton = (AbstractButton) actionEvent.getSource();
-							boolBase = abstractButton.getModel().isSelected();
-						}
-					});
-					break;
-				case 3:
-					s = "Grid";
-					cb.addActionListener(new ActionListener()
-					{
-						public void actionPerformed(ActionEvent actionEvent) 
-						{
-							AbstractButton abstractButton = (AbstractButton) actionEvent.getSource();
-							boolGrid = abstractButton.getModel().isSelected();
-						}
-					});
-					break;
-				}
-				renderPanel.add(new JLabel(s));
-			}
-
-			tabbedPane = new JTabbedPane();
-			tabbedPane.addTab("General", generalPanel);
-			tabbedPane.addTab("Rotation", rotationPanel);
-			tabbedPane.addTab("Render", renderPanel);
-
-			setContentPane(tabbedPane);
-			pack();
-			setAlwaysOnTop(true);
-			setLocation(Display.getX() + 50, Display.getY() + 200);
-			setVisible(true);
-			setResizable(false);
-		}
-
-		private void updateRotationSliderValues()
-		{
-			currentAnimation.animateAll(time, entityModel);
-			Part part = Util.getPartFromName(currentPartName, entityModel.parts);
-			double x = part.getValue(0);
-			double y = part.getValue(1);
-			double z = part.getValue(2);
-			if(part instanceof PartObj)
-			{
-				x = -x/Math.PI;
-				y = -y/Math.PI;
-				z = -z/Math.PI;
-			}
-			xRotPanel.slider.setDoubleValue(x);
-			yRotPanel.slider.setDoubleValue(y);
-			zRotPanel.slider.setDoubleValue(z);
-		}
-
-		private Double[] getSliderValues()
-		{
-			Double[] sliderVals = new Double[3];
-			sliderVals[0] = xRotPanel.slider.getScaledValue();
-			sliderVals[1] = yRotPanel.slider.getScaledValue();
-			sliderVals[2] = zRotPanel.slider.getScaledValue();
-			return getSliderValues();
-		}
-
-		private void refreshButtons()
-		{
-			addKeyframeButton.setEnabled(true);
-			deleteKeyframeButton.setEnabled(true);
-			if(keyframeExists())
-				addKeyframeButton.setEnabled(false);
-			else
-				deleteKeyframeButton.setEnabled(false);	
-		}
-
-		private class RotationSliderListener implements ChangeListener, MouseListener
-		{
-
-			private int dim;
-
-			private RotationSliderListener(int dim)
-			{
-				this.dim = dim;
-			}
-
-			@Override
-			public void mousePressed(MouseEvent arg0) 
-			{
-				exceptionPartName = currentPartName;
-				settingsFrame.xRotPanel.slider.shouldUpdate = true;
-				settingsFrame.yRotPanel.slider.shouldUpdate = true;
-				settingsFrame.zRotPanel.slider.shouldUpdate = true;
-			}
-
-			@Override
-			public void stateChanged(ChangeEvent e) 
-			{
-				if(((JDoubleSlider) e.getSource()).shouldUpdate)
-				{
-					if(keyframeExists() && !boolPlay)
-					{
-						Part part = Util.getPartFromName(currentPartName, entityModel.parts);
-						getExistingKeyframe().values = part.getValues();
-					}
-				}
-			}
-
-			@Override
-			public void mouseReleased(MouseEvent arg0) 
-			{
-				settingsFrame.xRotPanel.slider.shouldUpdate = false;
-				settingsFrame.yRotPanel.slider.shouldUpdate = false;
-				settingsFrame.zRotPanel.slider.shouldUpdate = false;
-				if(keyframeExists())
-					updateAnimation();	
-			}			
-
-			@Override
-			public void mouseClicked(MouseEvent arg0) {}
-
-			@Override
-			public void mouseEntered(MouseEvent arg0) {}
-
-			@Override
-			public void mouseExited(MouseEvent arg0) {}
-
-		}
-	}
-
-	private class TimelineFrame extends JFrame
-	{
-		KeyframeLine[] lines;
-		JSlider timeSlider;
-		int timelineLength = 100;
-		int timelineLengthMax = 300;
-		int timelineLengthMin = 50;
-		JPanel mainPanel;
-		JLabel[] partLabels;
-
-		private TimelineFrame()
-		{
-			super("Timeline");
-
-			final KeyframeLine[] lines = new KeyframeLine[parts.size()];
-			for(int i = 0; i < parts.size(); i++)
-			{
-				lines[i] = new KeyframeLine(parts.get(i));
-			}
-
-			mainPanel = new JPanel();
+			JPanel timelinePanel = new JPanel();
 			final JTextField timeTextField = new JTextField("0");
 			timeSlider = new JSlider(0, timelineLengthMax, 0);
 			updateTimelineLength(0);
@@ -972,8 +599,6 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRendererWithRotatio
 					{
 						lines[i].repaint();
 					}
-					settingsFrame.updateRotationSliderValues();
-					settingsFrame.refreshButtons();
 				}
 			});
 			timeSlider.addMouseListener(new MouseListener()
@@ -1011,7 +636,6 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRendererWithRotatio
 					double value = Double.parseDouble(typed);
 					timeSlider.setValue((int)value);
 					time = (float) value;
-					settingsFrame.refreshButtons();
 				}
 			});
 
@@ -1024,19 +648,19 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRendererWithRotatio
 				}
 			});
 
-			mainPanel.setLayout(new GridBagLayout());
+			timelinePanel.setLayout(new GridBagLayout());
 			GridBagConstraints c = new GridBagConstraints();
 			c.anchor = GridBagConstraints.WEST;
 
 			c.gridx = 0;
 			c.gridy = 0;
 			c.fill = GridBagConstraints.HORIZONTAL;
-			mainPanel.add(timeTextField, c);
+			timelinePanel.add(timeTextField, c);
 
 			c.fill = GridBagConstraints.BOTH;
 			c.gridx = 1;
 			c.weighty = 1;
-			mainPanel.add(timeSlider, c);
+			timelinePanel.add(timeSlider, c);
 
 			partLabels = new JLabel[parts.size()];
 			for(int i = 0; i < parts.size(); i++)
@@ -1051,20 +675,23 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRendererWithRotatio
 
 				JLabel partLabel = new JLabel(Util.getDisplayName(parts.get(i), entityModel.parts));
 				partLabels[i] = partLabel;
-				mainPanel.add(partLabel, c);
+				timelinePanel.add(partLabel, c);
 
 				c.gridx = 1;
 				c.weightx = 1;
 				c.weighty = 1;
 				c.insets = new Insets(0, 10, 0, 0);
 				c.fill = GridBagConstraints.BOTH;
-				mainPanel.add(lines[i], c);
+				timelinePanel.add(lines[i], c);
 			}
 
-			JScrollPane scrollPane = new JScrollPane(mainPanel);
+			JScrollPane scrollPane = new JScrollPane(timelinePanel);
 			scrollPane.setPreferredSize(new Dimension(700,400));
 			scrollPane.setWheelScrollingEnabled(false);
-			setContentPane(scrollPane);
+
+			mainPanel.add(optionsPanel);
+			mainPanel.add(scrollPane);
+			setContentPane(mainPanel);
 			pack();
 			setAlwaysOnTop(true);
 			setLocation(Display.getX() + 50, Display.getY() + 520);
@@ -1088,7 +715,12 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRendererWithRotatio
 			timeSlider.setMinorTickSpacing(majorIncrements);
 			timeSlider.setLabelTable(timeSlider.createStandardLabels(majorIncrements));
 			repaint();
-			settingsFrame.refreshButtons();
+		}
+
+		private void updatePlayPauseButton()
+		{
+			playPauseButton.setText(boolPlay ? "Pause" : "Play");
+			pack();
 		}
 
 		private void refresthLineColours()
@@ -1130,9 +762,6 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRendererWithRotatio
 							timelineFrame.timeSlider.setValue((int) time);
 							currentAnimation.animateAll(time, entityModel);
 							updatePart(partName);
-							settingsFrame.tabbedPane.setSelectedIndex(1);
-							settingsFrame.updateRotationSliderValues();
-							settingsFrame.refreshButtons();
 						}
 					}
 
@@ -1254,6 +883,68 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRendererWithRotatio
 		}
 	}
 
+	private class RenderFrame extends JFrame
+	{
+		private RenderFrame()
+		{
+			JPanel renderPanel = new JPanel();
+			renderPanel.setLayout(new GridLayout(4,2));
+			for(int i = 0; i < 4; i++)
+			{
+				JCheckBox cb = new JCheckBox();
+				cb.setHorizontalAlignment(JCheckBox.RIGHT);
+				renderPanel.add(cb);
+				String s = "";
+				switch(i)
+				{
+				case 0: 
+					s = "Loop"; 
+					cb.addActionListener(new ActionListener()
+					{
+						public void actionPerformed(ActionEvent actionEvent) 
+						{
+							AbstractButton abstractButton = (AbstractButton) actionEvent.getSource();
+							boolLoop = abstractButton.getModel().isSelected();
+						}
+					});
+					break;
+				case 1: s = "Shield"; break; //TODO shield??
+				case 2: 
+					s = "Base";
+					cb.addActionListener(new ActionListener()
+					{
+						public void actionPerformed(ActionEvent actionEvent) 
+						{
+							AbstractButton abstractButton = (AbstractButton) actionEvent.getSource();
+							boolBase = abstractButton.getModel().isSelected();
+						}
+					});
+					break;
+				case 3:
+					s = "Grid";
+					cb.addActionListener(new ActionListener()
+					{
+						public void actionPerformed(ActionEvent actionEvent) 
+						{
+							AbstractButton abstractButton = (AbstractButton) actionEvent.getSource();
+							boolGrid = abstractButton.getModel().isSelected();
+						}
+					});
+					break;
+				}
+				renderPanel.add(new JLabel(s));
+			}
+
+			setContentPane(renderPanel);
+			pack();
+			setAlwaysOnTop(true);
+			setLocation(Display.getX() + 50, Display.getY() + 520);
+
+			setVisible(true);
+			setResizable(false);
+		}
+	}
+
 	private class Keyframe 
 	{
 		String partName;
@@ -1309,7 +1000,6 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRendererWithRotatio
 		public void actionPerformed(ActionEvent arg0) 
 		{
 			addKeyframe();
-			settingsFrame.refreshButtons();
 		}
 	}
 
@@ -1360,7 +1050,6 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRendererWithRotatio
 			time = time > 0 ? time - 1 : time;
 			timelineFrame.timeSlider.setValue((int) time);
 			timelineFrame.repaint();
-			settingsFrame.repaint();
 		}
 	}
 
@@ -1429,7 +1118,7 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRendererWithRotatio
 		{
 			final JLabel valueLabel = new JLabel(Integer.toString(value));
 			valueLabel.setPreferredSize(new Dimension(30, 10));
-			
+
 			slider = new JDoubleSlider(min, max, value, (int) (1/delta), majorSpacing);
 			slider.addChangeListener(new ChangeListener()
 			{
@@ -1451,7 +1140,7 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRendererWithRotatio
 			c.gridy = 1;
 			c.gridwidth = 2;
 			add(slider, c);
-			
+
 			c.gridx = 1;
 			c.gridy = 0;
 			c.gridwidth = 1;
