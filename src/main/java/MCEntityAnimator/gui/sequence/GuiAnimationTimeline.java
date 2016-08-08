@@ -73,7 +73,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithRotation
 
 	private DecimalFormat df = new DecimalFormat("#.##");
 	private float time = 0.0F;
-	private float timeIncrement = 1.0F;
+	private float timeIncrement = 0.1F;
 	private TimelineFrame timelineFrame;
 	protected Map<String, List<Keyframe>> keyframes = new HashMap<String, List<Keyframe>>();
 
@@ -81,7 +81,6 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithRotation
 
 	private boolean boolPlay;	
 	private boolean boolLoop;
-
 
 	public GuiAnimationTimeline(String entityName, AnimationSequence animation)
 	{
@@ -101,6 +100,9 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithRotation
 
 	}
 
+	/* ---------------------------------------------------- *
+	 * 						Setup							*
+	 * ---------------------------------------------------- */
 
 	@Override
 	public void initGui()
@@ -202,18 +204,20 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithRotation
 		}
 	}
 
+	/* ---------------------------------------------------- *
+	 * 						General							*
+	 * ---------------------------------------------------- */
+
 	@Override
 	public void onGuiClosed()
 	{
-
 		saveSetup();
 		timelineFrame.dispose();
 		SaveLoadHandler.upload();
 	}
 
-
 	public void drawScreen(int par1, int par2, float par3)
-	{		
+	{				
 		if(boolPlay)
 		{
 			time += timeIncrement;
@@ -235,14 +239,23 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithRotation
 
 		this.currentAnimation.animateAll(time, entityModel, exceptionPartName);
 
+		timelineFrame.updatePartLabels();
+		
 		super.drawScreen(par1, par2, par3);
 	}
 
+	/* ---------------------------------------------------- *
+	 * 				   Keyframe manipulation				*
+	 * ---------------------------------------------------- */
+
 	private void addKeyframe()
 	{
-		Part part = Util.getPartFromName(currentPartName, entityModel.parts);
-		Keyframe kf = new Keyframe((int) time, currentPartName, part.getValues());
-		addKeyframe(kf);
+		if(!currentPartName.equals(""))
+		{
+			Part part = Util.getPartFromName(currentPartName, entityModel.parts);
+			Keyframe kf = new Keyframe((int) time, currentPartName, part.getValues());
+			addKeyframe(kf);
+		}
 	}
 
 	private void addKeyframe(Keyframe kf)
@@ -268,8 +281,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithRotation
 		partKeyframes.add(kf);
 		keyframes.put(kf.partName, partKeyframes);
 		timelineFrame.refresthLineColours();
-		if(!keyframeExists)
-			updateAnimation();
+		updateAnimation();
 	}
 
 	private void deleteKeyframe()
@@ -294,14 +306,9 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithRotation
 			if(keyframeRemoved)
 				updateAnimation();
 		}
-		refreshFrames();
+		timelineFrame.refresh();
 	}
 
-	/**
-	 * Create a new keyframe based off another keyframe.
-	 * @param kf - Keyframe to copy.
-	 * @param partName - Name of part to be copied to.
-	 */
 	private void copyKeyframe(Keyframe kf, String partName, int time)
 	{
 		if(partName.equals("entitypos") && !kf.partName.equals("entitypos"))
@@ -344,6 +351,34 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithRotation
 		}
 		return null;
 	}
+
+	private float getLastKeyFrameTime() 
+	{
+		float lastFrameTime = 0;
+		for(String part : parts)
+		{
+			if(keyframes.get(part) != null)
+			{
+				for(Keyframe kf : keyframes.get(part))
+				{
+					if(kf.frameTime > lastFrameTime)
+						lastFrameTime = kf.frameTime;
+				}
+			}
+
+		}
+		return lastFrameTime;
+	}
+
+	private boolean doesPartOnlyHaveOneKeyframe(String partName) 
+	{
+		List<Keyframe> kfs = keyframes.get(partName);
+		return (kfs != null && kfs.size() == 1);
+	}
+
+	/* ---------------------------------------------------- *
+	 * 				   Animation manipulation				*
+	 * ---------------------------------------------------- */
 
 	private void updateAnimation()
 	{
@@ -389,6 +424,22 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithRotation
 		AnimationData.addSequence(entityName, currentAnimation);
 	}
 
+	/* ---------------------------------------------------- *
+	 * 				  	Part manipulation					*
+	 * ---------------------------------------------------- */
+
+	@Override
+	protected void updatePart(String newPartName)
+	{
+		super.updatePart(newPartName);
+		exceptionPartName = newPartName;
+		timelineFrame.refresh();
+	}
+
+	/* ---------------------------------------------------- *
+	 * 				  		 Undo/redo						*
+	 * ---------------------------------------------------- */
+
 	private void undo()
 	{
 		if(animationVersion > 0)
@@ -397,7 +448,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithRotation
 			currentAnimation = animationVersions.get(animationVersion);
 			AnimationData.addSequence(entityName, currentAnimation);
 			loadKeyframes();
-			refreshFrames();
+			timelineFrame.refresh();
 		}
 		else
 			Toolkit.getDefaultToolkit().beep();
@@ -411,40 +462,15 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithRotation
 			currentAnimation = animationVersions.get(animationVersion);
 			AnimationData.addSequence(entityName, currentAnimation);
 			loadKeyframes();
-			refreshFrames();
+			timelineFrame.refresh();
 		}
 		else
 			Toolkit.getDefaultToolkit().beep();
 	}
 
-	private void refreshFrames()
-	{		
-		timelineFrame.refresthLineColours();
-	}
-
-	private float getLastKeyFrameTime() 
-	{
-		float lastFrameTime = 0;
-		for(String part : parts)
-		{
-			if(keyframes.get(part) != null)
-			{
-				for(Keyframe kf : keyframes.get(part))
-				{
-					if(kf.frameTime > lastFrameTime)
-						lastFrameTime = kf.frameTime;
-				}
-			}
-
-		}
-		return lastFrameTime;
-	}
-
-	private boolean doesPartOnlyHaveOneKeyframe(String partName) 
-	{
-		List<Keyframe> kfs = keyframes.get(partName);
-		return (kfs != null && kfs.size() == 1);
-	}
+	/* ---------------------------------------------------- *
+	 * 				   		Control							*
+	 * ---------------------------------------------------- */
 
 	@Override
 	protected void keyTyped(char par1, int par2)
@@ -498,12 +524,16 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithRotation
 		super.keyTyped(par1, par2);
 	}
 
-	private void updatePart(String newPartName)
+	protected void onRotationWheelRelease()
 	{
-		currentPartName = newPartName;
-		Part part = Util.getPartFromName(currentPartName, entityModel.parts);
-		timelineFrame.refresthLineColours();
+		if(keyframeExists())
+			addKeyframe();
+		//pdateAnimation();
 	}
+
+	/* ---------------------------------------------------- *
+	 * 				   	Timeline Frame						*
+	 * ---------------------------------------------------- */
 
 	private class TimelineFrame extends JFrame
 	{
@@ -515,6 +545,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithRotation
 		JPanel mainPanel;
 		JLabel[] partLabels;
 		JButton playPauseButton;
+		JLabel partName, partX, partY, partZ;
 
 		private TimelineFrame()
 		{
@@ -530,7 +561,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithRotation
 			mainPanel = new JPanel();
 
 			JPanel optionsPanel = new JPanel();
-			optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
+			optionsPanel.setLayout(new GridLayout(8,1));
 
 			playPauseButton = new JButton("Play");
 			playPauseButton.setPreferredSize(new Dimension(100,50));
@@ -581,6 +612,17 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithRotation
 				}
 			});
 			optionsPanel.add(emptyHandButton);
+			
+			partName = new JLabel();
+			partX = new JLabel();
+			partY = new JLabel();
+			partZ = new JLabel();
+			
+			optionsPanel.add(partName);
+			optionsPanel.add(partX);
+			optionsPanel.add(partY);
+			optionsPanel.add(partZ);
+
 
 			JPanel timelinePanel = new JPanel();
 			final JTextField timeTextField = new JTextField("0");
@@ -700,6 +742,14 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithRotation
 			setResizable(false);
 		}
 
+		private void refresh()
+		{
+			updatePlayPauseButton();
+			refresthLineColours();
+			revalidate();
+			repaint();
+		}
+
 		private void updateTimelineLength(int delta)
 		{
 			int newLength = timelineLength + delta;
@@ -727,12 +777,30 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithRotation
 		{
 			for(int i = 0; i < partLabels.length; i++)
 			{
-				if(partLabels[i].getText().equals(Util.getDisplayName(currentPartName, entityModel.parts)))
+				if(!currentPartName.equals("") && partLabels[i].getText().equals(Util.getDisplayName(currentPartName, entityModel.parts)))
 					partLabels[i].setForeground(Color.red);
 				else
 					partLabels[i].setForeground(Color.black);
 			}
 			repaint();
+		}
+		
+		private void updatePartLabels()
+		{
+			String name = "No part selected";
+			String x="-",y="-",z="-";
+			if(currentPartName != null && !currentPartName.equals(""))
+			{
+				Part part = Util.getPartFromName(currentPartName, entityModel.parts);
+				name = part.getDisplayName();
+				x = df.format(part.getValue(0));
+				y = df.format(part.getValue(1));
+				z = df.format(part.getValue(2));
+			}
+			partName.setText(name);
+			partX.setText("X: " + x);
+			partY.setText("Y: " + y);
+			partZ.setText("Z: " + z);
 		}
 
 		private class KeyframeLine extends JPanel
@@ -883,6 +951,10 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithRotation
 		}
 	}
 
+	/* ---------------------------------------------------- *
+	 * 				  		Render frame					*
+	 * ---------------------------------------------------- */
+
 	private class RenderFrame extends JFrame
 	{
 		private RenderFrame()
@@ -945,6 +1017,10 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithRotation
 		}
 	}
 
+	/* ---------------------------------------------------- *
+	 * 				   		Keyframe						*
+	 * ---------------------------------------------------- */
+
 	private class Keyframe 
 	{
 		String partName;
@@ -993,6 +1069,10 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithRotation
 			return previousKf;
 		}
 	}
+
+	/* ---------------------------------------------------- *
+	 * 				   		Actions							*
+	 * ---------------------------------------------------- */
 
 	private class SpaceAction extends AbstractAction
 	{
@@ -1105,48 +1185,6 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithRotation
 		public void actionPerformed(ActionEvent e)
 		{
 			changeView(numpadNumber);
-		}
-
-	}
-
-	private class SliderPanel extends JPanel
-	{	
-
-		private JDoubleSlider slider;
-
-		private SliderPanel(String name, int min, int max, int value, float delta, int majorSpacing)
-		{
-			final JLabel valueLabel = new JLabel(Integer.toString(value));
-			valueLabel.setPreferredSize(new Dimension(30, 10));
-
-			slider = new JDoubleSlider(min, max, value, (int) (1/delta), majorSpacing);
-			slider.addChangeListener(new ChangeListener()
-			{
-				@Override
-				public void stateChanged(ChangeEvent e) 
-				{
-					valueLabel.setText(Double.toString(slider.getScaledValue()));
-				}
-			});
-
-			setLayout(new GridBagLayout());
-			GridBagConstraints c = new GridBagConstraints();
-			c.gridx = 0;
-			c.gridy = 0;
-			c.weightx = 1;
-			add(new JLabel(name), c);
-
-			c.weightx = 2;
-			c.gridy = 1;
-			c.gridwidth = 2;
-			add(slider, c);
-
-			c.gridx = 1;
-			c.gridy = 0;
-			c.gridwidth = 1;
-			c.weightx = 1;
-			c.insets = new Insets(0, 0, 0, 20);
-			add(valueLabel, c);
 		}
 	}
 

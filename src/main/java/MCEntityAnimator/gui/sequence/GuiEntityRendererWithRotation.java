@@ -27,95 +27,48 @@ import net.minecraft.util.Vec3;
 public class GuiEntityRendererWithRotation extends GuiEntityRenderer
 {
 
+	//True if mouse is hovering over the rotation wheel.
 	private boolean rotationWheelMouseOver = false;
+	//True if mouse was clicked while hovering over the rotation wheel and is still down.
 	private boolean rotationWheelDrag = false;
+	//The current plane seleciton of the rotation wheel (0-x,1-y,2-z)
 	public Integer rotationWheelPlane;
+	
+	//Vector for current rotation of wheel while dragging.
 	public Vec3 rotationGuidePoint;
-	public Vec3 prevRotationGuidePoint;
+	//Vector for rotation of wheel when first clicked on.
+	public Vec3 initialRotationGuidePoint;
 	private double prevRotationWheelDelta = 0.0F;
 
 	public GuiEntityRendererWithRotation(String entityName)
 	{
 		super(entityName);
-		entityModel.renderRotationWheel = true;
 	}
+	
+	/* ---------------------------------------------------- *
+	 * 		     	   Part Manipulation					*
+	 * ---------------------------------------------------- */
 
-	//	private void setCursor(BufferedImage img)
-	//	{
-	//		final int w = img.getWidth();
-	//		final int h = img.getHeight();
-	//
-	//		int rgbData[] = new int[w * h];
-	//
-	//		for (int i = 0; i < rgbData.length; i++)
-	//		{
-	//			int x = i % w;
-	//			int y = h - 1 - i/w;
-	//
-	//			rgbData[i] = img.getRGB(x, y);
-	//		}
-	//
-	//		IntBuffer buffer = BufferUtils.createIntBuffer(w * h);
-	//		buffer.put(rgbData);
-	//		buffer.rewind();
-	//
-	//		try 
-	//		{
-	//			Mouse.setNativeCursor(new Cursor(w, h, w - 8, h - 9, 1, buffer, null));
-	//		} 
-	//		catch (LWJGLException e) {e.printStackTrace();}
-	//	}
-
-
-	private void drawRotationAxis(PartObj p)
+	private void updatePartValue(double value, int dim)
 	{
-		Vec3 origin = Vec3.createVectorHelper(0.0F, 0.0F, 0.0F);
-
-		GL11.glPushMatrix();
-		p.postRenderAll();
-		drawLine(Vec3.createVectorHelper(-0.05F, 0.0F, 0.0F), Vec3.createVectorHelper(0.05F, 0.0F, 0.0F), 0xFFFFFF);
-		drawLine(Vec3.createVectorHelper(0.0F, -0.05F, 0.0F), Vec3.createVectorHelper(0.0F, 0.05F, 0.0F), 0xFFFFFF);
-		drawLine(Vec3.createVectorHelper(0.0F, 0.0F, -0.05F), Vec3.createVectorHelper(0.0F, 0.0F, 0.05F), 0xFFFFFF);
-
-		int colour = 0xFFFFFF;
-		for(int i = 0; i < 3; i++)
+		Part part = Util.getPartFromName(currentPartName, entityModel.parts);
+		if(part instanceof PartObj)
 		{
-			switch(i)
-			{
-			case 0: colour = 0xFF0000; break;
-			case 1: colour = 0x00FF00; break;
-			case 2: colour = 0x0000FF; break;
-			}
-			if(rotationWheelPlane != null && rotationWheelPlane == i)
-			{
-				drawCircle(origin, MathHelper.rotationWheelRadius, i, colour, 4.0F, 1.0F);
-//				if(rotationGuidePoint != null)
-//				{
-//					Vec3 v = Vec3.createVectorHelper(rotationGuidePoint.xCoord, rotationGuidePoint.yCoord, rotationGuidePoint.zCoord);
-//					drawLine(origin, rotationGuidePoint, 0xFFFFFF);
-//				}
-//				if(prevRotationGuidePoint != null)
-//				{
-//					Vec3 v = Vec3.createVectorHelper(prevRotationGuidePoint.xCoord, prevRotationGuidePoint.yCoord, prevRotationGuidePoint.zCoord);
-//					drawLine(origin, prevRotationGuidePoint, 0xFFFFFF);
-//				}
-			}
-			else
-				drawCircle(origin, MathHelper.rotationWheelRadius, i, colour, 3.0F, 0.4F);
-		}	
-		GL11.glPopMatrix();
+			((PartObj) part).rotateLocal((float) value, dim);
+		}
+		else
+			part.setValue(dim, (float) value);
+		onPartOutputChange();
 	}
-
-	@Override
-	public void onGuiClosed()
-	{
-		super.onGuiClosed();
-		entityModel.renderRotationWheel = false;   
-	}
+		
+	/* ---------------------------------------------------- *
+	 * 						Input							*
+	 * ---------------------------------------------------- */
 
 	@Override
 	protected void mouseClicked(int x, int y, int button) 
 	{
+		//If mouse over and lmb clicked, begin drag.
 		if(rotationWheelMouseOver && button == 0)
 			rotationWheelDrag = true;
 		else
@@ -126,14 +79,21 @@ public class GuiEntityRendererWithRotation extends GuiEntityRenderer
 	public void mouseMovedOrUp(int x, int y, int which) 
 	{
 		super.mouseMovedOrUp(x, y, which);
+		//If lmb lifted, reset drag, guide and delta.
 		if(which == 0)
 		{
+			if(rotationWheelDrag)
+				onRotationWheelRelease();
 			rotationGuidePoint = null;
 			rotationWheelDrag = false;
 			prevRotationWheelDelta = 0.0F;
 		}
 	}
-
+	
+	/* ---------------------------------------------------- *
+	 * 					  Ray Trace							*
+	 * ---------------------------------------------------- */
+	
 	@Override
 	public void processRay()
 	{
@@ -142,35 +102,58 @@ public class GuiEntityRendererWithRotation extends GuiEntityRenderer
 			Part currentPart = Util.getPartFromName(currentPartName, entityModel.parts);
 			if(currentPart instanceof PartObj)
 			{
+				//Get current part selection.
 				PartObj part = (PartObj) currentPart;
+				//Draw rotation axis
 				drawRotationAxis(part);
+				
 				rotationWheelMouseOver = false;
 				if(!rotationWheelDrag)
 				{
-					Integer dim = testRotationRay(part);
-					if(dim != null)
-					{
-						rotationWheelMouseOver = true;
-						rotationWheelPlane = dim;
-						rotationGuidePoint = getMouseVectorInRotationPlane(part);
-						prevRotationGuidePoint = rotationGuidePoint;
-					}
-					else
-						rotationWheelPlane = null;
+					//If wheel is not being rotated, update its mouse over state.
+					updateWheelMouseOver(part);
+					//If it isn't being moused over, hand over ray processing to GuiEntityRenderer, which will test for hovering over parts.
 					if(!rotationWheelMouseOver)
 						super.processRay();
+					//If it is being hovered over, ensure there is no part highlighted for selection.
 					else
 						additionalHighlightPartName = null;
 				}
 				else
 				{
+					//If wheel is being rotated, update the guide point and calculate new wheel rotation.
 					rotationGuidePoint = getMouseVectorInRotationPlane(part);
-					calculateDifference();
+					processWheelRotation();
 				}
 			}
 		}
+		else
+			super.processRay();
+	}
+	
+	/**
+	 * Update the rotation wheel states based on the current part.
+	 * @param part - Current partObj.
+	 */
+	private void updateWheelMouseOver(PartObj part)
+	{
+		Integer dim = testRotationRay(part);
+		if(dim != null)
+		{
+			rotationWheelMouseOver = true;
+			rotationWheelPlane = dim;
+			rotationGuidePoint = getMouseVectorInRotationPlane(part);
+			initialRotationGuidePoint = rotationGuidePoint;
+		}
+		else
+			rotationWheelPlane = null;
 	}
 
+	/**
+	 * Test to see if the ray intersects with the rotation wheel at all.
+	 * @param part - Currently selected part
+	 * @return Dimension of wheel that intersection is with. (0-x,1-y,2-z).
+	 */
 	public Integer testRotationRay(PartObj part)
 	{
 		GL11.glPushMatrix();
@@ -198,6 +181,11 @@ public class GuiEntityRendererWithRotation extends GuiEntityRenderer
 		return dim;	
 	}
 	
+	/**
+	 * Use the ray trace of the mouse to get a vector point in the plane of the rotation wheel dimension.
+	 * @param part - Currently selected part.
+	 * @return Intersection of mouse ray trace and rotation wheel plane.
+	 */
 	public Vec3 getMouseVectorInRotationPlane(PartObj part)
 	{
 		GL11.glPushMatrix();
@@ -215,9 +203,9 @@ public class GuiEntityRendererWithRotation extends GuiEntityRenderer
 		return v;
 	}
 	
-	private void calculateDifference()
+	private void processWheelRotation()
 	{
-		if(rotationGuidePoint != null && prevRotationGuidePoint != null)
+		if(rotationGuidePoint != null && initialRotationGuidePoint != null)
 		{
 			Vec3 n = null;
 			switch(rotationWheelPlane)
@@ -226,30 +214,47 @@ public class GuiEntityRendererWithRotation extends GuiEntityRenderer
 			case 1: n = Vec3.createVectorHelper(0, 1, 0); break;
 			case 2: n = Vec3.createVectorHelper(0, 0, 1); break; 
 			}
-			double rotationWheelDelta = MathHelper.getAngleBetweenVectors(rotationGuidePoint, prevRotationGuidePoint, n);
+			double rotationWheelDelta = MathHelper.getAngleBetweenVectors(rotationGuidePoint, initialRotationGuidePoint, n);
 			double d = rotationWheelDelta - prevRotationWheelDelta;
 			if(!Double.isNaN(d))
 			{
-				updatePartValues(-d/Math.PI*180F, rotationWheelPlane);
+				updatePartValue(-d/Math.PI*180F, rotationWheelPlane);
 				prevRotationWheelDelta = rotationWheelDelta;
 			}
 		}
 	}
-
-	private void updatePartValues(double value, int dim)
+	
+	protected void onRotationWheelRelease(){}
+	
+	/* ---------------------------------------------------- *
+	 * 						Render							*
+	 * ---------------------------------------------------- */
+	private void drawRotationAxis(PartObj p)
 	{
-		System.out.println(value);
-		Part part = Util.getPartFromName(currentPartName, entityModel.parts);
-		//Negative for some reason - makes more sense when rotating..
-		if(part instanceof PartObj)
-		{
-			//System.out.println(value);
-			((PartObj) part).rotateLocal((float) value, dim);
-		}
-		else
-			part.setValue(dim, (float) value);
-	}
+		Vec3 origin = Vec3.createVectorHelper(0.0F, 0.0F, 0.0F);
 
+		GL11.glPushMatrix();
+		p.postRenderAll();
+		drawLine(Vec3.createVectorHelper(-0.05F, 0.0F, 0.0F), Vec3.createVectorHelper(0.05F, 0.0F, 0.0F), 0xFFFFFF);
+		drawLine(Vec3.createVectorHelper(0.0F, -0.05F, 0.0F), Vec3.createVectorHelper(0.0F, 0.05F, 0.0F), 0xFFFFFF);
+		drawLine(Vec3.createVectorHelper(0.0F, 0.0F, -0.05F), Vec3.createVectorHelper(0.0F, 0.0F, 0.05F), 0xFFFFFF);
+
+		int colour = 0xFFFFFF;
+		for(int i = 0; i < 3; i++)
+		{
+			switch(i)
+			{
+			case 0: colour = 0xFF0000; break;
+			case 1: colour = 0x00FF00; break;
+			case 2: colour = 0x0000FF; break;
+			}
+			if(rotationWheelPlane != null && rotationWheelPlane == i)
+				drawCircle(origin, MathHelper.rotationWheelRadius, i, colour, 4.0F, 1.0F);
+			else
+				drawCircle(origin, MathHelper.rotationWheelRadius, i, colour, 3.0F, 0.4F);
+		}	
+		GL11.glPopMatrix();
+	}
 
 	/**
 	 * Draw a circle in the x,y or z plane. 
@@ -298,7 +303,6 @@ public class GuiEntityRendererWithRotation extends GuiEntityRenderer
 		GL11.glPopMatrix();
 	}
 
-	//XXX
 	private void drawLine(Vec3 p1, Vec3 p2, int color)
 	{
 		GL11.glPushMatrix();

@@ -69,10 +69,13 @@ public class GuiEntityRenderer extends GuiBlack
 		}
 
 		currentPartName = parts.get(0);
-
 		setupViews();
 	}
 
+	/* ---------------------------------------------------- *
+	 * 						General							*
+	 * ---------------------------------------------------- */
+	
 	@Override
 	public void initGui()
 	{
@@ -80,6 +83,9 @@ public class GuiEntityRenderer extends GuiBlack
 		posY = 5;
 	}
 
+	/**
+	 * Create various default views. 
+	 */
 	private void setupViews()
 	{
 		views = new ArrayList<View>();
@@ -125,13 +131,19 @@ public class GuiEntityRenderer extends GuiBlack
 				entityModel.hightlightPart((PartObj) additionalPart, false);
 		}
 	}
+	
+	/* ---------------------------------------------------- *
+	 * 						Input							*
+	 * ---------------------------------------------------- */
 
 	@Override
 	protected void mouseClicked(int x, int y, int i) 
 	{
 		super.mouseClicked(x, y, i);
 		if(additionalHighlightPartName != null && !additionalHighlightPartName.equals(""))
-			currentPartName = additionalHighlightPartName;
+			updatePart(additionalHighlightPartName);
+		else if(i == 0)
+			updatePart("");
 	}
 
 	@Override
@@ -194,6 +206,23 @@ public class GuiEntityRenderer extends GuiBlack
 		super.handleMouseInput();
 	}
 
+	/* ---------------------------------------------------- *
+	 * 		     	   Part Manipulation					*
+	 * ---------------------------------------------------- */
+	
+	protected void updatePart(String newPartName)
+	{
+		currentPartName = newPartName;
+		onPartOutputChange();
+	}
+	
+	protected void onPartOutputChange(){}
+
+	
+	/* ---------------------------------------------------- *
+	 * 					  Ray Trace							*
+	 * ---------------------------------------------------- */
+	
 	public void processRay()
 	{
 		PartObj raySelection = entityModel.testRay();
@@ -202,6 +231,10 @@ public class GuiEntityRenderer extends GuiBlack
 		else
 			additionalHighlightPartName = "";
 	}
+	
+	/* ---------------------------------------------------- *
+	 * 						Render							*
+	 * ---------------------------------------------------- */
 
 	/**
 	 * Renders an entity into a gui. Parameters - xpos, ypos, scale, rotx, roty, entity.
@@ -264,9 +297,7 @@ public class GuiEntityRenderer extends GuiBlack
 
 		GL11.glPopMatrix();
 	}
-
-
-
+	
 	private void renderGrid(int xPos, int yPos, float scale, float rotX, float rotY)
 	{
 		GL11.glPushMatrix();
@@ -303,6 +334,10 @@ public class GuiEntityRenderer extends GuiBlack
 		GL11.glPopMatrix();
 	}
 
+	/* ---------------------------------------------------- *
+	 * 						Views							*
+	 * ---------------------------------------------------- */
+	
 	public void changeView(int numpadKey)
 	{
 		for(View v : views)

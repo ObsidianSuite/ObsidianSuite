@@ -62,8 +62,6 @@ public class ModelObj extends ModelBase
 
 	public static final ResourceLocation pinkResLoc = new ResourceLocation("mod_mcea:defaultModelTextures/pink.png");
 	public static final ResourceLocation whiteResLoc = new ResourceLocation("mod_mcea:defaultModelTextures/white.png");
-
-	public boolean renderRotationWheel = false;
 	
 	public ModelObj(String par0Str)
 	{	

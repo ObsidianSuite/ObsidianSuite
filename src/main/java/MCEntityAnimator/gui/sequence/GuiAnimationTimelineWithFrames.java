@@ -522,16 +522,16 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRendererWithRotatio
 		super.keyTyped(par1, par2);
 	}
 
-	private void updatePart(String newPartName)
-	{
-		currentPartName = newPartName;
-		controllerFrame.updatePartDropDown();
-		controllerFrame.repaint();
-		Part part = Util.getPartFromName(currentPartName, entityModel.parts);
-		settingsFrame.updateRotationSliderValues();
-		timelineFrame.refresthLineColours();
-		settingsFrame.refreshButtons();
-	}
+//	private void updatePart(String newPartName)
+//	{
+//		currentPartName = newPartName;
+//		controllerFrame.updatePartDropDown();
+//		controllerFrame.repaint();
+//		Part part = Util.getPartFromName(currentPartName, entityModel.parts);
+//		settingsFrame.updateRotationSliderValues();
+//		timelineFrame.refresthLineColours();
+//		settingsFrame.refreshButtons();
+//	}
 
 	private class ControllerFrame extends JFrame
 	{
