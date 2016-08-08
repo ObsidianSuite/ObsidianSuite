@@ -59,10 +59,12 @@ public class ModelObj extends ModelBase
 	public final boolean textureExists;
 
 	private boolean partSetupComplete;
-	
+
 	public static final ResourceLocation pinkResLoc = new ResourceLocation("mod_mcea:defaultModelTextures/pink.png");
 	public static final ResourceLocation whiteResLoc = new ResourceLocation("mod_mcea:defaultModelTextures/white.png");
 
+	public boolean renderRotationWheel = false;
+	
 	public ModelObj(String par0Str)
 	{	
 		entityType = par0Str;
@@ -273,11 +275,11 @@ public class ModelObj extends ModelBase
 	{				
 		super.setRotationAngles(f, f1, f2, f3, f4, f5, entity);
 	}
-	
+
 	//----------------------------------------------------------------
 	// 							 Selection
 	//----------------------------------------------------------------
-	
+
 	public PartObj testRay()
 	{
 		PartObj closestPart = null;
@@ -312,7 +314,7 @@ public class ModelObj extends ModelBase
 		}
 		return closestPart;
 	}
-	
+
 	//----------------------------------------------------------------
 	// 							Highlighting
 	//----------------------------------------------------------------
@@ -343,7 +345,7 @@ public class ModelObj extends ModelBase
 	{
 		return mainHighlight == partObj;
 	}
-	
+
 	/**
 	 * Highlighted but not main highlight (white).
 	 */
@@ -360,11 +362,11 @@ public class ModelObj extends ModelBase
 	public void render(Entity entity, float time, float distance, float loop, float lookY, float lookX, float scale) 
 	{		
 		super.render(entity, time, distance, loop, lookY, lookX, scale);
-		
+
 		GL11.glPushMatrix();
 		GL11.glRotatef(initRotFix, 1.0F, 0.0F, 0.0F);
 		GL11.glTranslatef(0.0F, offsetFixY, 0.0F);
-		
+
 		for(Part p : this.parts) 
 		{
 			if(p instanceof PartObj)
@@ -376,25 +378,9 @@ public class ModelObj extends ModelBase
 			else if(p instanceof PartEntityPos)
 				((PartEntityPos) p).move(entity);
 		}
-		
+
 		for(Bend bend : this.bends)
 			bend.render();
-
-		if(mainHighlight != null)
-		{
-			for(Part p : this.parts)
-			{
-				if(p instanceof PartObj)
-				{
-					PartObj part = (PartObj) p;
-					if(isMainHighlight(part))
-					{
-						part.renderRotationAxis();
-						break;
-					}
-				}
-			}
-		}
 
 		GL11.glPopMatrix();
 	}

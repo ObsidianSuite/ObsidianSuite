@@ -48,6 +48,7 @@ import MCEntityAnimator.distribution.SaveLoadHandler;
 import MCEntityAnimator.distribution.ServerAccess;
 import MCEntityAnimator.gui.GuiPartSetup;
 import MCEntityAnimator.gui.sequence.GuiAnimationTimelineWithFrames;
+import MCEntityAnimator.gui.sequence.GuiEntityRendererWithRotation;
 import net.minecraft.client.Minecraft;
 
 public class FileGUI extends JFrame
@@ -135,7 +136,8 @@ public class FileGUI extends JFrame
 				if(seq != null)
 				{
 					dispose();
-					Minecraft.getMinecraft().displayGuiScreen(new GuiAnimationTimelineWithFrames(entityToEdit,seq));
+					//Minecraft.getMinecraft().displayGuiScreen(new GuiAnimationTimelineWithFrames(entityToEdit,seq));
+					Minecraft.getMinecraft().displayGuiScreen(new GuiEntityRendererWithRotation(entityToEdit));
 				}
 				else
 					JOptionPane.showMessageDialog(FileGUI.this, "Unable to load animation " + animationToEdit + " for " + entityToEdit + ".");

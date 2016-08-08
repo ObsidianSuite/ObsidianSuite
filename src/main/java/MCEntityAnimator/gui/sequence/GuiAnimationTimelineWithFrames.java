@@ -231,28 +231,6 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 		SaveLoadHandler.upload();
 	}
 
-	@Override
-	public void processRay()
-	{
-		boolean rotationWheelMouseOver = false;
-		if(currentPartName != null && !currentPartName.equals(""))
-		{
-			Part currentPart = Util.getPartFromName(currentPartName, entityModel.parts);
-			if(currentPart instanceof PartObj)
-			{
-				Integer dim = ((PartObj) currentPart).testRotationRay();
-				if(dim != null)
-				{
-					rotationWheelMouseOver = true;
-					((PartObj) currentPart).rotationWheelPlaneHighlight = dim;
-				}
-				else
-					((PartObj) currentPart).rotationWheelPlaneHighlight = null;
-			}
-		}
-		if(!rotationWheelMouseOver)
-			super.processRay();
-	}
 	
 	public void drawScreen(int par1, int par2, float par3)
 	{		
@@ -288,7 +266,6 @@ public class GuiAnimationTimelineWithFrames extends GuiEntityRenderer
 		if(part instanceof PartObj)
 		{
 			value = (float) (-value*Math.PI);
-			((PartObj) part).setAxisRotation(dim, (float) value);
 		}
 		else
 			part.setValue(dim, (float) value);

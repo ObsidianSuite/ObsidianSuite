@@ -135,20 +135,23 @@ public class GuiEntityRenderer extends GuiBlack
 	}
 
 	@Override
-	protected void mouseClickMove(int x, int y, int par2, long par3Long) 
+	protected void mouseClickMove(int x, int y, int button, long par3Long) 
 	{
-		super.mouseClickMove(x, y, par2, par3Long);
-		if(prevMouseMoveX == 0)
+		super.mouseClickMove(x, y, button, par3Long);
+		if(button == 2)
 		{
-			prevMouseMoveX = x;
-			prevMouseMoveY = y;
-		}
-		else
-		{
-			horizontalRotation -= (x - prevMouseMoveX);
-			verticalRotation += (y - prevMouseMoveY);
-			prevMouseMoveX = x;
-			prevMouseMoveY = y;
+			if(prevMouseMoveX == 0)
+			{
+				prevMouseMoveX = x;
+				prevMouseMoveY = y;
+			}
+			else
+			{
+				horizontalRotation -= (x - prevMouseMoveX);
+				verticalRotation += (y - prevMouseMoveY);
+				prevMouseMoveX = x;
+				prevMouseMoveY = y;
+			}
 		}
 	}
 
@@ -218,14 +221,14 @@ public class GuiEntityRenderer extends GuiBlack
 		GL11.glTranslated(par5EntityLivingBase.posX, par5EntityLivingBase.posY, par5EntityLivingBase.posZ);
 		RenderManager.instance.playerViewY = 180.0F;
 		RenderManager.instance.renderEntityWithPosYaw(par5EntityLivingBase, 0.0D, 0.0D, 0.0D, 0.0F, 1.0F);
-		processRay();
-		GL11.glPopMatrix();
 		RenderHelper.disableStandardItemLighting();
 		GL11.glDisable(GL12.GL_RESCALE_NORMAL);
 		OpenGlHelper.setActiveTexture(OpenGlHelper.lightmapTexUnit);
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		OpenGlHelper.setActiveTexture(OpenGlHelper.defaultTexUnit);
 		GL11.glDisable(GL11.GL_COLOR_MATERIAL);
+		processRay();
+		GL11.glPopMatrix();
 	}
 
 	private void renderBase(int xPos, int yPos, float scale, float rotX, float rotY)

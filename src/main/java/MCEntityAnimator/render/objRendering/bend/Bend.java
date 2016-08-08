@@ -142,11 +142,11 @@ public class Bend
 		{	
 			Vertex v = childNearVertices[i];
 			bottomNearVertices[i] = new Vertex(v.x, v.y, v.z);
-			BendHelper.rotateVertex(bottomNearVertices[i], child.getValues(), centreOfBend);
+			BendHelper.rotateVertex(bottomNearVertices[i], child.createRotationMatrixFromAngles(), centreOfBend);
 
 			v = childFarVertices[i];
 			bottomFarVertices[i] = new Vertex(v.x, v.y, v.z);
-			BendHelper.rotateVertex(bottomFarVertices[i], child.getValues(), centreOfBend);
+			BendHelper.rotateVertex(bottomFarVertices[i], child.createRotationMatrixFromAngles(), centreOfBend);
 		}
 
 		//Generate curves.
@@ -256,11 +256,11 @@ public class Bend
 		{	
 			Vertex v = childNearVertices[i];
 			bottomNearVertices[i] = new Vertex(v.x, v.y, v.z);
-			BendHelper.rotateVertex(bottomNearVertices[i], child.getValues(), centreOfBend);
+			BendHelper.rotateVertex(bottomNearVertices[i], child.createRotationMatrixFromAngles(), centreOfBend);
 
 			v = childFarVertices[i];
 			bottomFarVertices[i] = new Vertex(v.x, v.y, v.z);
-			BendHelper.rotateVertex(bottomFarVertices[i], child.getValues(), centreOfBend);
+			BendHelper.rotateVertex(bottomFarVertices[i], child.createRotationMatrixFromAngles(), centreOfBend);
 		}
 
 		//Generate curves.
@@ -324,9 +324,7 @@ public class Bend
 	{
 		//Move to centre, rotate and move back.
 		GL11.glTranslatef(-p.getRotationPoint(0), -p.getRotationPoint(1), -p.getRotationPoint(2));
-		GL11.glRotated((p.getValue(0) - p.getOriginalValues()[0])/Math.PI*180.0F, 1.0F, 0.0F, 0.0F);
-		GL11.glRotated((p.getValue(1) - p.getOriginalValues()[1])/Math.PI*180.0F, 0.0F, 1.0F, 0.0F);
-		GL11.glRotated((p.getValue(2) - p.getOriginalValues()[2])/Math.PI*180.0F, 0.0F, 0.0F, 1.0F);
+		GL11.glMultMatrix(p.createRotationMatrixFromAngles());
 		GL11.glTranslatef(p.getRotationPoint(0), p.getRotationPoint(1), p.getRotationPoint(2));
 	}
 
