@@ -232,44 +232,49 @@ public class MathHelper
 		return buffer;
 	}
 
-	public static Quaternion slerp(Quaternion p, Quaternion q, float t)
-	{		
-		boolean out = false;
-		
-		if(out)
-			System.out.println("Pre: " + q);
-		
-		float pLen = p.length();
+	public static Quaternion slerp(Quaternion qa, Quaternion qb, float t)
+	{				
+		Quaternion qm = new Quaternion();
+		//Normalise p and q.
+		float pLen = qa.length();
 		if(pLen != 1 && pLen != 0)
-			p.normalise();
-		
-		float qLen = q.length();
+			qa.normalise();
+		float qLen = qb.length();
 		if(qLen != 1 && qLen != 0)
-			q.normalise();
+			qb.normalise();
 		
-		double a = Math.acos(Quaternion.dot(p, q));
-		double sa = Math.sin(a);
+		//Calculate cos half angle between 
+		double cosHalfTheta = Quaternion.dot(qa, qb);
+		//p=q or p=-q
+		if(Math.abs(cosHalfTheta) >= 1.0)
+		{
+			qm.w = qa.w;
+			qm.x = qa.x;
+			qm.y = qa.y;
+			qm.z = qa.z;
+			return qm;
+		}
+		double halfTheta = Math.acos(cosHalfTheta);
+		double sinHalfTheta = Math.sqrt(1.0 - cosHalfTheta*cosHalfTheta);
 		
-		if(sa == 0)
-			return p;
+		// if theta = 180 degrees then result is not fully defined
+	    // we could rotate around any axis normal to qa or qb
+	    if (Math.abs(sinHalfTheta) < 0.001){ // fabs is floating point absolute
+	        qm.w = (float) (qa.w * 0.5 + qb.w * 0.5);
+	        qm.x = (float) (qa.x * 0.5 + qb.x * 0.5);
+	        qm.y = (float) (qa.y * 0.5 + qb.y * 0.5);
+	        qm.z = (float) (qa.z * 0.5 + qb.z * 0.5);
+	        return qm;
+	    }
 		
-		float pScalar = (float) (Math.sin((1-t)*a)/sa);
-		float qScalar = (float) (Math.sin(t*a)/sa);
-
-		Quaternion p1 = new Quaternion();
-		Quaternion q1 = new Quaternion();
-		
-		Quaternion.scale(pScalar, p, p1);
-		Quaternion.scale(qScalar, q, q1);
-		
-		Quaternion r = new Quaternion(p1.x + q1.x, p1.y + q1.y, p1.z + q1.z, p1.w + q1.w);
-		
-		if(out)
-			System.out.println("Post: " + q);
-
-//		System.out.println(p);
-		
-		return r;
+	    double ratioA = Math.sin((1 - t) * halfTheta) / sinHalfTheta;
+	    double ratioB = Math.sin(t * halfTheta) / sinHalfTheta; 
+	    //calculate Quaternion.
+	    qm.w = (float) (qa.w * ratioA + qb.w * ratioB);
+	    qm.x = (float) (qa.x * ratioA + qb.x * ratioB);
+	    qm.y = (float) (qa.y * ratioA + qb.y * ratioB);
+	    qm.z = (float) (qa.z * ratioA + qb.z * ratioB);
+	    return qm;
 	}
 
 }

@@ -59,7 +59,7 @@ public class AnimationPart
 	
 	public void animatePart(float time) 
 	{		
-		boolean useQuarternions = false;
+		boolean useQuarternions = true;
 		
 		float[] values = new float[3];
 		if(useQuarternions && part instanceof PartObj)		
