@@ -25,8 +25,6 @@ public class BezierCurve
 {
 
 	private Vertex a1, a2, b1, b2, c1, c2;
-	//Rotation of the child part
-	private float[] rotation;
 	//Y value of the rotation point.
 	private float defaultY;
 	//Group obj used for rendering the bezier point (debugging).
@@ -34,13 +32,12 @@ public class BezierCurve
 
 	private boolean inverted;
 
-	public BezierCurve(Vertex a1, Vertex a2, Vertex b1, Vertex b2, float[] rotation, float defaultY)
+	public BezierCurve(Vertex a1, Vertex a2, Vertex b1, Vertex b2, float defaultY)
 	{
 		this.a1 = a1;
 		this.a2 = a2;
 		this.b1 = b1;
 		this.b2 = b2;
-		this.rotation = rotation;
 		this.defaultY = defaultY;
 		this.inverted = a1.y < defaultY;
 		setupControlVertices();

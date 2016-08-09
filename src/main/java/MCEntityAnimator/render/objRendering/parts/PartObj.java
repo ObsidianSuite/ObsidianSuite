@@ -37,7 +37,8 @@ public class PartObj extends Part
 {
 	private float[] rotationPoint;
 	private boolean showModel;
-
+	private FloatBuffer rotationMatrix;
+	
 	//XXX
 	private Map<Face, TextureCoordinate[]> defaultTextureCoords;
 
@@ -121,16 +122,12 @@ public class PartObj extends Part
 
 	private void setupRotationMatrix()
 	{
-		//		float[] rotationMatrixF = new 
-		//				float[]{1,0,0,0,
-		//						0,1,0,0,
-		//						0,0,1,0,
-		//						0,0,0,1};
-		//		ByteBuffer vbb = ByteBuffer.allocateDirect(rotationMatrixF.length*4);
-		//		vbb.order(ByteOrder.nativeOrder());
-		//		rotationMatrix = vbb.asFloatBuffer();
-		//		rotationMatrix.put(rotationMatrixF);
-		//		rotationMatrix.position(0);
+		float[] rotationMatrixF = new float[16];
+		ByteBuffer vbb = ByteBuffer.allocateDirect(rotationMatrixF.length*4);
+		vbb.order(ByteOrder.nativeOrder());
+		rotationMatrix = vbb.asFloatBuffer();
+		rotationMatrix.put(rotationMatrixF);
+		rotationMatrix.position(0);
 	}
 
 	//----------------------------------------------------------------
@@ -338,7 +335,7 @@ public class PartObj extends Part
 	public void postRenderAll()
 	{
 		postRenderAllTrans();
-		GL11.glMultMatrix(createRotationMatrixFromAngles());
+		rotate();
 	}
 
 	/**
@@ -374,7 +371,7 @@ public class PartObj extends Part
 			for(int i = 0; i < 3; i++)
 				totalTranslation[i] = -p.getRotationPoint(i);
 
-			GL11.glMultMatrix(p.createRotationMatrixFromAngles());
+			p.rotate();
 
 		}
 		return totalTranslation;
@@ -383,66 +380,52 @@ public class PartObj extends Part
 	public void move()
 	{
 		GL11.glTranslatef(-rotationPoint[0], -rotationPoint[1], -rotationPoint[2]);
-		GL11.glMultMatrix(createRotationMatrixFromAngles());
+		rotate();
 		GL11.glTranslatef(rotationPoint[0], rotationPoint[1], rotationPoint[2]);    
+	}
 
+	public void rotate()
+	{
+		GL11.glRotated(-valueX/Math.PI*180F, 1, 0, 0);
+		GL11.glRotated(-valueY/Math.PI*180F, 0, 1, 0);
+		GL11.glRotated(-valueZ/Math.PI*180F, 0, 0, 1);
 	}
 
 	public void rotateLocal(float delta, int dim)
 	{
-		//System.out.println("Detla: " + delta);
 		GL11.glPushMatrix();
 		GL11.glLoadIdentity();
-		GL11.glMultMatrix(createRotationMatrixFromAngles());
-
-		//GL11.glTranslatef(-rotationPoint[0], -rotationPoint[1], -rotationPoint[2]);
-		//		GL11.glRotatef(-valueZ,0,0,1);
-		//		GL11.glRotatef(-valueY,0,1,0);
-		//		GL11.glRotatef(-valueX,1,0,0);
+		rotate();
 		switch(dim)
 		{
 		case 0: GL11.glRotated(delta,1,0,0); break;
 		case 1: GL11.glRotated(delta,0,1,0); break;
 		case 2: GL11.glRotated(delta,0,0,1); break;
 		}
-		//		GL11.glRotatef(valueZ,0,0,1);
-		//		GL11.glRotatef(valueY,0,1,0);
-		//		GL11.glRotatef(valueX,1,0,0);
 
-		float[] rotationMatrixF = new float[16];
-		ByteBuffer vbb = ByteBuffer.allocateDirect(rotationMatrixF.length*4);
-		vbb.order(ByteOrder.nativeOrder());
-		FloatBuffer rotationMatrix = vbb.asFloatBuffer();
-		rotationMatrix.put(rotationMatrixF);
-		rotationMatrix.position(0);
 		GL11.glGetFloat(GL11.GL_MODELVIEW_MATRIX, rotationMatrix);
-		updateRotationAngles(rotationMatrix);
+		updateRotationAnglesFromMatrix();
 		GL11.glPopMatrix();
 	}
 
-	private void updateRotationAngles(FloatBuffer rotationMatrix)
+	private void updateRotationAnglesFromMatrix()
 	{
-		//		System.out.println("Matrix proper:");
-		//		System.out.println(String.format("%f %f %f", rotationMatrix.get(0),rotationMatrix.get(1),rotationMatrix.get(2)));
-		//		System.out.println(String.format("%f %f %f", rotationMatrix.get(4),rotationMatrix.get(5),rotationMatrix.get(6)));
-		//		System.out.println(String.format("%f %f %f", rotationMatrix.get(8),rotationMatrix.get(9),rotationMatrix.get(10)));
-
-
 		double x,y,z;
 		float r8 = rotationMatrix.get(8);
 		if(Math.abs(r8) != 1)
 		{
 			y = -Math.asin(r8);
-
+			double cy = Math.cos(y);
+			
 			//Find x value
 			float r9 = rotationMatrix.get(9);
 			float r10 = rotationMatrix.get(10);
-			x = Math.atan2(r9/Math.cos(y), r10/Math.cos(y));
+			x = Math.atan2(r9/cy, r10/cy);
 
 			//Find z value
 			float r0 = rotationMatrix.get(0);
 			float r4 = rotationMatrix.get(4);
-			z = Math.atan2(r4/Math.cos(y), r0/Math.cos(y));
+			z = Math.atan2(r4/cy, r0/cy);
 		}
 		else
 		{
@@ -461,55 +444,31 @@ public class PartObj extends Part
 				x = z + Math.atan2(-r1,-r2);
 			}
 		}
-
-		//		System.out.println("Matrix reconstructed:");
-		//		
-		//		double m0 = Math.cos(y)*Math.cos(z);
-		//		double m1 = Math.sin(x)*Math.sin(y)*Math.cos(z)-Math.cos(x)*Math.sin(z);
-		//		double m2 = Math.cos(x)*Math.sin(y)*Math.cos(z)+Math.sin(x)*Math.sin(z);
-		//		double m3 = Math.cos(y)*Math.sin(z);
-		//		double m4 = Math.sin(x)*Math.sin(y)*Math.sin(z)+Math.cos(x)*Math.cos(z);
-		//		double m5 = Math.cos(x)*Math.sin(y)*Math.sin(z)-Math.sin(x)*Math.cos(z);
-		//		double m6 = -Math.sin(y);
-		//		double m7 = Math.sin(x)*Math.cos(y);
-		//		double m8 = Math.cos(x)*Math.cos(y);
-		//		
-		//		System.out.println(String.format("%f %f %f",m0,m1,m2));
-		//		System.out.println(String.format("%f %f %f",m3,m4,m5));
-		//		System.out.println(String.format("%f %f %f",m6,m7,m8));
-
-
-		valueX = (float) (x/Math.PI*180F);
-		valueY = (float) (y/Math.PI*180F);
-		valueZ = (float) (z/Math.PI*180F);
+				
+		valueX = (float) x;
+		valueY = (float) y;
+		valueZ = (float) z;
 	}
-
-	public FloatBuffer createRotationMatrixFromAngles()
+	
+	public float[] createRotationMatrixFromAngles()
 	{
-		double x = valueX/180F*Math.PI;
-		double y = valueY/180F*Math.PI;
-		double z = valueZ/180F*Math.PI;
+		double sx = Math.sin(valueX);
+		double sy = Math.sin(valueY);
+		double sz = Math.sin(valueZ);
+		double cx = Math.cos(valueX);
+		double cy = Math.cos(valueY);
+		double cz = Math.cos(valueZ);
 
-		float m0 = (float) (Math.cos(y)*Math.cos(z));
-		float m1 = (float) (Math.sin(x)*Math.sin(y)*Math.cos(z)-Math.cos(x)*Math.sin(z));
-		float m2 = (float) (Math.cos(x)*Math.sin(y)*Math.cos(z)+Math.sin(x)*Math.sin(z));
-		float m3 = (float) (Math.cos(y)*Math.sin(z));
-		float m4 = (float) (Math.sin(x)*Math.sin(y)*Math.sin(z)+Math.cos(x)*Math.cos(z));
-		float m5 = (float) (Math.cos(x)*Math.sin(y)*Math.sin(z)-Math.sin(x)*Math.cos(z));
-		float m6 = (float) -Math.sin(y);
-		float m7 = (float) (Math.sin(x)*Math.cos(y));
-		float m8 = (float) (Math.cos(x)*Math.cos(y));
+		float m0 = (float) (cy*cz);
+		float m1 = (float) (sx*sy*cz-cx*sz);
+		float m2 = (float) (cx*sy*cz+sx*sz);
+		float m3 = (float) (cy*sz);
+		float m4 = (float) (sx*sy*sz+cx*cz);
+		float m5 = (float) (cx*sy*sz-sx*cz);
+		float m6 = (float) -sy;
+		float m7 = (float) (sx*cy);
+		float m8 = (float) (cx*cy);
 
-		float[] rotationMatrixF = new 
-				float[]{m0,m1,m2,0,
-						m3,m4,m5,0,
-						m6,m7,m8,0,
-						0,0,0,1};
-		ByteBuffer vbb = ByteBuffer.allocateDirect(rotationMatrixF.length*4);
-		vbb.order(ByteOrder.nativeOrder());
-		FloatBuffer m = vbb.asFloatBuffer();
-		m.put(rotationMatrixF);
-		m.position(0);
-		return m;
+		return new float[]{m0,m1,m2,m3,m4,m5,m6,m7,m8};
 	}
 }

@@ -138,15 +138,16 @@ public class Bend
 		}
 
 		//Set top far and near vertices to rotation compensated child far and near vertices.
+		float[] rotationMatrix = child.createRotationMatrixFromAngles();
 		for(int i = 0; i < childNearVertices.length; i++)
 		{	
 			Vertex v = childNearVertices[i];
 			bottomNearVertices[i] = new Vertex(v.x, v.y, v.z);
-			BendHelper.rotateVertex(bottomNearVertices[i], child.createRotationMatrixFromAngles(), centreOfBend);
+			BendHelper.rotateVertex(bottomNearVertices[i], rotationMatrix, centreOfBend);
 
 			v = childFarVertices[i];
 			bottomFarVertices[i] = new Vertex(v.x, v.y, v.z);
-			BendHelper.rotateVertex(bottomFarVertices[i], child.createRotationMatrixFromAngles(), centreOfBend);
+			BendHelper.rotateVertex(bottomFarVertices[i], rotationMatrix, centreOfBend);
 		}
 
 		//Generate curves.
@@ -252,15 +253,16 @@ public class Bend
 		}
 
 		//Set top far and near vertices to rotation compensated child far and near vertices.
+		float[] rotationMatrix = child.createRotationMatrixFromAngles();
 		for(int i = 0; i < childNearVertices.length; i++)
 		{	
 			Vertex v = childNearVertices[i];
 			bottomNearVertices[i] = new Vertex(v.x, v.y, v.z);
-			BendHelper.rotateVertex(bottomNearVertices[i], child.createRotationMatrixFromAngles(), centreOfBend);
+			BendHelper.rotateVertex(bottomNearVertices[i], rotationMatrix, centreOfBend);
 
 			v = childFarVertices[i];
 			bottomFarVertices[i] = new Vertex(v.x, v.y, v.z);
-			BendHelper.rotateVertex(bottomFarVertices[i], child.createRotationMatrixFromAngles(), centreOfBend);
+			BendHelper.rotateVertex(bottomFarVertices[i], rotationMatrix, centreOfBend);
 		}
 
 		//Generate curves.
@@ -327,10 +329,7 @@ public class Bend
 	 */
 	private void compensatePartRotation(PartObj p)
 	{
-		//Move to centre, rotate and move back.
-		GL11.glTranslatef(-p.getRotationPoint(0), -p.getRotationPoint(1), -p.getRotationPoint(2));
-		GL11.glMultMatrix(p.createRotationMatrixFromAngles());
-		GL11.glTranslatef(p.getRotationPoint(0), p.getRotationPoint(1), p.getRotationPoint(2));
+		p.move();
 	}
 
 	/**
@@ -341,7 +340,7 @@ public class Bend
 		BezierCurve[] curves = new BezierCurve[bottomNearVertices.length];
 		for(int i = 0; i < bottomNearVertices.length; i++)
 		{
-			BezierCurve curve = new BezierCurve(topFarVertices[i], topNearVertices[i], bottomFarVertices[i], bottomNearVertices[i], child.getValues(), centreOfBend.y);
+			BezierCurve curve = new BezierCurve(topFarVertices[i], topNearVertices[i], bottomFarVertices[i], bottomNearVertices[i], centreOfBend.y);
 			curves[i] = curve;
 		}
 		return curves;

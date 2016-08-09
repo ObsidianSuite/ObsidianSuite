@@ -41,10 +41,10 @@ public class AnimationPart
 		this.endTime = endTime;
 		this.startPosition = startPos;
 		this.endPosition = endPos;
-		
+
 		this.startQuart = MathHelper.eulerToQuarternion(startPos[0]/180F*Math.PI, startPos[1]/180F*Math.PI, startPos[2]/180F*Math.PI);
 		this.endQuart = MathHelper.eulerToQuarternion(endPos[0]/180F*Math.PI, endPos[1]/180F*Math.PI, endPos[2]/180F*Math.PI);
-		
+
 		for(int i = 0; i < 3; i++)
 		{
 			float dT = endTime - startTime;
@@ -52,23 +52,35 @@ public class AnimationPart
 			//it is at time zero.
 			if(dT == 0)
 				dT = 1;
-			this.movement[i] = (endPos[i] - startPos[i])/dT;
+			float dif = endPos[i] - startPos[i];
+			System.out.println(dif);
+			if(part instanceof PartObj)
+			{
+				if(Math.abs(dif) > Math.PI)
+				{
+					if(dif < 0)
+						dif += 2*Math.PI;
+					else
+						dif -= 2*Math.PI;
+				}
+			}
+			this.movement[i] = dif/dT;
 		}
 		this.part = part;
 	}
-	
+
 	public void animatePart(float time) 
 	{		
-		boolean useQuarternions = true;
-		
+		boolean useQuarternions = false;
+
 		float[] values = new float[3];
 		if(useQuarternions && part instanceof PartObj)		
 		{
 			PartObj partObj = (PartObj) part;
 			float t = time/(endTime - startTime);
-			
-		//	System.out.println(endQuart);
-			
+
+			//	System.out.println(endQuart);
+
 			Quaternion interpolatedQ = MathHelper.slerp(startQuart, endQuart, t);
 			values = MathHelper.quarternionToEuler(interpolatedQ);
 			for(int i = 0; i < 3; i++)
@@ -83,6 +95,16 @@ public class AnimationPart
 			values[1] = startPosition[1] + time*movement[1];
 			values[2] = startPosition[2] + time*movement[2];
 		}
+
+		for(int i = 0; i < 3; i++)
+		{
+			if(values[i] < -Math.PI)
+				values[i] += 2*Math.PI;
+			else if(values[i] > Math.PI)
+				values[i] -= 2*Math.PI;	
+		}
+
+
 		part.setValues(values);
 	}
 
@@ -90,7 +112,7 @@ public class AnimationPart
 	{
 		return part;
 	}
-	
+
 	public float[] getStartPosition() 
 	{
 		return startPosition;
@@ -105,7 +127,7 @@ public class AnimationPart
 	{
 		return startTime;
 	}
-	
+
 	public float getEndTime()
 	{
 		return endTime;
@@ -123,7 +145,7 @@ public class AnimationPart
 		}
 		return true;
 	}
-	
+
 	public boolean isEndPosDifferentToStartPos()
 	{
 		for(int i = 0; i < 3; i++)

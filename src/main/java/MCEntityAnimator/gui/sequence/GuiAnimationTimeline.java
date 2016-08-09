@@ -73,7 +73,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithRotation
 
 	private DecimalFormat df = new DecimalFormat("#.##");
 	private float time = 0.0F;
-	private float timeIncrement = 0.1F;
+	private float timeIncrement = 1.0F;
 	private TimelineFrame timelineFrame;
 	protected Map<String, List<Keyframe>> keyframes = new HashMap<String, List<Keyframe>>();
 
@@ -220,7 +220,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithRotation
 	{				
 		if(boolPlay)
 		{
-			time += timeIncrement;
+			time += 0.1F;
 			exceptionPartName = "";
 			if(time >= currentAnimation.getTotalTime())
 			{
