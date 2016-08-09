@@ -113,17 +113,17 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithRotation
 
 	public void setup()
 	{
-		String setup = AnimationData.getAnimationSetup(entityName);
-		if(setup != null)
-		{
-			String[] split = setup.split(",");
-			horizontalPan = Integer.parseInt(split[0]);
-			verticalPan = Integer.parseInt(split[1]);
-			horizontalRotation = Float.parseFloat(split[2]);
-			verticalRotation = Float.parseFloat(split[3]);
-			scaleModifier = Integer.parseInt(split[4]);
-			boolBase = Boolean.parseBoolean(split[5]);
-		}
+//		String setup = AnimationData.getAnimationSetup(entityName);
+//		if(setup != null)
+//		{
+//			String[] split = setup.split(",");
+//			horizontalPan = Integer.parseInt(split[0]);
+//			verticalPan = Integer.parseInt(split[1]);
+//			horizontalRotation = Float.parseFloat(split[2]);
+//			verticalRotation = Float.parseFloat(split[3]);
+//			scaleModifier = Integer.parseInt(split[4]);
+//			boolBase = Boolean.parseBoolean(split[5]);
+//		}
 	}
 
 	public void saveSetup()
@@ -235,6 +235,10 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithRotation
 			}
 			timelineFrame.timeSlider.setValue((int) time);
 			timelineFrame.repaint();
+		}
+		else
+		{
+			//exceptionPartName = currentPartName;
 		}
 
 		this.currentAnimation.animateAll(time, entityModel, exceptionPartName);
