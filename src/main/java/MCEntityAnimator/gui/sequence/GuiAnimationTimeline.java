@@ -1,7 +1,6 @@
 package MCEntityAnimator.gui.sequence;
 
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.GridBagConstraints;
@@ -30,27 +29,26 @@ import java.util.Map;
 import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
 import javax.swing.ActionMap;
+import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
-import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
+import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import javax.swing.plaf.basic.BasicComboBoxRenderer;
 
 import org.lwjgl.input.Keyboard;
+import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 
 import MCEntityAnimator.Util;
@@ -60,9 +58,11 @@ import MCEntityAnimator.animation.AnimationSequence;
 import MCEntityAnimator.distribution.SaveLoadHandler;
 import MCEntityAnimator.distribution.ServerAccess;
 import MCEntityAnimator.gui.GuiBlack;
+import MCEntityAnimator.gui.GuiInventoryChooseItem;
 import MCEntityAnimator.gui.animation.FileGUI;
 import MCEntityAnimator.render.objRendering.EntityObj;
 import MCEntityAnimator.render.objRendering.parts.Part;
+import MCEntityAnimator.render.objRendering.parts.PartObj;
 
 public class GuiAnimationTimeline extends GuiEntityRendererWithRotation
 {
@@ -113,17 +113,17 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithRotation
 
 	public void setup()
 	{
-//		String setup = AnimationData.getAnimationSetup(entityName);
-//		if(setup != null)
-//		{
-//			String[] split = setup.split(",");
-//			horizontalPan = Integer.parseInt(split[0]);
-//			verticalPan = Integer.parseInt(split[1]);
-//			horizontalRotation = Float.parseFloat(split[2]);
-//			verticalRotation = Float.parseFloat(split[3]);
-//			scaleModifier = Integer.parseInt(split[4]);
-//			boolBase = Boolean.parseBoolean(split[5]);
-//		}
+		//		String setup = AnimationData.getAnimationSetup(entityName);
+		//		if(setup != null)
+		//		{
+		//			String[] split = setup.split(",");
+		//			horizontalPan = Integer.parseInt(split[0]);
+		//			verticalPan = Integer.parseInt(split[1]);
+		//			horizontalRotation = Float.parseFloat(split[2]);
+		//			verticalRotation = Float.parseFloat(split[3]);
+		//			scaleModifier = Integer.parseInt(split[4]);
+		//			boolBase = Boolean.parseBoolean(split[5]);
+		//		}
 	}
 
 	public void saveSetup()
@@ -213,6 +213,8 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithRotation
 	{
 		saveSetup();
 		timelineFrame.dispose();
+		if(timelineFrame.renderFrame != null)
+			timelineFrame.renderFrame.dispose();
 		SaveLoadHandler.upload();
 	}
 
@@ -244,7 +246,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithRotation
 		this.currentAnimation.animateAll(time, entityModel, exceptionPartName);
 
 		timelineFrame.updatePartLabels();
-		
+
 		super.drawScreen(par1, par2, par3);
 	}
 
@@ -438,7 +440,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithRotation
 		super.updatePart(newPartName);
 		exceptionPartName = newPartName;
 		timelineFrame.refresh();
-	}
+	}	
 
 	/* ---------------------------------------------------- *
 	 * 				  		 Undo/redo						*
@@ -528,8 +530,17 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithRotation
 		super.keyTyped(par1, par2);
 	}
 
+	@Override
+	protected void onRotationWheelDrag(PartObj part)
+	{
+		super.onRotationWheelDrag(part);
+		exceptionPartName = part.getName();
+	}
+
+	@Override	
 	protected void onRotationWheelRelease()
 	{
+		super.onRotationWheelRelease();
 		if(keyframeExists())
 			addKeyframe();
 		//pdateAnimation();
@@ -550,6 +561,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithRotation
 		JLabel[] partLabels;
 		JButton playPauseButton;
 		JLabel partName, partX, partY, partZ;
+		RenderFrame renderFrame;
 
 		private TimelineFrame()
 		{
@@ -565,7 +577,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithRotation
 			mainPanel = new JPanel();
 
 			JPanel optionsPanel = new JPanel();
-			optionsPanel.setLayout(new GridLayout(8,1));
+			optionsPanel.setLayout(new GridLayout(7,1));
 
 			playPauseButton = new JButton("Play");
 			playPauseButton.setPreferredSize(new Dimension(100,50));
@@ -594,34 +606,24 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithRotation
 			});
 			optionsPanel.add(backButton);
 
-			JButton choosePropButton = new JButton("Choose Right Hand Item");
-			//			choosePropButton.addActionListener(new ActionListener()
-			//			{
-			//				@Override
-			//				public void actionPerformed(ActionEvent e) 
-			//				{
-			//					mc.displayGuiScreen(new GuiInventoryChooseItem(GuiAnimationTimelineWithFrames.this, (EntityObj) entityToRender));
-			//				}
-			//			});
-			optionsPanel.add(choosePropButton);
-
-			JButton emptyHandButton = new JButton("Empty Right Hand Item");
-			emptyHandButton.addActionListener(new ActionListener()
+			JButton renderingButton = new JButton("Rendering Options");
+			renderingButton.addActionListener(new ActionListener()
 			{
 				@Override
-				public void actionPerformed(ActionEvent e) 
+				public void actionPerformed(ActionEvent arg0) 
 				{
-					AnimationData.setAnimationItem(currentAnimation.getName(), -1);
-					((EntityObj) entityToRender).setCurrentItem(null); 
+					if(renderFrame != null)
+						renderFrame.dispose();
+					renderFrame = new RenderFrame();
 				}
 			});
-			optionsPanel.add(emptyHandButton);
-			
+			optionsPanel.add(renderingButton);
+
 			partName = new JLabel();
 			partX = new JLabel();
 			partY = new JLabel();
 			partZ = new JLabel();
-			
+
 			optionsPanel.add(partName);
 			optionsPanel.add(partX);
 			optionsPanel.add(partY);
@@ -788,7 +790,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithRotation
 			}
 			repaint();
 		}
-		
+
 		private void updatePartLabels()
 		{
 			String name = "No part selected";
@@ -962,19 +964,64 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithRotation
 	private class RenderFrame extends JFrame
 	{
 		private RenderFrame()
-		{
-			JPanel renderPanel = new JPanel();
-			renderPanel.setLayout(new GridLayout(4,2));
-			for(int i = 0; i < 4; i++)
+		{	
+			super("Rendering Options");
+
+			JPanel buttonPanel = new JPanel();
+			buttonPanel.setLayout(new GridBagLayout());
+			GridBagConstraints c = new GridBagConstraints();
+
+			c.gridx = 0;
+			c.gridy = 0;
+			c.insets = new Insets(2,5,2,5);
+			c.ipadx = 10;
+			c.fill = GridBagConstraints.BOTH;
+
+			JButton itemButton = new JButton("Choose Right Hand Item");
+			itemButton.addActionListener(new ActionListener()
 			{
+				@Override
+				public void actionPerformed(ActionEvent e) 
+				{
+					mc.displayGuiScreen(new GuiInventoryChooseItem(GuiAnimationTimeline.this, (EntityObj) entityToRender));
+				}
+			});
+			buttonPanel.add(itemButton, c);
+
+			c.gridy = 1;
+			JButton emptyItemButton = new JButton("Empty Right Hand");
+			emptyItemButton.addActionListener(new ActionListener()
+			{
+				@Override
+				public void actionPerformed(ActionEvent e) 
+				{
+					AnimationData.setAnimationItem(currentAnimation.getName(), -1);
+					((EntityObj) entityToRender).setCurrentItem(null); 
+				}
+			});
+			buttonPanel.add(emptyItemButton, c);
+
+			buttonPanel.setBorder(BorderFactory.createTitledBorder("Item"));
+
+			JPanel checkboxPanel = new JPanel();
+			checkboxPanel.setLayout(new GridBagLayout());
+			c.gridx = 0;
+			c.gridy = 0;
+			c.ipadx = 0;
+			for(int i = 0; i < 4; i++)
+			{	
+				c.gridx = 0;
+				c.gridy = i;
+				c.anchor = GridBagConstraints.EAST;
 				JCheckBox cb = new JCheckBox();
 				cb.setHorizontalAlignment(JCheckBox.RIGHT);
-				renderPanel.add(cb);
+				checkboxPanel.add(cb, c);
 				String s = "";
 				switch(i)
 				{
 				case 0: 
 					s = "Loop"; 
+					cb.setSelected(boolLoop);
 					cb.addActionListener(new ActionListener()
 					{
 						public void actionPerformed(ActionEvent actionEvent) 
@@ -987,6 +1034,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithRotation
 				case 1: s = "Shield"; break; //TODO shield??
 				case 2: 
 					s = "Base";
+					cb.setSelected(boolBase);
 					cb.addActionListener(new ActionListener()
 					{
 						public void actionPerformed(ActionEvent actionEvent) 
@@ -998,6 +1046,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithRotation
 					break;
 				case 3:
 					s = "Grid";
+					cb.setSelected(boolGrid);
 					cb.addActionListener(new ActionListener()
 					{
 						public void actionPerformed(ActionEvent actionEvent) 
@@ -1008,13 +1057,43 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithRotation
 					});
 					break;
 				}
-				renderPanel.add(new JLabel(s));
+				c.gridx = 1;
+				c.anchor = GridBagConstraints.WEST;
+				checkboxPanel.add(new JLabel(s),c);
 			}
+			checkboxPanel.setBorder(BorderFactory.createTitledBorder("Render"));
 
-			setContentPane(renderPanel);
+			JPanel mainPanel = new JPanel();
+			mainPanel.setLayout(new GridBagLayout());
+
+			c.gridx = 0;
+			c.gridy = 0;
+			c.gridheight = 2;
+			c.insets = new Insets(0,2,0,2);
+			mainPanel.add(checkboxPanel,c);
+			c.gridx = 1;
+			c.gridheight = 1;
+			mainPanel.add(buttonPanel,c);
+			c.gridy = 1;
+			c.fill = GridBagConstraints.HORIZONTAL;
+			c.insets = new Insets(0,7,0,7);
+			JButton closeButton = new JButton("Close");
+			closeButton.addActionListener(new ActionListener()
+			{
+				@Override
+				public void actionPerformed(ActionEvent arg0) 
+				{
+					RenderFrame.this.dispose();
+					System.out.println("Close");
+				}
+
+			});
+			mainPanel.add(closeButton,c);
+
+			setContentPane(mainPanel);
 			pack();
 			setAlwaysOnTop(true);
-			setLocation(Display.getX() + 50, Display.getY() + 520);
+			setLocationRelativeTo(timelineFrame);
 
 			setVisible(true);
 			setResizable(false);

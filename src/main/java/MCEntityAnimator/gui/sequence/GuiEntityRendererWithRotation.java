@@ -122,8 +122,7 @@ public class GuiEntityRendererWithRotation extends GuiEntityRenderer
 				else
 				{
 					//If wheel is being rotated, update the guide point and calculate new wheel rotation.
-					rotationGuidePoint = getMouseVectorInRotationPlane(part);
-					processWheelRotation();
+					onRotationWheelDrag(part);
 				}
 			}
 		}
@@ -222,6 +221,12 @@ public class GuiEntityRendererWithRotation extends GuiEntityRenderer
 				prevRotationWheelDelta = rotationWheelDelta;
 			}
 		}
+	}
+	
+	protected void onRotationWheelDrag(PartObj part)
+	{
+		rotationGuidePoint = getMouseVectorInRotationPlane(part);
+		processWheelRotation();
 	}
 	
 	protected void onRotationWheelRelease(){}
