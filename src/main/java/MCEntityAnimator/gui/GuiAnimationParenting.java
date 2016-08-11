@@ -42,36 +42,10 @@ public class GuiAnimationParenting extends GuiEntityRenderer
 		relationFrame = new RelationFrame();
 	}
 
-	/**
-	 * Adds the buttons (and other controls) to the screen in question.
-	 */
-	public void initGui()
-	{
-		super.initGui();
-		setup();
-	}
-
-	public void setup()
-	{
-		String setup = AnimationData.getParentingSetup(entityName);
-		if(setup != null)
-		{
-			String[] split = setup.split(",");
-			horizontalPan = Integer.parseInt(split[0]);
-			verticalPan = Integer.parseInt(split[1]);
-			scaleModifier = Integer.parseInt(split[2]);
-		}
-	}
-
-	public void saveSetup()
-	{
-		AnimationData.setParentingSetup(entityName, horizontalPan + "," + verticalPan + "," + scaleModifier);
-	}
-
 	@Override
 	public void onGuiClosed()
 	{
-		saveSetup();
+		super.onGuiClosed();
 		parentingFrame.dispose();
 		relationFrame.dispose();
 	}

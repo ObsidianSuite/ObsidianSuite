@@ -104,29 +104,6 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithRotation implemen
 	public void initGui()
 	{
 		super.initGui();
-		setup();
-	}
-
-	public void setup()
-	{
-		//		String setup = AnimationData.getAnimationSetup(entityName);
-		//		if(setup != null)
-		//		{
-		//			String[] split = setup.split(",");
-		//			horizontalPan = Integer.parseInt(split[0]);
-		//			verticalPan = Integer.parseInt(split[1]);
-		//			horizontalRotation = Float.parseFloat(split[2]);
-		//			verticalRotation = Float.parseFloat(split[3]);
-		//			scaleModifier = Integer.parseInt(split[4]);
-		//			boolBase = Boolean.parseBoolean(split[5]);
-		//		}
-	}
-
-	public void saveSetup()
-	{
-		String data = horizontalPan + "," + verticalPan + "," + horizontalRotation + "," 
-				+ verticalRotation + "," + scaleModifier + "," + boolBase;
-		AnimationData.setAnimationSetup(entityName, data);
 	}
 
 	public void loadFrames()
@@ -209,7 +186,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithRotation implemen
 	@Override
 	public void onGuiClosed()
 	{
-		saveSetup();
+		super.onGuiClosed();
 		timelineFrame.dispose();
 		SaveLoadHandler.upload();
 	}
@@ -238,7 +215,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithRotation implemen
 
 		timelineFrame.refresh();
 
-		updateExternalFrameFromDisplay();
+		//updateExternalFrameFromDisplay();
 
 		super.drawScreen(par1, par2, par3);
 	}

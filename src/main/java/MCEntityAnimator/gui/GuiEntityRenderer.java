@@ -14,6 +14,7 @@ import org.lwjgl.util.glu.GLU;
 
 import MCEntityAnimator.MCEA_Main;
 import MCEntityAnimator.Util;
+import MCEntityAnimator.animation.AnimationData;
 import MCEntityAnimator.render.objRendering.EntityObj;
 import MCEntityAnimator.render.objRendering.ModelObj;
 import MCEntityAnimator.render.objRendering.RayTrace;
@@ -75,12 +76,41 @@ public class GuiEntityRenderer extends GuiBlack
 	/* ---------------------------------------------------- *
 	 * 						General							*
 	 * ---------------------------------------------------- */
-	
+
 	@Override
 	public void initGui()
 	{
 		posX = width/2;
 		posY = 5;
+		loadSetup();
+	}
+
+	public void loadSetup()
+	{
+		String setup = AnimationData.getGUISetup(entityName);
+		if(setup != null)
+		{
+			String[] split = setup.split(",");
+			horizontalPan = Integer.parseInt(split[0]);
+			verticalPan = Integer.parseInt(split[1]);
+			horizontalRotation = Float.parseFloat(split[2]);
+			verticalRotation = Float.parseFloat(split[3]);
+			scaleModifier = Integer.parseInt(split[4]);
+		}
+	}
+
+	@Override
+	public void onGuiClosed()
+	{
+		super.onGuiClosed();
+		saveSetup();
+	}
+
+	public void saveSetup()
+	{
+		String data = horizontalPan + "," + verticalPan + "," + horizontalRotation + "," 
+				+ verticalRotation + "," + scaleModifier;
+		AnimationData.setGUISetup(entityName, data);
 	}
 
 	/**
@@ -131,7 +161,7 @@ public class GuiEntityRenderer extends GuiBlack
 				entityModel.hightlightPart((PartObj) additionalPart, false);
 		}
 	}
-	
+
 	/* ---------------------------------------------------- *
 	 * 						Input							*
 	 * ---------------------------------------------------- */
@@ -209,20 +239,20 @@ public class GuiEntityRenderer extends GuiBlack
 	/* ---------------------------------------------------- *
 	 * 		     	   Part Manipulation					*
 	 * ---------------------------------------------------- */
-	
+
 	protected void updatePart(String newPartName)
 	{
 		currentPartName = newPartName;
 		onPartOutputChange();
 	}
-	
+
 	protected void onPartOutputChange(){}
 
-	
+
 	/* ---------------------------------------------------- *
 	 * 					  Ray Trace							*
 	 * ---------------------------------------------------- */
-	
+
 	public void processRay()
 	{
 		PartObj raySelection = entityModel.testRay();
@@ -231,7 +261,7 @@ public class GuiEntityRenderer extends GuiBlack
 		else
 			additionalHighlightPartName = "";
 	}
-	
+
 	/* ---------------------------------------------------- *
 	 * 						Render							*
 	 * ---------------------------------------------------- */
@@ -297,7 +327,7 @@ public class GuiEntityRenderer extends GuiBlack
 
 		GL11.glPopMatrix();
 	}
-	
+
 	private void renderGrid(int xPos, int yPos, float scale, float rotX, float rotY)
 	{
 		GL11.glPushMatrix();
@@ -337,7 +367,7 @@ public class GuiEntityRenderer extends GuiBlack
 	/* ---------------------------------------------------- *
 	 * 						Views							*
 	 * ---------------------------------------------------- */
-	
+
 	public void changeView(int numpadKey)
 	{
 		for(View v : views)

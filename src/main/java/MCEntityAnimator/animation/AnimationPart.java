@@ -53,7 +53,6 @@ public class AnimationPart
 			if(dT == 0)
 				dT = 1;
 			float dif = endPos[i] - startPos[i];
-			System.out.println(dif);
 			if(part instanceof PartObj)
 			{
 				if(Math.abs(dif) > Math.PI)
