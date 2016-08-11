@@ -32,6 +32,10 @@ public class ServerAccess
 	public static List<String> uploadAll() throws IOException
 	{
 		File file;
+		
+		if(!canConnect())
+			return new ArrayList<String>();
+		
 		if(username.equals("root"))
 			file = new File(MCEA_Main.animationPath + "/data/shared");
 		else
@@ -132,6 +136,10 @@ public class ServerAccess
 	{
 		HttpURLConnection connection = (HttpURLConnection) new URL(downloadURL  + username).openConnection();
 		InputStream stream;
+		
+		if(!canConnect())
+			return;
+		
 		if(connection.getResponseCode() == 200)
 			stream = connection.getInputStream();
 		else
@@ -256,6 +264,20 @@ public class ServerAccess
 		dir.delete();	
 	}
 
+	public static boolean canConnect()
+	{
+		try
+		{
+			HttpURLConnection connection = (HttpURLConnection) new URL(baseURL).openConnection();
+			connection.connect();
+		}
+		catch(IOException e)
+		{
+			System.out.println("Unable to connect to animation server.");
+			return false;
+		}		
+		return true;
+	}
 
 }
 
