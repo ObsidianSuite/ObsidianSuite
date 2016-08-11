@@ -5,7 +5,6 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -30,7 +29,6 @@ import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
 import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
 import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -43,12 +41,10 @@ import javax.swing.JScrollPane;
 import javax.swing.JSlider;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
-import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.lwjgl.input.Keyboard;
-import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 
 import MCEntityAnimator.Util;
@@ -64,7 +60,7 @@ import MCEntityAnimator.render.objRendering.EntityObj;
 import MCEntityAnimator.render.objRendering.parts.Part;
 import MCEntityAnimator.render.objRendering.parts.PartObj;
 
-public class GuiAnimationTimeline extends GuiEntityRendererWithRotation
+public class GuiAnimationTimeline extends GuiEntityRendererWithRotation implements ExternalFrame
 {
 
 	public AnimationSequence currentAnimation;
@@ -213,8 +209,6 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithRotation
 	{
 		saveSetup();
 		timelineFrame.dispose();
-		if(timelineFrame.renderFrame != null)
-			timelineFrame.renderFrame.dispose();
 		SaveLoadHandler.upload();
 	}
 
@@ -231,21 +225,19 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithRotation
 				else
 				{
 					boolPlay = false;
-					timelineFrame.updatePlayPauseButton();
 					time = currentAnimation.getTotalTime();
 				}
 			}
 			timelineFrame.timeSlider.setValue((int) time);
 			timelineFrame.repaint();
 		}
-		else
-		{
-			//exceptionPartName = currentPartName;
-		}
 
 		this.currentAnimation.animateAll(time, entityModel, exceptionPartName);
 
-		timelineFrame.updatePartLabels();
+		timelineFrame.optionsPanel.updatePlayPauseButton();
+		timelineFrame.optionsPanel.updatePartLabels();
+		
+		updateExternalFrameFromDisplay();
 
 		super.drawScreen(par1, par2, par3);
 	}
@@ -546,6 +538,12 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithRotation
 		//pdateAnimation();
 	}
 
+	@Override
+	public void updateExternalFrameFromDisplay() 
+	{
+		timelineFrame.setAlwaysOnTop(Display.isActive());
+	}
+	
 	/* ---------------------------------------------------- *
 	 * 				   	Timeline Frame						*
 	 * ---------------------------------------------------- */
@@ -559,9 +557,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithRotation
 		int timelineLengthMin = 50;
 		JPanel mainPanel;
 		JLabel[] partLabels;
-		JButton playPauseButton;
-		JLabel partName, partX, partY, partZ;
-		RenderFrame renderFrame;
+		OptionsPanel optionsPanel;
 
 		private TimelineFrame()
 		{
@@ -575,60 +571,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithRotation
 
 
 			mainPanel = new JPanel();
-
-			JPanel optionsPanel = new JPanel();
-			optionsPanel.setLayout(new GridLayout(7,1));
-
-			playPauseButton = new JButton("Play");
-			playPauseButton.setPreferredSize(new Dimension(100,50));
-			playPauseButton.addActionListener(new ActionListener()
-			{
-				@Override
-				public void actionPerformed(ActionEvent e) 
-				{
-					if(time >= currentAnimation.getTotalTime())
-						time = 0;
-					boolPlay = !boolPlay; 		
-					updatePlayPauseButton();
-				}
-			});
-			optionsPanel.add(playPauseButton);
-
-			JButton backButton = new JButton("Back");
-			backButton.addActionListener(new ActionListener()
-			{
-				@Override
-				public void actionPerformed(ActionEvent e) 
-				{
-					mc.displayGuiScreen(new GuiBlack());
-					ServerAccess.gui = new FileGUI();
-				}
-			});
-			optionsPanel.add(backButton);
-
-			JButton renderingButton = new JButton("Rendering Options");
-			renderingButton.addActionListener(new ActionListener()
-			{
-				@Override
-				public void actionPerformed(ActionEvent arg0) 
-				{
-					if(renderFrame != null)
-						renderFrame.dispose();
-					renderFrame = new RenderFrame();
-				}
-			});
-			optionsPanel.add(renderingButton);
-
-			partName = new JLabel();
-			partX = new JLabel();
-			partY = new JLabel();
-			partZ = new JLabel();
-
-			optionsPanel.add(partName);
-			optionsPanel.add(partX);
-			optionsPanel.add(partY);
-			optionsPanel.add(partZ);
-
+			optionsPanel = new OptionsPanel();
 
 			JPanel timelinePanel = new JPanel();
 			final JTextField timeTextField = new JTextField("0");
@@ -737,12 +680,19 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithRotation
 			scrollPane.setPreferredSize(new Dimension(700,400));
 			scrollPane.setWheelScrollingEnabled(false);
 
-			mainPanel.add(optionsPanel);
+			mainPanel.add(new OptionsPanel());
 			mainPanel.add(scrollPane);
+			
 			setContentPane(mainPanel);
 			pack();
 			setAlwaysOnTop(true);
-			setLocation(Display.getX() + 50, Display.getY() + 520);
+			if(Display.isVisible())
+				setLocation(Display.getX() + 50, Display.getY() + 520);
+			else
+			{
+				setLocationRelativeTo(null);
+				setLocation(50, 520);
+			}
 
 			setVisible(true);
 			setResizable(false);
@@ -750,7 +700,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithRotation
 
 		private void refresh()
 		{
-			updatePlayPauseButton();
+			optionsPanel.updatePlayPauseButton();
 			refresthLineColours();
 			revalidate();
 			repaint();
@@ -773,12 +723,6 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithRotation
 			repaint();
 		}
 
-		private void updatePlayPauseButton()
-		{
-			playPauseButton.setText(boolPlay ? "Pause" : "Play");
-			pack();
-		}
-
 		private void refresthLineColours()
 		{
 			for(int i = 0; i < partLabels.length; i++)
@@ -791,23 +735,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithRotation
 			repaint();
 		}
 
-		private void updatePartLabels()
-		{
-			String name = "No part selected";
-			String x="-",y="-",z="-";
-			if(currentPartName != null && !currentPartName.equals(""))
-			{
-				Part part = Util.getPartFromName(currentPartName, entityModel.parts);
-				name = part.getDisplayName();
-				x = df.format(part.getValue(0));
-				y = df.format(part.getValue(1));
-				z = df.format(part.getValue(2));
-			}
-			partName.setText(name);
-			partX.setText("X: " + x);
-			partY.setText("Y: " + y);
-			partZ.setText("Z: " + z);
-		}
+
 
 		private class KeyframeLine extends JPanel
 		{		
@@ -958,18 +886,55 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithRotation
 	}
 
 	/* ---------------------------------------------------- *
-	 * 				  		Render frame					*
+	 * 				  	   Options panel					*
 	 * ---------------------------------------------------- */
 
-	private class RenderFrame extends JFrame
+	private class OptionsPanel extends JPanel
 	{
-		private RenderFrame()
-		{	
-			super("Rendering Options");
+		JButton playPauseButton;
+		JLabel partName, partX, partY, partZ;
+		
+		private OptionsPanel()
+		{				
+			playPauseButton = new JButton("Play");
+			playPauseButton.addActionListener(new ActionListener()
+			{
+				@Override
+				public void actionPerformed(ActionEvent e) 
+				{
+					if(time >= currentAnimation.getTotalTime())
+						time = 0;
+					boolPlay = !boolPlay; 		
+					updatePlayPauseButton();
+				}
+			});
+			
+			
+			JPanel partPanel = new JPanel();
 
+			partName = new JLabel();
+			partX = new JLabel();
+			partY = new JLabel();
+			partZ = new JLabel();
+			
+			updatePartLabels();
+			
+			partPanel.setLayout(new GridBagLayout());
+			GridBagConstraints c = new GridBagConstraints();
+			c.gridx = 0;
+			c.gridy = 0;
+			partPanel.add(partName,c);
+			c.gridy = 1;
+			partPanel.add(partX,c);
+			c.gridy = 2;
+			partPanel.add(partY,c);
+			c.gridy = 3;
+			partPanel.add(partZ,c);
+			
+			partPanel.setBorder(BorderFactory.createTitledBorder("Part"));
+			
 			JPanel buttonPanel = new JPanel();
 			buttonPanel.setLayout(new GridBagLayout());
-			GridBagConstraints c = new GridBagConstraints();
 
 			c.gridx = 0;
 			c.gridy = 0;
@@ -1062,41 +1027,60 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithRotation
 				checkboxPanel.add(new JLabel(s),c);
 			}
 			checkboxPanel.setBorder(BorderFactory.createTitledBorder("Render"));
-
-			JPanel mainPanel = new JPanel();
-			mainPanel.setLayout(new GridBagLayout());
-
-			c.gridx = 0;
-			c.gridy = 0;
-			c.gridheight = 2;
-			c.insets = new Insets(0,2,0,2);
-			mainPanel.add(checkboxPanel,c);
-			c.gridx = 1;
-			c.gridheight = 1;
-			mainPanel.add(buttonPanel,c);
-			c.gridy = 1;
-			c.fill = GridBagConstraints.HORIZONTAL;
-			c.insets = new Insets(0,7,0,7);
-			JButton closeButton = new JButton("Close");
-			closeButton.addActionListener(new ActionListener()
+			
+			JButton backButton = new JButton("Back");
+			backButton.addActionListener(new ActionListener()
 			{
 				@Override
-				public void actionPerformed(ActionEvent arg0) 
+				public void actionPerformed(ActionEvent e) 
 				{
-					RenderFrame.this.dispose();
-					System.out.println("Close");
+					mc.displayGuiScreen(new GuiBlack());
+					ServerAccess.gui = new FileGUI();
 				}
-
 			});
-			mainPanel.add(closeButton,c);
 
-			setContentPane(mainPanel);
-			pack();
-			setAlwaysOnTop(true);
-			setLocationRelativeTo(timelineFrame);
-
-			setVisible(true);
-			setResizable(false);
+			setLayout(new GridBagLayout());
+			c = new GridBagConstraints();
+			c.fill = GridBagConstraints.BOTH;
+			c.gridx = 0;
+			c.gridy = 0;
+			c.insets = new Insets(2,5,2,5);
+			add(playPauseButton,c);
+			c.insets = new Insets(0,2,0,2);
+			c.gridy = 1;
+			add(partPanel,c);
+			c.gridy = 2;
+			add(checkboxPanel,c);
+			c.gridy = 3;
+			add(buttonPanel,c);
+			c.gridy = 4;
+			c.insets = new Insets(2,5,2,5);
+			add(backButton,c);
+		}
+		
+		private void updatePartLabels()
+		{
+			String name = "No part selected";
+			String x="-",y="-",z="-";
+			if(currentPartName != null && !currentPartName.equals(""))
+			{
+				Part part = Util.getPartFromName(currentPartName, entityModel.parts);
+				name = part.getDisplayName();
+				x = df.format(part.getValue(0));
+				y = df.format(part.getValue(1));
+				z = df.format(part.getValue(2));
+			}
+			partName.setText(name);
+			partX.setText("X: " + x);
+			partY.setText("Y: " + y);
+			partZ.setText("Z: " + z);
+			revalidate();
+			repaint();
+		}
+		
+		private void updatePlayPauseButton()
+		{
+			playPauseButton.setText(boolPlay ? "Pause" : "Play");
 		}
 	}
 
@@ -1304,4 +1288,6 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithRotation
 			setValue((int) Math.round(d*this.scale));
 		}
 	}
+
+
 }
