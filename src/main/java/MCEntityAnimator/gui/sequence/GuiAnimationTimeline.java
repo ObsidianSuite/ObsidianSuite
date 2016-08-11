@@ -234,8 +234,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithRotation implemen
 
 		this.currentAnimation.animateAll(time, entityModel, exceptionPartName);
 
-		timelineFrame.optionsPanel.updatePlayPauseButton();
-		timelineFrame.optionsPanel.updatePartLabels();
+		timelineFrame.refresh();
 		
 		updateExternalFrameFromDisplay();
 
@@ -302,7 +301,10 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithRotation implemen
 			keyframes.put(currentPartName, partKeyframes);
 			timelineFrame.repaint();
 			if(keyframeRemoved)
+			{
+				exceptionPartName = "";
 				updateAnimation();
+			}
 		}
 		timelineFrame.refresh();
 	}
@@ -680,7 +682,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithRotation implemen
 			scrollPane.setPreferredSize(new Dimension(700,400));
 			scrollPane.setWheelScrollingEnabled(false);
 
-			mainPanel.add(new OptionsPanel());
+			mainPanel.add(optionsPanel);
 			mainPanel.add(scrollPane);
 			
 			setContentPane(mainPanel);
@@ -701,6 +703,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithRotation implemen
 		private void refresh()
 		{
 			optionsPanel.updatePlayPauseButton();
+			optionsPanel.updatePartLabels();
 			refresthLineColours();
 			revalidate();
 			repaint();
@@ -1074,9 +1077,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithRotation implemen
 			partX.setText("X: " + x);
 			partY.setText("Y: " + y);
 			partZ.setText("Z: " + z);
-			revalidate();
-			repaint();
-		}
+ 		}
 		
 		private void updatePlayPauseButton()
 		{
