@@ -1,11 +1,16 @@
 package MCEntityAnimator.render.objRendering.parts;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.lwjgl.opengl.GL11;
+
+import com.sun.org.apache.xpath.internal.operations.Variable;
 
 import MCEntityAnimator.animation.AnimationData;
 import MCEntityAnimator.animation.AnimationParenting;
@@ -16,8 +21,10 @@ import MCEntityAnimator.render.objRendering.bend.Bend;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.Entity;
+import net.minecraft.client.renderer.OpenGlHelper;
+import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Vec3;
 import net.minecraftforge.client.model.obj.Face;
 import net.minecraftforge.client.model.obj.GroupObject;
 import net.minecraftforge.client.model.obj.TextureCoordinate;
@@ -30,7 +37,8 @@ public class PartObj extends Part
 {
 	private float[] rotationPoint;
 	private boolean showModel;
-
+	private FloatBuffer rotationMatrix;
+	
 	//XXX
 	private Map<Face, TextureCoordinate[]> defaultTextureCoords;
 
@@ -47,6 +55,7 @@ public class PartObj extends Part
 		defaultTextureCoords = new HashMap<Face, TextureCoordinate[]>();
 		setDefaultTCsToCurrentTCs();
 		visible = true;
+		setupRotationMatrix();
 	}
 
 	//------------------------------------------
@@ -111,27 +120,37 @@ public class PartObj extends Part
 		bend = null;
 	}
 
+	private void setupRotationMatrix()
+	{
+		float[] rotationMatrixF = new float[16];
+		ByteBuffer vbb = ByteBuffer.allocateDirect(rotationMatrixF.length*4);
+		vbb.order(ByteOrder.nativeOrder());
+		rotationMatrix = vbb.asFloatBuffer();
+		rotationMatrix.put(rotationMatrixF);
+		rotationMatrix.position(0);
+	}
+
 	//----------------------------------------------------------------
 	// 							 Selection
 	//----------------------------------------------------------------
 
 	public void moveForAllParts()
 	{
-		AnimationParenting anipar = AnimationData.getAnipar(modelObj.getEntityType());
-		List<PartObj> parts = new ArrayList<PartObj>();
-		PartObj child = this;
-		PartObj parent;
-		parts.add(0, child);
-		while((parent = anipar.getParent(child)) != null)
-		{
-			parts.add(0, parent);
-			child = parent;
-		}
-		
-		for(PartObj p : parts)
-			p.move();
+		//		AnimationParenting anipar = AnimationData.getAnipar(modelObj.getEntityType());
+		//		List<PartObj> parts = new ArrayList<PartObj>();
+		//		PartObj child = this;
+		//		PartObj parent;
+		//		parts.add(0, child);
+		//		while((parent = anipar.getParent(child)) != null)
+		//		{
+		//			parts.add(0, parent);
+		//			child = parent;
+		//		}
+		//
+		//		for(PartObj p : parts)
+		//			p.move();
 	}
-	
+
 	/**
 	 * Test to see if a ray insects with this part.
 	 * @param p0 - Point on ray.
@@ -145,6 +164,7 @@ public class PartObj extends Part
 		Double min = null;
 		for(Face f : groupObj.faces)
 		{
+			//System.out.println(groupObj.faces.get(0).vertices[0].x + ", " + groupObj.faces.get(0).vertices[0].y + ", " + groupObj.faces.get(0).vertices[0].z);
 			Double d = MathHelper.rayIntersectsFace(RayTrace.getRayTrace(), f);
 			if(d != null && (min == null || d < min))
 				min = d;
@@ -189,7 +209,7 @@ public class PartObj extends Part
 	{	
 		updateTextureCoordinates(modelObj.isMainHighlight(this), modelObj.isPartHighlighted(this), true);
 	}
-	
+
 	/**
 	 * Change the texture coordinates and texture if the part is highlighted.
 	 */
@@ -210,12 +230,12 @@ public class PartObj extends Part
 			texture = modelObj.getTexture();
 			useHighlightCoords = false;
 		}
-		
+
 		//System.out.println(this.getDisplayName() + " " + texture);
 
 		if(bindTexture)
 			Minecraft.getMinecraft().getTextureManager().bindTexture(texture);		
-		
+
 		for(Face f : groupObj.faces)
 		{
 			if(useHighlightCoords)
@@ -305,29 +325,150 @@ public class PartObj extends Part
 			//Translate, compensating for the previous part translation.
 			GL11.glTranslatef(trans[0] - prevtrans[0], trans[1] - prevtrans[1], trans[2] - prevtrans[2]);
 			//Rotate
-			if (p.valueX != 0.0F)
-				GL11.glRotatef(p.valueX * (180F / (float)Math.PI), 1.0F, 0.0F, 0.0F);
-			if (p.valueY != 0.0F)
-				GL11.glRotatef(-p.valueY * (180F / (float)Math.PI), 0.0F, 1.0F, 0.0F);            
-			if (p.valueZ != 0.0F)
-				GL11.glRotatef(-p.valueZ * (180F / (float)Math.PI), 0.0F, 0.0F, 1.0F);   
+			p.move(); 
 		}
 	}
 
+	/**
+	 * Complete post render - parent post render, translation for this part, then rotation for this part.
+	 */
+	public void postRenderAll()
+	{
+		postRenderAllTrans();
+		rotate();
+	}
+
+	/**
+	 * Complete post render except rotation of this part.
+	 */
+	public void postRenderAllTrans()
+	{
+		float[] totalTranslation = postRenderParent();
+		GL11.glTranslated(-getRotationPoint(0)-totalTranslation[0], -getRotationPoint(1)-totalTranslation[1], -getRotationPoint(2)-totalTranslation[2]);
+	}
+
+	/**
+	 * Adjust GL11 Matrix for all parents of this part.
+	 */
+	//TODO could this be done recursively?
+	public float[] postRenderParent()
+	{
+		//Generate a list of parents: {topParent, topParent - 1,..., parent}
+		AnimationParenting anipar = AnimationData.getAnipar(modelObj.getEntityType());
+		List<PartObj> parts = new ArrayList<PartObj>();
+		PartObj child = this;
+		PartObj parent;
+		while((parent = anipar.getParent(child)) != null)
+		{
+			parts.add(0, parent);
+			child = parent;
+		}
+
+		float[] totalTranslation = new float[]{0,0,0};
+		for(PartObj p : parts)
+		{			
+			GL11.glTranslated(-p.getRotationPoint(0)-totalTranslation[0], -p.getRotationPoint(1)-totalTranslation[1], -p.getRotationPoint(2)-totalTranslation[2]);
+			for(int i = 0; i < 3; i++)
+				totalTranslation[i] = -p.getRotationPoint(i);
+
+			p.rotate();
+
+		}
+		return totalTranslation;
+	}
 
 	public void move()
 	{
-		//Translate part to centre
 		GL11.glTranslatef(-rotationPoint[0], -rotationPoint[1], -rotationPoint[2]);
-
-		//Rotate
-		GL11.glRotated((valueX - originalValues[0])/Math.PI*180.0F, 1.0F, 0.0F, 0.0F);
-		GL11.glRotated((valueY - originalValues[1])/Math.PI*180.0F, 0.0F, 1.0F, 0.0F);
-		GL11.glRotated((valueZ - originalValues[2])/Math.PI*180.0F, 0.0F, 0.0F, 1.0F);
-
-		//Translate to original position
+		rotate();
 		GL11.glTranslatef(rotationPoint[0], rotationPoint[1], rotationPoint[2]);    
 	}
 
+	public void rotate()
+	{
+		GL11.glRotated(-valueX/Math.PI*180F, 1, 0, 0);
+		GL11.glRotated(-valueY/Math.PI*180F, 0, 1, 0);
+		GL11.glRotated(-valueZ/Math.PI*180F, 0, 0, 1);
+	}
 
+	public void rotateLocal(float delta, int dim)
+	{
+		GL11.glPushMatrix();
+		GL11.glLoadIdentity();
+		rotate();
+		switch(dim)
+		{
+		case 0: GL11.glRotated(delta,1,0,0); break;
+		case 1: GL11.glRotated(delta,0,1,0); break;
+		case 2: GL11.glRotated(delta,0,0,1); break;
+		}
+
+		GL11.glGetFloat(GL11.GL_MODELVIEW_MATRIX, rotationMatrix);
+		updateRotationAnglesFromMatrix();
+		GL11.glPopMatrix();
+	}
+
+	private void updateRotationAnglesFromMatrix()
+	{
+		double x,y,z;
+		float r8 = rotationMatrix.get(8);
+		if(Math.abs(r8) != 1)
+		{
+			y = -Math.asin(r8);
+			double cy = Math.cos(y);
+			
+			//Find x value
+			float r9 = rotationMatrix.get(9);
+			float r10 = rotationMatrix.get(10);
+			x = Math.atan2(r9/cy, r10/cy);
+
+			//Find z value
+			float r0 = rotationMatrix.get(0);
+			float r4 = rotationMatrix.get(4);
+			z = Math.atan2(r4/cy, r0/cy);
+		}
+		else
+		{
+			//Gimbal lock case - infinite solutions, set z to zero.
+			z = 0.0F;
+			float r1 = rotationMatrix.get(1);
+			float r2 = rotationMatrix.get(2);
+			if(r8 == -1)
+			{
+				y = Math.PI/2;
+				x = z + Math.atan2(r1, r2);
+			}
+			else
+			{
+				y = -Math.PI/2;
+				x = z + Math.atan2(-r1,-r2);
+			}
+		}
+				
+		valueX = (float) x;
+		valueY = (float) y;
+		valueZ = (float) z;
+	}
+	
+	public float[] createRotationMatrixFromAngles()
+	{
+		double sx = Math.sin(valueX);
+		double sy = Math.sin(valueY);
+		double sz = Math.sin(valueZ);
+		double cx = Math.cos(valueX);
+		double cy = Math.cos(valueY);
+		double cz = Math.cos(valueZ);
+
+		float m0 = (float) (cy*cz);
+		float m1 = (float) (sx*sy*cz-cx*sz);
+		float m2 = (float) (cx*sy*cz+sx*sz);
+		float m3 = (float) (cy*sz);
+		float m4 = (float) (sx*sy*sz+cx*cz);
+		float m5 = (float) (cx*sy*sz-sx*cz);
+		float m6 = (float) -sy;
+		float m7 = (float) (sx*cy);
+		float m8 = (float) (cx*cy);
+
+		return new float[]{m0,m1,m2,m3,m4,m5,m6,m7,m8};
+	}
 }

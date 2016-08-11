@@ -51,7 +51,7 @@ public class GuiEntityRenderer extends GuiBlack
 	private RenderBlocks renderBlocks = new RenderBlocks();
 
 	private List<View> views;
-	
+
 	public GuiEntityRenderer(String entityName)
 	{
 		super();
@@ -69,10 +69,13 @@ public class GuiEntityRenderer extends GuiBlack
 		}
 
 		currentPartName = parts.get(0);
-
 		setupViews();
 	}
 
+	/* ---------------------------------------------------- *
+	 * 						General							*
+	 * ---------------------------------------------------- */
+	
 	@Override
 	public void initGui()
 	{
@@ -80,6 +83,9 @@ public class GuiEntityRenderer extends GuiBlack
 		posY = 5;
 	}
 
+	/**
+	 * Create various default views. 
+	 */
 	private void setupViews()
 	{
 		views = new ArrayList<View>();
@@ -125,30 +131,39 @@ public class GuiEntityRenderer extends GuiBlack
 				entityModel.hightlightPart((PartObj) additionalPart, false);
 		}
 	}
+	
+	/* ---------------------------------------------------- *
+	 * 						Input							*
+	 * ---------------------------------------------------- */
 
 	@Override
 	protected void mouseClicked(int x, int y, int i) 
 	{
 		super.mouseClicked(x, y, i);
-		if(additionalHighlightPartName != null && !additionalHighlightPartName.equals(""))
-			currentPartName = additionalHighlightPartName;
+		if(i == 0 && additionalHighlightPartName != null && !additionalHighlightPartName.equals(""))
+			updatePart(additionalHighlightPartName);
+		else if(i == 0)
+			updatePart("");
 	}
 
 	@Override
-	protected void mouseClickMove(int x, int y, int par2, long par3Long) 
+	protected void mouseClickMove(int x, int y, int button, long par3Long) 
 	{
-		super.mouseClickMove(x, y, par2, par3Long);
-		if(prevMouseMoveX == 0)
+		super.mouseClickMove(x, y, button, par3Long);
+		if(button == 2)
 		{
-			prevMouseMoveX = x;
-			prevMouseMoveY = y;
-		}
-		else
-		{
-			horizontalRotation -= (x - prevMouseMoveX);
-			verticalRotation += (y - prevMouseMoveY);
-			prevMouseMoveX = x;
-			prevMouseMoveY = y;
+			if(prevMouseMoveX == 0)
+			{
+				prevMouseMoveX = x;
+				prevMouseMoveY = y;
+			}
+			else
+			{
+				horizontalRotation -= (x - prevMouseMoveX);
+				verticalRotation += (y - prevMouseMoveY);
+				prevMouseMoveX = x;
+				prevMouseMoveY = y;
+			}
 		}
 	}
 
@@ -190,14 +205,36 @@ public class GuiEntityRenderer extends GuiBlack
 		scaleModifier += Mouse.getEventDWheel()/40;
 		super.handleMouseInput();
 	}
+
+	/* ---------------------------------------------------- *
+	 * 		     	   Part Manipulation					*
+	 * ---------------------------------------------------- */
 	
-	public void processRay(PartObj raySelection)
+	protected void updatePart(String newPartName)
 	{
+		currentPartName = newPartName;
+		onPartOutputChange();
+	}
+	
+	protected void onPartOutputChange(){}
+
+	
+	/* ---------------------------------------------------- *
+	 * 					  Ray Trace							*
+	 * ---------------------------------------------------- */
+	
+	public void processRay()
+	{
+		PartObj raySelection = entityModel.testRay();
 		if(raySelection != null)
 			additionalHighlightPartName = raySelection.getName();
 		else
 			additionalHighlightPartName = "";
 	}
+	
+	/* ---------------------------------------------------- *
+	 * 						Render							*
+	 * ---------------------------------------------------- */
 
 	/**
 	 * Renders an entity into a gui. Parameters - xpos, ypos, scale, rotx, roty, entity.
@@ -217,14 +254,14 @@ public class GuiEntityRenderer extends GuiBlack
 		GL11.glTranslated(par5EntityLivingBase.posX, par5EntityLivingBase.posY, par5EntityLivingBase.posZ);
 		RenderManager.instance.playerViewY = 180.0F;
 		RenderManager.instance.renderEntityWithPosYaw(par5EntityLivingBase, 0.0D, 0.0D, 0.0D, 0.0F, 1.0F);
-		processRay(entityModel.testRay());
-		GL11.glPopMatrix();
 		RenderHelper.disableStandardItemLighting();
 		GL11.glDisable(GL12.GL_RESCALE_NORMAL);
 		OpenGlHelper.setActiveTexture(OpenGlHelper.lightmapTexUnit);
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		OpenGlHelper.setActiveTexture(OpenGlHelper.defaultTexUnit);
 		GL11.glDisable(GL11.GL_COLOR_MATERIAL);
+		processRay();
+		GL11.glPopMatrix();
 	}
 
 	private void renderBase(int xPos, int yPos, float scale, float rotX, float rotY)
@@ -260,9 +297,7 @@ public class GuiEntityRenderer extends GuiBlack
 
 		GL11.glPopMatrix();
 	}
-
-
-
+	
 	private void renderGrid(int xPos, int yPos, float scale, float rotX, float rotY)
 	{
 		GL11.glPushMatrix();
@@ -299,6 +334,10 @@ public class GuiEntityRenderer extends GuiBlack
 		GL11.glPopMatrix();
 	}
 
+	/* ---------------------------------------------------- *
+	 * 						Views							*
+	 * ---------------------------------------------------- */
+	
 	public void changeView(int numpadKey)
 	{
 		for(View v : views)

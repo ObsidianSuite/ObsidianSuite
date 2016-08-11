@@ -6,7 +6,6 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -22,7 +21,7 @@ import MCEntityAnimator.animation.AnimationData;
 import MCEntityAnimator.animation.AnimationSequence;
 import MCEntityAnimator.distribution.DataHandler;
 import MCEntityAnimator.distribution.ServerAccess;
-import MCEntityAnimator.gui.sequence.GuiAnimationTimelineWithFrames;
+import MCEntityAnimator.gui.sequence.GuiAnimationTimeline;
 import net.minecraft.client.Minecraft;
 
 public class AnimationNewGUI extends JFrame
@@ -66,7 +65,7 @@ public class AnimationNewGUI extends JFrame
 						AnimationSequence sequence = new AnimationSequence(animationName);
 						AnimationData.addSequence(entityName, sequence);
 						dispose();
-						Minecraft.getMinecraft().displayGuiScreen(new GuiAnimationTimelineWithFrames(entityName, sequence));
+						Minecraft.getMinecraft().displayGuiScreen(new GuiAnimationTimeline(entityName, sequence));
 					}
 					else
 						JOptionPane.showMessageDialog(AnimationNewGUI.this, "An animation with that name already exists.");

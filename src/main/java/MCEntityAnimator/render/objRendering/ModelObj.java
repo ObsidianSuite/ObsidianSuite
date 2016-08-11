@@ -23,8 +23,11 @@ import MCEntityAnimator.render.objRendering.bend.Bend;
 import MCEntityAnimator.render.objRendering.parts.Part;
 import MCEntityAnimator.render.objRendering.parts.PartEntityPos;
 import MCEntityAnimator.render.objRendering.parts.PartObj;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelRenderer;
+import net.minecraft.client.renderer.OpenGlHelper;
+import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Vec3;
@@ -56,17 +59,17 @@ public class ModelObj extends ModelBase
 	public final boolean textureExists;
 
 	private boolean partSetupComplete;
-	
+
 	public static final ResourceLocation pinkResLoc = new ResourceLocation("mod_mcea:defaultModelTextures/pink.png");
 	public static final ResourceLocation whiteResLoc = new ResourceLocation("mod_mcea:defaultModelTextures/white.png");
-
+	
 	public ModelObj(String par0Str)
 	{	
 		entityType = par0Str;
 		File modelFile = new File(MCEA_Main.animationPath + "/data/shared/" + entityType + "/" + entityType + ".obj");
 		pxyFile = new File(MCEA_Main.animationPath + "/data/shared/" + entityType + "/" + entityType + ".pxy");
-		
-		
+
+
 		File textureFile = new File(MCEA_Main.animationPath + "/data/shared/" + entityType + "/" + entityType + ".png");
 		textureExists = textureFile.exists();
 		txtRL = new ResourceLocation("animation:data/shared/" + entityType + "/" + entityType + ".png");
@@ -270,11 +273,11 @@ public class ModelObj extends ModelBase
 	{				
 		super.setRotationAngles(f, f1, f2, f3, f4, f5, entity);
 	}
-	
+
 	//----------------------------------------------------------------
 	// 							 Selection
 	//----------------------------------------------------------------
-	
+
 	public PartObj testRay()
 	{
 		PartObj closestPart = null;
@@ -309,7 +312,7 @@ public class ModelObj extends ModelBase
 		}
 		return closestPart;
 	}
-	
+
 	//----------------------------------------------------------------
 	// 							Highlighting
 	//----------------------------------------------------------------
@@ -326,7 +329,7 @@ public class ModelObj extends ModelBase
 			if(main)
 				mainHighlight = part;
 			else
-				this.hightlightedParts.add(part);
+				hightlightedParts.add(part);
 		}
 	}
 
@@ -340,7 +343,7 @@ public class ModelObj extends ModelBase
 	{
 		return mainHighlight == partObj;
 	}
-	
+
 	/**
 	 * Highlighted but not main highlight (white).
 	 */
@@ -361,7 +364,7 @@ public class ModelObj extends ModelBase
 		GL11.glPushMatrix();
 		GL11.glRotatef(initRotFix, 1.0F, 0.0F, 0.0F);
 		GL11.glTranslatef(0.0F, offsetFixY, 0.0F);
-		
+
 		for(Part p : this.parts) 
 		{
 			if(p instanceof PartObj)
@@ -375,9 +378,7 @@ public class ModelObj extends ModelBase
 		}
 
 		for(Bend bend : this.bends)
-		{
 			bend.render();
-		}
 
 		GL11.glPopMatrix();
 	}

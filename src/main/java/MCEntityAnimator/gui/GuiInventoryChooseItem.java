@@ -1,7 +1,7 @@
 package MCEntityAnimator.gui;
 
 import MCEntityAnimator.animation.AnimationData;
-import MCEntityAnimator.gui.sequence.GuiAnimationTimelineWithFrames;
+import MCEntityAnimator.gui.sequence.GuiAnimationTimeline;
 import MCEntityAnimator.render.objRendering.EntityObj;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -17,10 +17,10 @@ public class GuiInventoryChooseItem extends GuiInventory
     
 	private EntityPlayer player;
 	private String entityName;
-	private GuiAnimationTimelineWithFrames parentGui;
+	private GuiAnimationTimeline parentGui;
 	private EntityObj entity;
 
-    public GuiInventoryChooseItem(GuiAnimationTimelineWithFrames parentGui, EntityObj entity)
+    public GuiInventoryChooseItem(GuiAnimationTimeline parentGui, EntityObj entity)
     {
         super(Minecraft.getMinecraft().thePlayer);
         this.allowUserInput = true;

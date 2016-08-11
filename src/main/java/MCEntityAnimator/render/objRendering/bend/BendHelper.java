@@ -1,7 +1,6 @@
 package MCEntityAnimator.render.objRendering.bend;
 
-import java.math.RoundingMode;
-import java.text.DecimalFormat;
+import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -125,17 +124,13 @@ public class BendHelper
 	/**
 	 * Rotate a vertex by a given rotation around a given rotation point.
 	 */
-	public static void rotateVertex(Vertex v, float[] rotation, Vertex rotationPoint)
+	public static void rotateVertex(Vertex v, float[] rotationMatrix, Vertex rotationPoint)
 	{
 		float[] vector = new float[]{v.x - rotationPoint.x, v.y - rotationPoint.y, v.z - rotationPoint.z};
-
-		vector = zMatrix(vector, rotation[2]);
-		vector = yMatrix(vector, rotation[1]);
-		vector = xMatrix(vector, rotation[0]);
-
-		v.x = vector[0] + rotationPoint.x;
-		v.y = vector[1] + rotationPoint.y;
-		v.z = vector[2] + rotationPoint.z;
+		
+		v.x = vector[0]*rotationMatrix[0] + vector[1]*rotationMatrix[3] + vector[2]*rotationMatrix[6] + rotationPoint.x;
+		v.y = vector[0]*rotationMatrix[1] + vector[1]*rotationMatrix[4] + vector[2]*rotationMatrix[7] + rotationPoint.y;
+		v.z = vector[0]*rotationMatrix[2] + vector[1]*rotationMatrix[5] + vector[2]*rotationMatrix[8] + rotationPoint.z;
 	}
 
 	/**

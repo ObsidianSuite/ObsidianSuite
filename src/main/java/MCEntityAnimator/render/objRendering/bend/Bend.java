@@ -11,7 +11,6 @@ import MCEntityAnimator.render.MathHelper;
 import MCEntityAnimator.render.objRendering.RayTrace;
 import MCEntityAnimator.render.objRendering.bend.UVMap.PartUVMap;
 import MCEntityAnimator.render.objRendering.parts.PartObj;
-import net.minecraft.util.Vec3;
 import net.minecraftforge.client.model.obj.Face;
 import net.minecraftforge.client.model.obj.Vertex;
 
@@ -139,15 +138,16 @@ public class Bend
 		}
 
 		//Set top far and near vertices to rotation compensated child far and near vertices.
+		float[] rotationMatrix = child.createRotationMatrixFromAngles();
 		for(int i = 0; i < childNearVertices.length; i++)
 		{	
 			Vertex v = childNearVertices[i];
 			bottomNearVertices[i] = new Vertex(v.x, v.y, v.z);
-			BendHelper.rotateVertex(bottomNearVertices[i], child.getValues(), centreOfBend);
+			BendHelper.rotateVertex(bottomNearVertices[i], rotationMatrix, centreOfBend);
 
 			v = childFarVertices[i];
 			bottomFarVertices[i] = new Vertex(v.x, v.y, v.z);
-			BendHelper.rotateVertex(bottomFarVertices[i], child.getValues(), centreOfBend);
+			BendHelper.rotateVertex(bottomFarVertices[i], rotationMatrix, centreOfBend);
 		}
 
 		//Generate curves.
@@ -253,15 +253,16 @@ public class Bend
 		}
 
 		//Set top far and near vertices to rotation compensated child far and near vertices.
+		float[] rotationMatrix = child.createRotationMatrixFromAngles();
 		for(int i = 0; i < childNearVertices.length; i++)
 		{	
 			Vertex v = childNearVertices[i];
 			bottomNearVertices[i] = new Vertex(v.x, v.y, v.z);
-			BendHelper.rotateVertex(bottomNearVertices[i], child.getValues(), centreOfBend);
+			BendHelper.rotateVertex(bottomNearVertices[i], rotationMatrix, centreOfBend);
 
 			v = childFarVertices[i];
 			bottomFarVertices[i] = new Vertex(v.x, v.y, v.z);
-			BendHelper.rotateVertex(bottomFarVertices[i], child.getValues(), centreOfBend);
+			BendHelper.rotateVertex(bottomFarVertices[i], rotationMatrix, centreOfBend);
 		}
 
 		//Generate curves.
@@ -276,7 +277,6 @@ public class Bend
 
 			//Generate part bottom.
 			Vertex[] bendPartBottom = generatePartBottom(curves,(float)(i+1)/bendSplit);
-
 			//Update bend, swap top and bottom vertices if part is inverted.
 			if(inverted)
 				bendParts.get(i).updateVertices(bendPartBottom, bendPartTop);
@@ -305,6 +305,11 @@ public class Bend
 	{	
 		GL11.glPushMatrix();
 
+		GL11.glTranslatef(centreOfBend.x, centreOfBend.y, centreOfBend.z);
+		//GL11.glRotatef(180F, 0, 1, 0);
+		//GL11.glRotatef(180F, 0, 0, 1);
+		GL11.glTranslatef(-centreOfBend.x, -centreOfBend.y, -centreOfBend.z);
+		
 		move();
 
 		//Actually render all the bend parts.
@@ -316,7 +321,6 @@ public class Bend
 			part.updateTextureCoordinates(mainHighlight, otherHighlight, parent.modelObj);
 			part.render();
 		}
-
 		GL11.glPopMatrix();
 	}
 
@@ -325,12 +329,7 @@ public class Bend
 	 */
 	private void compensatePartRotation(PartObj p)
 	{
-		//Move to centre, rotate and move back.
-		GL11.glTranslatef(-p.getRotationPoint(0), -p.getRotationPoint(1), -p.getRotationPoint(2));
-		GL11.glRotated((p.getValue(0) - p.getOriginalValues()[0])/Math.PI*180.0F, 1.0F, 0.0F, 0.0F);
-		GL11.glRotated((p.getValue(1) - p.getOriginalValues()[1])/Math.PI*180.0F, 0.0F, 1.0F, 0.0F);
-		GL11.glRotated((p.getValue(2) - p.getOriginalValues()[2])/Math.PI*180.0F, 0.0F, 0.0F, 1.0F);
-		GL11.glTranslatef(p.getRotationPoint(0), p.getRotationPoint(1), p.getRotationPoint(2));
+		p.move();
 	}
 
 	/**
@@ -341,7 +340,7 @@ public class Bend
 		BezierCurve[] curves = new BezierCurve[bottomNearVertices.length];
 		for(int i = 0; i < bottomNearVertices.length; i++)
 		{
-			BezierCurve curve = new BezierCurve(topFarVertices[i], topNearVertices[i], bottomFarVertices[i], bottomNearVertices[i], child.getValues(), centreOfBend.y);
+			BezierCurve curve = new BezierCurve(topFarVertices[i], topNearVertices[i], bottomFarVertices[i], bottomNearVertices[i], centreOfBend.y);
 			curves[i] = curve;
 		}
 		return curves;
