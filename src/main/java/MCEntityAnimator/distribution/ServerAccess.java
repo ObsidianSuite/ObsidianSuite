@@ -264,7 +264,7 @@ public class ServerAccess
 		dir.delete();	
 	}
 
-	private static boolean canConnect()
+	public static boolean canConnect()
 	{
 		try
 		{
