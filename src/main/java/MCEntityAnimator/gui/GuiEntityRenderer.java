@@ -140,7 +140,7 @@ public class GuiEntityRenderer extends GuiBlack
 	protected void mouseClicked(int x, int y, int i) 
 	{
 		super.mouseClicked(x, y, i);
-		if(additionalHighlightPartName != null && !additionalHighlightPartName.equals(""))
+		if(i == 0 && additionalHighlightPartName != null && !additionalHighlightPartName.equals(""))
 			updatePart(additionalHighlightPartName);
 		else if(i == 0)
 			updatePart("");
