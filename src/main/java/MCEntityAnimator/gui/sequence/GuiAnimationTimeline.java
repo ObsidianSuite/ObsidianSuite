@@ -153,6 +153,8 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithRotation implemen
 		actionMap.put("redoReleased", new RedoAction());
 		inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), "deletePressed");
 		actionMap.put("deletePressed", new DeleteAction());
+		inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "escPressed");
+		actionMap.put("escPressed", new EscAction());
 
 		for(int j = 0; j <= 9; j++)
 		{
@@ -235,7 +237,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithRotation implemen
 		this.currentAnimation.animateAll(time, entityModel, exceptionPartName);
 
 		timelineFrame.refresh();
-		
+
 		updateExternalFrameFromDisplay();
 
 		super.drawScreen(par1, par2, par3);
@@ -518,10 +520,12 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithRotation implemen
 			new ChangeViewAction(7).actionPerformed(new ActionEvent(this, ActionEvent.ACTION_FIRST, "")); break;
 		case Keyboard.KEY_NUMPAD8:
 			new ChangeViewAction(8).actionPerformed(new ActionEvent(this, ActionEvent.ACTION_FIRST, "")); break;
+		case Keyboard.KEY_ESCAPE:
+			new EscAction().actionPerformed(new ActionEvent(this, ActionEvent.ACTION_FIRST, ""));
 		}
-
-
-		super.keyTyped(par1, par2);
+		
+		if(par2 != Keyboard.KEY_ESCAPE)
+			super.keyTyped(par1, par2);
 	}
 
 	@Override
@@ -537,7 +541,6 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithRotation implemen
 		super.onRotationWheelRelease();
 		if(keyframeExists())
 			addKeyframe();
-		//pdateAnimation();
 	}
 
 	@Override
@@ -546,6 +549,12 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithRotation implemen
 		timelineFrame.setAlwaysOnTop(Display.isActive());
 	}
 	
+	private void close()
+	{
+		mc.displayGuiScreen(new GuiBlack());
+		ServerAccess.gui = new FileGUI();
+	}
+
 	/* ---------------------------------------------------- *
 	 * 				   	Timeline Frame						*
 	 * ---------------------------------------------------- */
@@ -684,7 +693,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithRotation implemen
 
 			mainPanel.add(optionsPanel);
 			mainPanel.add(scrollPane);
-			
+
 			setContentPane(mainPanel);
 			pack();
 			setAlwaysOnTop(true);
@@ -896,7 +905,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithRotation implemen
 	{
 		JButton playPauseButton;
 		JLabel partName, partX, partY, partZ;
-		
+
 		private OptionsPanel()
 		{				
 			playPauseButton = new JButton("Play");
@@ -911,17 +920,17 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithRotation implemen
 					updatePlayPauseButton();
 				}
 			});
-			
-			
+
+
 			JPanel partPanel = new JPanel();
 
 			partName = new JLabel();
 			partX = new JLabel();
 			partY = new JLabel();
 			partZ = new JLabel();
-			
+
 			updatePartLabels();
-			
+
 			partPanel.setLayout(new GridBagLayout());
 			GridBagConstraints c = new GridBagConstraints();
 			c.gridx = 0;
@@ -933,9 +942,9 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithRotation implemen
 			partPanel.add(partY,c);
 			c.gridy = 3;
 			partPanel.add(partZ,c);
-			
+
 			partPanel.setBorder(BorderFactory.createTitledBorder("Part"));
-			
+
 			JPanel buttonPanel = new JPanel();
 			buttonPanel.setLayout(new GridBagLayout());
 
@@ -1030,15 +1039,14 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithRotation implemen
 				checkboxPanel.add(new JLabel(s),c);
 			}
 			checkboxPanel.setBorder(BorderFactory.createTitledBorder("Render"));
-			
+
 			JButton backButton = new JButton("Back");
 			backButton.addActionListener(new ActionListener()
 			{
 				@Override
 				public void actionPerformed(ActionEvent e) 
 				{
-					mc.displayGuiScreen(new GuiBlack());
-					ServerAccess.gui = new FileGUI();
+					close();
 				}
 			});
 
@@ -1060,7 +1068,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithRotation implemen
 			c.insets = new Insets(2,5,2,5);
 			add(backButton,c);
 		}
-		
+
 		private void updatePartLabels()
 		{
 			String name = "No part selected";
@@ -1077,8 +1085,8 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithRotation implemen
 			partX.setText("X: " + x);
 			partY.setText("Y: " + y);
 			partZ.setText("Z: " + z);
- 		}
-		
+		}
+
 		private void updatePlayPauseButton()
 		{
 			playPauseButton.setText(boolPlay ? "Pause" : "Play");
@@ -1236,6 +1244,15 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithRotation implemen
 		public void actionPerformed(ActionEvent arg0) 
 		{
 			deleteKeyframe();		
+		}
+	}
+	
+	private class EscAction extends AbstractAction
+	{
+		@Override
+		public void actionPerformed(ActionEvent arg0) 
+		{
+			close();		
 		}
 	}
 
