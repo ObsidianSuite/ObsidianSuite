@@ -29,9 +29,7 @@ public class AnimationData
 	private static Map<String, AnimationParenting> parenting = Maps.newHashMap();
 
 	//Setup for GUIs
-	private static Map<String, String> animationSetup = Maps.newHashMap();
-	private static Map<String, String> stanceSetup = Maps.newHashMap();
-	private static Map<String, String> parentingSetup = Maps.newHashMap();
+	private static Map<String, String> guiSetup = Maps.newHashMap();
 	private static Map<String, Integer> animationItems = Maps.newHashMap();
 
 	//List of part names and groupings. 
@@ -122,44 +120,18 @@ public class AnimationData
 		stances.put(entityName, temp);
 	}
 
-	public static void setAnimationSetup(String entityName, String setup)
+	public static void setGUISetup(String entityName, String setup)
 	{
 		if(!setup.equals(""))
 		{
-			animationSetup.put(entityName, setup);
+			guiSetup.put(entityName, setup);
 		}
 	}
 
-	public static String getAnimationSetup(String entityName)
+	public static String getGUISetup(String entityName)
 	{
 
-		return animationSetup.get(entityName);
-	}
-
-	public static void setStanceSetup(String entityName, String setup)
-	{
-		if(!setup.equals(""))
-		{
-			stanceSetup.put(entityName, setup);
-		}
-	}
-
-	public static String getStanceSetup(String entityName)
-	{
-		return stanceSetup.get(entityName);
-	}
-
-	public static void setParentingSetup(String entityName, String setup)
-	{
-		if(!setup.equals(""))
-		{
-			parentingSetup.put(entityName, setup);
-		}
-	}
-
-	public static String getParentingSetup(String entityName)
-	{
-		return parentingSetup.get(entityName);
+		return guiSetup.get(entityName);
 	}
 
 	public static PartGroups getPartGroups(String entityName, ModelObj model)
@@ -201,12 +173,9 @@ public class AnimationData
 		{ 
 			NBTTagCompound guiSetupCompound = new NBTTagCompound();
 			guiSetupCompound.setString("EntityName", entity);
-			if(animationSetup.get(entity) != null)
-				guiSetupCompound.setString("AnimationSetup", animationSetup.get(entity));
-			if(parentingSetup.get(entity) != null)
-				guiSetupCompound.setString("ParentingSetup", parentingSetup.get(entity));
-			if(stanceSetup.get(entity) != null)
-				guiSetupCompound.setString("StanceSetup", stanceSetup.get(entity));
+			String setup = guiSetup.get(entity);
+			if(setup != null && !setup.equals(""))
+				guiSetupCompound.setString("GUISetup", setup);
 			entityList.appendTag(guiSetupCompound);
 		}
 		nbt.setTag("GuiSetup", entityList);
@@ -232,9 +201,7 @@ public class AnimationData
 		{
 			NBTTagCompound guiSetupCompound = entityList.getCompoundTagAt(i);
 			String entityName = guiSetupCompound.getString("EntityName");
-			setAnimationSetup(entityName, guiSetupCompound.getString("AnimationSetup"));
-			setStanceSetup(entityName, guiSetupCompound.getString("ParentingSetup"));
-			setParentingSetup(entityName, guiSetupCompound.getString("StanceSetup"));
+			setGUISetup(entityName, guiSetupCompound.getString("GUISetup"));
 		}
 		
 		NBTTagList animationItemList = nbt.getTagList("AnimationItems", 10);

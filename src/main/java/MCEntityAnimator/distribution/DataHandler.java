@@ -44,9 +44,9 @@ public class DataHandler
 	{	
 		List<String> entityNames = getEntities();
 		//GUI
-		File guiDataFile = getGUIFile();
-		if(guiDataFile.exists())
-			AnimationData.loadGUISetup(getNBTFromFile(guiDataFile));
+//		File guiDataFile = getGUIFile();
+//		if(guiDataFile.exists())
+//			AnimationData.loadGUISetup(getNBTFromFile(guiDataFile));
 		//Entity data
 		for(String entityName : entityNames)
 		{
