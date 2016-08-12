@@ -35,6 +35,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JLayeredPane;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -523,7 +524,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithRotation implemen
 		case Keyboard.KEY_ESCAPE:
 			new EscAction().actionPerformed(new ActionEvent(this, ActionEvent.ACTION_FIRST, ""));
 		}
-		
+
 		if(par2 != Keyboard.KEY_ESCAPE)
 			super.keyTyped(par1, par2);
 	}
@@ -548,7 +549,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithRotation implemen
 	{
 		timelineFrame.setAlwaysOnTop(Display.isActive());
 	}
-	
+
 	private void close()
 	{
 		mc.displayGuiScreen(new GuiBlack());
@@ -569,6 +570,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithRotation implemen
 		JPanel mainPanel;
 		JLabel[] partLabels;
 		OptionsPanel optionsPanel;
+		CopyLabel copyLabel;
 
 		private TimelineFrame()
 		{
@@ -705,6 +707,12 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithRotation implemen
 				setLocation(50, 520);
 			}
 
+
+			copyLabel = new CopyLabel();
+			JLayeredPane layeredPane = getRootPane().getLayeredPane();
+			layeredPane.add(copyLabel, JLayeredPane.DRAG_LAYER);
+			copyLabel.setBounds(0, 0, getWidth(), getHeight());
+
 			setVisible(true);
 			setResizable(false);
 		}
@@ -747,7 +755,14 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithRotation implemen
 			repaint();
 		}
 
-
+		private void updateCopyLabel(int x, int y, int time, boolean draw)
+		{
+			copyLabel.draw = draw;
+			copyLabel.time = time;
+			copyLabel.x = x;
+			copyLabel.y = y;
+			copyLabel.repaint();
+		}
 
 		private class KeyframeLine extends JPanel
 		{		
@@ -836,6 +851,9 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithRotation implemen
 					{
 						updateClosestKeyframe(e.getX());
 						repaint();
+						int x = 200 + KeyframeLine.this.getX() + e.getX();
+						int y = KeyframeLine.this.getY() + e.getY();
+						updateCopyLabel(x, y, xToKeyframeTime(e.getX()), e.isControlDown());
 					}			
 				});
 			}
@@ -1246,7 +1264,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithRotation implemen
 			deleteKeyframe();		
 		}
 	}
-	
+
 	private class EscAction extends AbstractAction
 	{
 		@Override
@@ -1304,6 +1322,25 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithRotation implemen
 		public void setDoubleValue(double d)
 		{
 			setValue((int) Math.round(d*this.scale));
+		}
+	}
+
+	private class CopyLabel extends JComponent
+	{
+		public int x;
+		public int y;
+		public int time;
+		public boolean draw;
+
+		protected void paintComponent(Graphics g)
+		{
+			super.paintComponent(g);
+			if(draw)
+			{
+				String s = String.valueOf(time);
+				g.setColor(Color.red);
+				g.drawString(s, x, y);
+			}
 		}
 	}
 
