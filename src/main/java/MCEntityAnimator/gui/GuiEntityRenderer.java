@@ -340,16 +340,19 @@ public class GuiEntityRenderer extends GuiBlack
 	
 	public void changeView(int numpadKey)
 	{
+		boolean viewFound = false;
 		for(View v : views)
 		{
 			if(v.numpadKey == numpadKey)
 			{
 				horizontalRotation = v.horizontalRotation;
 				verticalRotation = v.verticalRotation;
+				viewFound = true;
 				break;
 			}
 		}
-		System.err.println("Could not change to view, numpadkey: " + numpadKey);
+		if(!viewFound)
+			System.err.println("Could not change to view, numpadkey: " + numpadKey);
 	}
 
 	private class View

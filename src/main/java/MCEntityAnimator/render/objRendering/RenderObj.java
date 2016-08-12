@@ -103,8 +103,7 @@ public class RenderObj extends RenderLiving
 			
 			//Post render for lower right arm.
 			PartObj armLwR = Util.getPartObjFromName("armLwR", modelObj.parts);
-			armLwR.postRender();
-			GL11.glTranslatef(-0.125F, 0.2F, 0.2F);
+			armLwR.postRenderPart();
 			
 			//Prop rotation and translation
 			float[] propRotation = Util.getPartFromName("prop_rot", modelObj.parts).getValues();
