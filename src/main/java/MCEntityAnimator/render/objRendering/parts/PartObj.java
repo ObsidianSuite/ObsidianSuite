@@ -38,7 +38,7 @@ public class PartObj extends Part
 	private float[] rotationPoint;
 	private boolean showModel;
 	private FloatBuffer rotationMatrix;
-	
+
 	//XXX
 	private Map<Face, TextureCoordinate[]> defaultTextureCoords;
 
@@ -134,23 +134,6 @@ public class PartObj extends Part
 	// 							 Selection
 	//----------------------------------------------------------------
 
-	public void moveForAllParts()
-	{
-		//		AnimationParenting anipar = AnimationData.getAnipar(modelObj.getEntityType());
-		//		List<PartObj> parts = new ArrayList<PartObj>();
-		//		PartObj child = this;
-		//		PartObj parent;
-		//		parts.add(0, child);
-		//		while((parent = anipar.getParent(child)) != null)
-		//		{
-		//			parts.add(0, parent);
-		//			child = parent;
-		//		}
-		//
-		//		for(PartObj p : parts)
-		//			p.move();
-	}
-
 	/**
 	 * Test to see if a ray insects with this part.
 	 * @param p0 - Point on ray.
@@ -160,7 +143,6 @@ public class PartObj extends Part
 	public Double testRay()
 	{		
 		GL11.glPushMatrix();
-		moveForAllParts();
 		Double min = null;
 		for(Face f : groupObj.faces)
 		{
@@ -263,70 +245,18 @@ public class PartObj extends Part
 		Minecraft.getMinecraft().getTextureManager().bindTexture(modelObj.getTexture());		
 	}
 
-	/**
-	 * Setup rotation and translation for a GL11 matrix based on the rotation
-	 * and rotation point of this part and all its parents.
-	 * @param entityName - Name of the model. 
-	 */
-	@SideOnly(Side.CLIENT)
-	public void postRender()
+	public void postRenderPart()
 	{
-		//Generate a list of parents: {topParent, topParent - 1,..., parent, this}/
-		AnimationParenting anipar = AnimationData.getAnipar(modelObj.getEntityType());
-		List<PartObj> parts = new ArrayList<PartObj>();
-		PartObj child = this;
-		PartObj parent;
-		parts.add(0, child);
-		while((parent = anipar.getParent(child)) != null)
-		{
-			parts.add(0, parent);
-			child = parent;
-		}
-
-		//Translate and rotate all parts, starting with the top parent. 
-		PartObj prevPart = null;
-		for(PartObj p : parts)
-		{
-			//TODO Post render: Z formula, temporarily works for player though.
-			//Not sure if the formulae will work for other entities.
-			float[] currentRotPoint = p.getRotationPoint();
-			//If prevPart is null, ie part is top parent, use 0,0,0.
-			float[] prevRotPoint = prevPart != null ? prevPart.getRotationPoint() : new float[]{0.0F, 0.0F, 0.0F};
-			prevPart = p;
-
-			float[] trans = new float[3];
-			float[] prevtrans = new float[3];
-
-			for(int i = 0; i < 3; i++)
-			{
-				trans[i] = 0.0F;
-				if(currentRotPoint[i] != 0.0f)
-				{
-					switch(i)
-					{
-					case 0: trans[0] = currentRotPoint[0]*-0.78125f; break;
-					case 1: trans[1] = currentRotPoint[1]*0.77f + 1.2f; break;
-					case 2: /* Z formula */  break;         
-					}
-				}
-
-				prevtrans[i] = 0.0F;
-				if(prevRotPoint[i] != 0.0f)
-				{
-					switch(i)
-					{
-					case 0: prevtrans[0] = prevRotPoint[0]*-0.78125f; break;
-					case 1: prevtrans[1] = prevRotPoint[1]*0.77f + 1.2f; break;
-					case 2: /* Z formula */  break;         
-					}
-				}
-			}
-
-			//Translate, compensating for the previous part translation.
-			GL11.glTranslatef(trans[0] - prevtrans[0], trans[1] - prevtrans[1], trans[2] - prevtrans[2]);
-			//Rotate
-			p.move(); 
-		}
+		//Adjust initial position.
+		GL11.glRotatef(180F, 1, 0, 0);
+		GL11.glTranslatef(0, -1.6F, 0);
+		
+		//Actually do the post rendering here.
+		postRenderAll();
+		
+		//Re-adjust positon to align with hand in resting position.
+		GL11.glRotatef(180F, 1, 0, 0);
+		GL11.glTranslatef(-0.06F,0.05F,0.1F);
 	}
 
 	/**
@@ -386,9 +316,9 @@ public class PartObj extends Part
 
 	public void rotate()
 	{
-		GL11.glRotated(-valueX/Math.PI*180F, 1, 0, 0);
-		GL11.glRotated(-valueY/Math.PI*180F, 0, 1, 0);
-		GL11.glRotated(-valueZ/Math.PI*180F, 0, 0, 1);
+		GL11.glRotated(valueX/Math.PI*180F, 1, 0, 0);
+		GL11.glRotated(valueY/Math.PI*180F, 0, 1, 0);
+		GL11.glRotated(valueZ/Math.PI*180F, 0, 0, 1);
 	}
 
 	public void rotateLocal(float delta, int dim)
@@ -416,7 +346,7 @@ public class PartObj extends Part
 		{
 			y = -Math.asin(r8);
 			double cy = Math.cos(y);
-			
+
 			//Find x value
 			float r9 = rotationMatrix.get(9);
 			float r10 = rotationMatrix.get(10);
@@ -444,20 +374,20 @@ public class PartObj extends Part
 				x = z + Math.atan2(-r1,-r2);
 			}
 		}
-				
-		valueX = (float) x;
-		valueY = (float) y;
-		valueZ = (float) z;
+
+		valueX = (float) -x;
+		valueY = (float) -y;
+		valueZ = (float) -z;
 	}
-	
+
 	public float[] createRotationMatrixFromAngles()
 	{
-		double sx = Math.sin(valueX);
-		double sy = Math.sin(valueY);
-		double sz = Math.sin(valueZ);
-		double cx = Math.cos(valueX);
-		double cy = Math.cos(valueY);
-		double cz = Math.cos(valueZ);
+		double sx = Math.sin(-valueX);
+		double sy = Math.sin(-valueY);
+		double sz = Math.sin(-valueZ);
+		double cx = Math.cos(-valueX);
+		double cy = Math.cos(-valueY);
+		double cz = Math.cos(-valueZ);
 
 		float m0 = (float) (cy*cz);
 		float m1 = (float) (sx*sy*cz-cx*sz);
