@@ -143,6 +143,22 @@ public class PartObj extends Part
 	public Double testRay()
 	{		
 		GL11.glPushMatrix();
+
+		//Get all parents that need compensating for.
+		AnimationParenting anipar = AnimationData.getAnipar(modelObj.getEntityType());
+		List<PartObj> parents = new ArrayList<PartObj>();
+		PartObj p = this;
+		parents.add(p);
+		while(anipar.hasParent(p))
+		{
+			p = anipar.getParent(p);
+			parents.add(0, p);
+		}
+
+		//Compensate for all parents. TODO remove compensate Part rotation method
+		for(PartObj q : parents)
+			q.move();
+		
 		Double min = null;
 		for(Face f : groupObj.faces)
 		{

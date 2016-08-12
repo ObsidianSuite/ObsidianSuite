@@ -296,7 +296,7 @@ public class Bend
 			parents.add(0, p);
 		}
 
-		//Compensate for all parents.
+		//Compensate for all parents. TODO remove compensate Part rotation method
 		for(PartObj q : parents)
 			compensatePartRotation(q);
 	}
@@ -304,11 +304,6 @@ public class Bend
 	public void render()
 	{	
 		GL11.glPushMatrix();
-
-		GL11.glTranslatef(centreOfBend.x, centreOfBend.y, centreOfBend.z);
-		//GL11.glRotatef(180F, 0, 1, 0);
-		//GL11.glRotatef(180F, 0, 0, 1);
-		GL11.glTranslatef(-centreOfBend.x, -centreOfBend.y, -centreOfBend.z);
 		
 		move();
 

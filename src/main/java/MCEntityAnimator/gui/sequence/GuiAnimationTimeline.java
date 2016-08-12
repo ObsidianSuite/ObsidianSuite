@@ -211,14 +211,11 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithRotation implemen
 			timelineFrame.timeSlider.setValue((int) time);
 			timelineFrame.repaint();
 		}
-
-		//System.out.println("Test");
 		
 		this.currentAnimation.animateAll(time, entityModel, exceptionPartName);
 
-		//timelineFrame.refresh();
 
-		//updateExternalFrameFromDisplay();
+		updateExternalFrameFromDisplay();
 
 		super.drawScreen(par1, par2, par3);
 	}
