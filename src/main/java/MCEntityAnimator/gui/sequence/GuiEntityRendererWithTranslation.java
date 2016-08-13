@@ -6,6 +6,7 @@ import MCEntityAnimator.Util;
 import MCEntityAnimator.render.MathHelper;
 import MCEntityAnimator.render.objRendering.RayTrace;
 import MCEntityAnimator.render.objRendering.parts.Part;
+import MCEntityAnimator.render.objRendering.parts.PartEntityPos;
 import MCEntityAnimator.render.objRendering.parts.PartObj;
 import MCEntityAnimator.render.objRendering.parts.PartRotation;
 import net.minecraft.client.renderer.OpenGlHelper;
@@ -71,16 +72,15 @@ public class GuiEntityRendererWithTranslation extends GuiEntityRendererWithRotat
 			GL11.glPushMatrix();
 
 			Part part = Util.getPartFromName(currentPartName, entityModel.parts);
-			PartObj partObj;
 			if(part instanceof PartObj || part instanceof PartRotation)
 			{
 				GL11.glPopMatrix();
 				super.processRay();
 				return;
 			}
-			else
-			{
-				partObj = (PartObj) Util.getPartFromName("cube.008", entityModel.parts);
+			else if(!(part instanceof PartEntityPos))
+			{	
+				PartObj partObj = (PartObj) Util.getPartFromName("cube.008", entityModel.parts);
 				partObj.postRenderAll();
 				GL11.glTranslatef(0,-0.17F,0);
 			}
@@ -129,7 +129,13 @@ public class GuiEntityRendererWithTranslation extends GuiEntityRendererWithRotat
 			case 1: v = Vec3.createVectorHelper(0, 1, 0); break;
 			case 2: v = Vec3.createVectorHelper(0, 0, 1); break; 
 			}
+			GL11.glPushMatrix();
+			Part part = Util.getPartFromName(currentPartName, entityModel.parts);
+			if(part instanceof PartEntityPos)
+				GL11.glTranslated(-entityToRender.posX, -entityToRender.posY, -entityToRender.posZ);
 			prevTranslationDelta = MathHelper.getLineScalarForClosestPoint(Vec3.createVectorHelper(0, 0, 0), v, initialTranslationGuidePoint);
+			GL11.glPopMatrix();
+
 		}
 		else
 			translationAxisPlane = null;
@@ -188,6 +194,9 @@ public class GuiEntityRendererWithTranslation extends GuiEntityRendererWithRotat
 			System.out.println(translationGuidePoint + " " + initialTranslationGuidePoint);
 			if(!Double.isNaN(d))
 			{
+				Part part = Util.getPartFromName(currentPartName, entityModel.parts);
+				if(part instanceof PartEntityPos)
+					d *= -1;
 				updatePartValue(-d, translationAxisPlane);
 				prevTranslationDelta = translationDelta;
 			}
@@ -202,9 +211,13 @@ public class GuiEntityRendererWithTranslation extends GuiEntityRendererWithRotat
 			super.onControllerDrag();
 		else
 		{
+			GL11.glPushMatrix();
+			if(part instanceof PartEntityPos)
+				GL11.glTranslated(-entityToRender.posX, -entityToRender.posY, -entityToRender.posZ);
 			int i = translationAxisPlane == 0 ? 2 : translationAxisPlane - 1;
 			translationGuidePoint = getMouseVectorInPlane(i);
 			processAxisDrag();
+			GL11.glPopMatrix();
 		}
 	}
 
