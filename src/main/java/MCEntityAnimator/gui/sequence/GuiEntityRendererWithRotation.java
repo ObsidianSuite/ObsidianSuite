@@ -20,6 +20,7 @@ import MCEntityAnimator.render.MathHelper;
 import MCEntityAnimator.render.objRendering.RayTrace;
 import MCEntityAnimator.render.objRendering.parts.Part;
 import MCEntityAnimator.render.objRendering.parts.PartObj;
+import MCEntityAnimator.render.objRendering.parts.PartRotation;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.util.Vec3;
@@ -52,7 +53,8 @@ public class GuiEntityRendererWithRotation extends GuiEntityRenderer
 	private void updatePartValue(double value, int dim)
 	{
 		Part part = Util.getPartFromName(currentPartName, entityModel.parts);
-		part.rotateLocal((float) value, dim);
+		if(part instanceof PartRotation)
+			((PartRotation) part).rotateLocal((float) value, dim);
 	}
 
 	/* ---------------------------------------------------- *
@@ -102,12 +104,12 @@ public class GuiEntityRendererWithRotation extends GuiEntityRenderer
 				partObj = (PartObj) part;
 				partObj.postRenderAll();
 			}
-			else
+			else if(part instanceof PartRotation)
 			{
 				partObj = (PartObj) Util.getPartFromName("cube.008", entityModel.parts);
 				partObj.postRenderAll();
 				GL11.glTranslatef(0,-0.17F,0);
-				part.rotate();
+				((PartRotation) part).rotate();
 			}
 
 			drawRotationAxis();

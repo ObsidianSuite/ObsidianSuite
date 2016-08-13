@@ -23,16 +23,12 @@ import MCEntityAnimator.render.objRendering.bend.Bend;
 import MCEntityAnimator.render.objRendering.parts.Part;
 import MCEntityAnimator.render.objRendering.parts.PartEntityPos;
 import MCEntityAnimator.render.objRendering.parts.PartObj;
-import net.minecraft.client.Minecraft;
+import MCEntityAnimator.render.objRendering.parts.PartRotation;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelRenderer;
-import net.minecraft.client.renderer.OpenGlHelper;
-import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.Vec3;
 import net.minecraftforge.client.model.ModelFormatException;
-import net.minecraftforge.client.model.obj.Face;
 import net.minecraftforge.client.model.obj.GroupObject;
 import net.minecraftforge.client.model.obj.WavefrontObject;
 
@@ -62,7 +58,7 @@ public class ModelObj extends ModelBase
 
 	public static final ResourceLocation pinkResLoc = new ResourceLocation("mod_mcea:defaultModelTextures/pink.png");
 	public static final ResourceLocation whiteResLoc = new ResourceLocation("mod_mcea:defaultModelTextures/white.png");
-	
+
 	public ModelObj(String par0Str)
 	{	
 		entityType = par0Str;
@@ -84,8 +80,11 @@ public class ModelObj extends ModelBase
 
 		parts = createPartObjList(this, model.groupObjects);
 		parts.add(new PartEntityPos(this));
-		parts.add(new Part(this, "prop_rot"));
-		parts.add(new Part(this, "prop_trans"));
+		if(par0Str.equals("player"))
+		{
+			parts.add(new PartRotation(this, "prop_rot"));
+			parts.add(new Part(this, "prop_trans"));
+		}
 		parenting = AnimationData.getAnipar(par0Str);
 		hightlightedParts = new ArrayList<PartObj>();
 		bends = new ArrayList<Bend>();

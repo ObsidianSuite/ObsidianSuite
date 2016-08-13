@@ -23,6 +23,7 @@ import org.lwjgl.opengl.GL11;
 import MCEntityAnimator.Util;
 import MCEntityAnimator.item.ModelLargeShield;
 import MCEntityAnimator.render.objRendering.parts.PartObj;
+import MCEntityAnimator.render.objRendering.parts.PartRotation;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
@@ -111,7 +112,7 @@ public class RenderObj extends RenderLiving
 			GL11.glTranslatef(propTranslation[0], propTranslation[1], propTranslation[2]);	
 			
 			GL11.glRotatef(180F, 1, 0, 0);
-			Util.getPartFromName("prop_rot", modelObj.parts).rotate();
+			((PartRotation) Util.getPartFromName("prop_rot", modelObj.parts)).rotate();
 			GL11.glRotatef(-180F, 1, 0, 0);
 			
 			EnumAction enumaction = null;

@@ -33,7 +33,7 @@ import net.minecraftforge.client.model.obj.TextureCoordinate;
  * One partObj for each 'part' of the model.
  * 
  */
-public class PartObj extends Part
+public class PartObj extends PartRotation
 {
 	private float[] rotationPoint;
 	private boolean showModel;
