@@ -506,10 +506,10 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithRotation implemen
 	}
 
 	@Override
-	protected void onRotationWheelDrag(PartObj part)
+	protected void onRotationWheelDrag()
 	{
-		super.onRotationWheelDrag(part);
-		exceptionPartName = part.getName();
+		super.onRotationWheelDrag();
+		exceptionPartName = currentPartName;
 	}
 
 	@Override	
