@@ -23,6 +23,7 @@ import org.lwjgl.opengl.GL11;
 import MCEntityAnimator.Util;
 import MCEntityAnimator.item.ModelLargeShield;
 import MCEntityAnimator.render.objRendering.parts.PartObj;
+import MCEntityAnimator.render.objRendering.parts.PartRotation;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
@@ -103,15 +104,16 @@ public class RenderObj extends RenderLiving
 			
 			//Post render for lower right arm.
 			PartObj armLwR = Util.getPartObjFromName("armLwR", modelObj.parts);
-			armLwR.postRenderPart();
+			armLwR.postRenderItem();
 			
 			//Prop rotation and translation
 			float[] propRotation = Util.getPartFromName("prop_rot", modelObj.parts).getValues();
 			float[] propTranslation = Util.getPartFromName("prop_trans", modelObj.parts).getValues();
 			GL11.glTranslatef(propTranslation[0], propTranslation[1], propTranslation[2]);	
-			GL11.glRotatef(propRotation[0]*180.0F, 1.0F, 0.0F, 0.0F);
-			GL11.glRotatef(propRotation[1]*180.0F, 0.0F, 1.0F, 0.0F);
-			GL11.glRotatef(propRotation[2]*180.0F, 0.0F, 0.0F, 1.0F);
+			
+			GL11.glRotatef(180F, 1, 0, 0);
+			((PartRotation) Util.getPartFromName("prop_rot", modelObj.parts)).rotate();
+			GL11.glRotatef(-180F, 1, 0, 0);
 			
 			EnumAction enumaction = null;
 

@@ -1,5 +1,11 @@
 package MCEntityAnimator.render.objRendering.parts;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.FloatBuffer;
+
+import org.lwjgl.opengl.GL11;
+
 import MCEntityAnimator.render.objRendering.ModelObj;
 import net.minecraft.entity.Entity;
 
@@ -12,6 +18,7 @@ public class Part
 	protected float[] originalValues;
 	private String name;
 	public ModelObj modelObj;
+
 
 	public Part(ModelObj mObj, String name) 
 	{
@@ -44,7 +51,7 @@ public class Part
 		valueZ = values[2];
 	}
 
-	public void setValue(int i, float f) 
+	public void setValue(float f, int i) 
 	{
 		switch(i)
 		{

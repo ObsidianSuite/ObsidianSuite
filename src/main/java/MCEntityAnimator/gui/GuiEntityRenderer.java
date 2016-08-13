@@ -243,10 +243,7 @@ public class GuiEntityRenderer extends GuiBlack
 	protected void updatePart(String newPartName)
 	{
 		currentPartName = newPartName;
-		onPartOutputChange();
 	}
-
-	protected void onPartOutputChange(){}
 
 
 	/* ---------------------------------------------------- *
