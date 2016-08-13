@@ -59,9 +59,8 @@ import MCEntityAnimator.gui.GuiInventoryChooseItem;
 import MCEntityAnimator.gui.animation.FileGUI;
 import MCEntityAnimator.render.objRendering.EntityObj;
 import MCEntityAnimator.render.objRendering.parts.Part;
-import MCEntityAnimator.render.objRendering.parts.PartObj;
 
-public class GuiAnimationTimeline extends GuiEntityRendererWithRotation implements ExternalFrame
+public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation implements ExternalFrame
 {
 
 	public AnimationSequence currentAnimation;
@@ -506,16 +505,16 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithRotation implemen
 	}
 
 	@Override
-	protected void onRotationWheelDrag()
+	protected void onControllerDrag()
 	{
-		super.onRotationWheelDrag();
+		super.onControllerDrag();
 		exceptionPartName = currentPartName;
 	}
 
 	@Override	
-	protected void onRotationWheelRelease()
+	protected void onControllerRelease()
 	{
-		super.onRotationWheelRelease();
+		super.onControllerRelease();
 		if(keyframeExists())
 			addKeyframe();
 	}

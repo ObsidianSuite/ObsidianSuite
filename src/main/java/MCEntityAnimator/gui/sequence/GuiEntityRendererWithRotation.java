@@ -33,12 +33,12 @@ public class GuiEntityRendererWithRotation extends GuiEntityRenderer
 	//True if mouse was clicked while hovering over the rotation wheel and is still down.
 	private boolean rotationWheelDrag = false;
 	//The current plane seleciton of the rotation wheel (0-x,1-y,2-z)
-	public Integer rotationWheelPlane;
+	private Integer rotationWheelPlane;
 
 	//Vector for current rotation of wheel while dragging.
-	public Vec3 rotationGuidePoint;
+	private Vec3 rotationGuidePoint;
 	//Vector for rotation of wheel when first clicked on.
-	public Vec3 initialRotationGuidePoint;
+	private Vec3 initialRotationGuidePoint;
 	private double prevRotationWheelDelta = 0.0F;
 
 	public GuiEntityRendererWithRotation(String entityName)
@@ -50,11 +50,13 @@ public class GuiEntityRendererWithRotation extends GuiEntityRenderer
 	 * 		     	   Part Manipulation					*
 	 * ---------------------------------------------------- */
 
-	private void updatePartValue(double value, int dim)
+	protected void updatePartValue(double value, int dim)
 	{
 		Part part = Util.getPartFromName(currentPartName, entityModel.parts);
 		if(part instanceof PartRotation)
 			((PartRotation) part).rotateLocal((float) value, dim);
+		else
+			part.setValue((float) (part.getValue(dim) + value), dim);
 	}
 
 	/* ---------------------------------------------------- *
@@ -79,7 +81,7 @@ public class GuiEntityRendererWithRotation extends GuiEntityRenderer
 		if(which == 0)
 		{
 			if(rotationWheelDrag)
-				onRotationWheelRelease();
+				onControllerRelease();
 			rotationGuidePoint = null;
 			rotationWheelDrag = false;
 			prevRotationWheelDelta = 0.0F;
@@ -111,8 +113,14 @@ public class GuiEntityRendererWithRotation extends GuiEntityRenderer
 				GL11.glTranslatef(0,-0.17F,0);
 				((PartRotation) part).rotate();
 			}
+			else
+			{
+				GL11.glPopMatrix();
+				super.processRay();
+				return;
+			}
 
-			drawRotationAxis();
+			drawRotationWheel();
 
 			rotationWheelMouseOver = false;
 			if(!rotationWheelDrag)
@@ -130,7 +138,7 @@ public class GuiEntityRendererWithRotation extends GuiEntityRenderer
 					additionalHighlightPartName = null;
 			}
 			else
-				onRotationWheelDrag();
+				onControllerDrag();
 
 			GL11.glPopMatrix();
 		}
@@ -149,7 +157,7 @@ public class GuiEntityRendererWithRotation extends GuiEntityRenderer
 		{
 			rotationWheelMouseOver = true;
 			rotationWheelPlane = dim;
-			rotationGuidePoint = getMouseVectorInRotationPlane();
+			rotationGuidePoint = getMouseVectorInPlane(rotationWheelPlane);
 			initialRotationGuidePoint = rotationGuidePoint;
 		}
 		else
@@ -161,7 +169,7 @@ public class GuiEntityRendererWithRotation extends GuiEntityRenderer
 	 * @param part - Currently selected part
 	 * @return Dimension of wheel that intersection is with. (0-x,1-y,2-z).
 	 */
-	public Integer testRotationRay()
+	private Integer testRotationRay()
 	{
 		Double min = null;
 		Integer dim = null;
@@ -185,24 +193,22 @@ public class GuiEntityRendererWithRotation extends GuiEntityRenderer
 		return dim;	
 	}
 
-	/**
-	 * Use the ray trace of the mouse to get a vector point in the plane of the rotation wheel dimension.
-	 * @param part - Currently selected part.
-	 * @return Intersection of mouse ray trace and rotation wheel plane.
-	 */
-	public Vec3 getMouseVectorInRotationPlane()
+	public Vec3 getMouseVectorInPlane(int dim)
 	{
 		GL11.glPushMatrix();
 		if(currentPartName != null && !currentPartName.equals(""))
 		{
 			Part part = Util.getPartFromName(currentPartName, entityModel.parts);
-			GL11.glRotated(-part.getValue(2)/Math.PI*180F, 0, 0, 1);
-			GL11.glRotated(-part.getValue(1)/Math.PI*180F, 0, 1, 0);
-			GL11.glRotated(-part.getValue(0)/Math.PI*180F, 1, 0, 0);
+			if(part instanceof PartRotation)
+			{
+				GL11.glRotated(-part.getValue(2)/Math.PI*180F, 0, 0, 1);
+				GL11.glRotated(-part.getValue(1)/Math.PI*180F, 0, 1, 0);
+				GL11.glRotated(-part.getValue(0)/Math.PI*180F, 1, 0, 0);
+			}
 		}
 		Vec3 n = null;
 		Vec3 p = Vec3.createVectorHelper(0,0,0);
-		switch(rotationWheelPlane)
+		switch(dim)
 		{
 		case 0: n = Vec3.createVectorHelper(1, 0, 0); break;
 		case 1: n = Vec3.createVectorHelper(0, 1, 0); break;
@@ -234,19 +240,19 @@ public class GuiEntityRendererWithRotation extends GuiEntityRenderer
 		}
 	}
 
-	protected void onRotationWheelDrag()
+	protected void onControllerDrag()
 	{
-		rotationGuidePoint = getMouseVectorInRotationPlane();
+		rotationGuidePoint = getMouseVectorInPlane(rotationWheelPlane);
 		processWheelRotation();
 	}
 
-	protected void onRotationWheelRelease(){}
+	protected void onControllerRelease(){}
 
 	/* ---------------------------------------------------- *
 	 * 						Render							*
 	 * ---------------------------------------------------- */	
 
-	private void drawRotationAxis()
+	private void drawRotationWheel()
 	{
 		Vec3 origin = Vec3.createVectorHelper(0.0F, 0.0F, 0.0F);
 

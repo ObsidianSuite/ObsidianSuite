@@ -60,6 +60,45 @@ public class MathHelper
 			return ray.p0.distanceTo(pI);
 		return null;
 	}
+	
+	/**
+	 * Calculate the distance between the start of the ray and the axis slider.
+	 * Assumes axis slider starts at origin.
+	 * @param ray - Ray to test.
+	 * @param p - End of slider.
+	 * @param n - Normal to slider.
+	 * @return - Distance or null if not intersection.
+	 */
+	public static Double rayIntersectsAxisSlider(RayTrace ray, Vec3 p, Vec3 n)
+	{
+		Vec3 pI = getRayPlaneIntersection(ray,p,n);
+		if(pI == null)
+			return null;
+		double t = getLineScalarForClosestPoint(Vec3.createVectorHelper(0, 0, 0), p, pI);
+		double d;
+		if(t < 0)
+			d = pI.lengthVector();
+		else if(t > 1.0F)
+			d = p.subtract(pI).lengthVector();
+		else
+			d = scale(p,t).subtract(pI).lengthVector();
+		if(d < 0.05F)
+			return ray.p0.distanceTo(pI);
+		return null;
+	}
+	
+	/**
+	 * Line l = u + t*v. Return value of t that gives closest point to p.
+	 * @param u - Point on line.
+	 * @param v - Direction of line.
+	 * @param p - Test point.
+	 * @return t
+	 */
+	public static Double getLineScalarForClosestPoint(Vec3 u, Vec3 v, Vec3 p)
+	{
+		//System.out.println(v.dotProduct(v));
+		return v.dotProduct(u.subtract(p))/v.dotProduct(v);
+	}
 
 	/**
 	 * Calculate the point of intersection between a ray and a plane.

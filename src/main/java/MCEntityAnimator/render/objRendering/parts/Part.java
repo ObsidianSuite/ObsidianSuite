@@ -51,7 +51,7 @@ public class Part
 		valueZ = values[2];
 	}
 
-	public void setValue(int i, float f) 
+	public void setValue(float f, int i) 
 	{
 		switch(i)
 		{
