@@ -287,6 +287,17 @@ public class GuiEntityRenderer extends GuiBlack
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		OpenGlHelper.setActiveTexture(OpenGlHelper.defaultTexUnit);
 		GL11.glDisable(GL11.GL_COLOR_MATERIAL);
+		GL11.glPopMatrix();
+		
+		GL11.glPushMatrix();
+		GL11.glTranslatef(xPos, yPos, 200.0F);
+		GL11.glScalef(-scale, scale, scale);
+		GL11.glRotatef(180.0F, 0.0F, 0.0F, 1.0F);
+		GL11.glRotatef(135.0F, 0.0F, 1.0F, 0.0F);
+		GL11.glRotatef(-135.0F, 0.0F, 1.0F, 0.0F);
+		GL11.glRotatef(-((float)Math.atan((double)(rotY / 40.0F))) * 20.0F + verticalRotation , 1.0F, 0.0F, 0.0F);
+		GL11.glRotatef(((float)Math.atan((double)(rotX / 40.0F))) * 20.0F + horizontalRotation, 0.0F, -1.0F, 0.0F);
+		GL11.glTranslated(par5EntityLivingBase.posX, par5EntityLivingBase.posY, par5EntityLivingBase.posZ);
 		processRay();
 		GL11.glPopMatrix();
 	}

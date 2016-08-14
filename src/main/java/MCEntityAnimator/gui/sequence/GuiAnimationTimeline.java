@@ -195,7 +195,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 	{				
 		if(boolPlay)
 		{
-			time += 0.1F;
+			time += 0.4F;
 			exceptionPartName = "";
 			if(time >= currentAnimation.getTotalTime())
 			{
@@ -215,6 +215,8 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 
 
 		updateExternalFrameFromDisplay();
+		timelineFrame.optionsPanel.updatePlayPauseButton();
+		timelineFrame.optionsPanel.updatePartLabels();
 
 		super.drawScreen(par1, par2, par3);
 	}
