@@ -39,13 +39,15 @@ import javax.swing.text.DefaultCaret;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
+import org.lwjgl.opengl.Display;
+
 import MCEntityAnimator.MCEA_Main;
 import MCEntityAnimator.animation.AnimationData;
 import MCEntityAnimator.animation.AnimationSequence;
 import MCEntityAnimator.distribution.SaveLoadHandler;
 import MCEntityAnimator.distribution.ServerAccess;
 import MCEntityAnimator.gui.GuiPartSetup;
-import MCEntityAnimator.gui.sequence.GuiAnimationTimelineWithFrames;
+import MCEntityAnimator.gui.sequence.GuiAnimationTimeline;
 import net.minecraft.client.Minecraft;
 
 public class FileGUI extends JFrame
@@ -133,7 +135,7 @@ public class FileGUI extends JFrame
 				if(seq != null)
 				{
 					dispose();
-					Minecraft.getMinecraft().displayGuiScreen(new GuiAnimationTimelineWithFrames(entityToEdit,seq));
+					Minecraft.getMinecraft().displayGuiScreen(new GuiAnimationTimeline(entityToEdit,seq));
 				}
 				else
 					JOptionPane.showMessageDialog(FileGUI.this, "Unable to load animation " + animationToEdit + " for " + entityToEdit + ".");
@@ -263,7 +265,7 @@ public class FileGUI extends JFrame
 		setVisible(true);
 		setResizable(false);
 		setAlwaysOnTop(true);
-		setLocationRelativeTo(null);
+		setLocation(Display.getX() + Display.getWidth()/2 - this.getWidth()/2, Display.getY() + Display.getHeight()/2 - this.getHeight()/2);
 
 		outputLog.setText(outputText);
 

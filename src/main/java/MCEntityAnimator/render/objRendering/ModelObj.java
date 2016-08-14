@@ -23,6 +23,7 @@ import MCEntityAnimator.render.objRendering.bend.Bend;
 import MCEntityAnimator.render.objRendering.parts.Part;
 import MCEntityAnimator.render.objRendering.parts.PartEntityPos;
 import MCEntityAnimator.render.objRendering.parts.PartObj;
+import MCEntityAnimator.render.objRendering.parts.PartRotation;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.entity.Entity;
@@ -43,7 +44,7 @@ public class ModelObj extends ModelBase
 	private Map<PartObj, float[]> defaults;
 
 	private PartObj mainHighlight = null;
-	private ArrayList<PartObj> hightlightedParts;
+	private List<PartObj> hightlightedParts;
 
 	public static final float initRotFix = 180.0F;
 	public static final float offsetFixY = -1.5F;
@@ -51,19 +52,22 @@ public class ModelObj extends ModelBase
 	private final ResourceLocation txtRL;
 	private final File pxyFile;
 
-	public final boolean renderWithTexture;
+	public final boolean textureExists;
 
 	private boolean partSetupComplete;
+
+	public static final ResourceLocation pinkResLoc = new ResourceLocation("mod_mcea:defaultModelTextures/pink.png");
+	public static final ResourceLocation whiteResLoc = new ResourceLocation("mod_mcea:defaultModelTextures/white.png");
 
 	public ModelObj(String par0Str)
 	{	
 		entityType = par0Str;
 		File modelFile = new File(MCEA_Main.animationPath + "/data/shared/" + entityType + "/" + entityType + ".obj");
 		pxyFile = new File(MCEA_Main.animationPath + "/data/shared/" + entityType + "/" + entityType + ".pxy");
-		
-		
+
+
 		File textureFile = new File(MCEA_Main.animationPath + "/data/shared/" + entityType + "/" + entityType + ".png");
-		renderWithTexture = textureFile.exists();
+		textureExists = textureFile.exists();
 		txtRL = new ResourceLocation("animation:data/shared/" + entityType + "/" + entityType + ".png");
 
 
@@ -76,8 +80,11 @@ public class ModelObj extends ModelBase
 
 		parts = createPartObjList(this, model.groupObjects);
 		parts.add(new PartEntityPos(this));
-		parts.add(new Part(this, "prop_rot"));
-		parts.add(new Part(this, "prop_trans"));
+		if(par0Str.equals("player"))
+		{
+			parts.add(new PartRotation(this, "prop_rot"));
+			parts.add(new Part(this, "prop_trans"));
+		}
 		parenting = AnimationData.getAnipar(par0Str);
 		hightlightedParts = new ArrayList<PartObj>();
 		bends = new ArrayList<Bend>();
@@ -229,7 +236,7 @@ public class ModelObj extends ModelBase
 				if(p instanceof PartObj)
 				{
 					PartObj obj = (PartObj) p;
-					obj.updateTextureCoordinates(false, false);
+					obj.updateTextureCoordinates(false, false, false);
 				}
 			}
 
@@ -267,17 +274,61 @@ public class ModelObj extends ModelBase
 	}
 
 	//----------------------------------------------------------------
+	// 							 Selection
+	//----------------------------------------------------------------
+
+	public PartObj testRay()
+	{
+		PartObj closestPart = null;
+		Double min = null;
+		for(Part part : parts)
+		{
+			if(part instanceof PartObj)
+			{
+				PartObj p = (PartObj) part;
+				Double d = p.testRay();
+				if(d != null && (min == null || d < min))
+				{
+					closestPart = p;
+					min = d;
+				}
+			}
+		}
+		for(Bend bend : bends)
+		{
+			Double d = bend.testRayChild();
+			if(d != null && (min == null || d < min))
+			{
+				closestPart = bend.child;
+				min = d;
+			}
+			Double d2 = bend.testRayParent();
+			if(d2 != null && (min == null || d2 < min))
+			{
+				closestPart = bend.parent;
+				min = d2;
+			}
+		}
+		return closestPart;
+	}
+
+	//----------------------------------------------------------------
 	// 							Highlighting
 	//----------------------------------------------------------------
 
 	/**
-	 * Add a part to be highlighted
+	 * Highlight a part.
+	 * @param part - Part to highlight.
+	 * @param main - True if main highlight (pink).
 	 */
-	public void hightlightPart(PartObj part)
+	public void hightlightPart(PartObj part, boolean main)
 	{
 		if(part != null)
 		{
-			this.hightlightedParts.add(part);
+			if(main)
+				mainHighlight = part;
+			else
+				hightlightedParts.add(part);
 		}
 	}
 
@@ -287,15 +338,17 @@ public class ModelObj extends ModelBase
 		this.mainHighlight = null;
 	}
 
-	public boolean isPartHighlighted(PartObj partObj) 
-	{
-		return mainHighlight == partObj || hightlightedParts.contains(partObj);
-	}
-
-
 	public boolean isMainHighlight(PartObj partObj) 
 	{
 		return mainHighlight == partObj;
+	}
+
+	/**
+	 * Highlighted but not main highlight (white).
+	 */
+	public boolean isPartHighlighted(PartObj partObj) 
+	{
+		return  hightlightedParts.contains(partObj);
 	}
 
 	//----------------------------------------------------------------
@@ -317,22 +370,16 @@ public class ModelObj extends ModelBase
 			{
 				PartObj part = (PartObj) p;
 				if(!parenting.hasParent(part))
-				{
-					part.render(entity, isPartHighlighted(part), isMainHighlight(part));
-				}
+					part.render();
 			}
-			else
-				p.move(entity);
+			else if(p instanceof PartEntityPos)
+				((PartEntityPos) p).move(entity);
 		}
 
 		for(Bend bend : this.bends)
-		{
 			bend.render();
-		}
 
 		GL11.glPopMatrix();
-
-		//TODO rendering with different textures - for highlighting parts but also for rendering with actual textures.
 	}
 
 	//----------------------------------------------------------------

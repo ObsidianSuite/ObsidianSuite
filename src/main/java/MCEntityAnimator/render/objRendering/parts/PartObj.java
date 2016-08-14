@@ -1,7 +1,8 @@
 package MCEntityAnimator.render.objRendering.parts;
 
-import java.math.RoundingMode;
-import java.text.DecimalFormat;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -9,24 +10,30 @@ import java.util.Map;
 
 import org.lwjgl.opengl.GL11;
 
+import com.sun.org.apache.xpath.internal.operations.Variable;
+
 import MCEntityAnimator.animation.AnimationData;
 import MCEntityAnimator.animation.AnimationParenting;
+import MCEntityAnimator.render.MathHelper;
 import MCEntityAnimator.render.objRendering.ModelObj;
-import MCEntityAnimator.render.objRendering.bend.BendHelper;
+import MCEntityAnimator.render.objRendering.RayTrace;
 import MCEntityAnimator.render.objRendering.bend.Bend;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import net.minecraft.entity.Entity;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.OpenGlHelper;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Vec3;
 import net.minecraftforge.client.model.obj.Face;
 import net.minecraftforge.client.model.obj.GroupObject;
 import net.minecraftforge.client.model.obj.TextureCoordinate;
-import net.minecraftforge.client.model.obj.Vertex;
 
 /**
  * One partObj for each 'part' of the model.
  * 
  */
-public class PartObj extends Part
+public class PartObj extends PartRotation
 {
 	private float[] rotationPoint;
 	private boolean showModel;
@@ -111,6 +118,47 @@ public class PartObj extends Part
 		bend = null;
 	}
 
+	//----------------------------------------------------------------
+	// 							 Selection
+	//----------------------------------------------------------------
+
+	/**
+	 * Test to see if a ray insects with this part.
+	 * @param p0 - Point on ray.
+	 * @param p1 - Another point on ray.
+	 * @return - Minimum distance from p0 to part, null if no intersect exists.
+	 */
+	public Double testRay()
+	{		
+		GL11.glPushMatrix();
+
+		//Get all parents that need compensating for.
+		AnimationParenting anipar = AnimationData.getAnipar(modelObj.getEntityType());
+		List<PartObj> parents = new ArrayList<PartObj>();
+		PartObj p = this;
+		parents.add(p);
+		while(anipar.hasParent(p))
+		{
+			p = anipar.getParent(p);
+			parents.add(0, p);
+		}
+
+		//Compensate for all parents. TODO remove compensate Part rotation method
+		for(PartObj q : parents)
+			q.move();
+		
+		Double min = null;
+		for(Face f : groupObj.faces)
+		{
+			//System.out.println(groupObj.faces.get(0).vertices[0].x + ", " + groupObj.faces.get(0).vertices[0].y + ", " + groupObj.faces.get(0).vertices[0].z);
+			Double d = MathHelper.rayIntersectsFace(RayTrace.getRayTrace(), f);
+			if(d != null && (min == null || d < min))
+				min = d;
+		}
+		GL11.glPopMatrix();
+		return min;	
+	}
+
 	//------------------------------------------
 	//         Rendering and Rotating
 	//------------------------------------------
@@ -143,136 +191,152 @@ public class PartObj extends Part
 		}
 	}
 
+	public void updateTextureCoordinates()
+	{	
+		updateTextureCoordinates(modelObj.isMainHighlight(this), modelObj.isPartHighlighted(this), true);
+	}
+
 	/**
-	 * Change the texture coordinates if the part is highlighted or the main part.
-	 * TODO PartObj: Main highlight vs normal highlight.
-	 * XXX
+	 * Change the texture coordinates and texture if the part is highlighted.
 	 */
-	public void updateTextureCoordinates(boolean highlight, boolean main)
+	public void updateTextureCoordinates(boolean mainHighlight, boolean otherHighlight, boolean bindTexture)
 	{		
-		TextureCoordinate texCo1 = new TextureCoordinate(0.0F, 0.0F);
-		TextureCoordinate[] coordsHighlight = new TextureCoordinate[]{texCo1, texCo1, texCo1};
-		TextureCoordinate texCo2 = new TextureCoordinate(0.5F, 0.5F);
-		TextureCoordinate[] coordsNormal = new TextureCoordinate[]{texCo2, texCo2, texCo2};
+		boolean useHighlightCoords = true;
+		ResourceLocation texture;
+		TextureCoordinate[] highlightCoords = new TextureCoordinate[]{
+				new TextureCoordinate(0.0F, 0.0F), 
+				new TextureCoordinate(0.5F, 0.0F), 
+				new TextureCoordinate(0.0F, 0.5F)};
+		if(mainHighlight)
+			texture = ModelObj.pinkResLoc;
+		else if(otherHighlight)
+			texture = ModelObj.whiteResLoc;
+		else
+		{
+			texture = modelObj.getTexture();
+			useHighlightCoords = false;
+		}
+
+		//System.out.println(this.getDisplayName() + " " + texture);
+
+		if(bindTexture)
+			Minecraft.getMinecraft().getTextureManager().bindTexture(texture);		
 
 		for(Face f : groupObj.faces)
 		{
-			if(highlight)
-				f.textureCoordinates = coordsHighlight;
-			else if(modelObj.renderWithTexture)
-				f.textureCoordinates = defaultTextureCoords.get(f);
+			if(useHighlightCoords)
+				f.textureCoordinates = highlightCoords;
 			else
-				f.textureCoordinates = coordsNormal;	
+				f.textureCoordinates = defaultTextureCoords.get(f);
 		}
 	}
 
-	public void render(Entity entity, boolean highlight, boolean main) 
+	public void render() 
 	{
-		updateTextureCoordinates(highlight, main);
-
 		GL11.glPushMatrix();
-		move(entity);
+		move();
+		updateTextureCoordinates();
 		if(visible)
 			groupObj.render();
+		//Do for children - rotation for parent compensated for!
+		List<PartObj> children = AnimationData.getAnipar(modelObj.getEntityType()).getChildren(this);
+		if(children != null)
+		{
+			for(PartObj child : children)
+				child.render();  
+		}
 		GL11.glPopMatrix();
+		Minecraft.getMinecraft().getTextureManager().bindTexture(modelObj.getTexture());		
+	}
+
+	public void postRenderItem()
+	{
+		//Adjust initial position.
+		GL11.glRotatef(180F, 1, 0, 0);
+		GL11.glTranslatef(0, -1.6F, 0);
+		
+		//Actually do the post rendering here.
+		postRenderAll();
+		
+		//Re-adjust positon to align with hand in resting position.
+		GL11.glRotatef(180F, 1, 0, 0);
+		GL11.glTranslatef(-0.06F,0.05F,0.1F);
 	}
 
 	/**
-	 * Setup rotation and translation for a GL11 matrix based on the rotation
-	 * and rotation point of this part and all its parents.
-	 * @param entityName - Name of the model. 
+	 * Complete post render - parent post render, translation for this part, then rotation for this part.
 	 */
-	@SideOnly(Side.CLIENT)
-	public void postRender(String entityName)
+	public void postRenderAll()
 	{
-		//Generate a list of parents: {topParent, topParent - 1,..., parent, this}/
-		AnimationParenting anipar = AnimationData.getAnipar(entityName);
+		postRenderAllTrans();
+		rotate();
+	}
+
+	/**
+	 * Complete post render except rotation of this part.
+	 */
+	public void postRenderAllTrans()
+	{
+		float[] totalTranslation = postRenderParent();
+		GL11.glTranslated(-getRotationPoint(0)-totalTranslation[0], -getRotationPoint(1)-totalTranslation[1], -getRotationPoint(2)-totalTranslation[2]);
+	}
+
+	/**
+	 * Adjust GL11 Matrix for all parents of this part.
+	 */
+	//TODO could this be done recursively?
+	public float[] postRenderParent()
+	{
+		//Generate a list of parents: {topParent, topParent - 1,..., parent}
+		AnimationParenting anipar = AnimationData.getAnipar(modelObj.getEntityType());
 		List<PartObj> parts = new ArrayList<PartObj>();
 		PartObj child = this;
 		PartObj parent;
-		parts.add(0, child);
 		while((parent = anipar.getParent(child)) != null)
 		{
 			parts.add(0, parent);
 			child = parent;
 		}
 
-		//Translate and rotate all parts, starting with the top parent. 
-		PartObj prevPart = null;
+		float[] totalTranslation = new float[]{0,0,0};
 		for(PartObj p : parts)
-		{
-			//TODO Post render: Z formula, temporarily works for player though.
-			//Not sure if the formulae will work for other entities.
-			float[] currentRotPoint = p.getRotationPoint();
-			//If prevPart is null, ie part is top parent, use 0,0,0.
-			float[] prevRotPoint = prevPart != null ? prevPart.getRotationPoint() : new float[]{0.0F, 0.0F, 0.0F};
-			prevPart = p;
-
-			float[] trans = new float[3];
-			float[] prevtrans = new float[3];
-
+		{			
+			GL11.glTranslated(-p.getRotationPoint(0)-totalTranslation[0], -p.getRotationPoint(1)-totalTranslation[1], -p.getRotationPoint(2)-totalTranslation[2]);
 			for(int i = 0; i < 3; i++)
-			{
-				trans[i] = 0.0F;
-				if(currentRotPoint[i] != 0.0f)
-				{
-					switch(i)
-					{
-					case 0: trans[0] = currentRotPoint[0]*-0.78125f; break;
-					case 1: trans[1] = currentRotPoint[1]*0.77f + 1.2f; break;
-					case 2: /* Z formula */  break;         
-					}
-				}
+				totalTranslation[i] = -p.getRotationPoint(i);
 
-				prevtrans[i] = 0.0F;
-				if(prevRotPoint[i] != 0.0f)
-				{
-					switch(i)
-					{
-					case 0: prevtrans[0] = prevRotPoint[0]*-0.78125f; break;
-					case 1: prevtrans[1] = prevRotPoint[1]*0.77f + 1.2f; break;
-					case 2: /* Z formula */  break;         
-					}
-				}
-			}
+			p.rotate();
 
-			//Translate, compensating for the previous part translation.
-			GL11.glTranslatef(trans[0] - prevtrans[0], trans[1] - prevtrans[1], trans[2] - prevtrans[2]);
-			//Rotate
-			if (p.valueX != 0.0F)
-				GL11.glRotatef(p.valueX * (180F / (float)Math.PI), 1.0F, 0.0F, 0.0F);
-			if (p.valueY != 0.0F)
-				GL11.glRotatef(-p.valueY * (180F / (float)Math.PI), 0.0F, 1.0F, 0.0F);            
-			if (p.valueZ != 0.0F)
-				GL11.glRotatef(-p.valueZ * (180F / (float)Math.PI), 0.0F, 0.0F, 1.0F);   
 		}
+		return totalTranslation;
 	}
 
-
-	@Override
-	public void move(Entity entity)
+	public void move()
 	{
-		//Translate part to centre
 		GL11.glTranslatef(-rotationPoint[0], -rotationPoint[1], -rotationPoint[2]);
-
-		//Rotate
-		GL11.glRotated((valueX - originalValues[0])/Math.PI*180.0F, 1.0F, 0.0F, 0.0F);
-		GL11.glRotated((valueY - originalValues[1])/Math.PI*180.0F, 0.0F, 1.0F, 0.0F);
-		GL11.glRotated((valueZ - originalValues[2])/Math.PI*180.0F, 0.0F, 0.0F, 1.0F);
-
-		//Translate to original position
+		rotate();
 		GL11.glTranslatef(rotationPoint[0], rotationPoint[1], rotationPoint[2]);    
-
-		//Do for children - rotation for parent compensated for!
-		List<PartObj> children = AnimationData.getAnipar(modelObj.getEntityType()).getChildren(this);
-		if(children != null)
-		{
-			for(PartObj child : children)
-			{
-				child.render(entity, modelObj.isPartHighlighted(child), modelObj.isMainHighlight(child));
-			}   
-		}
 	}
 
+	public float[] createRotationMatrixFromAngles()
+	{
+		double sx = Math.sin(-valueX);
+		double sy = Math.sin(-valueY);
+		double sz = Math.sin(-valueZ);
+		double cx = Math.cos(-valueX);
+		double cy = Math.cos(-valueY);
+		double cz = Math.cos(-valueZ);
 
+		float m0 = (float) (cy*cz);
+		float m1 = (float) (sx*sy*cz-cx*sz);
+		float m2 = (float) (cx*sy*cz+sx*sz);
+		float m3 = (float) (cy*sz);
+		float m4 = (float) (sx*sy*sz+cx*cz);
+		float m5 = (float) (cx*sy*sz-sx*cz);
+		float m6 = (float) -sy;
+		float m7 = (float) (sx*cy);
+		float m8 = (float) (cx*cy);
+
+		return new float[]{m0,m1,m2,m3,m4,m5,m6,m7,m8};
+	}
 }

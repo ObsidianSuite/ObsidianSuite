@@ -3,15 +3,18 @@ package MCEntityAnimator.animation;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.nbt.NBTBase;
-import net.minecraft.nbt.NBTTagCompound;
+import org.lwjgl.util.vector.Quaternion;
+
 import MCEntityAnimator.Util;
+import MCEntityAnimator.render.MathHelper;
 import MCEntityAnimator.render.objRendering.EntityObj;
 import MCEntityAnimator.render.objRendering.RenderObj;
 import MCEntityAnimator.render.objRendering.parts.Part;
 import MCEntityAnimator.render.objRendering.parts.PartObj;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.nbt.NBTBase;
+import net.minecraft.nbt.NBTTagCompound;
 
 /**
  * A section of an animation for a specific part. 
@@ -25,6 +28,7 @@ public class AnimationPart
 	private float[] movement = new float[3];
 	private DecimalFormat df = new DecimalFormat("##.##");
 	private Part part;
+	private Quaternion startQuart, endQuart;
 
 	public AnimationPart(String entityName, NBTTagCompound compound) 
 	{
@@ -37,7 +41,10 @@ public class AnimationPart
 		this.endTime = endTime;
 		this.startPosition = startPos;
 		this.endPosition = endPos;
-		
+
+		this.startQuart = MathHelper.eulerToQuarternion(startPos[0]/180F*Math.PI, startPos[1]/180F*Math.PI, startPos[2]/180F*Math.PI);
+		this.endQuart = MathHelper.eulerToQuarternion(endPos[0]/180F*Math.PI, endPos[1]/180F*Math.PI, endPos[2]/180F*Math.PI);
+
 		for(int i = 0; i < 3; i++)
 		{
 			float dT = endTime - startTime;
@@ -45,25 +52,66 @@ public class AnimationPart
 			//it is at time zero.
 			if(dT == 0)
 				dT = 1;
-			this.movement[i] = (endPos[i] - startPos[i])/dT;
+			float dif = endPos[i] - startPos[i];
+			if(part instanceof PartObj)
+			{
+				if(Math.abs(dif) > Math.PI)
+				{
+					if(dif < 0)
+						dif += 2*Math.PI;
+					else
+						dif -= 2*Math.PI;
+				}
+			}
+			this.movement[i] = dif/dT;
 		}
 		this.part = part;
 	}
 
 	public void animatePart(float time) 
-	{			
-		float x = startPosition[0] + time*movement[0];
-		float y = startPosition[1] + time*movement[1];
-		float z = startPosition[2] + time*movement[2];
-		
-		part.setValues(new float[]{x, y, z});
+	{		
+		boolean useQuarternions = false;
+
+		float[] values = new float[3];
+		if(useQuarternions && part instanceof PartObj)		
+		{
+			PartObj partObj = (PartObj) part;
+			float t = time/(endTime - startTime);
+
+			//	System.out.println(endQuart);
+
+			Quaternion interpolatedQ = MathHelper.slerp(startQuart, endQuart, t);
+			values = MathHelper.quarternionToEuler(interpolatedQ);
+			for(int i = 0; i < 3; i++)
+			{
+				//System.out.println(i + values[i]);
+				values[i] = (float) (values[i]/Math.PI*180F);
+			}
+		}
+		else
+		{
+			values[0] = startPosition[0] + time*movement[0];
+			values[1] = startPosition[1] + time*movement[1];
+			values[2] = startPosition[2] + time*movement[2];
+		}
+
+		for(int i = 0; i < 3; i++)
+		{
+			if(values[i] < -Math.PI)
+				values[i] += 2*Math.PI;
+			else if(values[i] > Math.PI)
+				values[i] -= 2*Math.PI;	
+		}
+
+
+		part.setValues(values);
 	}
 
 	public Part getPart()
 	{
 		return part;
 	}
-	
+
 	public float[] getStartPosition() 
 	{
 		return startPosition;
@@ -78,7 +126,7 @@ public class AnimationPart
 	{
 		return startTime;
 	}
-	
+
 	public float getEndTime()
 	{
 		return endTime;
@@ -96,7 +144,7 @@ public class AnimationPart
 		}
 		return true;
 	}
-	
+
 	public boolean isEndPosDifferentToStartPos()
 	{
 		for(int i = 0; i < 3; i++)

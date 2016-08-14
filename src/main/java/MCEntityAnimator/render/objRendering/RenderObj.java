@@ -23,6 +23,7 @@ import org.lwjgl.opengl.GL11;
 import MCEntityAnimator.Util;
 import MCEntityAnimator.item.ModelLargeShield;
 import MCEntityAnimator.render.objRendering.parts.PartObj;
+import MCEntityAnimator.render.objRendering.parts.PartRotation;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
@@ -36,7 +37,7 @@ public class RenderObj extends RenderLiving
 	
 	private static final ModelLargeShield shieldModel = new ModelLargeShield();
 	private static final ResourceLocation shieldTexture = new ResourceLocation("mod_pxy:textures/models/L_shield.png");
-	private static final ResourceLocation defaultTexture = new ResourceLocation("mod_MCEA:default_model_texture.png"); 
+	private static final ResourceLocation defaultTexture = new ResourceLocation("mod_mcea:defaultModelTextures/grey.png");
 	private ResourceLocation properTexture;
 	
 	public RenderObj() 
@@ -48,7 +49,7 @@ public class RenderObj extends RenderLiving
 	@Override
 	protected ResourceLocation getEntityTexture(Entity entity) 
 	{
-		return getModel(((EntityObj) entity).getType()).renderWithTexture ? properTexture : defaultTexture;
+		return getModel(((EntityObj) entity).getType()).textureExists ? properTexture : defaultTexture;
 	}
 
 	public void updateModel(String entityType)
@@ -103,16 +104,16 @@ public class RenderObj extends RenderLiving
 			
 			//Post render for lower right arm.
 			PartObj armLwR = Util.getPartObjFromName("armLwR", modelObj.parts);
-			armLwR.postRender(modelObj.getEntityType());
-			GL11.glTranslatef(-0.125F, 0.2F, 0.2F);
+			armLwR.postRenderItem();
 			
 			//Prop rotation and translation
 			float[] propRotation = Util.getPartFromName("prop_rot", modelObj.parts).getValues();
 			float[] propTranslation = Util.getPartFromName("prop_trans", modelObj.parts).getValues();
 			GL11.glTranslatef(propTranslation[0], propTranslation[1], propTranslation[2]);	
-			GL11.glRotatef(propRotation[0]*180.0F, 1.0F, 0.0F, 0.0F);
-			GL11.glRotatef(propRotation[1]*180.0F, 0.0F, 1.0F, 0.0F);
-			GL11.glRotatef(propRotation[2]*180.0F, 0.0F, 0.0F, 1.0F);
+			
+			GL11.glRotatef(180F, 1, 0, 0);
+			((PartRotation) Util.getPartFromName("prop_rot", modelObj.parts)).rotate();
+			GL11.glRotatef(-180F, 1, 0, 0);
 			
 			EnumAction enumaction = null;
 
