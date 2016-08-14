@@ -103,7 +103,7 @@ public class MathHelper
 	/**
 	 * Calculate the point of intersection between a ray and a plane.
 	 * @param ray - Ray to test.
-	 * @param v0 - Point on plane.
+	 * @param p - Point on plane.
 	 * @param n - Normal to plane.
 	 * @return - Point on plane where ray intersects, null if no interception. 
 	 */
@@ -112,7 +112,7 @@ public class MathHelper
 		//System.out.println(ray.p1);
 		double rd = n.dotProduct(ray.p0.subtract(ray.p1));
 		if(rd == 0)
-			return null;
+			return p;
 		double r = n.dotProduct(ray.p0.subtract(p))/rd;
 		return addVector(ray.p0, scale(ray.p0.subtract(ray.p1),r));
 	}

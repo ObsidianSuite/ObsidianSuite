@@ -117,6 +117,10 @@ public class GuiEntityRendererWithTranslation extends GuiEntityRendererWithRotat
 		Integer dim = testAxisRay();
 		if(dim != null)
 		{
+			GL11.glPushMatrix();
+			Part part = Util.getPartFromName(currentPartName, entityModel.parts);
+			if(part instanceof PartEntityPos)
+				GL11.glTranslated(-entityToRender.posX, -entityToRender.posY, -entityToRender.posZ);
 			translationAxisMouseOver = true;
 			translationAxisPlane = dim;
 			int i = translationAxisPlane == 0 ? 2 : translationAxisPlane - 1;
@@ -129,13 +133,9 @@ public class GuiEntityRendererWithTranslation extends GuiEntityRendererWithRotat
 			case 1: v = Vec3.createVectorHelper(0, 1, 0); break;
 			case 2: v = Vec3.createVectorHelper(0, 0, 1); break; 
 			}
-			GL11.glPushMatrix();
-			Part part = Util.getPartFromName(currentPartName, entityModel.parts);
-			if(part instanceof PartEntityPos)
-				GL11.glTranslated(-entityToRender.posX, -entityToRender.posY, -entityToRender.posZ);
-			prevTranslationDelta = MathHelper.getLineScalarForClosestPoint(Vec3.createVectorHelper(0, 0, 0), v, initialTranslationGuidePoint);
+			if(translationGuidePoint != null)
+				prevTranslationDelta = MathHelper.getLineScalarForClosestPoint(Vec3.createVectorHelper(0, 0, 0), v, translationGuidePoint);
 			GL11.glPopMatrix();
-
 		}
 		else
 			translationAxisPlane = null;
@@ -187,11 +187,7 @@ public class GuiEntityRendererWithTranslation extends GuiEntityRendererWithRotat
 			}
 
 			double translationDelta = MathHelper.getLineScalarForClosestPoint(Vec3.createVectorHelper(0, 0, 0), v, translationGuidePoint);
-
 			double d = translationDelta - prevTranslationDelta;
-
-
-			System.out.println(translationGuidePoint + " " + initialTranslationGuidePoint);
 			if(!Double.isNaN(d))
 			{
 				Part part = Util.getPartFromName(currentPartName, entityModel.parts);
