@@ -69,7 +69,8 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 
 	private DecimalFormat df = new DecimalFormat("#.##");
 	private float time = 0.0F;
-	private float timeIncrement = 1.0F;
+	private final float defaultTimeIncrement = 0.4F;
+	private float timeIncrement = defaultTimeIncrement;
 	private TimelineFrame timelineFrame;
 	protected Map<String, List<Keyframe>> keyframes = new HashMap<String, List<Keyframe>>();
 
@@ -195,7 +196,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 	{				
 		if(boolPlay)
 		{
-			time += 0.4F;
+			time += timeIncrement;
 			exceptionPartName = "";
 			if(time >= currentAnimation.getTotalTime())
 			{
@@ -916,7 +917,50 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 				}
 			});
 
-
+			JPanel sliderPanel = new JPanel();
+			
+			final JLabel valueLabel = new JLabel();
+			valueLabel.setPreferredSize(new Dimension(30, 16));
+			valueLabel.setText("100%");
+			
+			final JSlider slider = new JSlider(0, 300, 100);
+			slider.addChangeListener(new ChangeListener()
+			{
+				@Override
+				public void stateChanged(ChangeEvent e)
+				{
+					valueLabel.setText(slider.getValue() + "%");
+					timeIncrement = defaultTimeIncrement*slider.getValue()/100F;
+				}
+			});
+			
+			JButton resetButton = new JButton("Reset");
+			resetButton.addActionListener(new ActionListener()
+			{
+				@Override
+				public void actionPerformed(ActionEvent e) 
+				{
+					slider.setValue(100);
+				}
+			});
+			
+			sliderPanel.setLayout(new GridBagLayout());
+			GridBagConstraints c = new GridBagConstraints();
+			
+			c.gridx = 0;
+			c.gridy = 0;
+			c.gridwidth = 2;	
+			c.anchor = c.CENTER;
+			sliderPanel.add(slider, c);
+			c.gridy = 1;
+			c.gridwidth = 1;		
+			c.weightx = 1;
+			sliderPanel.add(valueLabel,c);
+			c.gridx = 1;
+			sliderPanel.add(resetButton,c);
+			
+			sliderPanel.setBorder(BorderFactory.createTitledBorder("Speed"));
+			
 			JPanel partPanel = new JPanel();
 
 			partName = new JLabel();
@@ -927,7 +971,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 			updatePartLabels();
 
 			partPanel.setLayout(new GridBagLayout());
-			GridBagConstraints c = new GridBagConstraints();
+			c = new GridBagConstraints();
 			c.gridx = 0;
 			c.gridy = 0;
 			partPanel.add(partName,c);
@@ -1054,12 +1098,14 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 			add(playPauseButton,c);
 			c.insets = new Insets(0,2,0,2);
 			c.gridy = 1;
-			add(partPanel,c);
+			add(sliderPanel,c);
 			c.gridy = 2;
-			add(checkboxPanel,c);
+			add(partPanel,c);
 			c.gridy = 3;
-			add(buttonPanel,c);
+			add(checkboxPanel,c);
 			c.gridy = 4;
+			add(buttonPanel,c);
+			c.gridy = 5;
 			c.insets = new Insets(2,5,2,5);
 			add(backButton,c);
 		}
