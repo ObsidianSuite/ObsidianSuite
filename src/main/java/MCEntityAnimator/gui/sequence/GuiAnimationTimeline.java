@@ -189,6 +189,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 	{
 		super.onGuiClosed();
 		timelineFrame.dispose();
+		AnimationData.addChangedSequence(entityName, currentAnimation.getName());
 		SaveLoadHandler.upload();
 	}
 

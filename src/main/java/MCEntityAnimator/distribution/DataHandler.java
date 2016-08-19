@@ -18,7 +18,7 @@ public class DataHandler
 {
 
 	public void saveNBTData()
-	{			
+	{	
 		if(ServerAccess.username != null)
 		{
 			List<String> entityNames = getEntities();
@@ -33,8 +33,12 @@ public class DataHandler
 				//Sequences
 				if(!ServerAccess.username.equals("root"))			
 				{
+					List<String> changeSequences = AnimationData.getChangedSequences(entityName);
 					for(AnimationSequence s : AnimationData.getSequences(entityName))
-						writeNBTToFile(s.getSaveData(), getAnimationFile(entityName, s.getName()));
+					{
+						if(changeSequences.contains(s.getName()))
+							writeNBTToFile(s.getSaveData(), getAnimationFile(entityName, s.getName()));
+					}
 				}
 			}
 		}
@@ -44,9 +48,9 @@ public class DataHandler
 	{	
 		List<String> entityNames = getEntities();
 		//GUI
-//		File guiDataFile = getGUIFile();
-//		if(guiDataFile.exists())
-//			AnimationData.loadGUISetup(getNBTFromFile(guiDataFile));
+		//		File guiDataFile = getGUIFile();
+		//		if(guiDataFile.exists())
+		//			AnimationData.loadGUISetup(getNBTFromFile(guiDataFile));
 		//Entity data
 		for(String entityName : entityNames)
 		{

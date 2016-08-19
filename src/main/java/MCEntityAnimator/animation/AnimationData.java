@@ -25,6 +25,7 @@ public class AnimationData
 
 	//All sequences, stances and parenting data.
 	private static Map<String, List<AnimationSequence>> sequences = Maps.newHashMap();	
+	private static Map<String, List<String>> changedSequences = Maps.newHashMap();	
 	private static Map<String, List<AnimationStance>> stances = Maps.newHashMap();	
 	private static Map<String, AnimationParenting> parenting = Maps.newHashMap();
 
@@ -60,6 +61,29 @@ public class AnimationData
 			sqs.remove(existingSeq);
 		sqs.add(sequence);
 		sequences.put(entityName, sqs);
+	}
+	
+	public static void addChangedSequence(String entityName, String sequenceName)
+	{
+		List<String> sqs = changedSequences.get(entityName);
+		if(sqs == null)
+			sqs = new ArrayList<String>();
+		if(!sqs.contains(sequenceName))	
+			sqs.add(sequenceName);
+		changedSequences.put(entityName, sqs);
+	}	
+	
+	public static List<String> getChangedSequences(String entityName)
+	{
+		List<String> sqs = changedSequences.get(entityName);
+		if(sqs == null)
+			sqs = new ArrayList<String>();
+		return sqs;
+	}
+	
+	public static void clearChangedSequences(String entityName)
+	{
+		changedSequences.put(entityName, new ArrayList<String>());
 	}
 
 	public static AnimationSequence getSequenceFromName(String entityName, String animationName)
