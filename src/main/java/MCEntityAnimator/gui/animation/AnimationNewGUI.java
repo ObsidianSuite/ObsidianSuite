@@ -80,7 +80,7 @@ public class AnimationNewGUI extends JFrame
 			public void actionPerformed(ActionEvent e) 
 			{
 				dispose();
-				ServerAccess.gui = new FileGUI();
+				ServerAccess.gui = new MainGUI();
 			}
 		});
 		

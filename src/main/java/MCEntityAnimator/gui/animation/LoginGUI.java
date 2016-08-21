@@ -89,7 +89,7 @@ public class LoginGUI extends JFrame
 						dispose();
 						ServerAccess.username = username;
 						SaveLoadHandler.download();
-						ServerAccess.gui = new FileGUI();
+						ServerAccess.gui = new MainGUI();
 					}
 				}
 				else

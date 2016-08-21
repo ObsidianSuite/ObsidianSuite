@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import MCEntityAnimator.MCEA_Main;
-import MCEntityAnimator.gui.animation.FileGUI;
+import MCEntityAnimator.gui.animation.MainGUI;
 
 public class ServerAccess
 {
@@ -26,7 +26,7 @@ public class ServerAccess
 	private static final String uploadURL = baseURL + "upload.php?folder=";
 	private static final String downloadURL = baseURL + "download.php?user=";
 
-	public static FileGUI gui;
+	public static MainGUI gui;
 	public static String username;
 
 	public static List<String> uploadAll() throws IOException

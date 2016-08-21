@@ -1,5 +1,6 @@
 package MCEntityAnimator.gui.animation;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Desktop;
 import java.awt.Dimension;
@@ -11,7 +12,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
@@ -23,18 +23,19 @@ import java.util.Calendar;
 import java.util.List;
 
 import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTree;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.Border;
+import javax.swing.table.TableColumnModel;
 import javax.swing.text.DefaultCaret;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
@@ -50,7 +51,7 @@ import MCEntityAnimator.gui.GuiPartSetup;
 import MCEntityAnimator.gui.sequence.GuiAnimationTimeline;
 import net.minecraft.client.Minecraft;
 
-public class FileGUI extends JFrame
+public class MainGUI extends JFrame
 {
 
 	private static final long serialVersionUID = -3402393679860402540L;
@@ -70,7 +71,7 @@ public class FileGUI extends JFrame
 	private String entityToEdit;
 	private String animationToEdit;
 
-	public FileGUI()
+	public MainGUI()
 	{
 		super("Animation Files");
 
@@ -100,11 +101,10 @@ public class FileGUI extends JFrame
 		treeView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		treeView.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
 
-		JPanel todoPanel = createErrorPanel();
-		JScrollPane todoView = new JScrollPane(todoPanel);
-		todoView.setPreferredSize(new Dimension(200,200));
-		todoView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-		todoView.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+		JScrollPane overviewView = new JScrollPane(createTable());
+		overviewView.setPreferredSize(new Dimension(overviewView.getPreferredSize().width, 200));
+		overviewView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		overviewView.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
 
 		outputLog = new JTextArea(15,30);
 		DefaultCaret caret = (DefaultCaret)outputLog.getCaret();
@@ -138,7 +138,7 @@ public class FileGUI extends JFrame
 					Minecraft.getMinecraft().displayGuiScreen(new GuiAnimationTimeline(entityToEdit,seq));
 				}
 				else
-					JOptionPane.showMessageDialog(FileGUI.this, "Unable to load animation " + animationToEdit + " for " + entityToEdit + ".");
+					JOptionPane.showMessageDialog(MainGUI.this, "Unable to load animation " + animationToEdit + " for " + entityToEdit + ".");
 			}
 		});
 		c.fill = GridBagConstraints.BOTH;
@@ -157,10 +157,10 @@ public class FileGUI extends JFrame
 
 		c.gridx = 1;
 		c.gridy = 0;
-		mainPanel.add(new JLabel("Errors"),c);
+		mainPanel.add(new JLabel("File Overview"),c);
 		c.gridy = 1;
 		c.gridheight = 2;
-		mainPanel.add(todoView,c);
+		mainPanel.add(overviewView,c);
 
 		JPanel buttonPanel = new JPanel();
 		GridLayout layout = new GridLayout(0,4);
@@ -186,7 +186,7 @@ public class FileGUI extends JFrame
 			@Override
 			public void actionPerformed(ActionEvent arg0) 
 			{
-				if(JOptionPane.showConfirmDialog(FileGUI.this, "Refreshing will overwrite any changes you may \n have made since the last time you uploaded.\n Continue?", 
+				if(JOptionPane.showConfirmDialog(MainGUI.this, "Refreshing will overwrite any changes you may \n have made since the last time you uploaded.\n Continue?", 
 						"Refresh?", JOptionPane.YES_NO_OPTION) == 0)
 				{
 
@@ -310,44 +310,21 @@ public class FileGUI extends JFrame
 		return top;
 	}
 
-	private JPanel createErrorPanel()
+	private JTable createTable()
 	{
-		JPanel errorPanel = new JPanel();
-		errorPanel.setBorder(customBorder);
-		errorPanel.setBackground(Color.white);
-		errorPanel.setLayout(new BoxLayout(errorPanel, BoxLayout.Y_AXIS));
-
-		for(String s : ServerAccess.getErrors())
-		{
-			final JLabel label = new JLabel(s);
-			if(label.getText().contains("No data file"))
-			{
-				final String entityName = label.getText().substring(17, label.getText().length() - 1);
-				label.setForeground(Color.decode("#0000FF"));
-				label.addMouseListener(new MouseListener()
-				{
-
-					@Override
-					public void mouseClicked(MouseEvent arg0) {initModelSetup(entityName);}
-
-					@Override
-					public void mouseEntered(MouseEvent arg0) {label.setForeground(Color.decode("#00CCFF"));}
-
-					@Override
-					public void mouseExited(MouseEvent arg0) {label.setForeground(Color.decode("#0000FF"));}
-
-					@Override
-					public void mousePressed(MouseEvent arg0) {}
-
-					@Override
-					public void mouseReleased(MouseEvent arg0) {}
-
-				});
-			}
-			errorPanel.add(label);
-		}
-
-		return errorPanel;
+		String[] columnNames = {"File", "Status", "Modified local", "Modified server", "Last modified by"};
+		Object[][] data = {{"test.txt", "Ahead", "11:27 21-08-2016", "10:24 21-08-2016", "DaBigJoe"},{"quantum.txt", "Up to date", "10:24 21-08-2016", "10:24 21-08-2016", "DaBigJoe"}};
+		
+		JTable table = new JTable(data, columnNames);
+		table.setEnabled(false);
+		table.getTableHeader().setReorderingAllowed(false);
+		
+		TableColumnModel columnModel = table.getColumnModel();
+		columnModel.getColumn(2).setPreferredWidth(120);
+		columnModel.getColumn(3).setPreferredWidth(120);
+		columnModel.getColumn(4).setPreferredWidth(120);
+		
+		return table;
 	}
 
 	private void showUploadErrorPopup(String text)
@@ -425,13 +402,13 @@ public class FileGUI extends JFrame
 	private void initModelSetup(String entityName)
 	{
 		if(ServerAccess.username.equals("root"))
-			if(JOptionPane.showConfirmDialog(FileGUI.this, "Setup model for " + entityName + "?", "Setup Model", JOptionPane.YES_NO_OPTION) == 0)
+			if(JOptionPane.showConfirmDialog(MainGUI.this, "Setup model for " + entityName + "?", "Setup Model", JOptionPane.YES_NO_OPTION) == 0)
 			{
 				Minecraft.getMinecraft().displayGuiScreen(new GuiPartSetup(entityName));
-				FileGUI.this.dispose();
+				MainGUI.this.dispose();
 			}
 			else
-				JOptionPane.showMessageDialog(FileGUI.this, "Permission denied, must be root user.");
+				JOptionPane.showMessageDialog(MainGUI.this, "Permission denied, must be root user.");
 	}
 
 }
