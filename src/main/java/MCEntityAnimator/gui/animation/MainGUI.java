@@ -1,6 +1,5 @@
 package MCEntityAnimator.gui.animation;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Desktop;
 import java.awt.Dimension;
@@ -19,6 +18,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
@@ -45,7 +45,6 @@ import org.lwjgl.opengl.Display;
 import MCEntityAnimator.MCEA_Main;
 import MCEntityAnimator.animation.AnimationData;
 import MCEntityAnimator.animation.AnimationSequence;
-import MCEntityAnimator.distribution.SaveLoadHandler;
 import MCEntityAnimator.distribution.ServerAccess;
 import MCEntityAnimator.gui.GuiPartSetup;
 import MCEntityAnimator.gui.sequence.GuiAnimationTimeline;
@@ -196,7 +195,7 @@ public class MainGUI extends JFrame
 					{
 						public void run() 
 						{
-							SaveLoadHandler.download();
+							//SaveLoadHandler.download();
 							updateOutput("\\-------------< Download complete >-------------/", false);
 							createGUI(mainPanel, outputLog.getText());
 						}
@@ -218,7 +217,7 @@ public class MainGUI extends JFrame
 				{
 					public void run() 
 					{
-						List<String> failedFiles = SaveLoadHandler.upload();
+						List<String> failedFiles =  new ArrayList<String>();//SaveLoadHandler.upload();
 						if(failedFiles.isEmpty())
 							updateOutput("\\--------------< Upload complete >-------------/", false);
 						else
@@ -241,7 +240,6 @@ public class MainGUI extends JFrame
 			@Override
 			public void actionPerformed(ActionEvent arg0) 
 			{
-				ServerAccess.username = "";
 				dispose();
 				Minecraft.getMinecraft().displayGuiScreen(null);
 			}
@@ -273,12 +271,10 @@ public class MainGUI extends JFrame
 		{    
 			public void windowClosed(WindowEvent e) 
 			{
-				ServerAccess.gui = null;
 			}
 
 			public void windowClosing(WindowEvent e) 
 			{
-				ServerAccess.gui = null;			
 			}
 		});
 	}
@@ -401,14 +397,14 @@ public class MainGUI extends JFrame
 
 	private void initModelSetup(String entityName)
 	{
-		if(ServerAccess.username.equals("root"))
-			if(JOptionPane.showConfirmDialog(MainGUI.this, "Setup model for " + entityName + "?", "Setup Model", JOptionPane.YES_NO_OPTION) == 0)
-			{
-				Minecraft.getMinecraft().displayGuiScreen(new GuiPartSetup(entityName));
-				MainGUI.this.dispose();
-			}
-			else
-				JOptionPane.showMessageDialog(MainGUI.this, "Permission denied, must be root user.");
+//		if(ServerAccess.username.equals("root"))
+//			if(JOptionPane.showConfirmDialog(MainGUI.this, "Setup model for " + entityName + "?", "Setup Model", JOptionPane.YES_NO_OPTION) == 0)
+//			{
+//				Minecraft.getMinecraft().displayGuiScreen(new GuiPartSetup(entityName));
+//				MainGUI.this.dispose();
+//			}
+//			else
+//				JOptionPane.showMessageDialog(MainGUI.this, "Permission denied, must be root user.");
 	}
 
 }

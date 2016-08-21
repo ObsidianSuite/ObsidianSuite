@@ -19,27 +19,20 @@ public class DataHandler
 
 	public void saveNBTData()
 	{	
-		if(ServerAccess.username != null)
+		List<String> entityNames = getEntities();
+		//GUI
+		//writeNBTToFile(AnimationData.getGUISetupTag(entityNames), getGUIFile());
+		//Entity data
+		for(String entityName : entityNames)
 		{
-			List<String> entityNames = getEntities();
-			//GUI
-			if(!ServerAccess.username.equals("root"))			
-				writeNBTToFile(AnimationData.getGUISetupTag(entityNames), getGUIFile());
-			//Entity data
-			for(String entityName : entityNames)
+			//Parenting and part names
+			writeNBTToFile(AnimationData.getEntityDataTag(entityName), getEntityDataFile(entityName));
+			//Sequences
+			List<String> changeSequences = AnimationData.getChangedSequences(entityName);
+			for(AnimationSequence s : AnimationData.getSequences(entityName))
 			{
-				//Parenting and part names
-				writeNBTToFile(AnimationData.getEntityDataTag(entityName), getEntityDataFile(entityName));
-				//Sequences
-				if(!ServerAccess.username.equals("root"))			
-				{
-					List<String> changeSequences = AnimationData.getChangedSequences(entityName);
-					for(AnimationSequence s : AnimationData.getSequences(entityName))
-					{
-						if(changeSequences.contains(s.getName()))
-							writeNBTToFile(s.getSaveData(), getAnimationFile(entityName, s.getName()));
-					}
-				}
+				if(changeSequences.contains(s.getName()))
+					writeNBTToFile(s.getSaveData(), getAnimationFile(entityName, s.getName()));
 			}
 		}
 	}
@@ -51,6 +44,8 @@ public class DataHandler
 		//		File guiDataFile = getGUIFile();
 		//		if(guiDataFile.exists())
 		//			AnimationData.loadGUISetup(getNBTFromFile(guiDataFile));
+
+
 		//Entity data
 		for(String entityName : entityNames)
 		{
@@ -59,15 +54,11 @@ public class DataHandler
 			if(entityDataFile.exists())
 				AnimationData.loadEntityData(entityName, getNBTFromFile(entityDataFile));
 
-
-			if(!ServerAccess.username.equals("root"))
+			//Sequences
+			for(File animationFile : getAnimationFiles(entityName))
 			{
-				//Sequences
-				for(File animationFile : getAnimationFiles(entityName))
-				{
-					AnimationSequence sequence = new AnimationSequence(entityName, getNBTFromFile(animationFile));
-					AnimationData.addSequence(entityName, sequence);
-				}
+				AnimationSequence sequence = new AnimationSequence(entityName, getNBTFromFile(animationFile));
+				AnimationData.addSequence(entityName, sequence);
 			}
 		}
 	}
@@ -115,19 +106,19 @@ public class DataHandler
 
 	private static File getGUIFile()
 	{
-		return new File(MCEA_Main.animationPath + "/data/" + ServerAccess.username +  "/GuiData.data");
+		return new File(MCEA_Main.animationPath + "/data/GuiData.data");
 	}
 
 	private static File getEntityDataFile(String entityName)
 	{
-		return new File(MCEA_Main.animationPath + "/data/shared/" + entityName +  "/" + entityName + ".data");
+		return new File(MCEA_Main.animationPath + "/data/" + entityName +  "/" + entityName + ".data");
 	}
 
 	private static List<File> getAnimationFiles(String entityName)
 	{
 		List<File> animationFiles = new ArrayList<File>();
 		System.out.println(entityName);
-		File animationFolder = new File(MCEA_Main.animationPath + "/data/" + ServerAccess.username + "/" + entityName);
+		File animationFolder = new File(MCEA_Main.animationPath + "/data/" + entityName);
 		animationFolder.mkdir();
 		for(File f : animationFolder.listFiles())
 			animationFiles.add(f);
@@ -136,7 +127,7 @@ public class DataHandler
 
 	private static File getAnimationFile(String entityName, String animationName)
 	{
-		return new File(MCEA_Main.animationPath + "/data/" + ServerAccess.username + "/" + entityName + "/" + animationName + ".data");
+		return new File(MCEA_Main.animationPath + "/data/" + entityName + "/" + animationName + ".data");
 	}
 
 }

@@ -20,7 +20,6 @@ import org.lwjgl.opengl.Display;
 import MCEntityAnimator.animation.AnimationData;
 import MCEntityAnimator.animation.AnimationSequence;
 import MCEntityAnimator.distribution.DataHandler;
-import MCEntityAnimator.distribution.ServerAccess;
 import MCEntityAnimator.gui.sequence.GuiAnimationTimeline;
 import net.minecraft.client.Minecraft;
 
@@ -80,7 +79,7 @@ public class AnimationNewGUI extends JFrame
 			public void actionPerformed(ActionEvent e) 
 			{
 				dispose();
-				ServerAccess.gui = new MainGUI();
+				new MainGUI();
 			}
 		});
 		

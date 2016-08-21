@@ -1,8 +1,6 @@
 package MCEntityAnimator;
 
 import MCEntityAnimator.distribution.DataHandler;
-import MCEntityAnimator.distribution.SaveLoadHandler;
-import MCEntityAnimator.distribution.ServerAccess;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
@@ -14,20 +12,17 @@ public class ExtendedPropertiesAnimation implements IExtendedEntityProperties
 	private DataHandler dataHandler;
 
 	@Override
-	public void init(Entity entity, World world)
-	{
-	}
+	public void init(Entity entity, World world){}
 
 	@Override
 	public void saveNBTData(NBTTagCompound nbtTagCompound)
 	{
-		if(ServerAccess.username != null && !ServerAccess.username.equals(""))
-			SaveLoadHandler.upload();
+		MCEA_Main.dataHandler.saveNBTData();
 	}
 
 	@Override
 	public void loadNBTData(NBTTagCompound nbtTagCompound)
 	{
-		//MCEA_Main.dataHandler.loadNBTData();
+		MCEA_Main.dataHandler.loadNBTData();
 	}
 }

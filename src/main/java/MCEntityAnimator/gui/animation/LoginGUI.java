@@ -1,28 +1,25 @@
 package MCEntityAnimator.gui.animation;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
+import javax.swing.JTextField;
 
 import org.lwjgl.opengl.Display;
 
-import MCEntityAnimator.distribution.SaveLoadHandler;
+import com.jcraft.jsch.JSchException;
+
 import MCEntityAnimator.distribution.ServerAccess;
 
 public class LoginGUI extends JFrame
@@ -30,23 +27,21 @@ public class LoginGUI extends JFrame
 
 	private static final long serialVersionUID = 6032906317630465138L;
 
-	private static final String[] users = new String[]{"joe", "kurt", "root"};
-
-	private static final Map<String, char[]> passwords = new HashMap<String, char[]>();
-
-
-	private static final char[] joePassword = "dabigjoe".toCharArray();
-	private static final char[] kurtPassword = "projectxykurt".toCharArray();
-	private static final char[] rootPassword = "iamroot".toCharArray();
+	//	private static final String[] users = new String[]{"joe", "kurt", "root"};
+	//	private static final Map<String, char[]> passwords = new HashMap<String, char[]>();
+	//	private static final char[] joePassword = "dabigjoe".toCharArray();
+	//	private static final char[] kurtPassword = "projectxykurt".toCharArray();
+	//	private static final char[] rootPassword = "iamroot".toCharArray();
+	//	
 	private JPasswordField passwordField;
 
 	public LoginGUI()
 	{
 		super("Login");
 
-		passwords.put("joe", joePassword);
-		passwords.put("kurt", kurtPassword);
-		passwords.put("root", rootPassword);
+		//		passwords.put("joe", joePassword);
+		//		passwords.put("kurt", kurtPassword);
+		//		passwords.put("root", rootPassword);
 
 		final JPanel mainPanel = new JPanel();
 		mainPanel.setLayout(new GridBagLayout());
@@ -62,8 +57,8 @@ public class LoginGUI extends JFrame
 		c.gridwidth = 1;
 		mainPanel.add(new JLabel("Login as: "),c);
 		c.gridx = 1;
-		final JComboBox<String> userSelect = new JComboBox<String>(users);
-		mainPanel.add(userSelect, c);
+		final JTextField usernameField = new JTextField();
+		mainPanel.add(usernameField, c);
 
 		c.gridy = 1;
 		c.gridx = 0;
@@ -79,21 +74,29 @@ public class LoginGUI extends JFrame
 			@Override
 			public void actionPerformed(ActionEvent e) 
 			{
-				String username = (String) userSelect.getSelectedItem();
-				char[] password = passwords.get(username);
-				if(Arrays.equals(passwordField.getPassword(), password))
+				String username = usernameField.getText();
+				String password = new String(passwordField.getPassword());
+
+				if(ServerAccess.testConnection())
 				{
-					if(ServerAccess.canConnect() || 
-							JOptionPane.showConfirmDialog(mainPanel, "Unable to connect to server. Run in offline mode? (Changes will not be saved).", "Connection Error", JOptionPane.YES_NO_OPTION) == 0)
+					try 
 					{
+						ServerAccess.login(username, password);
 						dispose();
-						ServerAccess.username = username;
-						SaveLoadHandler.download();
-						ServerAccess.gui = new MainGUI();
-					}
+						new MainGUI();
+					} 
+					catch (JSchException exeception) 
+					{
+						System.out.println("Incorrect username/password combination.");
+					}	
 				}
 				else
-					JOptionPane.showMessageDialog(mainPanel, "Incorrect password.");
+					System.out.println("Offline");
+				
+
+
+				//JOptionPane.showConfirmDialog(mainPanel, "Unable to connect to server. Run in offline mode? (Changes will not be saved).", "Connection Error", JOptionPane.YES_NO_OPTION) == 0)
+				//JOptionPane.showMessageDialog(mainPanel, "Incorrect password.");
 			}
 		});
 		mainPanel.add(loginButton,c);

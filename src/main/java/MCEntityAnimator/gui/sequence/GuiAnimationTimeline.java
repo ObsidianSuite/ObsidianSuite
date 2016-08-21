@@ -52,7 +52,6 @@ import MCEntityAnimator.Util;
 import MCEntityAnimator.animation.AnimationData;
 import MCEntityAnimator.animation.AnimationPart;
 import MCEntityAnimator.animation.AnimationSequence;
-import MCEntityAnimator.distribution.SaveLoadHandler;
 import MCEntityAnimator.distribution.ServerAccess;
 import MCEntityAnimator.gui.GuiBlack;
 import MCEntityAnimator.gui.GuiInventoryChooseItem;
@@ -190,7 +189,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 		super.onGuiClosed();
 		timelineFrame.dispose();
 		AnimationData.addChangedSequence(entityName, currentAnimation.getName());
-		SaveLoadHandler.upload();
+		//SaveLoadHandler.upload();
 	}
 
 	public void drawScreen(int par1, int par2, float par3)
@@ -532,7 +531,6 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 	private void close()
 	{
 		mc.displayGuiScreen(new GuiBlack());
-		ServerAccess.gui = new MainGUI();
 	}
 
 	/* ---------------------------------------------------- *
