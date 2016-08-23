@@ -59,6 +59,7 @@ import MCEntityAnimator.gui.GuiInventoryChooseItem;
 import MCEntityAnimator.gui.animation.FileGUI;
 import MCEntityAnimator.render.objRendering.EntityObj;
 import MCEntityAnimator.render.objRendering.parts.Part;
+import net.minecraft.client.Minecraft;
 
 public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation implements ExternalFrame
 {
@@ -211,7 +212,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 			timelineFrame.timeSlider.setValue((int) time);
 			timelineFrame.repaint();
 		}
-		
+
 		this.currentAnimation.animateAll(time, entityModel, exceptionPartName);
 
 
@@ -918,11 +919,11 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 			});
 
 			JPanel sliderPanel = new JPanel();
-			
+
 			final JLabel valueLabel = new JLabel();
 			valueLabel.setPreferredSize(new Dimension(30, 16));
 			valueLabel.setText("100%");
-			
+
 			final JSlider slider = new JSlider(0, 300, 100);
 			slider.addChangeListener(new ChangeListener()
 			{
@@ -933,7 +934,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 					timeIncrement = defaultTimeIncrement*slider.getValue()/100F;
 				}
 			});
-			
+
 			JButton resetButton = new JButton("Reset");
 			resetButton.addActionListener(new ActionListener()
 			{
@@ -943,10 +944,10 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 					slider.setValue(100);
 				}
 			});
-			
+
 			sliderPanel.setLayout(new GridBagLayout());
 			GridBagConstraints c = new GridBagConstraints();
-			
+
 			c.gridx = 0;
 			c.gridy = 0;
 			c.gridwidth = 2;	
@@ -958,9 +959,9 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 			sliderPanel.add(valueLabel,c);
 			c.gridx = 1;
 			sliderPanel.add(resetButton,c);
-			
+
 			sliderPanel.setBorder(BorderFactory.createTitledBorder("Speed"));
-			
+
 			JPanel partPanel = new JPanel();
 
 			partName = new JLabel();
@@ -1079,6 +1080,26 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 			}
 			checkboxPanel.setBorder(BorderFactory.createTitledBorder("Render"));
 
+			JButton duplicateButton = new JButton("Duplicate");
+			duplicateButton.addActionListener(new ActionListener()
+			{
+				@Override
+				public void actionPerformed(ActionEvent e) 
+				{
+					String newName = JOptionPane.showInputDialog(timelineFrame, "Name of duplicate animation: ");
+					if(newName == null || newName.equals("") || newName.equals(" "))
+						JOptionPane.showMessageDialog(timelineFrame, "Invalid name");
+					else if(AnimationData.sequenceExists(entityName, newName))
+						JOptionPane.showMessageDialog(timelineFrame, "An animation with this name already exists.");
+					else
+					{
+						AnimationSequence sequence = currentAnimation.copy(newName);
+						AnimationData.addSequence(entityName, sequence);
+						Minecraft.getMinecraft().displayGuiScreen(new GuiAnimationTimeline(entityName, sequence));
+					}
+				}
+			});
+
 			JButton backButton = new JButton("Back");
 			backButton.addActionListener(new ActionListener()
 			{
@@ -1107,6 +1128,8 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 			add(buttonPanel,c);
 			c.gridy = 5;
 			c.insets = new Insets(2,5,2,5);
+			add(duplicateButton,c);
+			c.gridy = 6;
 			add(backButton,c);
 		}
 
