@@ -1,12 +1,12 @@
 package MCEntityAnimator.animation;
 
 import java.util.ArrayList;
+import java.util.List;
 
-import net.minecraft.nbt.NBTBase;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
 import MCEntityAnimator.render.objRendering.ModelObj;
 import MCEntityAnimator.render.objRendering.parts.Part;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 
 /**
  * An actual animation. Comprised of animation parts - sections for each part of the model.
@@ -16,7 +16,7 @@ public class AnimationSequence
 {
 
 	private String animationName;
-	ArrayList<AnimationPart> animations = new ArrayList<AnimationPart>();
+	List<AnimationPart> animations = new ArrayList<AnimationPart>();
 	private float actionPoint = 0.0F;
 
 	public AnimationSequence(String par0Str) 
@@ -33,8 +33,8 @@ public class AnimationSequence
 	{
 		return animationName;
 	}
-
-	public ArrayList<AnimationPart> getAnimations() 
+	
+	public List<AnimationPart> getAnimations() 
 	{
 		return animations;
 	}
@@ -134,6 +134,16 @@ public class AnimationSequence
 					lastAnimation = s;
 		}
 		return lastAnimation;
+	}
+	
+	public AnimationSequence copy(String newName)
+	{
+		AnimationSequence seq = new AnimationSequence(newName);
+		
+		for(AnimationPart p : animations)
+			seq.addAnimation(p.copy());
+		
+		return seq;
 	}
 
 	public NBTTagCompound getSaveData() 
