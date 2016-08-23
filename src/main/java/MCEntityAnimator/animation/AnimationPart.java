@@ -154,6 +154,12 @@ public class AnimationPart
 		}
 		return false;
 	}
+	
+
+	public AnimationPart copy() 
+	{
+		return new AnimationPart(startTime, endTime, startPosition.clone(), endPosition.clone(), part);
+	}
 
 	public NBTBase getSaveData() 
 	{
