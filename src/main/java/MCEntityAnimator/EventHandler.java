@@ -5,6 +5,7 @@ import java.io.IOException;
 import MCEntityAnimator.distribution.ServerAccess;
 import MCEntityAnimator.gui.GuiAnimationMainMenu;
 import MCEntityAnimator.gui.GuiBlack;
+import MCEntityAnimator.gui.GuiHandler;
 import MCEntityAnimator.gui.animation.LoginGUI;
 import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
@@ -51,7 +52,8 @@ public class EventHandler
 		if(Minecraft.getMinecraft().inGameHasFocus)
 		{
 			Minecraft.getMinecraft().displayGuiScreen(new GuiBlack());
-			new LoginGUI();
+			if(GuiHandler.loginGUI == null)
+				GuiHandler.loginGUI = new LoginGUI();
 		}
 	}
 

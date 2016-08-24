@@ -61,7 +61,6 @@ public class MCEA_Main
 		
         if (FMLCommonHandler.instance().getEffectiveSide().isClient())
         {
-            FMLCommonHandler.instance().bus().register(new KeyHandler());
             FMLCommonHandler.instance().bus().register(eventHandler);
         }
 	}
