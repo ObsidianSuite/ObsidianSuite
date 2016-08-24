@@ -46,6 +46,8 @@ import MCEntityAnimator.animation.AnimationData;
 import MCEntityAnimator.animation.AnimationSequence;
 import MCEntityAnimator.distribution.SaveLoadHandler;
 import MCEntityAnimator.distribution.ServerAccess;
+import MCEntityAnimator.gui.GuiBlack;
+import MCEntityAnimator.gui.GuiHandler;
 import MCEntityAnimator.gui.GuiPartSetup;
 import MCEntityAnimator.gui.sequence.GuiAnimationTimeline;
 import net.minecraft.client.Minecraft;
@@ -241,9 +243,8 @@ public class FileGUI extends JFrame
 			@Override
 			public void actionPerformed(ActionEvent arg0) 
 			{
-				ServerAccess.username = "";
 				dispose();
-				Minecraft.getMinecraft().displayGuiScreen(null);
+				onClose();		
 			}
 		});
 
@@ -271,14 +272,9 @@ public class FileGUI extends JFrame
 
 		addWindowListener(new WindowAdapter() 
 		{    
-			public void windowClosed(WindowEvent e) 
-			{
-				ServerAccess.gui = null;
-			}
-
 			public void windowClosing(WindowEvent e) 
 			{
-				ServerAccess.gui = null;			
+				onClose();		
 			}
 		});
 	}
@@ -308,6 +304,15 @@ public class FileGUI extends JFrame
 
 		}
 		return top;
+	}
+	
+	private void onClose()
+	{
+		ServerAccess.gui = null;			
+		GuiHandler.loginGUI = null;
+		Minecraft mc = Minecraft.getMinecraft();
+		if(mc.currentScreen instanceof GuiBlack)
+			((GuiBlack) mc.currentScreen).initateClose();
 	}
 
 	private JPanel createErrorPanel()

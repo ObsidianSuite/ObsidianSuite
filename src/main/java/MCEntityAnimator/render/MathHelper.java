@@ -115,7 +115,7 @@ public class MathHelper
 	{
 		//System.out.println(ray.p1);
 		double rd = n.dotProduct(ray.p0.subtract(ray.p1));
-		if(rd < 0.00001)
+		if(rd == 0)
 			return p;
 		double r = n.dotProduct(ray.p0.subtract(p))/rd;
 		return addVector(ray.p0, scale(ray.p0.subtract(ray.p1),r));
