@@ -55,12 +55,14 @@ public class MCEA_Main
 		proxy.init();
 		proxy.registerBlocks();
 		proxy.registerItems();
-
-        MinecraftForge.EVENT_BUS.register(new EventHandler());
+        
+        EventHandler eventHandler = new EventHandler();
+        MinecraftForge.EVENT_BUS.register(eventHandler);
 		
         if (FMLCommonHandler.instance().getEffectiveSide().isClient())
         {
             FMLCommonHandler.instance().bus().register(new KeyHandler());
+            FMLCommonHandler.instance().bus().register(eventHandler);
         }
 	}
 	
