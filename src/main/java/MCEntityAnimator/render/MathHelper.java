@@ -1,5 +1,6 @@
 package MCEntityAnimator.render;
 
+import java.awt.Color;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
@@ -154,6 +155,15 @@ public class MathHelper
 
 		return rgb;
 	}
+//	
+//	public static int colorToInt(Color c)
+//	{
+//		int colour;
+//		colour = (int) (c.getRed()*0xFF0000);
+//		colour += (int) (c.getRed()*0x00FF00);
+//		colour += (int) (b*0x0000FF);
+//		return colour;
+//	}
 
 	public static Quaternion eulerToQuarternion(double x, double y, double z)
 	{
