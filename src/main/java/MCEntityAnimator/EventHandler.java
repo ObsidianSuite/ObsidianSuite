@@ -4,6 +4,8 @@ import java.io.IOException;
 
 import MCEntityAnimator.distribution.ServerAccess;
 import MCEntityAnimator.gui.GuiAnimationMainMenu;
+import MCEntityAnimator.gui.GuiBlack;
+import MCEntityAnimator.gui.animation.LoginGUI;
 import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
@@ -45,6 +47,12 @@ public class EventHandler
 	{    	    	
 		if(Minecraft.getMinecraft().currentScreen instanceof GuiMainMenu && !(Minecraft.getMinecraft().currentScreen instanceof GuiAnimationMainMenu))
 			Minecraft.getMinecraft().displayGuiScreen(new GuiAnimationMainMenu());
+		
+		if(Minecraft.getMinecraft().inGameHasFocus)
+		{
+			Minecraft.getMinecraft().displayGuiScreen(new GuiBlack());
+			new LoginGUI();
+		}
 	}
 
 	@SubscribeEvent
