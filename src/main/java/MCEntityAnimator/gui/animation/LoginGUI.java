@@ -1,13 +1,13 @@
 package MCEntityAnimator.gui.animation;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -24,6 +24,9 @@ import org.lwjgl.opengl.Display;
 
 import MCEntityAnimator.distribution.SaveLoadHandler;
 import MCEntityAnimator.distribution.ServerAccess;
+import MCEntityAnimator.gui.GuiBlack;
+import MCEntityAnimator.gui.GuiHandler;
+import net.minecraft.client.Minecraft;
 
 public class LoginGUI extends JFrame
 {
@@ -110,6 +113,30 @@ public class LoginGUI extends JFrame
 			}
 		});
 		mainPanel.add(registerButton,c);
+		
+		c.gridy = 4;
+		JButton closeButton = new JButton("Quit");
+		closeButton.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent e) 
+			{
+				onClose();
+				dispose();
+			}
+		});
+		mainPanel.add(closeButton,c);
+		
+		addWindowListener(new WindowAdapter()
+		{
+			
+			@Override
+			public void windowClosing(WindowEvent e)
+			{
+				onClose();
+			}
+			
+		});
 
 		setContentPane(mainPanel);
 		pack();
@@ -121,5 +148,13 @@ public class LoginGUI extends JFrame
 	}
 
 
+	private void onClose()
+	{
+		GuiHandler.loginGUI = null;
+		Minecraft mc = Minecraft.getMinecraft();
+		if(mc.currentScreen instanceof GuiBlack)
+			((GuiBlack) mc.currentScreen).initateClose();
+	}
+	
 }
 
