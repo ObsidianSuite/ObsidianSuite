@@ -35,11 +35,14 @@ public class MathHelper
 		Vec3 u = v0.subtract(v1);
 		Vec3 v = v0.subtract(v2);
 		Vec3 w = v0.subtract(pI);
+		//System.out.println(u + " " + v + " " + w);
 		double dn = u.dotProduct(v)*u.dotProduct(v)-u.dotProduct(u)*v.dotProduct(v);
 		double s = (u.dotProduct(v)*w.dotProduct(v)-v.dotProduct(v)*w.dotProduct(u))/dn;
 		double t = (u.dotProduct(v)*w.dotProduct(u)-u.dotProduct(u)*w.dotProduct(v))/dn;
-		if(s>=0 && t>=0 && s+t<=1)
+		if(s>=0 && t>=0 && s+t<=1 && s != -0.0F && t != -0.0F)
+		{
 			return ray.p0.distanceTo(pI);
+		}
 		return null;
 	}
 
@@ -111,7 +114,7 @@ public class MathHelper
 	{
 		//System.out.println(ray.p1);
 		double rd = n.dotProduct(ray.p0.subtract(ray.p1));
-		if(rd == 0)
+		if(rd < 0.00001)
 			return p;
 		double r = n.dotProduct(ray.p0.subtract(p))/rd;
 		return addVector(ray.p0, scale(ray.p0.subtract(ray.p1),r));
