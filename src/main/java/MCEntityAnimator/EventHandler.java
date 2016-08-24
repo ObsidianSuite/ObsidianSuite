@@ -46,7 +46,7 @@ public class EventHandler
 		if(Minecraft.getMinecraft().currentScreen instanceof GuiMainMenu && !(Minecraft.getMinecraft().currentScreen instanceof GuiAnimationMainMenu))
 			Minecraft.getMinecraft().displayGuiScreen(new GuiAnimationMainMenu());
 		
-		if(Minecraft.getMinecraft().inGameHasFocus)
+		if(Minecraft.getMinecraft().inGameHasFocus && Minecraft.getMinecraft().currentScreen == null)
 		{
 			Minecraft.getMinecraft().displayGuiScreen(new GuiBlack());
 			if(GuiHandler.loginGUI == null)
