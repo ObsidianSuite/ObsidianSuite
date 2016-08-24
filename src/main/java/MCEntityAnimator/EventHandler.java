@@ -3,10 +3,10 @@ package MCEntityAnimator;
 import java.io.IOException;
 
 import MCEntityAnimator.distribution.ServerAccess;
-import MCEntityAnimator.gui.GuiAnimationMainMenu;
 import MCEntityAnimator.gui.GuiBlack;
 import MCEntityAnimator.gui.GuiHandler;
 import MCEntityAnimator.gui.animation.LoginGUI;
+import MCEntityAnimator.gui.stance.GuiAnimationMainMenu;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
 import cpw.mods.fml.relauncher.Side;

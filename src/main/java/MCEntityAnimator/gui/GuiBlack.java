@@ -3,6 +3,7 @@ package MCEntityAnimator.gui;
 import org.lwjgl.opengl.GL11;
 
 import MCEntityAnimator.Util;
+import MCEntityAnimator.gui.stance.GuiAnimationMainMenu;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.util.ResourceLocation;
