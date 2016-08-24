@@ -17,6 +17,8 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -694,6 +696,17 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 
 			setVisible(true);
 			setResizable(false);
+			
+			addWindowListener(new WindowAdapter()
+			{
+				
+				@Override
+				public void windowClosing(WindowEvent e)
+				{
+					close();
+				}
+				
+			});
 		}
 
 		private void refresh()
