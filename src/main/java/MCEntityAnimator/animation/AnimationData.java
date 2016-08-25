@@ -26,8 +26,10 @@ public class AnimationData
 	//All sequences, stances and parenting data.
 	private static Map<String, List<AnimationSequence>> sequences = Maps.newHashMap();	
 	private static Map<String, List<String>> changedSequences = Maps.newHashMap();	
+	
 	private static Map<String, List<AnimationStance>> stances = Maps.newHashMap();	
 	private static Map<String, AnimationParenting> parenting = Maps.newHashMap();
+	private static List<String> changedEntitySetups = new ArrayList<String>();
 
 	//Setup for GUIs
 	private static Map<String, String> guiSetup = Maps.newHashMap();
@@ -47,6 +49,11 @@ public class AnimationData
 		return parenting.get(model);
 	}
 
+	public static boolean getEntitySetupChanged(String entityName)
+	{
+		return changedEntitySetups.contains(entityName);
+	}
+	
 	/**
 	 * Adds the sequence to the list of sequences for the given entity.
 	 * Will overwrite any sequence with the same name.

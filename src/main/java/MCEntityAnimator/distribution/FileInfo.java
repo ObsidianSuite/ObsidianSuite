@@ -33,6 +33,8 @@ public class FileInfo
 	{
 		if(lastModifiedLocal == null)
 			return Status.New;
+		if(lastModifiedRemote == null)
+			return Status.Local;
 		if(lastModifiedLocal.before(lastModifiedRemote))
 			return Status.Behind;
 		else if(lastModifiedLocal.after(lastModifiedRemote))

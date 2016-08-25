@@ -30,27 +30,36 @@ public class DataHandler
 	
 	private static List<FileInfo> fileList = new ArrayList<FileInfo>();
 
-	public static void downloadFileList()
+	public static void generateFileList()
 	{
 		try 
 		{
 			fileList.clear();
 			
-			String serverFileOutput = ServerAccess.executeCommand("/home/shared/getFileData.sh dabigjoe");
+			//TODO username
+			String username = "dabigjoe";
+			String serverFileOutput = ServerAccess.executeCommand("/home/shared/getFileData.sh " + username);
 			String[] fileStrings = serverFileOutput.split("\\r?\\n");
 			
+			List<String> existingPaths = new ArrayList<String>();
 			for(String s : fileStrings)
 			{
 				String[] fileData = s.split("=");
 				String path = fileData[0];
-				Date lastModifiedLocal = getDateModifiedLocal(path);
-				Date lastModifiedRemote = dateFormat.parse(fileData[1]);
-				FileInfo fileInfo = new FileInfo(path, lastModifiedLocal, lastModifiedRemote);
-				fileList.add(fileInfo);
+				addFileInfo(path, getDateModifiedLocal(path), dateFormat.parse(fileData[1]));
+				existingPaths.add(path);
 			}
 			
-			
-			
+			//Check local files to see if file exists locally but not remotely.			
+			for(String entity : getEntities())
+			{
+				for(File f : getAnimationFiles(entity))
+				{
+					String path = String.format("%s/%s", entity, f.getName());
+					if(!existingPaths.contains(path))
+						addFileInfo(path, getDateModifiedLocal(path), null);
+				}
+			}
 			//ServerAccess.getFile("animation/user", "animation");
 			//ServerAccess.getFile("animation/shared", "/home/shared/animation");
 			//MCEA_Main.dataHandler.loadNBTData();
@@ -59,7 +68,13 @@ public class DataHandler
 		catch (JSchException e) {e.printStackTrace();}
 		catch (ParseException e) {e.printStackTrace();}
 	}
-
+	
+	private static void addFileInfo(String path, Date lastModifiedLocal, Date lastModifiedRemote)
+	{
+		FileInfo fileInfo = new FileInfo(path, lastModifiedLocal, lastModifiedRemote);
+		fileList.add(fileInfo);
+	}
+	
 	public static List<FileInfo> getFileList()
 	{
 		return fileList;
@@ -74,7 +89,8 @@ public class DataHandler
 		for(String entityName : entityNames)
 		{
 			//Parenting and part names
-			writeNBTToFile(AnimationData.getEntityDataTag(entityName), getEntityFile(entityName, "data"));
+			if(AnimationData.getEntitySetupChanged(entityName))
+				writeNBTToFile(AnimationData.getEntityDataTag(entityName), getEntityFile(entityName, "data"));
 			//Sequences
 
 			List<String> changeSequences = AnimationData.getChangedSequences(entityName);

@@ -333,6 +333,17 @@ public class MainGUI extends JFrame
 					catch (IOException e1) {e1.printStackTrace();} 
 					catch (JSchException e1) {e1.printStackTrace();}
 				}
+				else if(action == StatusAction.Push)
+				{
+					try 
+					{
+						String path = DataHandler.getFileList().get(row).getPath();
+						if(path.contains("."))
+							ServerAccess.sendFile("animation/user/" + path, "animation/" + path, true);
+					} 
+					catch (IOException e1) {e1.printStackTrace();} 
+					catch (JSchException e1) {e1.printStackTrace();}
+				}
 			}
 		};
 
