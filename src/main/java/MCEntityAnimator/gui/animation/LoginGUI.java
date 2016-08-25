@@ -87,7 +87,7 @@ public class LoginGUI extends JFrame
 					try 
 					{
 						ServerAccess.login(username, password);
-						DataHandler.generateFileList();
+						DataHandler.generateFileList(username);
 						GuiHandler.loginGUI = null;
 						dispose();
 						new MainGUI();

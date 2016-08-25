@@ -30,14 +30,12 @@ public class DataHandler
 	
 	private static List<FileInfo> fileList = new ArrayList<FileInfo>();
 
-	public static void generateFileList()
+	public static void generateFileList(String username)
 	{
 		try 
 		{
 			fileList.clear();
 			
-			//TODO username
-			String username = "dabigjoe";
 			String serverFileOutput = ServerAccess.executeCommand("/home/shared/getFileData.sh " + username);
 			String[] fileStrings = serverFileOutput.split("\\r?\\n");
 			
