@@ -1,5 +1,6 @@
 package MCEntityAnimator.render;
 
+import java.awt.Color;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
@@ -35,11 +36,14 @@ public class MathHelper
 		Vec3 u = v0.subtract(v1);
 		Vec3 v = v0.subtract(v2);
 		Vec3 w = v0.subtract(pI);
+		//System.out.println(u + " " + v + " " + w);
 		double dn = u.dotProduct(v)*u.dotProduct(v)-u.dotProduct(u)*v.dotProduct(v);
 		double s = (u.dotProduct(v)*w.dotProduct(v)-v.dotProduct(v)*w.dotProduct(u))/dn;
 		double t = (u.dotProduct(v)*w.dotProduct(u)-u.dotProduct(u)*w.dotProduct(v))/dn;
-		if(s>=0 && t>=0 && s+t<=1)
+		if(s>=0 && t>=0 && s+t<=1 && s != -0.0F && t != -0.0F)
+		{
 			return ray.p0.distanceTo(pI);
+		}
 		return null;
 	}
 
@@ -151,6 +155,15 @@ public class MathHelper
 
 		return rgb;
 	}
+//	
+//	public static int colorToInt(Color c)
+//	{
+//		int colour;
+//		colour = (int) (c.getRed()*0xFF0000);
+//		colour += (int) (c.getRed()*0x00FF00);
+//		colour += (int) (b*0x0000FF);
+//		return colour;
+//	}
 
 	public static Quaternion eulerToQuarternion(double x, double y, double z)
 	{

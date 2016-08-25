@@ -23,7 +23,7 @@ public class MCEA_Main
 	
 	public static final String homePath = Minecraft.getMinecraft().mcDataDir.getAbsolutePath();
 	public static final String animationPath = homePath + "/animation";
-	public static final String version = "4.1";
+	public static final String version = "4.3.1";
 	public static final DataHandler dataHandler = new DataHandler();
 
 	
@@ -55,12 +55,13 @@ public class MCEA_Main
 		proxy.init();
 		proxy.registerBlocks();
 		proxy.registerItems();
-
-        MinecraftForge.EVENT_BUS.register(new EventHandler());
+        
+        EventHandler eventHandler = new EventHandler();
+        MinecraftForge.EVENT_BUS.register(eventHandler);
 		
         if (FMLCommonHandler.instance().getEffectiveSide().isClient())
         {
-            FMLCommonHandler.instance().bus().register(new KeyHandler());
+            FMLCommonHandler.instance().bus().register(eventHandler);
         }
 	}
 	

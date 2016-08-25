@@ -18,10 +18,12 @@
 1. Change the version string in MCEA_Main to the new version number.
 2. Change version in build.gradle file.
 3. Final commit on working branch - 'bump version'
-4. Merge working branch with master/dev.
-5. Push changes to repo.
-6. Export mod (gradlew build) and add to exports folder.
-7. Edit the history and version files on server.
-8. Add new version to server.
-9. Zip new version to MCEA_Updater.zip.
-10. Check it works!
+4. Tag on working branch.
+5. Merge working branch with master/dev.
+6. Delete working branch.
+7. Push changes to repo (including tag).
+8. Export mod (gradlew build) and add to exports folder.
+9. Edit the history and version files on server.
+10. Add new version to server.
+11. Zip new version to MCEA_Latest.zip.
+12. Check it works!

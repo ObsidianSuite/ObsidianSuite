@@ -155,6 +155,7 @@ public class PartObj extends PartRotation
 			if(d != null && (min == null || d < min))
 				min = d;
 		}
+		
 		GL11.glPopMatrix();
 		return min;	
 	}

@@ -294,6 +294,7 @@ public class ModelObj extends ModelBase
 				}
 			}
 		}
+				
 		for(Bend bend : bends)
 		{
 			Double d = bend.testRayChild();

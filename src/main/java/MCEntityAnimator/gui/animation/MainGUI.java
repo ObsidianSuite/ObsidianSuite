@@ -46,6 +46,8 @@ import MCEntityAnimator.MCEA_Main;
 import MCEntityAnimator.animation.AnimationData;
 import MCEntityAnimator.animation.AnimationSequence;
 import MCEntityAnimator.distribution.ServerAccess;
+import MCEntityAnimator.gui.GuiBlack;
+import MCEntityAnimator.gui.GuiHandler;
 import MCEntityAnimator.gui.GuiPartSetup;
 import MCEntityAnimator.gui.sequence.GuiAnimationTimeline;
 import net.minecraft.client.Minecraft;
@@ -241,7 +243,7 @@ public class MainGUI extends JFrame
 			public void actionPerformed(ActionEvent arg0) 
 			{
 				dispose();
-				Minecraft.getMinecraft().displayGuiScreen(null);
+				onClose();		
 			}
 		});
 
@@ -269,12 +271,9 @@ public class MainGUI extends JFrame
 
 		addWindowListener(new WindowAdapter() 
 		{    
-			public void windowClosed(WindowEvent e) 
-			{
-			}
-
 			public void windowClosing(WindowEvent e) 
 			{
+				onClose();		
 			}
 		});
 	}
@@ -304,6 +303,14 @@ public class MainGUI extends JFrame
 
 		}
 		return top;
+	}
+	
+	private void onClose()
+	{
+		GuiHandler.loginGUI = null;
+		Minecraft mc = Minecraft.getMinecraft();
+		if(mc.currentScreen instanceof GuiBlack)
+			((GuiBlack) mc.currentScreen).initateClose();
 	}
 
 	private JTable createTable()
