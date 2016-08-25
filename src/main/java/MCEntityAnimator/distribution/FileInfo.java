@@ -5,7 +5,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class FileInfo 
+public class FileInfo implements Comparable<FileInfo>
 {
 
 	private String path;
@@ -88,6 +88,32 @@ public class FileInfo
 		if(date != null)
 			return dateHRF.format(date);
 		return "-";
+	}
+	
+	@Override
+	public int compareTo(FileInfo o)
+	{
+		String[] split = path.split("/");
+		String entityName = split[0];
+		String file = split[1];
+		
+		String[] split2 = o.getPath().split("/");
+		String o_entityName = split2[0];
+		String o_file = split2[1];
+		
+		//Compare names - if names differ return string comparison.
+		int nameCompare = entityName.compareTo(o_entityName);
+		if(nameCompare != 0)
+			return nameCompare;
+		
+		//Setup file should come first.
+		int fileCompare = 0;
+		if(file.contains("."))
+			fileCompare += 1;
+		if(o_file.contains("."))
+			fileCompare -= 1;
+		
+		return fileCompare;
 	}
 
 	public enum StatusAction{Push, Pull, None};

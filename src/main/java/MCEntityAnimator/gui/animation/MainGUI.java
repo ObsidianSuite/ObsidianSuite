@@ -72,15 +72,18 @@ public class MainGUI extends JFrame
 
 	JTextArea outputLog;
 	JButton editButton;
+	JScrollPane overviewView;
+	JPanel mainPanel;
 
 	private String entityToEdit;
 	private String animationToEdit;
+
 
 	public MainGUI()
 	{
 		super("Animation Files");
 
-		JPanel mainPanel = new JPanel();
+		mainPanel = new JPanel();
 		mainPanel.setLayout(new GridBagLayout());
 
 		createGUI(mainPanel, "");
@@ -92,7 +95,7 @@ public class MainGUI extends JFrame
 
 		GridBagConstraints c = new GridBagConstraints();
 
-		JScrollPane overviewView = new JScrollPane(createTable());
+		overviewView = new JScrollPane(createTable());
 		overviewView.setPreferredSize(new Dimension(overviewView.getPreferredSize().width, 200));
 		overviewView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		overviewView.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
@@ -300,17 +303,17 @@ public class MainGUI extends JFrame
 			public Component prepareRenderer(TableCellRenderer renderer, int row, int column)
 			{
 				Component c = super.prepareRenderer(renderer, row, column);
-				
+
 				if(column == 1)
 					c.setForeground(DataHandler.getFileList().get(row).getStatus().color);
 				else
 					c.setForeground(Color.black);
-					
+
 				return c;
 			}
 		};
 		table.getTableHeader().setReorderingAllowed(false);
-		
+
 		DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
 		centerRenderer.setHorizontalAlignment( JLabel.CENTER );
 		table.getColumnModel().getColumn(1).setCellRenderer( centerRenderer );
@@ -344,12 +347,40 @@ public class MainGUI extends JFrame
 					catch (IOException e1) {e1.printStackTrace();} 
 					catch (JSchException e1) {e1.printStackTrace();}
 				}
+				refreshTable();
 			}
 		};
 
 		ButtonColumn buttonColumn = new ButtonColumn(table, processAction, 2, StatusAction.None.name());
 
 		return table;
+	}
+
+	private void refreshTable()
+	{
+		String username = ServerAccess.getUser();
+		System.out.println(username);
+		if(username != null)
+		{
+			DataHandler.generateFileList(username);
+			mainPanel.remove(overviewView);
+			overviewView = new JScrollPane(createTable());
+			overviewView.setPreferredSize(new Dimension(overviewView.getPreferredSize().width, 200));
+			overviewView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+			overviewView.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+			GridBagConstraints c = new GridBagConstraints();
+			c.fill = GridBagConstraints.BOTH;
+			c.insets = new Insets(5,5,5,5);
+			c.weightx = 1;
+			c.weighty = 1;
+			c.gridwidth = 1;
+			c.gridheight = 1;
+			c.gridx = 0;
+			c.gridy = 1;
+			mainPanel.add(overviewView, c);
+			mainPanel.revalidate();
+			mainPanel.repaint();
+		}
 	}
 
 	private void showUploadErrorPopup(String text)

@@ -58,6 +58,11 @@ public class ServerAccess
 		System.out.println("Connected");
 	}
 	
+	public static String getUser()
+	{
+		return session != null ? session.getUserName() : null;
+	}
+	
 	
 
 	public static void getFile(String localFileAddress, String remoteFileAddress) throws IOException, JSchException
