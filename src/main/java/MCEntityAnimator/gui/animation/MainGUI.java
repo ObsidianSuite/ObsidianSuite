@@ -308,8 +308,8 @@ public class MainGUI extends JFrame
 
 	private JTable createTable()
 	{
-		String[] columnNames = {"File", "Status", "Modified local", "Modified server", "Last modified by"};
-		Object[][] data = {{"test.txt", "Ahead", "11:27 21-08-2016", "10:24 21-08-2016", "DaBigJoe"},{"quantum.txt", "Up to date", "10:24 21-08-2016", "10:24 21-08-2016", "DaBigJoe"}};
+		String[] columnNames = {"File", "Status", "Modified local", "Modified server"};
+		Object[][] data = {{"test.txt", "Ahead", "11:27 21-08-2016", "10:24 21-08-2016"},{"quantum.txt", "Up to date", "10:24 21-08-2016", "10:24 21-08-2016"}};
 		
 		JTable table = new JTable(data, columnNames);
 		table.setEnabled(false);

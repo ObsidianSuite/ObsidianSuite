@@ -6,12 +6,10 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Arrays;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
@@ -20,6 +18,7 @@ import org.lwjgl.opengl.Display;
 
 import com.jcraft.jsch.JSchException;
 
+import MCEntityAnimator.distribution.DataHandler;
 import MCEntityAnimator.distribution.ServerAccess;
 
 public class LoginGUI extends JFrame
@@ -82,8 +81,9 @@ public class LoginGUI extends JFrame
 					try 
 					{
 						ServerAccess.login(username, password);
-						dispose();
-						new MainGUI();
+						DataHandler.downloadFileList();
+						//dispose();
+						//new MainGUI();
 					} 
 					catch (JSchException exeception) 
 					{

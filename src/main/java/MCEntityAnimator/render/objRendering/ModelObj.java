@@ -62,13 +62,13 @@ public class ModelObj extends ModelBase
 	public ModelObj(String par0Str)
 	{	
 		entityType = par0Str;
-		File modelFile = new File(MCEA_Main.animationPath + "/data/shared/" + entityType + "/" + entityType + ".obj");
-		pxyFile = new File(MCEA_Main.animationPath + "/data/shared/" + entityType + "/" + entityType + ".pxy");
+		File modelFile = new File(MCEA_Main.animationPath + "/shared/animation/" + entityType + "/" + entityType + ".obj");
+		pxyFile = new File(MCEA_Main.animationPath + "/shared/animation/" + entityType + "/" + entityType + ".pxy");
 
 
-		File textureFile = new File(MCEA_Main.animationPath + "/data/shared/" + entityType + "/" + entityType + ".png");
+		File textureFile = new File(MCEA_Main.animationPath + "/shared/animation/" + entityType + "/" + entityType + ".png");
 		textureExists = textureFile.exists();
-		txtRL = new ResourceLocation("animation:data/shared/" + entityType + "/" + entityType + ".png");
+		txtRL = new ResourceLocation("animation:shared/animation/" + entityType + "/" + entityType + ".png");
 
 
 		try 

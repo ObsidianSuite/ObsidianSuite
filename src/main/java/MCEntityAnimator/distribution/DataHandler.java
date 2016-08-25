@@ -8,6 +8,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.jcraft.jsch.ChannelExec;
+import com.jcraft.jsch.JSchException;
+
 import MCEntityAnimator.MCEA_Main;
 import MCEntityAnimator.animation.AnimationData;
 import MCEntityAnimator.animation.AnimationSequence;
@@ -16,6 +19,21 @@ import net.minecraft.nbt.NBTTagCompound;
 
 public class DataHandler
 {
+	
+	//private static List<FileInfo> fileList = new ArrayList<FileInfo>();
+	
+	public static void downloadFileList()
+	{
+		try 
+		{
+			//System.out.println(ServerAccess.executeCommand("/home/shared/getFileData.sh dabigjoe"));
+			ServerAccess.getFile("animation/user", "animation");
+			ServerAccess.getFile("animation/shared", "/home/shared");
+			MCEA_Main.dataHandler.loadNBTData();
+		} 
+		catch (IOException e) {e.printStackTrace();}
+		catch (JSchException e) {e.printStackTrace();}
+	}
 
 	public void saveNBTData()
 	{	
@@ -28,10 +46,13 @@ public class DataHandler
 			//Parenting and part names
 			writeNBTToFile(AnimationData.getEntityDataTag(entityName), getEntityDataFile(entityName));
 			//Sequences
+						
 			List<String> changeSequences = AnimationData.getChangedSequences(entityName);
+			System.out.println(entityName + " " + changeSequences);
 			for(AnimationSequence s : AnimationData.getSequences(entityName))
 			{
-				if(changeSequences.contains(s.getName()))
+//				if(changeSequences.contains(s.getName()))
+				System.out.println("Saving " + getAnimationFile(entityName, s.getName()));
 					writeNBTToFile(s.getSaveData(), getAnimationFile(entityName, s.getName()));
 			}
 		}
@@ -53,11 +74,14 @@ public class DataHandler
 			File entityDataFile = getEntityDataFile(entityName);
 			if(entityDataFile.exists())
 				AnimationData.loadEntityData(entityName, getNBTFromFile(entityDataFile));
-
+			
+			System.out.println("Adding sequences for " + entityName);
+			
 			//Sequences
 			for(File animationFile : getAnimationFiles(entityName))
 			{
 				AnimationSequence sequence = new AnimationSequence(entityName, getNBTFromFile(animationFile));
+				System.out.println("  " + sequence.getName());
 				AnimationData.addSequence(entityName, sequence);
 			}
 		}
@@ -70,6 +94,8 @@ public class DataHandler
 	{
 		try 
 		{
+			if(!file.exists())
+				file.createNewFile();
 			CompressedStreamTools.writeCompressed(nbt, new FileOutputStream(file));
 		} 
 		catch (FileNotFoundException e) {e.printStackTrace();}
@@ -95,7 +121,7 @@ public class DataHandler
 	public static List<String> getEntities()
 	{
 		List<String> entities = new ArrayList<String>();
-		File dataFolder = new File(MCEA_Main.animationPath + "/data/shared");
+		File dataFolder = new File(MCEA_Main.animationPath + "/shared/animation");
 		for(File file : dataFolder.listFiles())
 		{
 			if(file.isDirectory())
@@ -111,14 +137,14 @@ public class DataHandler
 
 	private static File getEntityDataFile(String entityName)
 	{
-		return new File(MCEA_Main.animationPath + "/data/" + entityName +  "/" + entityName + ".data");
+		return new File(MCEA_Main.animationPath + "/shared/animation/" + entityName +  "/" + entityName + ".data");
 	}
 
 	private static List<File> getAnimationFiles(String entityName)
 	{
 		List<File> animationFiles = new ArrayList<File>();
 		System.out.println(entityName);
-		File animationFolder = new File(MCEA_Main.animationPath + "/data/" + entityName);
+		File animationFolder = new File(MCEA_Main.animationPath + "/user/" + entityName);
 		animationFolder.mkdir();
 		for(File f : animationFolder.listFiles())
 			animationFiles.add(f);
@@ -127,7 +153,7 @@ public class DataHandler
 
 	private static File getAnimationFile(String entityName, String animationName)
 	{
-		return new File(MCEA_Main.animationPath + "/data/" + entityName + "/" + animationName + ".data");
+		return new File(MCEA_Main.animationPath + "/user/" + entityName + "/" + animationName + ".anim");
 	}
 
 }

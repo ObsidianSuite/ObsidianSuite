@@ -103,6 +103,9 @@ public class AnimationData
 
 	public static List<AnimationSequence> getSequences(String entityName) 
 	{
+		for(String s : sequences.keySet())
+			System.out.println(s);
+		
 		return sequences.get(entityName) == null ? new ArrayList<AnimationSequence>() : sequences.get(entityName);
 	}
 	
