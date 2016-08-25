@@ -23,7 +23,6 @@ public class ServerAccess
 
 	private static final String host="192.241.128.45";
 	private static Session session;
-	private static DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
 	public static boolean testConnection()
 	{
@@ -179,7 +178,7 @@ public class ServerAccess
 			try 
 			{
 				File localFile = new File(localFileAddress);
-				localFile.setLastModified(dateFormat.parse(getDateModified(remoteFileAddress)).getTime());
+				localFile.setLastModified(DataHandler.dateFormat.parse(getDateModified(remoteFileAddress)).getTime());
 			} 
 			catch (ParseException e) {e.printStackTrace();}
 			
@@ -276,7 +275,7 @@ public class ServerAccess
 			return true;
 		
 		String serverDate = getDateModified(remoteFileAddress);
-		String localDate = dateFormat.format(new Date(localFile.lastModified()));
+		String localDate = DataHandler.dateFormat.format(new Date(localFile.lastModified()));
 		
 		System.out.println(serverDate + " " + localDate);
 		

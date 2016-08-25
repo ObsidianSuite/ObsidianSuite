@@ -12,6 +12,7 @@ import java.awt.event.WindowEvent;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
@@ -87,12 +88,13 @@ public class LoginGUI extends JFrame
 					{
 						ServerAccess.login(username, password);
 						DataHandler.downloadFileList();
-						//dispose();
-						//new MainGUI();
+						GuiHandler.loginGUI = null;
+						dispose();
+						new MainGUI();
 					} 
 					catch (JSchException exeception) 
 					{
-						System.out.println("Incorrect username/password combination.");
+						JOptionPane.showMessageDialog(mainPanel, "Incorrect username/password combination.");
 					}	
 				}
 				else
@@ -101,7 +103,6 @@ public class LoginGUI extends JFrame
 
 
 				//JOptionPane.showConfirmDialog(mainPanel, "Unable to connect to server. Run in offline mode? (Changes will not be saved).", "Connection Error", JOptionPane.YES_NO_OPTION) == 0)
-				//JOptionPane.showMessageDialog(mainPanel, "Incorrect password.");
 			}
 		});
 		mainPanel.add(loginButton,c);

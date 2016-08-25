@@ -5,10 +5,13 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
-import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSchException;
 
 import MCEntityAnimator.MCEA_Main;
@@ -23,21 +26,44 @@ public class DataHandler
 
 	public static final String userPath = MCEA_Main.animationPath + "/user";
 	public static final String sharedPath = MCEA_Main.animationPath + "/shared";
+	public static final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	
-	
-	//private static List<FileInfo> fileList = new ArrayList<FileInfo>();
+	private static List<FileInfo> fileList = new ArrayList<FileInfo>();
 
 	public static void downloadFileList()
 	{
 		try 
 		{
-			//System.out.println(ServerAccess.executeCommand("/home/shared/getFileData.sh dabigjoe"));
-			ServerAccess.getFile("animation/user", "animation");
-			ServerAccess.getFile("animation/shared", "/home/shared/animation");
-			MCEA_Main.dataHandler.loadNBTData();
+			fileList.clear();
+			
+			String serverFileOutput = ServerAccess.executeCommand("/home/shared/getFileData.sh dabigjoe");
+			String[] fileStrings = serverFileOutput.split("\\r?\\n");
+			
+			for(String s : fileStrings)
+			{
+				String[] fileData = s.split("=");
+				String path = fileData[0];
+				File localFile = getFileFromPath(path);
+				Date lastModifiedLocal = localFile.exists() ? new Date(localFile.lastModified()) : null;
+				Date lastModifiedRemote = dateFormat.parse(fileData[1]);
+				FileInfo fileInfo = new FileInfo(path, lastModifiedLocal, lastModifiedRemote);
+				fileList.add(fileInfo);
+			}
+			
+			
+			
+			//ServerAccess.getFile("animation/user", "animation");
+			//ServerAccess.getFile("animation/shared", "/home/shared/animation");
+			//MCEA_Main.dataHandler.loadNBTData();
 		} 
 		catch (IOException e) {e.printStackTrace();}
 		catch (JSchException e) {e.printStackTrace();}
+		catch (ParseException e) {e.printStackTrace();}
+	}
+	
+	public static List<FileInfo> getFileList()
+	{
+		return fileList;
 	}
 
 	public void saveNBTData()
@@ -56,9 +82,7 @@ public class DataHandler
 			for(AnimationSequence s : AnimationData.getSequences(entityName))
 			{
 				if(changeSequences.contains(s.getName()))
-				{
 					writeNBTToFile(s.getSaveData(), getAnimationFile(entityName, s.getName()));
-				}
 			}
 		}
 	}
@@ -130,6 +154,18 @@ public class DataHandler
 				entities.add(file.getName());
 		}
 		return entities;
+	}
+	
+	/**
+	 * Get a file based on a partial path.
+	 * @param filePath - Path to file, must be a file not a folder. In the form entityName/fileName.ext
+	 * @return A file represented by this partial path.
+	 */
+	private static File getFileFromPath(String filePath)
+	{
+		String ext = filePath.substring(filePath.lastIndexOf("."));
+		String folder = ext.equals(".mcea") ? userPath : sharedPath;
+		return new File(String.format("%s/%s", folder, filePath));
 	}
 
 	private static File getGUIFile()

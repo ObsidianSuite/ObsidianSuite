@@ -1,6 +1,7 @@
 package MCEntityAnimator.gui.animation;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -35,6 +36,7 @@ import javax.swing.JTree;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.Border;
+import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 import javax.swing.text.DefaultCaret;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -45,10 +47,11 @@ import org.lwjgl.opengl.Display;
 import MCEntityAnimator.MCEA_Main;
 import MCEntityAnimator.animation.AnimationData;
 import MCEntityAnimator.animation.AnimationSequence;
-import MCEntityAnimator.distribution.ServerAccess;
+import MCEntityAnimator.distribution.DataHandler;
+import MCEntityAnimator.distribution.FileInfo;
+import MCEntityAnimator.distribution.FileInfo.Status;
 import MCEntityAnimator.gui.GuiBlack;
 import MCEntityAnimator.gui.GuiHandler;
-import MCEntityAnimator.gui.GuiPartSetup;
 import MCEntityAnimator.gui.sequence.GuiAnimationTimeline;
 import net.minecraft.client.Minecraft;
 
@@ -87,20 +90,6 @@ public class MainGUI extends JFrame
 		mainPanel.removeAll();
 
 		GridBagConstraints c = new GridBagConstraints();
-
-		final JTree tree = new JTree(getFileTree(new File(MCEA_Main.animationPath + "/data")));
-		tree.setBorder(customBorder);
-		tree.addMouseListener(new MouseAdapter() 
-		{
-			public void mouseClicked(MouseEvent e) 
-			{
-				processTreeClick(tree, e);
-			}
-		});
-		JScrollPane treeView = new JScrollPane(tree);
-		treeView.setPreferredSize(new Dimension(200,200));
-		treeView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-		treeView.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
 
 		JScrollPane overviewView = new JScrollPane(createTable());
 		overviewView.setPreferredSize(new Dimension(overviewView.getPreferredSize().width, 200));
@@ -142,27 +131,7 @@ public class MainGUI extends JFrame
 					JOptionPane.showMessageDialog(MainGUI.this, "Unable to load animation " + animationToEdit + " for " + entityToEdit + ".");
 			}
 		});
-		c.fill = GridBagConstraints.BOTH;
-		c.insets = new Insets(5,5,5,5);
-		c.weightx = 1;
-		c.weighty = 1;
-		c.gridwidth = 1;
-		c.gridheight = 1;
-		c.gridx = 0;
-		c.gridy = 0;
-		mainPanel.add(new JLabel("Data"),c);
-		c.gridy = 1;
-		mainPanel.add(treeView,c);
-		c.gridy = 2;
-		mainPanel.add(editButton, c);
-
-		c.gridx = 1;
-		c.gridy = 0;
-		mainPanel.add(new JLabel("File Overview"),c);
-		c.gridy = 1;
-		c.gridheight = 2;
-		mainPanel.add(overviewView,c);
-
+		
 		JPanel buttonPanel = new JPanel();
 		GridLayout layout = new GridLayout(0,4);
 		layout.setHgap(5);
@@ -252,6 +221,21 @@ public class MainGUI extends JFrame
 		buttonPanel.add(upload);
 		buttonPanel.add(close);
 
+		c.fill = GridBagConstraints.BOTH;
+		c.insets = new Insets(5,5,5,5);
+		c.weightx = 1;
+		c.weighty = 1;
+		c.gridwidth = 1;
+		c.gridheight = 1;
+		c.gridx = 0;
+		c.gridy = 0;
+		c.gridy = 0;
+		mainPanel.add(new JLabel("File Overview"),c);
+		c.gridy = 1;
+		mainPanel.add(overviewView,c);
+		c.gridy = 2;
+		mainPanel.add(editButton, c);
+
 		c.gridwidth = 2;
 		c.gridheight = 1;
 		c.gridx = 0;
@@ -286,25 +270,6 @@ public class MainGUI extends JFrame
 		outputLog.setText(current + text + "\n");
 	}
 
-	private DefaultMutableTreeNode getFileTree(File file)
-	{   
-		DefaultMutableTreeNode top = new DefaultMutableTreeNode(file.getName());
-
-		if(file.isDirectory())
-		{
-			File[] files = file.listFiles();
-			if(files.length == 0)
-				top.add(new DefaultMutableTreeNode("EMPTY!"));
-			else
-			{
-				for(File f : files)
-					top.add(getFileTree(f));
-			}
-
-		}
-		return top;
-	}
-	
 	private void onClose()
 	{
 		GuiHandler.loginGUI = null;
@@ -315,18 +280,41 @@ public class MainGUI extends JFrame
 
 	private JTable createTable()
 	{
-		String[] columnNames = {"File", "Status", "Modified local", "Modified server"};
-		Object[][] data = {{"test.txt", "Ahead", "11:27 21-08-2016", "10:24 21-08-2016"},{"quantum.txt", "Up to date", "10:24 21-08-2016", "10:24 21-08-2016"}};
+		String[] columnNames = {"File", "Status"};
+
+		List<FileInfo> fileData = DataHandler.getFileList();
+		Object[][] data = new Object[fileData.size()][4];
+		final Color[] colours = new Color[fileData.size()];
 		
-		JTable table = new JTable(data, columnNames);
+		for(int i = 0; i < fileData.size(); i++)
+		{
+			FileInfo fileInfo = fileData.get(i);
+			Status status = fileInfo.getStatus();
+			data[i][0] = fileInfo.getFileHRF();
+			data[i][1] = status.name();
+			colours[i] = status.color;
+		}
+
+		JTable table = new JTable(data, columnNames)
+		{
+			public Component prepareRenderer(TableCellRenderer renderer, int row, int column)
+			{
+				Component c = super.prepareRenderer(renderer, row, column);
+
+				if(column == 1)
+					c.setForeground(colours[row]);
+				else
+					c.setForeground(Color.black);
+
+				return c;
+			}
+		};
 		table.setEnabled(false);
 		table.getTableHeader().setReorderingAllowed(false);
-		
+
 		TableColumnModel columnModel = table.getColumnModel();
-		columnModel.getColumn(2).setPreferredWidth(120);
-		columnModel.getColumn(3).setPreferredWidth(120);
-		columnModel.getColumn(4).setPreferredWidth(120);
-		
+
+
 		return table;
 	}
 
@@ -377,41 +365,16 @@ public class MainGUI extends JFrame
 		return file;
 	}
 
-	private void processTreeClick(JTree tree, MouseEvent e) 
-	{
-		TreePath tp = tree.getPathForLocation(e.getX(), e.getY());
-		if (tp != null)
-		{
-			int length = tp.getPathCount();
-			boolean enabled = false;
-			if(length == 4 && !tp.getPathComponent(1).toString().equals("shared"))
-			{
-				animationToEdit = tp.getPathComponent(3).toString();
-				if(!animationToEdit.equals("EMPTY!"))
-				{
-					enabled = true;
-					animationToEdit = animationToEdit.substring(0, animationToEdit.indexOf("."));
-					entityToEdit = tp.getPathComponent(2).toString();
-				}
-			}
-			else if(length == 3 && tp.getPathComponent(1).toString().equals("shared"))
-			{
-				initModelSetup(tp.getPathComponent(2).toString());
-			}
-			editButton.setEnabled(enabled);
-		}
-	}
-
 	private void initModelSetup(String entityName)
 	{
-//		if(ServerAccess.username.equals("root"))
-//			if(JOptionPane.showConfirmDialog(MainGUI.this, "Setup model for " + entityName + "?", "Setup Model", JOptionPane.YES_NO_OPTION) == 0)
-//			{
-//				Minecraft.getMinecraft().displayGuiScreen(new GuiPartSetup(entityName));
-//				MainGUI.this.dispose();
-//			}
-//			else
-//				JOptionPane.showMessageDialog(MainGUI.this, "Permission denied, must be root user.");
+		//		if(ServerAccess.username.equals("root"))
+		//			if(JOptionPane.showConfirmDialog(MainGUI.this, "Setup model for " + entityName + "?", "Setup Model", JOptionPane.YES_NO_OPTION) == 0)
+		//			{
+		//				Minecraft.getMinecraft().displayGuiScreen(new GuiPartSetup(entityName));
+		//				MainGUI.this.dispose();
+		//			}
+		//			else
+		//				JOptionPane.showMessageDialog(MainGUI.this, "Permission denied, must be root user.");
 	}
 
 }
