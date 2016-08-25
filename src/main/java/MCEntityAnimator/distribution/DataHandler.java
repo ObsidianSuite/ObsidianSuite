@@ -43,8 +43,7 @@ public class DataHandler
 			{
 				String[] fileData = s.split("=");
 				String path = fileData[0];
-				File localFile = getFileFromPath(path);
-				Date lastModifiedLocal = localFile.exists() ? new Date(localFile.lastModified()) : null;
+				Date lastModifiedLocal = getDateModifiedLocal(path);
 				Date lastModifiedRemote = dateFormat.parse(fileData[1]);
 				FileInfo fileInfo = new FileInfo(path, lastModifiedLocal, lastModifiedRemote);
 				fileList.add(fileInfo);
@@ -60,7 +59,7 @@ public class DataHandler
 		catch (JSchException e) {e.printStackTrace();}
 		catch (ParseException e) {e.printStackTrace();}
 	}
-	
+
 	public static List<FileInfo> getFileList()
 	{
 		return fileList;
@@ -156,16 +155,29 @@ public class DataHandler
 		return entities;
 	}
 	
-	/**
-	 * Get a file based on a partial path.
-	 * @param filePath - Path to file, must be a file not a folder. In the form entityName/fileName.ext
-	 * @return A file represented by this partial path.
-	 */
-	private static File getFileFromPath(String filePath)
+	private static Date getDateModifiedLocal(String path) 
 	{
-		String ext = filePath.substring(filePath.lastIndexOf("."));
-		String folder = ext.equals(".mcea") ? userPath : sharedPath;
-		return new File(String.format("%s/%s", folder, filePath));
+		Date lastModifiedLocal = null;
+		if(path.contains("."))
+		{
+			//If path points to animation file, simply get last modified date of animation file, null if it doesn't exist.
+			File localFile = new File(String.format("%s/%s", userPath, path));
+			lastModifiedLocal = localFile.exists() ? new Date(localFile.lastModified()) : null;
+		}
+		else
+		{
+			//If path points to shared entity folder, get folder and then get the most recently modified file in it.
+			File folder = new File(String.format("%s/%s", sharedPath, path.substring(path.lastIndexOf("/") + 1))); 
+			Date mostRecent = null;
+			for(File f : folder.listFiles())
+			{
+				Date lastModified = new Date(f.lastModified());
+				if(mostRecent == null || lastModified.after(mostRecent))
+					mostRecent = lastModified;
+			}
+			lastModifiedLocal = mostRecent;
+		}
+		return lastModifiedLocal;
 	}
 
 	private static File getGUIFile()

@@ -7,15 +7,15 @@ import java.util.Date;
 
 public class FileInfo 
 {
-	
+
 	private String path;
 	private Date lastModifiedLocal;
 	private Date lastModifiedRemote;
 	//The date at which the file was last modified on the server, at the time of downloading. 
 	private Date lastModifiedRemoteOnDownload;
 	private static final DateFormat dateHRF = new SimpleDateFormat("HH:mm, EEE MMM d, yyyy");
-	
-	
+
+
 	public FileInfo(String path, Date lastModifiedLocal, Date lastModifiedRemote) 
 	{
 		this.path = path;
@@ -25,12 +25,14 @@ public class FileInfo
 
 	public Status getStatus()
 	{
-		if(lastModifiedLocal == null || lastModifiedLocal.before(lastModifiedRemote))
+		if(lastModifiedLocal == null)
+			return Status.New;
+		if(lastModifiedLocal.before(lastModifiedRemote))
 			return Status.Behind;
 		else if(lastModifiedLocal.after(lastModifiedRemote))
 			return Status.Ahead;
 		else
-			return Status.Synced;
+			return Status.InSync;
 	}
 
 	@Override
@@ -44,24 +46,22 @@ public class FileInfo
 	 */
 	public String getFileHRF() 
 	{
-		System.out.println("Path: " + path);
-		
+		String hrf = "";
+
 		String[] split = path.split("/");
 		String entityName = split[0];
 		String file = split[1];
-		
-		System.out.println("file: " + file);
-		String[] split2 = file.split("\\.");
-		System.out.println(split2.length);
-		String fileName = split2[0];
-		String ext = split2[1];
-		
-		String hrf = "";
-		if(ext.equals("mcea"))
+
+		if(file.contains("."))
+		{
+			String[] split2 = file.split("\\.");
+			String fileName = split2[0];
+			String ext = split2[1];
 			hrf = String.format("%s animation - %s", entityName, fileName);
-		else 
-			hrf = String.format("%s %s file", entityName, ext);	
-		
+		}
+		else
+			hrf = String.format("%s setup", entityName);	
+
 		return hrf;
 	}
 
@@ -74,7 +74,7 @@ public class FileInfo
 	{
 		return getDateHRF(lastModifiedRemote);
 	}
-	
+
 
 	private static String getDateHRF(Date date)
 	{
@@ -82,20 +82,35 @@ public class FileInfo
 			return dateHRF.format(date);
 		return "-";
 	}
+
+	public enum Action{Push, Pull, None};
 	
 	public enum Status 
 	{
-		Behind (Color.ORANGE),
-		Ahead (Color.BLUE),
-		Synced (Color.GREEN),
-		Conflicted (Color.RED); 
+		/**
+		 * Behind - Local behind remote, pull
+		 * Ahead - Local ahead of remote, push
+		 * InSync - Local and remote in sync, none
+		 * Conflicted - Local and remote both changed, TODO conflict...
+		 * New - New file on remote, pull
+		 * Local - New file on server, push
+		 */
+		Behind (Color.ORANGE, Action.Pull),
+		Ahead (Color.BLUE, Action.Push),
+		InSync (Color.GREEN, Action.None),
+		Conflicted (Color.RED, Action.None),
+		New (Color.PINK, Action.Pull),
+		Local (Color.GRAY, Action.Push);
 		
+
 		public final Color color;
-		Status(Color color)
+		public final Action action;
+		Status(Color color, Action action)
 		{
 			this.color = color;
+			this.action = action;
 		}
 	}
 
-	
+
 }
