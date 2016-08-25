@@ -19,9 +19,9 @@ import net.minecraft.nbt.NBTTagCompound;
 
 public class DataHandler
 {
-	
+
 	//private static List<FileInfo> fileList = new ArrayList<FileInfo>();
-	
+
 	public static void downloadFileList()
 	{
 		try 
@@ -46,14 +46,15 @@ public class DataHandler
 			//Parenting and part names
 			writeNBTToFile(AnimationData.getEntityDataTag(entityName), getEntityDataFile(entityName));
 			//Sequences
-						
+
 			List<String> changeSequences = AnimationData.getChangedSequences(entityName);
-			System.out.println(entityName + " " + changeSequences);
 			for(AnimationSequence s : AnimationData.getSequences(entityName))
 			{
-//				if(changeSequences.contains(s.getName()))
-				System.out.println("Saving " + getAnimationFile(entityName, s.getName()));
+				if(changeSequences.contains(s.getName()))
+				{
+					System.out.println("Saving " + getAnimationFile(entityName, s.getName()));
 					writeNBTToFile(s.getSaveData(), getAnimationFile(entityName, s.getName()));
+				}
 			}
 		}
 	}
@@ -74,14 +75,11 @@ public class DataHandler
 			File entityDataFile = getEntityDataFile(entityName);
 			if(entityDataFile.exists())
 				AnimationData.loadEntityData(entityName, getNBTFromFile(entityDataFile));
-			
-			System.out.println("Adding sequences for " + entityName);
-			
+
 			//Sequences
 			for(File animationFile : getAnimationFiles(entityName))
 			{
 				AnimationSequence sequence = new AnimationSequence(entityName, getNBTFromFile(animationFile));
-				System.out.println("  " + sequence.getName());
 				AnimationData.addSequence(entityName, sequence);
 			}
 		}
@@ -143,7 +141,6 @@ public class DataHandler
 	private static List<File> getAnimationFiles(String entityName)
 	{
 		List<File> animationFiles = new ArrayList<File>();
-		System.out.println(entityName);
 		File animationFolder = new File(MCEA_Main.animationPath + "/user/" + entityName);
 		animationFolder.mkdir();
 		for(File f : animationFolder.listFiles())
@@ -153,7 +150,7 @@ public class DataHandler
 
 	private static File getAnimationFile(String entityName, String animationName)
 	{
-		return new File(MCEA_Main.animationPath + "/user/" + entityName + "/" + animationName + ".anim");
+		return new File(MCEA_Main.animationPath + "/user/" + entityName + "/" + animationName + ".mcea");
 	}
 
 }
