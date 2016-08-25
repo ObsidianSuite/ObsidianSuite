@@ -10,8 +10,6 @@ import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
@@ -23,6 +21,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -32,26 +32,27 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
-import javax.swing.JTree;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.Border;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
-import javax.swing.table.TableColumnModel;
 import javax.swing.text.DefaultCaret;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.TreePath;
 
 import org.lwjgl.opengl.Display;
 
-import MCEntityAnimator.MCEA_Main;
+import com.jcraft.jsch.JSchException;
+
 import MCEntityAnimator.animation.AnimationData;
 import MCEntityAnimator.animation.AnimationSequence;
 import MCEntityAnimator.distribution.DataHandler;
 import MCEntityAnimator.distribution.FileInfo;
 import MCEntityAnimator.distribution.FileInfo.Status;
+import MCEntityAnimator.distribution.FileInfo.StatusAction;
+import MCEntityAnimator.distribution.ServerAccess;
 import MCEntityAnimator.gui.GuiBlack;
 import MCEntityAnimator.gui.GuiHandler;
+import MCEntityAnimator.gui.animation.table.ButtonColumn;
 import MCEntityAnimator.gui.sequence.GuiAnimationTimeline;
 import net.minecraft.client.Minecraft;
 
@@ -131,7 +132,7 @@ public class MainGUI extends JFrame
 					JOptionPane.showMessageDialog(MainGUI.this, "Unable to load animation " + animationToEdit + " for " + entityToEdit + ".");
 			}
 		});
-		
+
 		JPanel buttonPanel = new JPanel();
 		GridLayout layout = new GridLayout(0,4);
 		layout.setHgap(5);
@@ -280,19 +281,18 @@ public class MainGUI extends JFrame
 
 	private JTable createTable()
 	{
-		String[] columnNames = {"File", "Status"};
+		String[] columnNames = {"File", "Status", "Action"};
 
 		List<FileInfo> fileData = DataHandler.getFileList();
 		Object[][] data = new Object[fileData.size()][4];
-		final Color[] colours = new Color[fileData.size()];
-		
+
 		for(int i = 0; i < fileData.size(); i++)
 		{
 			FileInfo fileInfo = fileData.get(i);
 			Status status = fileInfo.getStatus();
 			data[i][0] = fileInfo.getFileHRF();
 			data[i][1] = status.name();
-			colours[i] = status.color;
+			data[i][2] = status.action.name();
 		}
 
 		JTable table = new JTable(data, columnNames)
@@ -300,20 +300,43 @@ public class MainGUI extends JFrame
 			public Component prepareRenderer(TableCellRenderer renderer, int row, int column)
 			{
 				Component c = super.prepareRenderer(renderer, row, column);
-
+				
 				if(column == 1)
-					c.setForeground(colours[row]);
+					c.setForeground(DataHandler.getFileList().get(row).getStatus().color);
 				else
 					c.setForeground(Color.black);
-
+					
 				return c;
 			}
 		};
-		table.setEnabled(false);
 		table.getTableHeader().setReorderingAllowed(false);
+		
+		DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+		centerRenderer.setHorizontalAlignment( JLabel.CENTER );
+		table.getColumnModel().getColumn(1).setCellRenderer( centerRenderer );
 
-		TableColumnModel columnModel = table.getColumnModel();
+		Action processAction = new AbstractAction()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				JTable table = (JTable)e.getSource();
+				int row = Integer.valueOf(e.getActionCommand());
+				StatusAction action = DataHandler.getFileList().get(row).getStatus().action;
+				if(action == StatusAction.Pull)
+				{
+					try 
+					{
+						String path = DataHandler.getFileList().get(row).getPath();
+						if(path.contains("."))
+							ServerAccess.getFile("animation/user/" + path, "animation/" + path);
+					} 
+					catch (IOException e1) {e1.printStackTrace();} 
+					catch (JSchException e1) {e1.printStackTrace();}
+				}
+			}
+		};
 
+		ButtonColumn buttonColumn = new ButtonColumn(table, processAction, 2, StatusAction.None.name());
 
 		return table;
 	}

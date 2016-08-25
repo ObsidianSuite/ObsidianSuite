@@ -22,6 +22,12 @@ public class FileInfo
 		this.lastModifiedLocal = lastModifiedLocal;
 		this.lastModifiedRemote = lastModifiedRemote;
 	}
+	
+
+	public String getPath() 
+	{
+		return path;
+	}
 
 	public Status getStatus()
 	{
@@ -75,7 +81,6 @@ public class FileInfo
 		return getDateHRF(lastModifiedRemote);
 	}
 
-
 	private static String getDateHRF(Date date)
 	{
 		if(date != null)
@@ -83,7 +88,7 @@ public class FileInfo
 		return "-";
 	}
 
-	public enum Action{Push, Pull, None};
+	public enum StatusAction{Push, Pull, None};
 	
 	public enum Status 
 	{
@@ -95,22 +100,23 @@ public class FileInfo
 		 * New - New file on remote, pull
 		 * Local - New file on server, push
 		 */
-		Behind (Color.ORANGE, Action.Pull),
-		Ahead (Color.BLUE, Action.Push),
-		InSync (Color.GREEN, Action.None),
-		Conflicted (Color.RED, Action.None),
-		New (Color.PINK, Action.Pull),
-		Local (Color.GRAY, Action.Push);
+		Behind (Color.ORANGE, StatusAction.Pull),
+		Ahead (Color.BLUE, StatusAction.Push),
+		InSync (Color.GREEN, StatusAction.None),
+		Conflicted (Color.RED, StatusAction.None),
+		New (Color.PINK, StatusAction.Pull),
+		Local (Color.GRAY, StatusAction.Push);
 		
 
 		public final Color color;
-		public final Action action;
-		Status(Color color, Action action)
+		public final StatusAction action;
+		Status(Color color, StatusAction action)
 		{
 			this.color = color;
 			this.action = action;
 		}
 	}
+
 
 
 }
