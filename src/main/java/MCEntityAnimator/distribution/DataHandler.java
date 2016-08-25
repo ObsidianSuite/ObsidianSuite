@@ -16,10 +16,15 @@ import MCEntityAnimator.animation.AnimationData;
 import MCEntityAnimator.animation.AnimationSequence;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.ResourceLocation;
 
 public class DataHandler
 {
 
+	public static final String userPath = MCEA_Main.animationPath + "/user";
+	public static final String sharedPath = MCEA_Main.animationPath + "/shared";
+	
+	
 	//private static List<FileInfo> fileList = new ArrayList<FileInfo>();
 
 	public static void downloadFileList()
@@ -28,7 +33,7 @@ public class DataHandler
 		{
 			//System.out.println(ServerAccess.executeCommand("/home/shared/getFileData.sh dabigjoe"));
 			ServerAccess.getFile("animation/user", "animation");
-			ServerAccess.getFile("animation/shared", "/home/shared");
+			ServerAccess.getFile("animation/shared", "/home/shared/animation");
 			MCEA_Main.dataHandler.loadNBTData();
 		} 
 		catch (IOException e) {e.printStackTrace();}
@@ -44,7 +49,7 @@ public class DataHandler
 		for(String entityName : entityNames)
 		{
 			//Parenting and part names
-			writeNBTToFile(AnimationData.getEntityDataTag(entityName), getEntityDataFile(entityName));
+			writeNBTToFile(AnimationData.getEntityDataTag(entityName), getEntityFile(entityName, "data"));
 			//Sequences
 
 			List<String> changeSequences = AnimationData.getChangedSequences(entityName);
@@ -52,7 +57,6 @@ public class DataHandler
 			{
 				if(changeSequences.contains(s.getName()))
 				{
-					System.out.println("Saving " + getAnimationFile(entityName, s.getName()));
 					writeNBTToFile(s.getSaveData(), getAnimationFile(entityName, s.getName()));
 				}
 			}
@@ -72,7 +76,7 @@ public class DataHandler
 		for(String entityName : entityNames)
 		{
 			//Parenting and part names)
-			File entityDataFile = getEntityDataFile(entityName);
+			File entityDataFile = getEntityFile(entityName, "data");
 			if(entityDataFile.exists())
 				AnimationData.loadEntityData(entityName, getNBTFromFile(entityDataFile));
 
@@ -119,7 +123,7 @@ public class DataHandler
 	public static List<String> getEntities()
 	{
 		List<String> entities = new ArrayList<String>();
-		File dataFolder = new File(MCEA_Main.animationPath + "/shared/animation");
+		File dataFolder = new File(sharedPath);
 		for(File file : dataFolder.listFiles())
 		{
 			if(file.isDirectory())
@@ -133,24 +137,46 @@ public class DataHandler
 		return new File(MCEA_Main.animationPath + "/data/GuiData.data");
 	}
 
-	private static File getEntityDataFile(String entityName)
+	/**
+	 * Get an entity file from the shared folder
+	 * @param entityName - Name of entity.
+	 * @param ext - File extension (data, pxy, png or obj). No dot!
+	 * @return Entity file.
+	 */
+	public static File getEntityFile(String entityName, String ext)
 	{
-		return new File(MCEA_Main.animationPath + "/shared/animation/" + entityName +  "/" + entityName + ".data");
+		return new File(String.format("%s/%s/%s.%s", sharedPath, entityName, entityName, ext));
+	}
+	
+	public static ResourceLocation getEntityResourceLocation(String entityName)
+	{
+		 return new ResourceLocation(String.format("animation:shared/%s/%s.png", entityName, entityName));
 	}
 
+	/**
+	 * Get all the animations files for an entity.
+	 * @param entityName - Name of entity.
+	 * @return List of all animation files.
+	 */
 	private static List<File> getAnimationFiles(String entityName)
 	{
 		List<File> animationFiles = new ArrayList<File>();
-		File animationFolder = new File(MCEA_Main.animationPath + "/user/" + entityName);
+		File animationFolder = new File(String.format("%s/%s", userPath, entityName));
 		animationFolder.mkdir();
 		for(File f : animationFolder.listFiles())
 			animationFiles.add(f);
 		return animationFiles;
 	}
 
+	/**
+	 * Get the file for a single animation.
+	 * @param entityName - Name of entity.
+	 * @param animationName - Name of animation.
+	 * @return Animation file.
+	 */
 	private static File getAnimationFile(String entityName, String animationName)
 	{
-		return new File(MCEA_Main.animationPath + "/user/" + entityName + "/" + animationName + ".mcea");
+		return new File(String.format("%s/%s/%s.mcea", userPath, entityName, animationName));
 	}
 
 }

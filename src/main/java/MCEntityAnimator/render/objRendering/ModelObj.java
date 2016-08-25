@@ -19,6 +19,7 @@ import MCEntityAnimator.Util;
 import MCEntityAnimator.animation.AnimationData;
 import MCEntityAnimator.animation.AnimationParenting;
 import MCEntityAnimator.animation.PartGroups;
+import MCEntityAnimator.distribution.DataHandler;
 import MCEntityAnimator.render.objRendering.bend.Bend;
 import MCEntityAnimator.render.objRendering.parts.Part;
 import MCEntityAnimator.render.objRendering.parts.PartEntityPos;
@@ -62,14 +63,13 @@ public class ModelObj extends ModelBase
 	public ModelObj(String par0Str)
 	{	
 		entityType = par0Str;
-		File modelFile = new File(MCEA_Main.animationPath + "/shared/animation/" + entityType + "/" + entityType + ".obj");
-		pxyFile = new File(MCEA_Main.animationPath + "/shared/animation/" + entityType + "/" + entityType + ".pxy");
-
-
-		File textureFile = new File(MCEA_Main.animationPath + "/shared/animation/" + entityType + "/" + entityType + ".png");
+		
+		File modelFile = DataHandler.getEntityFile(entityType, "obj");
+		File textureFile = DataHandler.getEntityFile(entityType, "png");
 		textureExists = textureFile.exists();
-		txtRL = new ResourceLocation("animation:shared/animation/" + entityType + "/" + entityType + ".png");
-
+		txtRL = DataHandler.getEntityResourceLocation(entityType);
+		
+		pxyFile = DataHandler.getEntityFile(entityType, "pxy");
 
 		try 
 		{
