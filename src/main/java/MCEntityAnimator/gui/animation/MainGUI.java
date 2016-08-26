@@ -64,6 +64,7 @@ public class MainGUI extends JFrame
 	JButton editButton;
 	JScrollPane overviewView;
 	JPanel mainPanel;
+	JobPanel jobPanel;
 
 	private String entityToEdit;
 	private String animationToEdit;
@@ -88,7 +89,47 @@ public class MainGUI extends JFrame
 		overviewView.setPreferredSize(new Dimension(overviewView.getPreferredSize().width, 200));
 		overviewView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		overviewView.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);	
+		
+		jobPanel = new JobPanel();
 
+		c.fill = GridBagConstraints.BOTH;
+		c.insets = new Insets(5,5,5,5);
+		c.gridx = 0;
+		c.gridy = 0;
+		mainPanel.add(new JLabel("File Overview"),c);
+		c.gridy = 1;
+		mainPanel.add(overviewView,c);
+		c.gridy = 2;
+		mainPanel.add(jobPanel, c);
+		c.gridy = 3;
+		mainPanel.add(createButtonPanel(),c);
+
+		setContentPane(mainPanel);
+		pack();
+		setVisible(true);
+		setResizable(false);
+		setAlwaysOnTop(true);
+		setLocation(Display.getX() + Display.getWidth()/2 - this.getWidth()/2, Display.getY() + Display.getHeight()/2 - this.getHeight()/2);
+
+		addWindowListener(new WindowAdapter() 
+		{    
+			public void windowClosing(WindowEvent e) 
+			{
+				onClose();		
+			}
+		});
+	}
+
+	private void onClose()
+	{
+		GuiHandler.loginGUI = null;
+		Minecraft mc = Minecraft.getMinecraft();
+		if(mc.currentScreen instanceof GuiBlack)
+			((GuiBlack) mc.currentScreen).initateClose();
+	}
+	
+	private JPanel createButtonPanel()
+	{
 		JPanel buttonPanel = new JPanel();
 		GridLayout layout = new GridLayout(0,6);
 		layout.setHgap(5);
@@ -141,6 +182,7 @@ public class MainGUI extends JFrame
 			public void actionPerformed(ActionEvent arg0) 
 			{
 				refreshTable();
+				jobPanel.refresh();
 			}
 		});
 
@@ -185,48 +227,81 @@ public class MainGUI extends JFrame
 		buttonPanel.add(pushAllButton);
 		buttonPanel.add(pullAllButton);
 		buttonPanel.add(close);
-
-		c.fill = GridBagConstraints.BOTH;
-		c.insets = new Insets(5,5,5,5);
-		c.weightx = 1;
-		c.weighty = 1;
-		c.gridwidth = 1;
-		c.gridheight = 1;
-		c.gridx = 0;
-		c.gridy = 0;
-		c.gridy = 0;
-		mainPanel.add(new JLabel("File Overview"),c);
-		c.gridy = 1;
-		mainPanel.add(overviewView,c);
-
-		c.gridwidth = 2;
-		c.gridheight = 1;
-		c.gridx = 0;
-		c.gridy = 2;
-		mainPanel.add(buttonPanel,c);
-
-		setContentPane(mainPanel);
-		pack();
-		setVisible(true);
-		setResizable(false);
-		setAlwaysOnTop(true);
-		setLocation(Display.getX() + Display.getWidth()/2 - this.getWidth()/2, Display.getY() + Display.getHeight()/2 - this.getHeight()/2);
-
-		addWindowListener(new WindowAdapter() 
-		{    
-			public void windowClosing(WindowEvent e) 
-			{
-				onClose();		
-			}
-		});
+		
+		return buttonPanel;
 	}
-
-	private void onClose()
+	
+	private class JobPanel extends JPanel
 	{
-		GuiHandler.loginGUI = null;
-		Minecraft mc = Minecraft.getMinecraft();
-		if(mc.currentScreen instanceof GuiBlack)
-			((GuiBlack) mc.currentScreen).initateClose();
+		private JLabel jobNumLabel;
+		private JLabel curJobLabel;
+		private JLabel curJobStatusLabel;
+		
+		private JobPanel()
+		{				
+			jobNumLabel = new JLabel("8");
+			curJobLabel = new JLabel("Push player animation - test");
+			curJobStatusLabel = new JLabel("Uploading player/test.mcea");
+			
+			setLayout(new GridBagLayout());
+			setBorder(BorderFactory.createTitledBorder("Job queue"));
+			GridBagConstraints c = new GridBagConstraints();
+			
+			c.gridx = 0;
+			c.gridy = 0;
+			c.anchor = GridBagConstraints.EAST;
+			c.insets = new Insets(2,2,2,2);
+			c.weightx = 0;
+			add(new JLabel("Jobs in queue:"),c);
+			c.gridy = 1;
+			add(new JLabel("Current job:"),c);
+			c.gridy = 2;
+			add(new JLabel("Current job status:"),c);
+			
+			c.gridx = 1;
+			c.gridy = 0;
+			c.anchor = GridBagConstraints.WEST;
+			c.weightx = 1;
+			add(jobNumLabel,c);
+			c.gridy = 1;
+			add(curJobLabel,c);
+			c.gridy = 2;
+			add(curJobStatusLabel,c);
+		}
+		
+		private void refresh()
+		{
+//			mainPanel.remove(this);
+//			jobPanel = new JobPanel();
+//			GridBagConstraints c = new GridBagConstraints();
+//			c.fill = GridBagConstraints.BOTH;
+//			c.insets = new Insets(5,5,5,5);
+//			c.gridy = 2;
+//			mainPanel.add(jobPanel, c);
+//			mainPanel.revalidate();
+//			mainPanel.repaint();
+
+			revalidate();
+			repaint();
+		}
+		
+		private void updateJobNumberLabel(int number)
+		{
+			jobNumLabel.setText(Integer.toHexString(number));
+			refresh();
+		}
+		
+		private void updateCurrentJobLabel(String currentJob)
+		{
+			curJobLabel.setText(currentJob);
+			refresh();
+		}
+		
+		private void updateCurrentJobStatusLabel(String currentJobStatus)
+		{
+			curJobStatusLabel.setText(currentJobStatus);
+			refresh();
+		}
 	}
 
 	private JTable createTable()
