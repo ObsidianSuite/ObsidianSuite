@@ -2,7 +2,6 @@ package MCEntityAnimator.gui.animation;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -12,13 +11,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
 import javax.swing.AbstractAction;
@@ -31,17 +23,11 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.JTextArea;
 import javax.swing.ScrollPaneConstants;
-import javax.swing.border.BevelBorder;
-import javax.swing.border.Border;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
-import javax.swing.text.DefaultCaret;
 
 import org.lwjgl.opengl.Display;
-
-import com.jcraft.jsch.JSchException;
 
 import MCEntityAnimator.animation.AnimationData;
 import MCEntityAnimator.animation.AnimationSequence;
@@ -50,6 +36,8 @@ import MCEntityAnimator.distribution.FileInfo;
 import MCEntityAnimator.distribution.FileInfo.Status;
 import MCEntityAnimator.distribution.FileInfo.StatusAction;
 import MCEntityAnimator.distribution.ServerAccess;
+import MCEntityAnimator.distribution.job.JobPush;
+import MCEntityAnimator.distribution.job.JobPushAll;
 import MCEntityAnimator.gui.GuiBlack;
 import MCEntityAnimator.gui.GuiHandler;
 import MCEntityAnimator.gui.animation.table.ButtonColumn;
@@ -64,7 +52,7 @@ public class MainGUI extends JFrame
 	JButton editButton;
 	JScrollPane overviewView;
 	JPanel mainPanel;
-	JobPanel jobPanel;
+	public JobPanel jobPanel;
 
 	private String entityToEdit;
 	private String animationToEdit;
@@ -193,8 +181,8 @@ public class MainGUI extends JFrame
 			@Override
 			public void actionPerformed(ActionEvent arg0) 
 			{
-				DataHandler.pushAll();
-				refreshTable();
+				JobPushAll job = new JobPushAll(DataHandler.getFilesForPushAll());
+				DataHandler.jobHandler.queueJob(job);
 			}
 		});
 
@@ -231,7 +219,7 @@ public class MainGUI extends JFrame
 		return buttonPanel;
 	}
 	
-	private class JobPanel extends JPanel
+	public class JobPanel extends JPanel
 	{
 		private JLabel jobNumLabel;
 		private JLabel curJobLabel;
@@ -239,9 +227,9 @@ public class MainGUI extends JFrame
 		
 		private JobPanel()
 		{				
-			jobNumLabel = new JLabel("8");
-			curJobLabel = new JLabel("Push player animation - test");
-			curJobStatusLabel = new JLabel("Uploading player/test.mcea");
+			jobNumLabel = new JLabel("0");
+			curJobLabel = new JLabel("-");
+			curJobStatusLabel = new JLabel("-");
 			
 			setLayout(new GridBagLayout());
 			setBorder(BorderFactory.createTitledBorder("Job queue"));
@@ -285,19 +273,19 @@ public class MainGUI extends JFrame
 			repaint();
 		}
 		
-		private void updateJobNumberLabel(int number)
+		public void updateJobNumberLabel(int number)
 		{
 			jobNumLabel.setText(Integer.toHexString(number));
 			refresh();
 		}
 		
-		private void updateCurrentJobLabel(String currentJob)
+		public void updateCurrentJobLabel(String currentJob)
 		{
 			curJobLabel.setText(currentJob);
 			refresh();
 		}
 		
-		private void updateCurrentJobStatusLabel(String currentJobStatus)
+		public void updateCurrentJobStatusLabel(String currentJobStatus)
 		{
 			curJobStatusLabel.setText(currentJobStatus);
 			refresh();
@@ -354,10 +342,10 @@ public class MainGUI extends JFrame
 				}
 				else if(action == StatusAction.Push)
 				{
-					String path = DataHandler.getFileList().get(row).getPath();
-					DataHandler.push(path);
+					FileInfo fileInfo = DataHandler.getFileList().get(row);
+					JobPush job = new JobPush(fileInfo.getFileHRF(), fileInfo.getPath());
+					DataHandler.jobHandler.queueJob(job);
 				}
-				refreshTable();
 			}
 		};
 
@@ -368,7 +356,7 @@ public class MainGUI extends JFrame
 		return table;
 	}
 
-	private void refreshTable()
+	public void refreshTable()
 	{
 		String username = ServerAccess.getUser();
 		if(username != null)

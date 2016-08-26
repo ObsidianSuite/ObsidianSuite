@@ -19,7 +19,7 @@ import MCEntityAnimator.MCEA_Main;
 import MCEntityAnimator.animation.AnimationData;
 import MCEntityAnimator.animation.AnimationSequence;
 import MCEntityAnimator.distribution.FileInfo.Status;
-import MCEntityAnimator.gui.GuiHandler;
+import MCEntityAnimator.distribution.job.JobHandler;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
@@ -32,6 +32,7 @@ public class DataHandler
 	public static final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
 	private static List<FileInfo> fileList = new ArrayList<FileInfo>();
+	public static JobHandler jobHandler = new JobHandler();
 
 	public static void generateFileList(String username)
 	{
@@ -84,15 +85,16 @@ public class DataHandler
 		return fileList;
 	}
 
-	public static void pushAll()
+	public static List<FileInfo> getFilesForPushAll()
 	{
-		List<String> paths = new ArrayList<String>();
+		List<FileInfo> files = new ArrayList<FileInfo>();
 		for(FileInfo fileInfo : fileList)
 		{
 			Status status = fileInfo.getStatus();
 			if(status == Status.Ahead || status == Status.Local)
-				push(fileInfo.getPath());
+				files.add(fileInfo);
 		}
+		return files;
 	}
 	
 	public static void push(String path)
