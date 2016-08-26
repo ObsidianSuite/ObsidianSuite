@@ -36,8 +36,9 @@ import MCEntityAnimator.distribution.FileInfo;
 import MCEntityAnimator.distribution.FileInfo.Status;
 import MCEntityAnimator.distribution.FileInfo.StatusAction;
 import MCEntityAnimator.distribution.ServerAccess;
+import MCEntityAnimator.distribution.job.Job;
+import MCEntityAnimator.distribution.job.JobPull;
 import MCEntityAnimator.distribution.job.JobPush;
-import MCEntityAnimator.distribution.job.JobPushAll;
 import MCEntityAnimator.gui.GuiBlack;
 import MCEntityAnimator.gui.GuiHandler;
 import MCEntityAnimator.gui.animation.table.ButtonColumn;
@@ -77,7 +78,7 @@ public class MainGUI extends JFrame
 		overviewView.setPreferredSize(new Dimension(overviewView.getPreferredSize().width, 200));
 		overviewView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		overviewView.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);	
-		
+
 		jobPanel = new JobPanel();
 
 		c.fill = GridBagConstraints.BOTH;
@@ -115,7 +116,7 @@ public class MainGUI extends JFrame
 		if(mc.currentScreen instanceof GuiBlack)
 			((GuiBlack) mc.currentScreen).initateClose();
 	}
-	
+
 	private JPanel createButtonPanel()
 	{
 		JPanel buttonPanel = new JPanel();
@@ -181,8 +182,23 @@ public class MainGUI extends JFrame
 			@Override
 			public void actionPerformed(ActionEvent arg0) 
 			{
-				JobPushAll job = new JobPushAll(DataHandler.getFilesForPushAll());
-				DataHandler.jobHandler.queueJob(job);
+				for(FileInfo fileInfo : DataHandler.getFilesForPushAll())
+				{
+					String path = fileInfo.getPath();
+					String localAddress, remoteAddress;
+					if(path.contains("."))
+					{
+						localAddress = "animation/user/" + path;
+						remoteAddress = "animation/" + path;
+					}
+					else
+					{
+						localAddress = "animation/shared/" + path + ".data";
+						remoteAddress = "/home/shared/animation/" + path + ".data";
+					}
+					JobPush job = new JobPush(fileInfo.getFileHRF(), localAddress, remoteAddress);
+					DataHandler.jobHandler.queueJob(job);
+				}		
 			}
 		});
 
@@ -193,8 +209,27 @@ public class MainGUI extends JFrame
 			@Override
 			public void actionPerformed(ActionEvent arg0) 
 			{
-				//TODO pull all files
-				refreshTable();
+				for(FileInfo fileInfo : DataHandler.getFilesForPullAll())
+				{
+					String path = fileInfo.getPath();
+					String localAddress, remoteAddress;
+					if(path.contains("."))
+					{
+						localAddress = "animation/user/" + path;
+						remoteAddress = "animation/" + path;
+						DataHandler.jobHandler.queueJob(new JobPull(fileInfo.getFileHRF(), localAddress, remoteAddress));
+					}
+					else
+					{
+						String[] exts = new String[]{"data", "pxy", "png", "obj"};
+						for(String ext : exts)
+						{
+							localAddress = "animation/shared/" + path + "." + ext;
+							remoteAddress = "/home/shared/animation/" + path + "."  + ext;
+							DataHandler.jobHandler.queueJob(new JobPull(fileInfo.getFileHRF(), localAddress, remoteAddress));
+						}
+					}
+				}
 			}
 		});
 
@@ -215,26 +250,26 @@ public class MainGUI extends JFrame
 		buttonPanel.add(pushAllButton);
 		buttonPanel.add(pullAllButton);
 		buttonPanel.add(close);
-		
+
 		return buttonPanel;
 	}
-	
+
 	public class JobPanel extends JPanel
 	{
 		private JLabel jobNumLabel;
 		private JLabel curJobLabel;
 		private JLabel curJobStatusLabel;
-		
+
 		private JobPanel()
 		{				
 			jobNumLabel = new JLabel("0");
 			curJobLabel = new JLabel("-");
 			curJobStatusLabel = new JLabel("-");
-			
+
 			setLayout(new GridBagLayout());
 			setBorder(BorderFactory.createTitledBorder("Job queue"));
 			GridBagConstraints c = new GridBagConstraints();
-			
+
 			c.gridx = 0;
 			c.gridy = 0;
 			c.anchor = GridBagConstraints.EAST;
@@ -245,7 +280,7 @@ public class MainGUI extends JFrame
 			add(new JLabel("Current job:"),c);
 			c.gridy = 2;
 			add(new JLabel("Current job status:"),c);
-			
+
 			c.gridx = 1;
 			c.gridy = 0;
 			c.anchor = GridBagConstraints.WEST;
@@ -256,35 +291,35 @@ public class MainGUI extends JFrame
 			c.gridy = 2;
 			add(curJobStatusLabel,c);
 		}
-		
+
 		private void refresh()
 		{
-//			mainPanel.remove(this);
-//			jobPanel = new JobPanel();
-//			GridBagConstraints c = new GridBagConstraints();
-//			c.fill = GridBagConstraints.BOTH;
-//			c.insets = new Insets(5,5,5,5);
-//			c.gridy = 2;
-//			mainPanel.add(jobPanel, c);
-//			mainPanel.revalidate();
-//			mainPanel.repaint();
+			//			mainPanel.remove(this);
+			//			jobPanel = new JobPanel();
+			//			GridBagConstraints c = new GridBagConstraints();
+			//			c.fill = GridBagConstraints.BOTH;
+			//			c.insets = new Insets(5,5,5,5);
+			//			c.gridy = 2;
+			//			mainPanel.add(jobPanel, c);
+			//			mainPanel.revalidate();
+			//			mainPanel.repaint();
 
 			revalidate();
 			repaint();
 		}
-		
+
 		public void updateJobNumberLabel(int number)
 		{
 			jobNumLabel.setText(Integer.toHexString(number));
 			refresh();
 		}
-		
+
 		public void updateCurrentJobLabel(String currentJob)
 		{
 			curJobLabel.setText(currentJob);
 			refresh();
 		}
-		
+
 		public void updateCurrentJobStatusLabel(String currentJobStatus)
 		{
 			curJobStatusLabel.setText(currentJobStatus);
@@ -335,16 +370,42 @@ public class MainGUI extends JFrame
 				JTable table = (JTable)e.getSource();
 				int row = Integer.valueOf(e.getActionCommand());
 				StatusAction action = DataHandler.getFileList().get(row).getStatus().action;
-				if(action == StatusAction.Pull)
+				FileInfo fileInfo = DataHandler.getFileList().get(row);
+				String path = fileInfo.getPath();
+				if(action == StatusAction.Push)
 				{
-					String path = DataHandler.getFileList().get(row).getPath();
-					DataHandler.pull(path);
+					String localAddress, remoteAddress;
+					if(path.contains("."))
+					{
+						localAddress = "animation/user/" + path;
+						remoteAddress = "animation/" + path;
+					}
+					else
+					{
+						localAddress = "animation/shared/" + path + ".data";
+						remoteAddress = "/home/shared/animation/" + path + ".data";
+					}
+					DataHandler.jobHandler.queueJob(new JobPush(fileInfo.getFileHRF(), localAddress, remoteAddress));
 				}
-				else if(action == StatusAction.Push)
+				else if(action == StatusAction.Pull)
 				{
-					FileInfo fileInfo = DataHandler.getFileList().get(row);
-					JobPush job = new JobPush(fileInfo.getFileHRF(), fileInfo.getPath());
-					DataHandler.jobHandler.queueJob(job);
+					String localAddress, remoteAddress;
+					if(path.contains("."))
+					{
+						localAddress = "animation/user/" + path;
+						remoteAddress = "animation/" + path;
+						DataHandler.jobHandler.queueJob(new JobPull(fileInfo.getFileHRF(), localAddress, remoteAddress));
+					}
+					else
+					{
+						String[] exts = new String[]{"data", "pxy", "png", "obj"};
+						for(String ext : exts)
+						{
+							localAddress = "animation/shared/" + path + "." + ext;
+							remoteAddress = "/home/shared/animation/" + path + "."  + ext;
+							DataHandler.jobHandler.queueJob(new JobPull(fileInfo.getFileHRF(), localAddress, remoteAddress));
+						}
+					}
 				}
 			}
 		};

@@ -6,15 +6,15 @@ import com.jcraft.jsch.JSchException;
 
 import MCEntityAnimator.distribution.ServerAccess;
 
-public class JobPush extends Job
+public class JobPull extends Job
 {
 	
 	private String localAddress;
 	private String remoteAddress;
-
-	public JobPush(String hrf, String localAddress, String remoteAddress)
+	
+	public JobPull(String hrf, String localAddress, String remoteAddress)
 	{
-		super("Push " + hrf, new String[]{"Starting push", "Uploading " + localAddress, "Done"});
+		super("Pull " + hrf, new String[]{"Starting pull", "Downloading " + remoteAddress, "Done"});
 		this.localAddress = localAddress;
 		this.remoteAddress = remoteAddress;
 	}
@@ -24,15 +24,15 @@ public class JobPush extends Job
 	{
 		super.run();
 		incrementStage();
-		push();
+		pull();
 		incrementStage();
 	}
 	
-	public void push()
+	public void pull()
 	{
 		try 
 		{
-			ServerAccess.sendFile(localAddress, remoteAddress, true);
+			ServerAccess.getFile(localAddress, remoteAddress);
 		} 
 		catch (IOException e1) {e1.printStackTrace();} 
 		catch (JSchException e1) {e1.printStackTrace();}

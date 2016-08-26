@@ -1,8 +1,12 @@
 package MCEntityAnimator.distribution.job;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.jcraft.jsch.JSchException;
+
+import MCEntityAnimator.distribution.ServerAccess;
 import MCEntityAnimator.gui.GuiHandler;
 
 

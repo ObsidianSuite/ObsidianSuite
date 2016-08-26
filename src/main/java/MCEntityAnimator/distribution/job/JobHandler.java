@@ -1,6 +1,6 @@
 package MCEntityAnimator.distribution.job;
 
-import java.util.PriorityQueue;
+import java.util.LinkedList;
 import java.util.Queue;
 
 import MCEntityAnimator.gui.GuiHandler;
@@ -13,7 +13,7 @@ public class JobHandler
 
 	public JobHandler()
 	{
-		jobQueue = new PriorityQueue<Job>();
+		jobQueue = new LinkedList<Job>();
 		jobThread = new JobThread();
 		new Thread(jobThread).start();
 	}
@@ -21,8 +21,8 @@ public class JobHandler
 	public void queueJob(Job job)
 	{
 		//TODO remove these two lines once JobThread has been completed (allows debug changes...)
-		jobThread = new JobThread();
-		new Thread(jobThread).start();
+//		jobThread = new JobThread();
+//		new Thread(jobThread).start();
 		
 		jobQueue.add(job);	
 	}

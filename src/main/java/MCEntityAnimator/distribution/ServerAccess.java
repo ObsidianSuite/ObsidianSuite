@@ -75,25 +75,6 @@ public class ServerAccess
 			return;
 		}
 
-		boolean isDir = executeCommand("[ -d " + remoteFileAddress + " ] && echo \"true\" || echo \"false\"").replace("\n", "").replace("\r", "").equals("true");
-		if(isDir)
-		{
-			new File(localFileAddress).mkdirs();
-			String files = executeCommand("ls " + remoteFileAddress).replace("\n", ",").replace("\r", "");
-			if(files.length() == 0)
-			{
-				return;
-			}
-			else
-			{
-				files = files.substring(0, files.length() - 1);
-				String[] fileNames = files.split(",");
-				for(String fileName : fileNames)
-					getFile(localFileAddress + "/" + fileName, remoteFileAddress + "/" + fileName);
-				return;
-			}
-		}
-
 		FileOutputStream fos=null;
 
 		//Add separator if folder

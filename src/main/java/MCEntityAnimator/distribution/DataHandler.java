@@ -48,7 +48,10 @@ public class DataHandler
 			{
 				String[] fileData = s.split("=");
 				String path = fileData[0];
-				addFileInfo(path, getDateModifiedLocal(path), dateFormat.parse(fileData[1]));
+				if(fileData.length == 1)
+					addFileInfo(path, getDateModifiedLocal(path), null);
+				else
+					addFileInfo(path, getDateModifiedLocal(path), dateFormat.parse(fileData[1]));
 				existingPaths.add(path);
 			}
 
@@ -97,15 +100,17 @@ public class DataHandler
 		return files;
 	}
 	
-	public static void push(String path)
+
+	public static List<FileInfo> getFilesForPullAll()
 	{
-		try 
+		List<FileInfo> files = new ArrayList<FileInfo>();
+		for(FileInfo fileInfo : fileList)
 		{
-			if(path.contains("."))
-				ServerAccess.sendFile("animation/user/" + path, "animation/" + path, true);
-		} 
-		catch (IOException e1) {e1.printStackTrace();} 
-		catch (JSchException e1) {e1.printStackTrace();}
+			Status status = fileInfo.getStatus();
+			if(status == Status.Behind || status == Status.New)
+				files.add(fileInfo);
+		}
+		return files;
 	}
 
 	public static void pull(String path)
@@ -114,8 +119,6 @@ public class DataHandler
 		{
 			if(path.contains("."))
 				ServerAccess.getFile("animation/user/" + path, "animation/" + path);
-			else
-				ServerAccess.getFile("animation/shared/" + path.substring(path.indexOf("/") + 1), "/home/shared/animation/" + path.substring(path.indexOf("/") + 1));
 		} 
 		catch (IOException e) {e.printStackTrace();} 
 		catch (JSchException e) {e.printStackTrace();}
@@ -228,7 +231,10 @@ public class DataHandler
 			if(folder.exists())
 			{
 				Date mostRecent = null;
-				for(File f : folder.listFiles())
+				File[] files = folder.listFiles();
+				if(files.length != 4)
+					return null;
+				for(File f : files)
 				{
 					Date lastModified = new Date(f.lastModified());
 					if(mostRecent == null || lastModified.after(mostRecent))
@@ -286,5 +292,6 @@ public class DataHandler
 	{
 		return new File(String.format("%s/%s/%s.mcea", userPath, entityName, animationName));
 	}
+
 
 }
