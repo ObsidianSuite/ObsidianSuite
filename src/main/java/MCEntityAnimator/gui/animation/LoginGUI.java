@@ -90,7 +90,7 @@ public class LoginGUI extends JFrame
 						DataHandler.generateFileList(username);
 						GuiHandler.loginGUI = null;
 						dispose();
-						new MainGUI();
+						GuiHandler.mainGui = new MainGUI();
 					} 
 					catch (JSchException exeception) 
 					{

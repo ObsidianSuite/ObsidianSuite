@@ -18,6 +18,8 @@ import com.jcraft.jsch.JSchException;
 import MCEntityAnimator.MCEA_Main;
 import MCEntityAnimator.animation.AnimationData;
 import MCEntityAnimator.animation.AnimationSequence;
+import MCEntityAnimator.distribution.FileInfo.Status;
+import MCEntityAnimator.gui.GuiHandler;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
@@ -28,7 +30,7 @@ public class DataHandler
 	public static final String userPath = MCEA_Main.animationPath + "/user";
 	public static final String sharedPath = MCEA_Main.animationPath + "/shared";
 	public static final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-	
+
 	private static List<FileInfo> fileList = new ArrayList<FileInfo>();
 
 	public static void generateFileList(String username)
@@ -36,10 +38,10 @@ public class DataHandler
 		try 
 		{
 			fileList.clear();
-			
+
 			String serverFileOutput = ServerAccess.executeCommand("/home/shared/getFileData.sh " + username);
 			String[] fileStrings = serverFileOutput.split("\\r?\\n");
-			
+
 			List<String> existingPaths = new ArrayList<String>();
 			for(String s : fileStrings)
 			{
@@ -48,7 +50,7 @@ public class DataHandler
 				addFileInfo(path, getDateModifiedLocal(path), dateFormat.parse(fileData[1]));
 				existingPaths.add(path);
 			}
-			
+
 			//Check local files to see if file exists locally but not remotely.			
 			for(String entity : getEntities())
 			{
@@ -59,9 +61,9 @@ public class DataHandler
 						addFileInfo(path, getDateModifiedLocal(path), null);
 				}
 			}
-			
+
 			Collections.sort(fileList);
-			
+
 			//ServerAccess.getFile("animation/user", "animation");
 			//ServerAccess.getFile("animation/shared", "/home/shared/animation");
 			//MCEA_Main.dataHandler.loadNBTData();
@@ -70,16 +72,51 @@ public class DataHandler
 		catch (JSchException e) {e.printStackTrace();}
 		catch (ParseException e) {e.printStackTrace();}
 	}
-	
+
 	private static void addFileInfo(String path, Date lastModifiedLocal, Date lastModifiedRemote)
 	{
 		FileInfo fileInfo = new FileInfo(path, lastModifiedLocal, lastModifiedRemote);
 		fileList.add(fileInfo);
 	}
-	
+
 	public static List<FileInfo> getFileList()
 	{
 		return fileList;
+	}
+
+	public static void pushAll()
+	{
+		List<String> paths = new ArrayList<String>();
+		for(FileInfo fileInfo : fileList)
+		{
+			Status status = fileInfo.getStatus();
+			if(status == Status.Ahead || status == Status.Local)
+				push(fileInfo.getPath());
+		}
+	}
+	
+	public static void push(String path)
+	{
+		try 
+		{
+			if(path.contains("."))
+				ServerAccess.sendFile("animation/user/" + path, "animation/" + path, true);
+		} 
+		catch (IOException e1) {e1.printStackTrace();} 
+		catch (JSchException e1) {e1.printStackTrace();}
+	}
+
+	public static void pull(String path)
+	{
+		try 
+		{
+			if(path.contains("."))
+				ServerAccess.getFile("animation/user/" + path, "animation/" + path);
+			else
+				ServerAccess.getFile("animation/shared/" + path.substring(path.indexOf("/") + 1), "/home/shared/animation/" + path.substring(path.indexOf("/") + 1));
+		} 
+		catch (IOException e) {e.printStackTrace();} 
+		catch (JSchException e) {e.printStackTrace();}
 	}
 
 	public void saveNBTData()
@@ -172,7 +209,7 @@ public class DataHandler
 		}
 		return entities;
 	}
-	
+
 	private static Date getDateModifiedLocal(String path) 
 	{
 		Date lastModifiedLocal = null;
@@ -186,14 +223,17 @@ public class DataHandler
 		{
 			//If path points to shared entity folder, get folder and then get the most recently modified file in it.
 			File folder = new File(String.format("%s/%s", sharedPath, path.substring(path.lastIndexOf("/") + 1))); 
-			Date mostRecent = null;
-			for(File f : folder.listFiles())
+			if(folder.exists())
 			{
-				Date lastModified = new Date(f.lastModified());
-				if(mostRecent == null || lastModified.after(mostRecent))
-					mostRecent = lastModified;
+				Date mostRecent = null;
+				for(File f : folder.listFiles())
+				{
+					Date lastModified = new Date(f.lastModified());
+					if(mostRecent == null || lastModified.after(mostRecent))
+						mostRecent = lastModified;
+				}
+				lastModifiedLocal = mostRecent;
 			}
-			lastModifiedLocal = mostRecent;
 		}
 		return lastModifiedLocal;
 	}
@@ -213,10 +253,10 @@ public class DataHandler
 	{
 		return new File(String.format("%s/%s/%s.%s", sharedPath, entityName, entityName, ext));
 	}
-	
+
 	public static ResourceLocation getEntityResourceLocation(String entityName)
 	{
-		 return new ResourceLocation(String.format("animation:shared/%s/%s.png", entityName, entityName));
+		return new ResourceLocation(String.format("animation:shared/%s/%s.png", entityName, entityName));
 	}
 
 	/**

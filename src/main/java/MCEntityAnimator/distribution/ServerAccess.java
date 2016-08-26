@@ -18,6 +18,8 @@ import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 
+import MCEntityAnimator.gui.GuiHandler;
+
 public class ServerAccess 
 {
 
@@ -66,13 +68,10 @@ public class ServerAccess
 	
 
 	public static void getFile(String localFileAddress, String remoteFileAddress) throws IOException, JSchException
-	{
-		System.out.println("Copying remote:" + remoteFileAddress + " to local:" + localFileAddress + "...");		
-		
+	{		
 		boolean exists = executeCommand("[ -e " + remoteFileAddress + " ] && echo \"true\" || echo \"false\"").replace("\n", "").replace("\r", "").equals("true");
 		if(!exists)
 		{
-			System.out.println(" Failed");
 			return;
 		}
 
@@ -93,12 +92,6 @@ public class ServerAccess
 					getFile(localFileAddress + "/" + fileName, remoteFileAddress + "/" + fileName);
 				return;
 			}
-		}
-		
-		if(!downloadRequired(localFileAddress, remoteFileAddress))
-		{
-			System.out.println(" Already up to date.");
-			return;
 		}
 
 		FileOutputStream fos=null;
@@ -194,12 +187,13 @@ public class ServerAccess
 			buf[0]=0; 
 			out.write(buf, 0, 1); 
 			out.flush();
+
 		}
 	}
 
 
 	public static void sendFile(String localFileAddress, String remoteFileAddress, boolean preserveTimeStamp) throws IOException, JSchException
-	{
+	{		
 		FileInputStream fis=null;
 
 		//Execute 'scp -t remoteFileAddress' remotely
@@ -269,22 +263,6 @@ public class ServerAccess
 		out.close();
 
 		channel.disconnect();
-	}
-
-	private static boolean downloadRequired(String localFileAddress, String remoteFileAddress) throws JSchException, IOException
-	{
-		File localFile = new File(localFileAddress);
-		
-		//Local file doesn't exist, so download required.
-		if(!localFile.exists())
-			return true;
-		
-		String serverDate = getDateModified(remoteFileAddress);
-		String localDate = DataHandler.dateFormat.format(new Date(localFile.lastModified()));
-		
-		System.out.println(serverDate + " " + localDate);
-		
-		return !serverDate.equals(localDate);
 	}
 		
 	private static String getDateModified(String remoteFileAddress) throws JSchException, IOException

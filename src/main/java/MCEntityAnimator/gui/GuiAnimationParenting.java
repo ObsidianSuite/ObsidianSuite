@@ -190,7 +190,7 @@ public class GuiAnimationParenting extends GuiEntityRenderer
 				public void actionPerformed(ActionEvent e) 
 				{
 					Minecraft.getMinecraft().displayGuiScreen(new GuiBlack());
-					new MainGUI();
+					GuiHandler.mainGui = new MainGUI();
 				}
 			});
 
