@@ -56,6 +56,7 @@ import MCEntityAnimator.animation.AnimationPart;
 import MCEntityAnimator.animation.AnimationSequence;
 import MCEntityAnimator.distribution.ServerAccess;
 import MCEntityAnimator.gui.GuiBlack;
+import MCEntityAnimator.gui.GuiHandler;
 import MCEntityAnimator.gui.GuiInventoryChooseItem;
 import MCEntityAnimator.gui.animation.MainGUI;
 import MCEntityAnimator.render.objRendering.EntityObj;
@@ -534,6 +535,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 	private void close()
 	{
 		mc.displayGuiScreen(new GuiBlack());
+		GuiHandler.mainGui = new MainGUI();
 	}
 
 	/* ---------------------------------------------------- *

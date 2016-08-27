@@ -16,6 +16,7 @@ import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
+import javax.swing.DefaultListSelectionModel;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -23,8 +24,12 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 
 import org.lwjgl.opengl.Display;
@@ -36,11 +41,11 @@ import MCEntityAnimator.distribution.FileInfo;
 import MCEntityAnimator.distribution.FileInfo.Status;
 import MCEntityAnimator.distribution.FileInfo.StatusAction;
 import MCEntityAnimator.distribution.ServerAccess;
-import MCEntityAnimator.distribution.job.Job;
 import MCEntityAnimator.distribution.job.JobPull;
 import MCEntityAnimator.distribution.job.JobPush;
 import MCEntityAnimator.gui.GuiBlack;
 import MCEntityAnimator.gui.GuiHandler;
+import MCEntityAnimator.gui.GuiPartSetup;
 import MCEntityAnimator.gui.animation.table.ButtonColumn;
 import MCEntityAnimator.gui.sequence.GuiAnimationTimeline;
 import net.minecraft.client.Minecraft;
@@ -51,12 +56,11 @@ public class MainGUI extends JFrame
 	private static final long serialVersionUID = -3402393679860402540L;
 
 	JButton editButton;
+	private String editSelection;
 	JScrollPane overviewView;
 	JPanel mainPanel;
 	public JobPanel jobPanel;
-
-	private String entityToEdit;
-	private String animationToEdit;
+	private JTable table;
 
 	public MainGUI()
 	{
@@ -145,21 +149,40 @@ public class MainGUI extends JFrame
 			public void actionPerformed(ActionEvent arg0) 
 			{
 				AnimationSequence seq = null;
-				for(AnimationSequence s : AnimationData.getSequences(entityToEdit))
+
+				String entityToEdit = null;
+				if(editSelection.contains("animation"))
 				{
-					if(s.getName().equals(animationToEdit))
+					entityToEdit = editSelection.substring(0, editSelection.indexOf("animation") - 1);
+					String animationToEdit = editSelection.substring(editSelection.indexOf("animation") + 12, editSelection.length());
+					for(AnimationSequence s : AnimationData.getSequences(entityToEdit))
 					{
-						seq = s;
-						break;
+						if(s.getName().equals(animationToEdit))
+						{
+							seq = s;
+							break;
+						}
 					}
-				}
-				if(seq != null)
-				{
-					dispose();
-					Minecraft.getMinecraft().displayGuiScreen(new GuiAnimationTimeline(entityToEdit,seq));
+					if(seq != null)
+					{
+						dispose();
+						Minecraft.getMinecraft().displayGuiScreen(new GuiAnimationTimeline(entityToEdit,seq));
+					}
+					else
+						JOptionPane.showMessageDialog(MainGUI.this, "Unable to load animation " + animationToEdit + " for " + entityToEdit + ".");
 				}
 				else
-					JOptionPane.showMessageDialog(MainGUI.this, "Unable to load animation " + animationToEdit + " for " + entityToEdit + ".");
+				{
+					entityToEdit = editSelection.substring(0, editSelection.indexOf("setup") - 1);
+					dispose();
+					Minecraft.getMinecraft().displayGuiScreen(new GuiPartSetup(entityToEdit));
+				}
+
+
+
+
+
+
 			}
 		});
 
@@ -343,7 +366,16 @@ public class MainGUI extends JFrame
 			data[i][2] = status.action.name();
 		}
 
-		JTable table = new JTable(data, columnNames)
+		DefaultTableModel tableModel = new DefaultTableModel(data, columnNames) 
+		{
+			@Override
+			public boolean isCellEditable(int row, int column) 
+			{
+				return false;
+			}
+		};
+
+		table = new JTable(tableModel)
 		{
 			public Component prepareRenderer(TableCellRenderer renderer, int row, int column)
 			{
@@ -358,6 +390,17 @@ public class MainGUI extends JFrame
 			}
 		};
 		table.getTableHeader().setReorderingAllowed(false);
+
+		ListSelectionModel selectionModel = table.getSelectionModel();
+		selectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
+		selectionModel.addListSelectionListener(new ListSelectionListener() 
+		{
+			public void valueChanged(ListSelectionEvent e) 
+			{
+				processSelection();
+			}
+		});
 
 		DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
 		centerRenderer.setHorizontalAlignment( JLabel.CENTER );
@@ -412,6 +455,34 @@ public class MainGUI extends JFrame
 
 		table.getColumnModel().getColumn(0).setPreferredWidth(200);
 
+		table.setRowSelectionAllowed(false);
+		table.setColumnSelectionAllowed(false);
+		table.setCellSelectionEnabled(true);
+
+		table.getColumnModel().setSelectionModel(new DefaultListSelectionModel()
+		{
+			private boolean isSelectable(int row, int column) 
+			{
+				return column == 0;
+			}
+
+			@Override
+			public void setSelectionInterval(int index0, int index1) 
+			{
+				if(isSelectable(index0, index1)) {
+					super.setSelectionInterval(index0, index1);
+				}
+			}
+
+			@Override
+			public void addSelectionInterval(int index0, int index1)
+			{
+				if(isSelectable(index0, index1)) {
+					super.addSelectionInterval(index0, index1);
+				}
+			}
+		});
+
 		ButtonColumn buttonColumn = new ButtonColumn(table, processAction, 2, StatusAction.None.name());
 
 		return table;
@@ -440,6 +511,24 @@ public class MainGUI extends JFrame
 			mainPanel.add(overviewView, c);
 			mainPanel.revalidate();
 			mainPanel.repaint();
+			processSelection();
+		}
+	}
+
+	public void processSelection()
+	{
+		Object obj = null;
+		if(table.getSelectedRow() != -1)
+			obj = table.getValueAt(table.getSelectedRow(), 0);
+		if(obj != null && obj instanceof String)
+		{
+			editButton.setEnabled(true);
+			editSelection = (String) obj;
+		}
+		else
+		{
+			editButton.setEnabled(false);
+			editSelection = "";
 		}
 	}
 
