@@ -114,17 +114,6 @@ public class DataHandler
 		return files;
 	}
 
-	public static void pull(String path)
-	{
-		try 
-		{
-			if(path.contains("."))
-				ServerAccess.getFile("animation/user/" + path, "animation/" + path);
-		} 
-		catch (IOException e) {e.printStackTrace();} 
-		catch (JSchException e) {e.printStackTrace();}
-	}
-
 	public void saveNBTData()
 	{	
 		List<String> entityNames = getEntities();
@@ -148,6 +137,7 @@ public class DataHandler
 			}
 			AnimationData.clearChangedSequences(entityName);
 		}
+		AnimationData.clearEntitySetupChanged();
 	}
 
 	public void loadNBTData()

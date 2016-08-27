@@ -6,7 +6,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -17,8 +16,6 @@ import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
-
-import MCEntityAnimator.gui.GuiHandler;
 
 public class ServerAccess 
 {
@@ -173,12 +170,12 @@ public class ServerAccess
 	}
 
 
-	public static void sendFile(String localFileAddress, String remoteFileAddress, boolean preserveTimeStamp) throws IOException, JSchException
+	public static void sendFile(String localFileAddress, String remoteFileAddress, boolean userFolder) throws IOException, JSchException
 	{		
 		FileInputStream fis=null;
 
 		//Execute 'scp -t remoteFileAddress' remotely
-		String command="scp " + (preserveTimeStamp ? "-p" :"") + " -t " + remoteFileAddress;
+		String command="scp " + (userFolder ? "-p" :"") + " -t " + remoteFileAddress;
 		Channel channel = session.openChannel("exec");
 		((ChannelExec)channel).setCommand(command);
 
@@ -197,7 +194,7 @@ public class ServerAccess
 
 		//If time stamp is to be preserved, read the time
 		//details of the local file and send it over before the file data
-		if(preserveTimeStamp)
+		if(userFolder)
 		{
 			command="T" + (localFile.lastModified()/1000) + " 0";
 			command+=(" " + (localFile.lastModified()/1000) + " 0\n"); 
@@ -244,6 +241,23 @@ public class ServerAccess
 		out.close();
 
 		channel.disconnect();
+		
+		if(!userFolder)
+		{
+			Date d = new Date(localFile.lastModified());
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmm.ss");
+			String date = sdf.format(d);
+			
+			String remoteFileAddressAlt = remoteFileAddress + "b";
+			
+			String copyCommand = String.format("cp %s %s", remoteFileAddress, remoteFileAddressAlt);
+			String removeCommand = String.format("rm %s", remoteFileAddress);
+			String moveCommand = String.format("mv %s %s", remoteFileAddressAlt, remoteFileAddress);
+			String touchCommand = String.format("touch -mt %s %s", date, remoteFileAddress);
+			
+			String completeCommand = String.format("%s && %s && %s && %s", copyCommand, removeCommand, moveCommand, touchCommand);
+			executeCommand(completeCommand);
+		}
 	}
 		
 	private static String getDateModified(String remoteFileAddress) throws JSchException, IOException
@@ -305,16 +319,16 @@ public class ServerAccess
 		//Not good, read issue and output.
 		if(b==1 || b==2)
 		{
-			System.out.println("Input stream error " + b);
 			StringBuffer sb=new StringBuffer();
 			int c;
 			do 
 			{
 				c=in.read();
-				sb.append((char)c);
+				if(c != '\n')
+					sb.append((char)c);
 			}
 			while(c!='\n');
-			System.err.print(sb.toString());
+			throw new IOException("Error uploading: " + sb.toString());
 		}
 		return b;
 	}

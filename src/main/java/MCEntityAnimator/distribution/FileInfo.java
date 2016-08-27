@@ -36,7 +36,10 @@ public class FileInfo implements Comparable<FileInfo>
 		if(lastModifiedRemote == null)
 			return Status.Local;
 		if(lastModifiedLocal.before(lastModifiedRemote))
+		{
+			System.out.println(lastModifiedLocal + " " + lastModifiedRemote);
 			return Status.Behind;
+		}
 		else if(lastModifiedLocal.after(lastModifiedRemote))
 			return Status.Ahead;
 		else

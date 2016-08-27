@@ -32,7 +32,7 @@ public class JobPush extends Job
 	{
 		try 
 		{
-			ServerAccess.sendFile(localAddress, remoteAddress, true);
+			ServerAccess.sendFile(localAddress, remoteAddress, localAddress.contains("/home/shared/"));
 		} 
 		catch (IOException e1) {e1.printStackTrace();} 
 		catch (JSchException e1) {e1.printStackTrace();}

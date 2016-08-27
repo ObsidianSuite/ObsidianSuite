@@ -48,10 +48,20 @@ public class AnimationData
 			parenting.put(model, new AnimationParenting());
 		return parenting.get(model);
 	}
+	
+	public static void setEntitySetupChanged(String entityName)
+	{
+		changedEntitySetups.add(entityName);
+	}
 
 	public static boolean getEntitySetupChanged(String entityName)
 	{
 		return changedEntitySetups.contains(entityName);
+	}
+	
+	public static void clearEntitySetupChanged()
+	{
+		changedEntitySetups.clear();
 	}
 	
 	/**

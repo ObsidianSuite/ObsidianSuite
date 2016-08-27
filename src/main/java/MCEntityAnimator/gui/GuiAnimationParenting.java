@@ -48,6 +48,7 @@ public class GuiAnimationParenting extends GuiEntityRenderer
 		super.onGuiClosed();
 		parentingFrame.dispose();
 		relationFrame.dispose();
+		AnimationData.setEntitySetupChanged(entityName);
 	}
 
 	@Override
