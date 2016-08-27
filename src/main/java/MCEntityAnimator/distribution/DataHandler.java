@@ -38,6 +38,7 @@ public class DataHandler
 	{
 		try 
 		{
+			MCEA_Main.dataHandler.saveNBTData();
 			fileList.clear();
 
 			String serverFileOutput = ServerAccess.executeCommand("/home/shared/getFileData.sh " + username);
@@ -141,8 +142,11 @@ public class DataHandler
 			for(AnimationSequence s : AnimationData.getSequences(entityName))
 			{
 				if(changeSequences.contains(s.getName()))
+				{
 					writeNBTToFile(s.getSaveData(), getAnimationFile(entityName, s.getName()));
+				}
 			}
+			AnimationData.clearChangedSequences(entityName);
 		}
 	}
 
@@ -243,6 +247,9 @@ public class DataHandler
 				lastModifiedLocal = mostRecent;
 			}
 		}
+		
+		long roundedTime = (long) (Math.floor(lastModifiedLocal.getTime()/1000)*1000);
+		lastModifiedLocal = new Date(roundedTime);
 		return lastModifiedLocal;
 	}
 

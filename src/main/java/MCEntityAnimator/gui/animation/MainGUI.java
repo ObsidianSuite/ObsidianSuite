@@ -70,6 +70,7 @@ public class MainGUI extends JFrame
 		mainPanel.setLayout(new GridBagLayout());
 
 		createGUI(mainPanel, "");
+		refreshTable();
 	}
 
 	private void createGUI(final JPanel mainPanel, String outputText)
