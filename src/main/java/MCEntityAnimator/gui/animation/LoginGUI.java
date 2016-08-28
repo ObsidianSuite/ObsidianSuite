@@ -106,6 +106,7 @@ public class LoginGUI extends JFrame
 				{
 					if(JOptionPane.showConfirmDialog(mainPanel, "Unable to connect to server. Run in offline mode?", "Connection Error", JOptionPane.YES_NO_OPTION) == 0)
 					{
+						ServerAccess.online = false;
 						DataHandler.generateFileList(username);
 						GuiHandler.loginGUI = null;
 						dispose();

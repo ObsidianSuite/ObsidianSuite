@@ -27,7 +27,6 @@ public class ServerAccess
 
 	public static boolean testConnection()
 	{
-		//TODO uncomment once offline mode implemented.
 		Properties properties = new Properties(); 
 		properties.put("StrictHostKeyChecking", "no");
 
@@ -45,8 +44,6 @@ public class ServerAccess
 			return false;
 		}
 		return true;
-		
-	//	return false;
 	}
 
 	public static void login(String username, String password) throws JSchException, IOException
