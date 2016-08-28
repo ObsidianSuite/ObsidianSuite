@@ -51,21 +51,19 @@ public class RenderObj extends RenderLiving
 	{
 		return getModel(((EntityObj) entity).getType()).textureExists ? properTexture : defaultTexture;
 	}
+	
+	public void loadModel(String entityType)
+	{
+		ModelObj m = new ModelObj(entityType);
+		models.put(entityType, m);
+	}
 
 	public void updateModel(String entityType)
 	{
-		if(models.containsKey(entityType))
-		{
-			mainModel = models.get(entityType);
-			modelObj = models.get(entityType);
-		}
-		else
-		{
-			ModelObj m = new ModelObj(entityType);
-			models.put(entityType, m);
-			modelObj = m;
-			mainModel = m;
-		}
+		if(!models.containsKey(entityType))
+			loadModel(entityType);
+		mainModel = models.get(entityType);
+		modelObj = models.get(entityType);
         properTexture = modelObj.getTexture();
 	}
 	

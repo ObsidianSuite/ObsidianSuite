@@ -82,6 +82,12 @@ public class ServerAccess
 			return;
 		}
 
+		File localFile = new File(localFileAddress);
+		if(!localFile.exists())
+		{
+			localFile.getParentFile().mkdirs();
+			localFile.createNewFile();
+		}
 		FileOutputStream fos=null;
 
 		//Add separator if folder
@@ -163,7 +169,6 @@ public class ServerAccess
 			
 			try 
 			{
-				File localFile = new File(localFileAddress);
 				localFile.setLastModified(DataHandler.dateFormat.parse(getDateModified(remoteFileAddress)).getTime());
 			} 
 			catch (ParseException e) {e.printStackTrace();}
@@ -178,13 +183,15 @@ public class ServerAccess
 
 		}
 		
-		System.out.println(executeCommand(String.format("/home/shared/animation/log.sh -q %s %s", session.getUserName(), remoteFileAddress)));
+		executeCommand(String.format("/home/shared/animation/log.sh -q %s %s", session.getUserName(), remoteFileAddress));
 
 	}
 
 
 	public static void sendFile(String localFileAddress, String remoteFileAddress, boolean userFolder) throws IOException, JSchException
 	{		
+		System.out.println(session.getUserName());
+		
 		FileInputStream fis=null;
 
 		//Execute 'scp -t remoteFileAddress' remotely
@@ -201,9 +208,8 @@ public class ServerAccess
 
 		//Get local file
 		File localFile = new File(localFileAddress);
-		//TODO remove create new file.
 		if(!localFile.exists())
-			localFile.createNewFile();
+			return;
 
 		//If time stamp is to be preserved, read the time
 		//details of the local file and send it over before the file data

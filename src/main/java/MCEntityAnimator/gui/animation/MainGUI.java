@@ -318,7 +318,7 @@ public class MainGUI extends JFrame
 
 		public void updateJobNumberLabel(int number)
 		{
-			jobNumLabel.setText(Integer.toHexString(number));
+			jobNumLabel.setText(Integer.toString(number));
 			refresh();
 		}
 

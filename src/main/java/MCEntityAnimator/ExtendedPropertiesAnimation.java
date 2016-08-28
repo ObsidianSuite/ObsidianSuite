@@ -17,12 +17,12 @@ public class ExtendedPropertiesAnimation implements IExtendedEntityProperties
 	@Override
 	public void saveNBTData(NBTTagCompound nbtTagCompound)
 	{
-		MCEA_Main.dataHandler.saveNBTData();
+		DataHandler.saveNBTData();
 	}
 
 	@Override
 	public void loadNBTData(NBTTagCompound nbtTagCompound)
 	{
-		MCEA_Main.dataHandler.loadNBTData();
+		DataHandler.loadNBTData();
 	}
 }

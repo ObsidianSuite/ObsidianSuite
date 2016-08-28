@@ -20,6 +20,7 @@ import javax.swing.JOptionPane;
 
 import com.jcraft.jsch.JSchException;
 
+import MCEntityAnimator.ClientProxy;
 import MCEntityAnimator.MCEA_Main;
 import MCEntityAnimator.animation.AnimationData;
 import MCEntityAnimator.animation.AnimationSequence;
@@ -43,7 +44,7 @@ public class DataHandler
 	{
 		try 
 		{
-			MCEA_Main.dataHandler.saveNBTData();
+			DataHandler.saveNBTData();
 			fileList.clear();
 
 			List<String> existingPaths = new ArrayList<String>();
@@ -67,9 +68,9 @@ public class DataHandler
 			//Check local files to see if file exists locally but not remotely.			
 			for(String entity : getEntities())
 			{
-				for(File f : getAnimationFiles(entity))
+				for(String animationName : getEntityAnimations(entity))
 				{
-					String path = String.format("%s/%s", entity, f.getName());
+					String path = String.format("%s/%s", entity, animationName);
 					if(!existingPaths.contains(path))
 						addFileInfo(path, getDateModifiedLocal(path), null);
 				}
@@ -122,7 +123,7 @@ public class DataHandler
 		return files;
 	}
 
-	public void saveNBTData()
+	public static void saveNBTData()
 	{	
 		List<String> entityNames = getEntities();
 		//GUI
@@ -148,8 +149,8 @@ public class DataHandler
 		AnimationData.clearEntitySetupChanged();
 	}
 
-	public void loadNBTData()
-	{	
+	public static void loadNBTData()
+	{			
 		List<String> entityNames = getEntities();
 		//GUI
 		//		File guiDataFile = getGUIFile();
@@ -160,18 +161,26 @@ public class DataHandler
 		//Entity data
 		for(String entityName : entityNames)
 		{
-			//Parenting and part names)
-			File entityDataFile = getEntityFile(entityName, "data");
-			if(entityDataFile.exists())
-				AnimationData.loadEntityData(entityName, getNBTFromFile(entityDataFile));
+			loadEntityData(entityName);
 
 			//Sequences
-			for(File animationFile : getAnimationFiles(entityName))
-			{
-				AnimationSequence sequence = new AnimationSequence(entityName, getNBTFromFile(animationFile));
-				AnimationData.addSequence(entityName, sequence);
-			}
+			for(String animationName : getEntityAnimations(entityName))
+				loadEntityAnimation(entityName, animationName.substring(0, animationName.indexOf(".")));
 		}
+	}
+
+	public static void loadEntityData(String entityName)
+	{
+		ClientProxy.renderObj.loadModel(entityName);
+		File entityDataFile = getEntityFile(entityName, "data");
+		if(entityDataFile.exists())
+			AnimationData.loadEntityData(entityName, getNBTFromFile(entityDataFile));
+	}
+
+	public static void loadEntityAnimation(String entityName, String animationName)
+	{
+		AnimationSequence sequence = new AnimationSequence(entityName, getNBTFromFile(getAnimationFile(entityName, animationName)));
+		AnimationData.addSequence(entityName, sequence);
 	}
 
 	/**
@@ -208,8 +217,10 @@ public class DataHandler
 	public static List<String> getEntities()
 	{
 		List<String> entities = new ArrayList<String>();
-		File dataFolder = new File(sharedPath);
-		for(File file : dataFolder.listFiles())
+		File sharedFolder = new File(sharedPath);
+		if(!sharedFolder.exists())
+			sharedFolder.mkdirs();
+		for(File file : sharedFolder.listFiles())
 		{
 			if(file.isDirectory())
 				entities.add(file.getName());
@@ -281,13 +292,14 @@ public class DataHandler
 	 * @param entityName - Name of entity.
 	 * @return List of all animation files.
 	 */
-	private static List<File> getAnimationFiles(String entityName)
+	private static List<String> getEntityAnimations(String entityName)
 	{
-		List<File> animationFiles = new ArrayList<File>();
+		List<String> animationFiles = new ArrayList<String>();
 		File animationFolder = new File(String.format("%s/%s", userPath, entityName));
-		animationFolder.mkdir();
+		if(!animationFolder.exists())
+			animationFolder.mkdirs();
 		for(File f : animationFolder.listFiles())
-			animationFiles.add(f);
+			animationFiles.add(f.getName());
 		return animationFiles;
 	}
 
@@ -353,7 +365,7 @@ public class DataHandler
 		}
 		return null;
 	}
-	
+
 	private static String getOfflinePassword()
 	{
 		try
@@ -381,16 +393,41 @@ public class DataHandler
 
 	public static void clearDataIfDifferentUser(String username)
 	{
-		String offlineUsername = getOfflineUsername();
-		if(offlineUsername != null)
+		File f = new File(MCEA_Main.animationPath + "/user.txt");
+		if(f.exists())
 		{
-			if(username.equals(offlineUsername))
+			String offlineUsername = getOfflineUsername();
+			if(offlineUsername != null && username.equals(offlineUsername))
 				return;
-			else
+		}
+
+		System.out.println("Remove");
+		removeDirectory(new File(userPath));
+		AnimationData.clear();
+		DataHandler.loadNBTData();
+	}
+
+	private static boolean removeDirectory(File dir)
+	{
+		if(!dir.exists())
+			return true;
+		if(!dir.isDirectory())
+			return dir.delete();
+		File[] files = dir.listFiles();
+		if(files.length == 0)
+			return dir.delete();
+		boolean allDeleted = true;
+		for(File f : files)
+		{
+			if(f.isDirectory())
+				removeDirectory(f);
+			else if(!f.delete())
 			{
-				//TODO remove folder.
+				allDeleted = false;
+				System.out.println("Failed to delete " + f.getAbsolutePath());
 			}
 		}
+		return true;
 	}
 
 }
