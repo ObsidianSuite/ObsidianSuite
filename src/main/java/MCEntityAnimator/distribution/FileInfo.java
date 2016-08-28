@@ -95,7 +95,7 @@ public class FileInfo implements Comparable<FileInfo>
 	
 	@Override
 	public int compareTo(FileInfo o)
-	{
+	{		
 		String[] split = path.split("/");
 		String entityName = split[0];
 		String file = split[1];
@@ -104,10 +104,10 @@ public class FileInfo implements Comparable<FileInfo>
 		String o_entityName = split2[0];
 		String o_file = split2[1];
 		
-		//Compare names - if names differ return string comparison.
-		int nameCompare = entityName.compareTo(o_entityName);
-		if(nameCompare != 0)
-			return nameCompare;
+		//Compare entity names - if names differ return string comparison.
+		int entityNameCompare = entityName.compareTo(o_entityName);
+		if(entityNameCompare != 0)
+			return entityNameCompare > 0 ? 1 : -1;
 		
 		//Setup file should come first.
 		int fileCompare = 0;
@@ -116,7 +116,14 @@ public class FileInfo implements Comparable<FileInfo>
 		if(o_file.contains("."))
 			fileCompare -= 1;
 		
-		return fileCompare;
+		if(fileCompare != 0)
+			return fileCompare;
+		
+		int fileNameCompare = file.compareTo(o_file);
+		if(entityNameCompare != 0)
+			return entityNameCompare > 0 ? 1 : -1;
+
+		return 0;
 	}
 
 	public enum StatusAction{Push, Pull, None};

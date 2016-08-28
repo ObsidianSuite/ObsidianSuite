@@ -372,7 +372,7 @@ public class MainGUI extends JFrame
 			@Override
 			public boolean isCellEditable(int row, int column) 
 			{
-				return false;
+				return column == 2;
 			}
 		};
 
@@ -520,7 +520,12 @@ public class MainGUI extends JFrame
 	{
 		Object obj = null;
 		if(table.getSelectedRow() != -1)
+		{
 			obj = table.getValueAt(table.getSelectedRow(), 0);
+			Status status = Status.valueOf((String) table.getValueAt(table.getSelectedRow(), 1));
+			if(status.equals(Status.Behind) || status.equals(Status.New) || status.equals(Status.Conflicted))
+				return;
+		}
 		if(obj != null && obj instanceof String)
 		{
 			editButton.setEnabled(true);

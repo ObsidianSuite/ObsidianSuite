@@ -66,12 +66,8 @@ public class DataHandler
 						addFileInfo(path, getDateModifiedLocal(path), null);
 				}
 			}
-
+			
 			Collections.sort(fileList);
-
-			//ServerAccess.getFile("animation/user", "animation");
-			//ServerAccess.getFile("animation/shared", "/home/shared/animation");
-			//MCEA_Main.dataHandler.loadNBTData();
 		} 
 		catch (IOException e) {e.printStackTrace();}
 		catch (JSchException e) {e.printStackTrace();}
@@ -238,8 +234,12 @@ public class DataHandler
 			}
 		}
 		
-		long roundedTime = (long) (Math.floor(lastModifiedLocal.getTime()/1000)*1000);
-		lastModifiedLocal = new Date(roundedTime);
+		if(lastModifiedLocal != null)
+		{
+			long roundedTime = (long) (Math.floor(lastModifiedLocal.getTime()/1000)*1000);
+			lastModifiedLocal = new Date(roundedTime);
+		}
+
 		return lastModifiedLocal;
 	}
 

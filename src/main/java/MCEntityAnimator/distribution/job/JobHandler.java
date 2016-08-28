@@ -20,10 +20,6 @@ public class JobHandler
 	
 	public void queueJob(Job job)
 	{
-		//TODO remove these two lines once JobThread has been completed (allows debug changes...)
-//		jobThread = new JobThread();
-//		new Thread(jobThread).start();
-		
 		jobQueue.add(job);	
 	}
 	
