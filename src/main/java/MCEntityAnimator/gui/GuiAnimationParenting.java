@@ -22,7 +22,7 @@ import org.lwjgl.input.Mouse;
 import MCEntityAnimator.Util;
 import MCEntityAnimator.animation.AnimationData;
 import MCEntityAnimator.distribution.ServerAccess;
-import MCEntityAnimator.gui.animation.FileGUI;
+import MCEntityAnimator.gui.animation.MainGUI;
 import MCEntityAnimator.render.objRendering.bend.Bend;
 import MCEntityAnimator.render.objRendering.parts.Part;
 import MCEntityAnimator.render.objRendering.parts.PartObj;
@@ -48,6 +48,7 @@ public class GuiAnimationParenting extends GuiEntityRenderer
 		super.onGuiClosed();
 		parentingFrame.dispose();
 		relationFrame.dispose();
+		AnimationData.setEntitySetupChanged(entityName);
 	}
 
 	@Override
@@ -190,7 +191,7 @@ public class GuiAnimationParenting extends GuiEntityRenderer
 				public void actionPerformed(ActionEvent e) 
 				{
 					Minecraft.getMinecraft().displayGuiScreen(new GuiBlack());
-					ServerAccess.gui = new FileGUI();
+					GuiHandler.mainGui = new MainGUI();
 				}
 			});
 
