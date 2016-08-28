@@ -60,6 +60,10 @@ public class ServerAccess
 		
 		executeCommand("/home/shared/animation/log.sh -l " + username);
 		
+		DataHandler.clearDataIfDifferentUser(username);
+		
+		DataHandler.writeUserData(username, password);
+		
 		online = true;
 	}
 	

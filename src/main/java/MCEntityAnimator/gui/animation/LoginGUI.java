@@ -106,11 +106,20 @@ public class LoginGUI extends JFrame
 				{
 					if(JOptionPane.showConfirmDialog(mainPanel, "Unable to connect to server. Run in offline mode?", "Connection Error", JOptionPane.YES_NO_OPTION) == 0)
 					{
-						ServerAccess.online = false;
-						DataHandler.generateFileList(username);
-						GuiHandler.loginGUI = null;
-						dispose();
-						GuiHandler.mainGui = new MainGUI();
+						Boolean canLogin = DataHandler.canLoginOffline(username, password);
+						if(canLogin != null)
+						{
+							if(canLogin)
+							{
+								ServerAccess.online = false;
+								DataHandler.generateFileList(username);
+								GuiHandler.loginGUI = null;
+								dispose();
+								GuiHandler.mainGui = new MainGUI();
+							}
+							else
+								JOptionPane.showMessageDialog(mainPanel, "Incorrect username/password combination.");
+						}
 					}
 				}
 			}
@@ -129,7 +138,7 @@ public class LoginGUI extends JFrame
 			}
 		});
 		mainPanel.add(registerButton,c);
-		
+
 		c.gridy = 4;
 		JButton closeButton = new JButton("Quit");
 		closeButton.addActionListener(new ActionListener()
@@ -142,16 +151,16 @@ public class LoginGUI extends JFrame
 			}
 		});
 		mainPanel.add(closeButton,c);
-		
+
 		addWindowListener(new WindowAdapter()
 		{
-			
+
 			@Override
 			public void windowClosing(WindowEvent e)
 			{
 				onClose();
 			}
-			
+
 		});
 
 		setContentPane(mainPanel);
@@ -171,6 +180,6 @@ public class LoginGUI extends JFrame
 		if(mc.currentScreen instanceof GuiBlack)
 			((GuiBlack) mc.currentScreen).initateClose();
 	}
-	
+
 }
 

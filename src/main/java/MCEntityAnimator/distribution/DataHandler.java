@@ -1,9 +1,12 @@
 package MCEntityAnimator.distribution;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -12,6 +15,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+
+import javax.swing.JOptionPane;
 
 import com.jcraft.jsch.JSchException;
 
@@ -68,7 +73,7 @@ public class DataHandler
 					if(!existingPaths.contains(path))
 						addFileInfo(path, getDateModifiedLocal(path), null);
 				}
-				
+
 				String path = String.format("%s/%s", entity, entity);
 				if(!existingPaths.contains(path))
 					addFileInfo(path, getDateModifiedLocal(path), null);
@@ -297,5 +302,95 @@ public class DataHandler
 		return new File(String.format("%s/%s/%s.mcea", userPath, entityName, animationName));
 	}
 
+	public static void writeUserData(String username, String password) throws IOException
+	{
+		File f = new File(MCEA_Main.animationPath + "/user.txt");
+		if(!f.exists())
+			f.createNewFile();
+		FileWriter fileWriter = new FileWriter(f);
+		fileWriter.write(String.format("Username: %s\r\nPassword: %s", username, password));
+		fileWriter.close();
+	}
+
+	public static Boolean canLoginOffline(String username, String password)
+	{
+		File f = new File(MCEA_Main.animationPath + "/user.txt");
+		if(!f.exists())
+		{
+			JOptionPane.showMessageDialog(null, "Offline login information not found. Please login with an internet connection.");
+			return null;
+		}
+		String offlineUsername = getOfflineUsername();
+		if(offlineUsername == null)
+			return false;
+		String offlinePassword = getOfflinePassword();
+		if(offlinePassword == null)
+			return false;
+		return username.equals(offlineUsername) && password.equals(offlinePassword);
+	}
+
+	private static String getOfflineUsername()
+	{
+		try
+		{
+			File f = new File(MCEA_Main.animationPath + "/user.txt");
+			FileReader fileReader = new FileReader(f);
+			BufferedReader reader = new BufferedReader(fileReader);
+			String line;
+			while((line = reader.readLine()) != null)
+			{
+				if(line.contains("Username:"))
+				{
+					reader.close();
+					return line.substring(line.indexOf(":") + 2, line.length());
+				}
+			}
+			reader.close();
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	private static String getOfflinePassword()
+	{
+		try
+		{
+			File f = new File(MCEA_Main.animationPath + "/user.txt");
+			FileReader fileReader = new FileReader(f);
+			BufferedReader reader = new BufferedReader(fileReader);
+			String line;
+			while((line = reader.readLine()) != null)
+			{
+				if(line.contains("Password:"))
+				{
+					reader.close();
+					return line.substring(line.indexOf(":") + 2, line.length());
+				}
+			}
+			reader.close();
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	public static void clearDataIfDifferentUser(String username)
+	{
+		String offlineUsername = getOfflineUsername();
+		if(offlineUsername != null)
+		{
+			if(username.equals(offlineUsername))
+				return;
+			else
+			{
+				//TODO remove folder.
+			}
+		}
+	}
 
 }
