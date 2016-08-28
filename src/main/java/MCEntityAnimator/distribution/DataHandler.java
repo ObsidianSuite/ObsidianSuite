@@ -41,19 +41,22 @@ public class DataHandler
 			MCEA_Main.dataHandler.saveNBTData();
 			fileList.clear();
 
-			String serverFileOutput = ServerAccess.executeCommand("/home/shared/animation/getFileData.sh " + username);
-			String[] fileStrings = serverFileOutput.split("\\r?\\n");
-
 			List<String> existingPaths = new ArrayList<String>();
-			for(String s : fileStrings)
+			if(ServerAccess.online)
 			{
-				String[] fileData = s.split("=");
-				String path = fileData[0];
-				if(fileData.length == 1)
-					addFileInfo(path, getDateModifiedLocal(path), null);
-				else
-					addFileInfo(path, getDateModifiedLocal(path), dateFormat.parse(fileData[1]));
-				existingPaths.add(path);
+				String serverFileOutput = ServerAccess.executeCommand("/home/shared/animation/getFileData.sh " + username);
+				String[] fileStrings = serverFileOutput.split("\\r?\\n");
+
+				for(String s : fileStrings)
+				{
+					String[] fileData = s.split("=");
+					String path = fileData[0];
+					if(fileData.length == 1)
+						addFileInfo(path, getDateModifiedLocal(path), null);
+					else
+						addFileInfo(path, getDateModifiedLocal(path), dateFormat.parse(fileData[1]));
+					existingPaths.add(path);
+				}
 			}
 
 			//Check local files to see if file exists locally but not remotely.			
@@ -65,8 +68,12 @@ public class DataHandler
 					if(!existingPaths.contains(path))
 						addFileInfo(path, getDateModifiedLocal(path), null);
 				}
+				
+				String path = String.format("%s/%s", entity, entity);
+				if(!existingPaths.contains(path))
+					addFileInfo(path, getDateModifiedLocal(path), null);
 			}
-			
+
 			Collections.sort(fileList);
 		} 
 		catch (IOException e) {e.printStackTrace();}
@@ -96,7 +103,7 @@ public class DataHandler
 		}
 		return files;
 	}
-	
+
 
 	public static List<FileInfo> getFilesForPullAll()
 	{
@@ -233,7 +240,7 @@ public class DataHandler
 				lastModifiedLocal = mostRecent;
 			}
 		}
-		
+
 		if(lastModifiedLocal != null)
 		{
 			long roundedTime = (long) (Math.floor(lastModifiedLocal.getTime()/1000)*1000);

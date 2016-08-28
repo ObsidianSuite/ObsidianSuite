@@ -31,6 +31,8 @@ public class FileInfo implements Comparable<FileInfo>
 
 	public Status getStatus()
 	{
+		if(!ServerAccess.online)
+			return Status.Offline;
 		if(lastModifiedLocal == null)
 			return Status.New;
 		if(lastModifiedRemote == null)
@@ -143,7 +145,8 @@ public class FileInfo implements Comparable<FileInfo>
 		InSync (Color.GREEN, StatusAction.None),
 		Conflicted (Color.RED, StatusAction.None),
 		New (Color.PINK, StatusAction.Pull),
-		Local (Color.GRAY, StatusAction.Push);
+		Local (Color.GRAY, StatusAction.Push),
+		Offline (Color.RED, StatusAction.None);
 		
 
 		public final Color color;

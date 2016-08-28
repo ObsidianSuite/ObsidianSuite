@@ -22,9 +22,12 @@ public class ServerAccess
 
 	private static final String host="192.241.128.45";
 	private static Session session;
+	
+	public static boolean online = false;
 
 	public static boolean testConnection()
 	{
+		//TODO uncomment once offline mode implemented.
 		Properties properties = new Properties(); 
 		properties.put("StrictHostKeyChecking", "no");
 
@@ -42,6 +45,8 @@ public class ServerAccess
 			return false;
 		}
 		return true;
+		
+	//	return false;
 	}
 
 	public static void login(String username, String password) throws JSchException, IOException
@@ -57,6 +62,8 @@ public class ServerAccess
 		System.out.println("Connected");
 		
 		executeCommand("/home/shared/animation/log.sh -l " + username);
+		
+		online = true;
 	}
 	
 	public static String getUser()

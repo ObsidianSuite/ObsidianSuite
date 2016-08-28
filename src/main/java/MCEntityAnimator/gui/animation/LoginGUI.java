@@ -103,11 +103,15 @@ public class LoginGUI extends JFrame
 					}	
 				}
 				else
-					System.out.println("Offline");
-				
-
-
-				//JOptionPane.showConfirmDialog(mainPanel, "Unable to connect to server. Run in offline mode? (Changes will not be saved).", "Connection Error", JOptionPane.YES_NO_OPTION) == 0)
+				{
+					if(JOptionPane.showConfirmDialog(mainPanel, "Unable to connect to server. Run in offline mode?", "Connection Error", JOptionPane.YES_NO_OPTION) == 0)
+					{
+						DataHandler.generateFileList(username);
+						GuiHandler.loginGUI = null;
+						dispose();
+						GuiHandler.mainGui = new MainGUI();
+					}
+				}
 			}
 		});
 		mainPanel.add(loginButton,c);

@@ -178,12 +178,6 @@ public class MainGUI extends JFrame
 					dispose();
 					Minecraft.getMinecraft().displayGuiScreen(new GuiPartSetup(entityToEdit));
 				}
-
-
-
-
-
-
 			}
 		});
 
@@ -318,16 +312,6 @@ public class MainGUI extends JFrame
 
 		private void refresh()
 		{
-			//			mainPanel.remove(this);
-			//			jobPanel = new JobPanel();
-			//			GridBagConstraints c = new GridBagConstraints();
-			//			c.fill = GridBagConstraints.BOTH;
-			//			c.insets = new Insets(5,5,5,5);
-			//			c.gridy = 2;
-			//			mainPanel.add(jobPanel, c);
-			//			mainPanel.revalidate();
-			//			mainPanel.repaint();
-
 			revalidate();
 			repaint();
 		}
