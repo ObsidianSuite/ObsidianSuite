@@ -41,7 +41,7 @@ public class DataHandler
 			MCEA_Main.dataHandler.saveNBTData();
 			fileList.clear();
 
-			String serverFileOutput = ServerAccess.executeCommand("/home/shared/getFileData.sh " + username);
+			String serverFileOutput = ServerAccess.executeCommand("/home/shared/animation/getFileData.sh " + username);
 			String[] fileStrings = serverFileOutput.split("\\r?\\n");
 
 			List<String> existingPaths = new ArrayList<String>();

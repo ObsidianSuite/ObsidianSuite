@@ -44,7 +44,7 @@ public class ServerAccess
 		return true;
 	}
 
-	public static void login(String username, String password) throws JSchException
+	public static void login(String username, String password) throws JSchException, IOException
 	{		
 		Properties properties = new Properties(); 
 		properties.put("StrictHostKeyChecking", "no");
@@ -55,6 +55,8 @@ public class ServerAccess
 		session.setConfig(properties);
 		session.connect();
 		System.out.println("Connected");
+		
+		executeCommand("/home/shared/animation/log.sh -l " + username);
 	}
 	
 	public static String getUser()
@@ -167,6 +169,9 @@ public class ServerAccess
 			out.flush();
 
 		}
+		
+		System.out.println(executeCommand(String.format("/home/shared/animation/log.sh -q %s %s", session.getUserName(), remoteFileAddress)));
+
 	}
 
 
@@ -258,6 +263,8 @@ public class ServerAccess
 			String completeCommand = String.format("%s && %s && %s && %s", copyCommand, removeCommand, moveCommand, touchCommand);
 			executeCommand(completeCommand);
 		}
+		
+		executeCommand(String.format("/home/shared/animation/log.sh -p %s %s", session.getUserName(), remoteFileAddress));
 	}
 		
 	private static String getDateModified(String remoteFileAddress) throws JSchException, IOException

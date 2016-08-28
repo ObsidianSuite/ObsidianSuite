@@ -8,6 +8,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.IOException;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -92,9 +93,13 @@ public class LoginGUI extends JFrame
 						dispose();
 						GuiHandler.mainGui = new MainGUI();
 					} 
-					catch (JSchException exeception) 
+					catch (JSchException e1) 
 					{
 						JOptionPane.showMessageDialog(mainPanel, "Incorrect username/password combination.");
+					}
+					catch (IOException e2) 
+					{
+						JOptionPane.showMessageDialog(mainPanel, "Login issue, try again.");
 					}	
 				}
 				else
