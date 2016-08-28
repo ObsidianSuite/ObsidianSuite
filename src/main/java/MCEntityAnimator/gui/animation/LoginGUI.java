@@ -8,21 +8,21 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.io.IOException;
 
 import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
+import javax.swing.JTextField;
 
 import org.lwjgl.opengl.Display;
 
-import MCEntityAnimator.distribution.SaveLoadHandler;
+import com.jcraft.jsch.JSchException;
+
+import MCEntityAnimator.distribution.DataHandler;
 import MCEntityAnimator.distribution.ServerAccess;
 import MCEntityAnimator.gui.GuiBlack;
 import MCEntityAnimator.gui.GuiHandler;
@@ -33,23 +33,21 @@ public class LoginGUI extends JFrame
 
 	private static final long serialVersionUID = 6032906317630465138L;
 
-	private static final String[] users = new String[]{"joe", "kurt", "root"};
-
-	private static final Map<String, char[]> passwords = new HashMap<String, char[]>();
-
-
-	private static final char[] joePassword = "dabigjoe".toCharArray();
-	private static final char[] kurtPassword = "projectxykurt".toCharArray();
-	private static final char[] rootPassword = "iamroot".toCharArray();
+	//	private static final String[] users = new String[]{"joe", "kurt", "root"};
+	//	private static final Map<String, char[]> passwords = new HashMap<String, char[]>();
+	//	private static final char[] joePassword = "dabigjoe".toCharArray();
+	//	private static final char[] kurtPassword = "projectxykurt".toCharArray();
+	//	private static final char[] rootPassword = "iamroot".toCharArray();
+	//	
 	private JPasswordField passwordField;
 
 	public LoginGUI()
 	{
 		super("Login");
 
-		passwords.put("joe", joePassword);
-		passwords.put("kurt", kurtPassword);
-		passwords.put("root", rootPassword);
+		//		passwords.put("joe", joePassword);
+		//		passwords.put("kurt", kurtPassword);
+		//		passwords.put("root", rootPassword);
 
 		final JPanel mainPanel = new JPanel();
 		mainPanel.setLayout(new GridBagLayout());
@@ -65,8 +63,8 @@ public class LoginGUI extends JFrame
 		c.gridwidth = 1;
 		mainPanel.add(new JLabel("Login as: "),c);
 		c.gridx = 1;
-		final JComboBox<String> userSelect = new JComboBox<String>(users);
-		mainPanel.add(userSelect, c);
+		final JTextField usernameField = new JTextField();
+		mainPanel.add(usernameField, c);
 
 		c.gridy = 1;
 		c.gridx = 0;
@@ -82,21 +80,48 @@ public class LoginGUI extends JFrame
 			@Override
 			public void actionPerformed(ActionEvent e) 
 			{
-				String username = (String) userSelect.getSelectedItem();
-				char[] password = passwords.get(username);
-				if(Arrays.equals(passwordField.getPassword(), password))
+				String username = usernameField.getText();
+				String password = new String(passwordField.getPassword());
+
+				if(ServerAccess.testConnection())
 				{
-					if(ServerAccess.canConnect() || 
-							JOptionPane.showConfirmDialog(mainPanel, "Unable to connect to server. Run in offline mode? (Changes will not be saved).", "Connection Error", JOptionPane.YES_NO_OPTION) == 0)
+					try 
 					{
+						ServerAccess.login(username, password);
+						DataHandler.generateFileList(username);
+						GuiHandler.loginGUI = null;
 						dispose();
-						ServerAccess.username = username;
-						SaveLoadHandler.download();
-						ServerAccess.gui = new FileGUI();
+						GuiHandler.mainGui = new MainGUI();
+					} 
+					catch (JSchException e1) 
+					{
+						JOptionPane.showMessageDialog(mainPanel, "Incorrect username/password combination.");
 					}
+					catch (IOException e2) 
+					{
+						JOptionPane.showMessageDialog(mainPanel, "Login issue, try again.");
+					}	
 				}
 				else
-					JOptionPane.showMessageDialog(mainPanel, "Incorrect password.");
+				{
+					if(JOptionPane.showConfirmDialog(mainPanel, "Unable to connect to server. Run in offline mode?", "Connection Error", JOptionPane.YES_NO_OPTION) == 0)
+					{
+						Boolean canLogin = DataHandler.canLoginOffline(username, password);
+						if(canLogin != null)
+						{
+							if(canLogin)
+							{
+								ServerAccess.online = false;
+								DataHandler.generateFileList(username);
+								GuiHandler.loginGUI = null;
+								dispose();
+								GuiHandler.mainGui = new MainGUI();
+							}
+							else
+								JOptionPane.showMessageDialog(mainPanel, "Incorrect username/password combination.");
+						}
+					}
+				}
 			}
 		});
 		mainPanel.add(loginButton,c);
@@ -113,7 +138,7 @@ public class LoginGUI extends JFrame
 			}
 		});
 		mainPanel.add(registerButton,c);
-		
+
 		c.gridy = 4;
 		JButton closeButton = new JButton("Quit");
 		closeButton.addActionListener(new ActionListener()
@@ -126,16 +151,16 @@ public class LoginGUI extends JFrame
 			}
 		});
 		mainPanel.add(closeButton,c);
-		
+
 		addWindowListener(new WindowAdapter()
 		{
-			
+
 			@Override
 			public void windowClosing(WindowEvent e)
 			{
 				onClose();
 			}
-			
+
 		});
 
 		setContentPane(mainPanel);
@@ -155,6 +180,6 @@ public class LoginGUI extends JFrame
 		if(mc.currentScreen instanceof GuiBlack)
 			((GuiBlack) mc.currentScreen).initateClose();
 	}
-	
+
 }
 

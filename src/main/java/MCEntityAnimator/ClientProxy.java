@@ -14,11 +14,13 @@ import net.minecraftforge.client.MinecraftForgeClient;
 
 public class ClientProxy extends CommonProxy
 {	
+	
+	public static final RenderObj renderObj = new RenderObj();
 
 	public void registerRendering()
 	{
 		//Entities
-        RenderingRegistry.registerEntityRenderingHandler(EntityObj.class, new RenderObj());
+        RenderingRegistry.registerEntityRenderingHandler(EntityObj.class, renderObj);
 
         //SpecialItems
         LongItemRenderer longrender = new LongItemRenderer();

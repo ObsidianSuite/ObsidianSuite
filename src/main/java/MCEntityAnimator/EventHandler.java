@@ -27,7 +27,7 @@ public class EventHandler
 	{
 		try 
 		{
-			if(event.gui instanceof GuiMainMenu && !updateChecked && ServerAccess.canConnect())
+			if(event.gui instanceof GuiMainMenu && !updateChecked && ServerAccess.testConnection())
 			{
 				new Updater().checkForUpdate(MCEA_Main.version);
 				updateChecked = true;

@@ -1,283 +1,390 @@
 package MCEntityAnimator.distribution;
 
-import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLConnection;
-import java.util.ArrayList;
-import java.util.List;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Properties;
 
-import MCEntityAnimator.MCEA_Main;
-import MCEntityAnimator.gui.animation.FileGUI;
+import com.jcraft.jsch.Channel;
+import com.jcraft.jsch.ChannelExec;
+import com.jcraft.jsch.JSch;
+import com.jcraft.jsch.JSchException;
+import com.jcraft.jsch.Session;
 
-public class ServerAccess
+public class ServerAccess 
 {
 
-	private static final String CrLf = "\r\n";
-	private static final String baseURL = "http://nthrootsoftware.com/MCEA/";
-	private static final String uploadURL = baseURL + "upload.php?folder=";
-	private static final String downloadURL = baseURL + "download.php?user=";
+	private static final String host="192.241.128.45";
+	private static Session session;
+	
+	public static boolean online = false;
 
-	public static FileGUI gui;
-	public static String username;
-
-	public static List<String> uploadAll() throws IOException
+	public static boolean testConnection()
 	{
-		File file;
-		
-		if(!canConnect())
-			return new ArrayList<String>();
-		
-		if(username.equals("root"))
-			file = new File(MCEA_Main.animationPath + "/data/shared");
-		else
-			file = new File(MCEA_Main.animationPath + "/data/" + username);
-		return uploadFolder(file);
-	}	
+		Properties properties = new Properties(); 
+		properties.put("StrictHostKeyChecking", "no");
 
-	private static List<String> uploadFolder(File folder) throws IOException
-	{
-		List<String> failedFiles = new ArrayList<String>();
-		for(File f : folder.listFiles())
+		JSch jsch = new JSch();
+		try 
 		{
-			if(f.isDirectory())
-				failedFiles.addAll(uploadFolder(f));
-			else
-			{
-				if(!uploadFile(f))
-					failedFiles.add(f.getName());
-			}
-				
-		}
-		return failedFiles;
-	}
-
-	/**
-	 * Upload a file to the server.
-	 * @param file File to upload.
-	 * @param path Destination path on server, will for example data/path, do not start with a '/'! 
-	 * @throws IOException
-	 */
-	private static boolean uploadFile(File file) throws IOException 
-	{
-		output("Uploading " + file.getName() + "...", false);
-
-		String parentPath = file.getParentFile().getPath().replace("\\", "/");
-		parentPath = parentPath.substring(parentPath.indexOf("/data") + 1, parentPath.length());	
-		URL	url = new URL(uploadURL + parentPath);
-
-		URLConnection connection = url.openConnection();
-		connection.setDoOutput(true);
-
-		FileInputStream fileInputStream = new FileInputStream(file);
-		byte[] fileData = new byte[fileInputStream.available()];
-		fileInputStream.read(fileData);
-		fileInputStream.close();
-
-		String message1 = "";
-		message1 += "-----------------------------4664151417711" + CrLf;
-		message1 += "Content-Disposition: form-data; name=\"uploadedfile\"; filename=\"" + file.getName() + "\"" + CrLf;
-		message1 += "Content-Type: image/jpeg" + CrLf;
-		message1 += CrLf;
-
-		String message2 = "";
-		message2 += CrLf + "-----------------------------4664151417711--" + CrLf;
-
-		connection.setRequestProperty("Content-Type", "multipart/form-data; boundary=---------------------------4664151417711");
-		connection.setRequestProperty("Content-Length", String.valueOf((message1.length() + message2.length() + fileData.length)));
-
-		OutputStream output = connection.getOutputStream();
-		output.write(message1.getBytes());
-
-		// SEND THE FILE
-		int index = 0;
-		int size = 1024;
-		do 
+			Session s = jsch.getSession(host);
+			s.setConfig(properties);
+			s.connect();
+		} 
+		catch (JSchException e) 
 		{
-			if ((index + size) > fileData.length) 
-				size = fileData.length - index;
-			output.write(fileData, index, size);
-			index += size;
-		} while (index < fileData.length);
-
-		output.write(message2.getBytes());
-		output.flush();
-
-		output("Processing file...", true);
-
-		// READ RETURNING MESSAGE
-		InputStream input = connection.getInputStream();
-		BufferedReader reader = new BufferedReader(new InputStreamReader(input));		
-		String s;
-		while((s = reader.readLine()) != null)
-		{
-			if(!s.equals("") && !s.equals(" "))
-			{
-				output(s, true);
-				if(s.contains("There was an error uploading"))
-					return false;
-			}
-		}
-
-		output.close();
-		input.close();
-		return true;
-	}
-
-	public static void downloadAll() throws IOException
-	{
-		HttpURLConnection connection = (HttpURLConnection) new URL(downloadURL  + username).openConnection();
-		InputStream stream;
-		
-		if(!canConnect())
-			return;
-		
-		if(connection.getResponseCode() == 200)
-			stream = connection.getInputStream();
-		else
-			stream = connection.getErrorStream();
-
-		if(stream != null)
-		{
-			File homeDir = new File(MCEA_Main.animationPath);
-			if(homeDir.exists())
-				deleteDirectory(homeDir);
-			BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
-			String s;
-			while((s = reader.readLine()) != null)
-			{
-				if(!s.equals(" "))
-				{
-					if(s.contains("No folder found for"))
-						output(s, true);
-					else
-					{
-
-						//* denotes folder
-						if(s.contains("*"))
-						{
-							String folderName = s.substring(0, s.length() - 1);
-							File file = new File(MCEA_Main.animationPath + "/" + folderName);
-							file.mkdirs();
-						}
-						else
-						{
-							output("Downloading " + s + "...", false);
-
-							File file = new File(MCEA_Main.animationPath + "/" + s);
-							file.getParentFile().mkdirs();
-
-							URL downloadURL = new URL(baseURL + s);
-							URLConnection downloadConnection = downloadURL.openConnection();
-							InputStream is = downloadConnection.getInputStream();
-
-							BufferedOutputStream fOut = new BufferedOutputStream(new FileOutputStream(file));
-							byte[] buffer = new byte[32 * 1024];
-							int bytesRead = 0;
-							while ((bytesRead = is.read(buffer)) != -1) 
-							{
-								fOut.write(buffer, 0, bytesRead);
-							}
-							output(s + " downloaded", false);
-							fOut.flush();
-							fOut.close();
-							is.close();
-						}
-					}
-				}
-
-			}
-			stream.close();
-		}
-	}
-
-
-	public static void output(String output, boolean server)
-	{
-		if(gui != null)
-			gui.updateOutput(output, server);
-//		else
-//			System.out.println("[" + (server ? "SERVER" : "CLIENT") + "] " + output);
-	}
-
-	public static List<String> getErrors()
-	{
-		List<String> errorList = new ArrayList<String>();
-		File sharedFolder = new File(MCEA_Main.animationPath + "/data/shared");
-		for(File f : sharedFolder.listFiles())
-		{
-			if(f.isDirectory())
-				errorList.addAll(getEntityFolderErrors(f));
-		}
-		return errorList;
-	}
-
-	private static List<String> getEntityFolderErrors(File folder)
-	{
-		List<String> errorList = new ArrayList<String>();
-		boolean dataExists = false;
-		boolean textureExists = false;
-		boolean modelExists = false;
-		boolean pxyExists = false;
-
-		for(File f : folder.listFiles())
-		{
-			if(f.getName().contains(".data"))
-				dataExists = true;
-			else if(f.getName().contains(".png"))
-				textureExists = true;
-			else if(f.getName().contains(".obj"))
-				modelExists = true;
-			else if(f.getName().contains(".pxy"))
-				pxyExists = true;
-		}
-
-		if(!dataExists)
-			errorList.add("No data file for " + folder.getName() + ".");
-		if(!textureExists)
-			errorList.add("No texture for " + folder.getName() + ".");
-		if(!modelExists)
-			errorList.add("No model for " + folder.getName() + ".");
-		if(!pxyExists)
-			errorList.add("No pxy file for " + folder.getName() + ".");
-
-		return errorList;
-	}
-
-	private static void deleteDirectory(File dir)
-	{
-		for(File f : dir.listFiles())
-		{
-			if(f.isDirectory())
-				deleteDirectory(f);
-			else
-				f.delete();
-		}
-		dir.delete();	
-	}
-
-	public static boolean canConnect()
-	{
-		try
-		{
-			HttpURLConnection connection = (HttpURLConnection) new URL(baseURL).openConnection();
-			connection.connect();
-		}
-		catch(IOException e)
-		{
-			System.out.println("Unable to connect to animation server.");
+			if(e.getMessage().equals("Auth fail"))
+				return true;
 			return false;
-		}		
+		}
 		return true;
+	}
+
+	public static void login(String username, String password) throws JSchException, IOException
+	{		
+		Properties properties = new Properties(); 
+		properties.put("StrictHostKeyChecking", "no");
+
+		JSch jsch = new JSch();
+		session=jsch.getSession(username, host, 22);
+		session.setPassword(password);
+		session.setConfig(properties);
+		session.connect();
+		System.out.println("Connected");
+		
+		executeCommand("/home/shared/animation/log.sh -l " + username);
+		
+		DataHandler.clearDataIfDifferentUser(username);
+		
+		DataHandler.writeUserData(username, password);
+		
+		online = true;
+	}
+	
+	public static String getUser()
+	{
+		return session != null ? session.getUserName() : null;
+	}
+	
+	
+
+	public static void getFile(String localFileAddress, String remoteFileAddress) throws IOException, JSchException
+	{		
+		boolean exists = executeCommand("[ -e " + remoteFileAddress + " ] && echo \"true\" || echo \"false\"").replace("\n", "").replace("\r", "").equals("true");
+		if(!exists)
+		{
+			return;
+		}
+
+		File localFile = new File(localFileAddress);
+		if(!localFile.exists())
+		{
+			localFile.getParentFile().mkdirs();
+			localFile.createNewFile();
+		}
+		FileOutputStream fos=null;
+
+		//Add separator if folder
+		String prefix=null;
+		if(new File(localFileAddress).isDirectory())
+			prefix=localFileAddress+File.separator;
+
+		//Execute 'scp -f remoteFileAddress' remotely
+		String command="scp -f "+ remoteFileAddress;
+		Channel channel= session.openChannel("exec");
+		((ChannelExec)channel).setCommand(command);
+
+		//Get I/O streams for remote scp
+		OutputStream out = channel.getOutputStream();
+		InputStream in = channel.getInputStream();
+		channel.connect();
+
+		//Send '\0'
+		byte[] buf=new byte[1024];
+		buf[0]=0;
+		out.write(buf, 0, 1); 
+		out.flush();
+
+		while(true)
+		{
+			int c = checkConnection(in);
+			if(c != 'C')
+				break;
+
+			//Read '0644'
+			in.read(buf, 0, 5);
+			long filesize=0L;
+
+			while(true)
+			{
+				//Error
+				if(in.read(buf, 0, 1) < 0)
+					break; 
+				if(buf[0] == ' ')
+					break;
+				filesize=filesize*10L+(long)(buf[0]-'0');
+			}
+
+			String file=null;
+			for(int i=0; ;i++)
+			{
+				in.read(buf, i, 1);
+				if(buf[i]==(byte)0x0a)
+				{
+					file=new String(buf, 0, i);
+					break;
+				}
+			}
+
+			//Send '\0'
+			buf[0]=0;
+			out.write(buf, 0, 1); 
+			out.flush();
+
+			//Write content to local file
+			fos = new FileOutputStream(prefix==null ? localFileAddress : prefix + file);
+			int foo;
+			while(true)
+			{
+				if(buf.length < filesize) 
+					foo = buf.length;
+				else 
+					foo = (int)filesize;
+				foo = in.read(buf, 0, foo);
+				if(foo<0)// error 
+					break;
+				fos.write(buf, 0, foo);
+				filesize-=foo;
+				if(filesize == 0L)
+					break;
+			}
+			fos.close();
+			fos=null;
+			
+			try 
+			{
+				localFile.setLastModified(DataHandler.dateFormat.parse(getDateModified(remoteFileAddress)).getTime());
+			} 
+			catch (ParseException e) {e.printStackTrace();}
+			
+			if(checkConnection(in)!=0)
+				return;
+
+			//Send '\0'
+			buf[0]=0; 
+			out.write(buf, 0, 1); 
+			out.flush();
+
+		}
+		
+		executeCommand(String.format("/home/shared/animation/log.sh -q %s %s", session.getUserName(), remoteFileAddress));
+
+	}
+
+
+	public static void sendFile(String localFileAddress, String remoteFileAddress, boolean userFolder) throws IOException, JSchException
+	{		
+		System.out.println(session.getUserName());
+		
+		FileInputStream fis=null;
+
+		//Execute 'scp -t remoteFileAddress' remotely
+		String command="scp " + (userFolder ? "-p" :"") + " -t " + remoteFileAddress;
+		Channel channel = session.openChannel("exec");
+		((ChannelExec)channel).setCommand(command);
+
+		//Get I/O streams for remote scp
+		OutputStream out=channel.getOutputStream();
+		InputStream in=channel.getInputStream();
+		channel.connect();
+		if(checkConnection(in) != 0)
+			return;
+
+		//Get local file
+		File localFile = new File(localFileAddress);
+		if(!localFile.exists())
+			return;
+
+		//If time stamp is to be preserved, read the time
+		//details of the local file and send it over before the file data
+		if(userFolder)
+		{
+			command="T" + (localFile.lastModified()/1000) + " 0";
+			command+=(" " + (localFile.lastModified()/1000) + " 0\n"); 
+			out.write(command.getBytes()); 
+			out.flush();
+			if(checkConnection(in) != 0)
+				return;
+		}
+
+		//Send "C0644 filesize filename", where filename should not include '/'
+		long filesize= localFile.length();
+		command="C0644 " + filesize + " ";
+
+		if(localFileAddress.lastIndexOf('/')>0)
+			command+=localFileAddress.substring(localFileAddress.lastIndexOf('/')+1);
+		else
+			command+=localFileAddress;
+		command+="\n";
+
+		out.write(command.getBytes()); 
+		out.flush();
+		if(checkConnection(in) != 0)
+			return;
+
+		//Send contents of local file
+		fis=new FileInputStream(localFile);
+		byte[] buf=new byte[1024];
+		while(true)
+		{
+			int len=fis.read(buf, 0, buf.length);
+			if(len<=0) break;
+			out.write(buf, 0, len);
+		}
+		fis.close();
+		fis=null;
+
+		//Send '\0'
+		buf[0]=0; out.write(buf, 0, 1); 
+		out.flush();
+
+		if(checkConnection(in)!=0)
+			return;
+
+		out.close();
+
+		channel.disconnect();
+		
+		if(!userFolder)
+		{
+			Date d = new Date(localFile.lastModified());
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmm.ss");
+			String date = sdf.format(d);
+			
+			String remoteFileAddressAlt = remoteFileAddress + "b";
+			
+			String copyCommand = String.format("cp %s %s", remoteFileAddress, remoteFileAddressAlt);
+			String removeCommand = String.format("rm %s", remoteFileAddress);
+			String moveCommand = String.format("mv %s %s", remoteFileAddressAlt, remoteFileAddress);
+			String touchCommand = String.format("touch -mt %s %s", date, remoteFileAddress);
+			
+			String completeCommand = String.format("%s && %s && %s && %s", copyCommand, removeCommand, moveCommand, touchCommand);
+			executeCommand(completeCommand);
+		}
+		
+		executeCommand(String.format("/home/shared/animation/log.sh -p %s %s", session.getUserName(), remoteFileAddress));
+	}
+		
+	private static String getDateModified(String remoteFileAddress) throws JSchException, IOException
+	{		
+		//Execute 'stat remoteFileAddress' remotely
+		String command = "stat " + remoteFileAddress;
+		Channel channel = session.openChannel("exec");
+		((ChannelExec)channel).setCommand(command);
+
+		//Get I/O streams for remote stat
+		OutputStream out=channel.getOutputStream();
+		InputStream in=channel.getInputStream();
+		channel.connect();
+
+
+		//Get stat output
+		String statOutput = "";
+		byte[] tmp=new byte[1024];
+		while(true)
+		{
+			while(in.available()>0)
+			{
+				int i=in.read(tmp, 0, 1024);
+				if(i<0)break;
+				statOutput += new String(tmp, 0, i);
+			}
+			if(channel.isClosed())
+			{
+				if(in.available()>0) 
+					continue; 
+				break;
+			}
+			try{Thread.sleep(1000);}catch(Exception ee){}
+		}
+		channel.disconnect();
+
+		String lines[] = statOutput.split("\\r?\\n");
+
+		for(String line : lines)
+		{
+			if(line.contains("Modify:"))
+				return line.substring(8).substring(0, 19);
+		}
+		throw new JSchException("Unable to retrieve last modified date of " + remoteFileAddress + " from server.");
+	}
+
+	public static int checkConnection(InputStream in) throws IOException
+	{
+		int b=in.read();
+		// b may be 0 for success,
+		//          1 for error,
+		//          2 for fatal error,
+		//          -1
+
+		//All good
+		if(b==0) return b;
+		if(b==-1) return b;
+
+		//Not good, read issue and output.
+		if(b==1 || b==2)
+		{
+			StringBuffer sb=new StringBuffer();
+			int c;
+			do 
+			{
+				c=in.read();
+				if(c != '\n')
+					sb.append((char)c);
+			}
+			while(c!='\n');
+			throw new IOException("Error uploading: " + sb.toString());
+		}
+		return b;
+	}
+
+	public static String executeCommand(String command) throws JSchException, IOException
+	{
+		Channel channel = session.openChannel("exec");
+		((ChannelExec)channel).setCommand(command);
+		channel.setInputStream(null);
+		((ChannelExec)channel).setErrStream(System.err);
+
+		InputStream in = channel.getInputStream();
+		channel.connect();
+
+		String s = "";
+
+		byte[] tmp=new byte[1024];
+		while(true)
+		{
+			while(in.available()>0)
+			{
+				int i=in.read(tmp, 0, 1024);
+				if(i<0)break;
+				s += new String(tmp, 0, i);
+			}
+			if(channel.isClosed())
+			{
+				if(in.available()>0) 
+					continue; 
+				break;
+			}
+		}
+		channel.disconnect();
+
+		return s;
 	}
 
 }
-

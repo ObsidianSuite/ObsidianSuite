@@ -54,11 +54,11 @@ import MCEntityAnimator.Util;
 import MCEntityAnimator.animation.AnimationData;
 import MCEntityAnimator.animation.AnimationPart;
 import MCEntityAnimator.animation.AnimationSequence;
-import MCEntityAnimator.distribution.SaveLoadHandler;
 import MCEntityAnimator.distribution.ServerAccess;
 import MCEntityAnimator.gui.GuiBlack;
+import MCEntityAnimator.gui.GuiHandler;
 import MCEntityAnimator.gui.GuiInventoryChooseItem;
-import MCEntityAnimator.gui.animation.FileGUI;
+import MCEntityAnimator.gui.animation.MainGUI;
 import MCEntityAnimator.render.objRendering.EntityObj;
 import MCEntityAnimator.render.objRendering.parts.Part;
 import net.minecraft.client.Minecraft;
@@ -192,7 +192,8 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 	{
 		super.onGuiClosed();
 		timelineFrame.dispose();
-		SaveLoadHandler.upload();
+		if(animationVersion != 0)
+			AnimationData.addChangedSequence(entityName, currentAnimation.getName());
 	}
 
 	public void drawScreen(int par1, int par2, float par3)
@@ -534,7 +535,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 	private void close()
 	{
 		mc.displayGuiScreen(new GuiBlack());
-		ServerAccess.gui = new FileGUI();
+		GuiHandler.mainGui = new MainGUI();
 	}
 
 	/* ---------------------------------------------------- *

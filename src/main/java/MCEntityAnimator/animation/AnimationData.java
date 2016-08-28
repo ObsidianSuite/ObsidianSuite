@@ -25,8 +25,11 @@ public class AnimationData
 
 	//All sequences, stances and parenting data.
 	private static Map<String, List<AnimationSequence>> sequences = Maps.newHashMap();	
+	private static Map<String, List<String>> changedSequences = Maps.newHashMap();	
+
 	private static Map<String, List<AnimationStance>> stances = Maps.newHashMap();	
 	private static Map<String, AnimationParenting> parenting = Maps.newHashMap();
+	private static List<String> changedEntitySetups = new ArrayList<String>();
 
 	//Setup for GUIs
 	private static Map<String, String> guiSetup = Maps.newHashMap();
@@ -46,6 +49,21 @@ public class AnimationData
 		return parenting.get(model);
 	}
 
+	public static void setEntitySetupChanged(String entityName)
+	{
+		changedEntitySetups.add(entityName);
+	}
+
+	public static boolean getEntitySetupChanged(String entityName)
+	{
+		return changedEntitySetups.contains(entityName);
+	}
+
+	public static void clearEntitySetupChanged()
+	{
+		changedEntitySetups.clear();
+	}
+
 	/**
 	 * Adds the sequence to the list of sequences for the given entity.
 	 * Will overwrite any sequence with the same name.
@@ -60,6 +78,29 @@ public class AnimationData
 			sqs.remove(existingSeq);
 		sqs.add(sequence);
 		sequences.put(entityName, sqs);
+	}
+
+	public static void addChangedSequence(String entityName, String sequenceName)
+	{
+		List<String> sqs = changedSequences.get(entityName);
+		if(sqs == null)
+			sqs = new ArrayList<String>();
+		if(!sqs.contains(sequenceName))	
+			sqs.add(sequenceName);
+		changedSequences.put(entityName, sqs);
+	}	
+
+	public static List<String> getChangedSequences(String entityName)
+	{
+		List<String> sqs = changedSequences.get(entityName);
+		if(sqs == null)
+			sqs = new ArrayList<String>();
+		return sqs;
+	}
+
+	public static void clearChangedSequences(String entityName)
+	{
+		changedSequences.put(entityName, new ArrayList<String>());
 	}
 
 	public static AnimationSequence getSequenceFromName(String entityName, String animationName)
@@ -81,7 +122,7 @@ public class AnimationData
 	{
 		return sequences.get(entityName) == null ? new ArrayList<AnimationSequence>() : sequences.get(entityName);
 	}
-	
+
 	public static boolean sequenceExists(String entityName, String animationName)
 	{
 		List<AnimationSequence> seqs = getSequences(entityName);
@@ -159,12 +200,12 @@ public class AnimationData
 		}
 		return null;
 	}
-	
+
 	public static void setAnimationItem(String animationName, int id)
 	{
 		animationItems.put(animationName, id);
 	}
-	
+
 	public static NBTTagCompound getGUISetupTag(List<String> entities)
 	{
 		NBTTagCompound nbt = new NBTTagCompound();
@@ -179,7 +220,7 @@ public class AnimationData
 			entityList.appendTag(guiSetupCompound);
 		}
 		nbt.setTag("GuiSetup", entityList);
-		
+
 		NBTTagList animationItemList = new NBTTagList();
 		for(Entry<String, Integer> e : animationItems.entrySet())
 		{
@@ -189,7 +230,7 @@ public class AnimationData
 			animationItemList.appendTag(animationItem);
 		}
 		nbt.setTag("AnimationItems", animationItemList);
-		
+
 		return nbt;
 	}	
 
@@ -203,14 +244,14 @@ public class AnimationData
 			String entityName = guiSetupCompound.getString("EntityName");
 			setGUISetup(entityName, guiSetupCompound.getString("GUISetup"));
 		}
-		
+
 		NBTTagList animationItemList = nbt.getTagList("AnimationItems", 10);
 		for(int i = 0; i < animationItemList.tagCount(); i++)
 		{
 			NBTTagCompound animationItem = animationItemList.getCompoundTagAt(i);
 			setAnimationItem(animationItem.getString("name"), animationItem.getInteger("id"));
 		}
-		
+
 		System.out.println(" Done");
 	}	
 
@@ -230,6 +271,18 @@ public class AnimationData
 
 		PartGroups p = partGroups.get(entityName);
 		p.loadData(compound.getCompoundTag("Groups"), entityName);
+	}
+
+	public static void clear() 
+	{
+		sequences.clear();
+		changedSequences.clear();
+		stances.clear();
+		parenting.clear();
+		changedEntitySetups.clear();
+		guiSetup.clear();
+		animationItems.clear();
+		partGroups.clear();
 	}
 
 }
