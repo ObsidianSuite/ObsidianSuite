@@ -1,6 +1,7 @@
 /lib
 /logs
 /src_backup
+/mods
 
 # eclipse
 /bin
