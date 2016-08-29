@@ -38,8 +38,7 @@ dependencies {
 
     // for more info...
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
-    // http://www.gradle.org/docs/current/userguide/dependency_management.html
-
+    // http://www.gradle.org/docs/current/userguide/dependency_management.html	
 }
 
 processResources
@@ -60,4 +59,23 @@ processResources
     from(sourceSets.main.resources.srcDirs) {
         exclude 'mcmod.info'
     }
+}
+
+//Add "embedded" configuration
+configurations 
+{
+    embed
+    compile.extendsFrom(embed)
+}
+// Add dependencies
+dependencies
+{
+    // This dependency and its transitive deps will be embedded
+    embed files('libs/jsch-0.1.53.jar')
+}
+
+//Add dependencies to the JAR
+jar 
+{
+    from configurations.embed.collect { it.isDirectory() ? it : zipTree(it) }
 }
