@@ -35,8 +35,16 @@ public class Updater
 		updaterFrame = new UpdaterFrame();
 		if(ServerConfig.updaterLive())
 			installUpdater();
-		if(!ServerConfig.modLive() || !outOfDate(currentVersion, getLatestVersion()))
-			updaterFrame.dispose();
+		if(ServerConfig.modLive() || Minecraft.getMinecraft().getSession().getUsername().equals("DaBigJoe"))
+		{
+			System.out.println("Mod live");
+			if(!outOfDate(currentVersion, getLatestVersion()))
+				updaterFrame.dispose();	
+		}
+		else
+			updaterFrame.dispose();	
+			
+	
 	}
 
 	public String getLatestVersion() throws IOException
