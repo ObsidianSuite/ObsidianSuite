@@ -1,4 +1,4 @@
-package com.nthrootsoftware.mcea;
+package com.nthrootsoftware.mcea.updater;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -19,35 +19,36 @@ import net.minecraft.client.Minecraft;
 
 public class Updater 
 {
-	
+
 	private final static String versionURL = "http://nthrootsoftware.com/MCEA/version.html";
-    private final static String historyURL = "http://nthrootsoftware.com/MCEA/history.html";
-    
-    private String modVersion;
-    private String serverVersion;
-	
-    private UpdaterFrame updaterFrame;
-    
-    public void checkForUpdate(String currentVersion) throws IOException
-    {
-    	modVersion = currentVersion;
-    	serverVersion = getLatestVersion();
+	private final static String historyURL = "http://nthrootsoftware.com/MCEA/history.html";
+
+	private String modVersion;
+	private String serverVersion;
+
+	private UpdaterFrame updaterFrame;
+
+	public void checkForUpdate(String currentVersion) throws IOException
+	{
+		modVersion = currentVersion;
+		serverVersion = getLatestVersion();
 		updaterFrame = new UpdaterFrame();
-    	installUpdater();
-    	if(!outOfDate(currentVersion, getLatestVersion()))
-    		updaterFrame.dispose();
-    }
-    
+		if(ServerConfig.updaterLive())
+			installUpdater();
+		if(!ServerConfig.modLive() || !outOfDate(currentVersion, getLatestVersion()))
+			updaterFrame.dispose();
+	}
+
 	public String getLatestVersion() throws IOException
 	{
-		 String data = getData(versionURL);
-	     return data.substring(data.indexOf("[version]")+9, data.indexOf("[/version]"));
+		String data = getData(versionURL);
+		return data.substring(data.indexOf("[version]")+9, data.indexOf("[/version]"));
 	}
 
 	public String getWhatsNew() throws IOException
 	{
 		String data = getData(historyURL);
-        return data.substring(data.indexOf("[history]")+9,data.indexOf("[/history]"));
+		return data.substring(data.indexOf("[history]")+9,data.indexOf("[/history]"));
 	}
 
 	public String getData(String address) throws IOException
@@ -64,15 +65,15 @@ public class Updater
 			c = html.read();
 			buffer.append((char)c);
 		}
-		
+
 		return buffer.toString();
 	}
-	
+
 	private boolean outOfDate(String modVersion, String serverVersion)
 	{
 		String[] modVerSplit = modVersion.split("\\.");
 		String[] serverVerSplit = serverVersion.split("\\.");
-		
+
 		for(int i = 0; i < serverVerSplit.length; i++)
 		{
 			int s = Integer.parseInt(serverVerSplit[i]);
@@ -89,24 +90,24 @@ public class Updater
 		}
 		return false;
 	}
-	
+
 	public void setOutputText(String s)
 	{
 		updaterFrame.output.setText(s);
 	}
-	
+
 	private class UpdaterFrame extends JFrame
 	{
-		
+
 		private JPanel mainPanel;
 		private JLabel output = new JLabel("Would you like to update now?");
 		private JButton updateButton, cancelButton;
-		
+
 		private UpdaterFrame()
 		{
 			super("MCEA Update");
 			mainPanel = new JPanel();
-			
+
 			updateButton = new JButton("Update");
 			updateButton.addActionListener(new ActionListener()
 			{
@@ -117,7 +118,7 @@ public class Updater
 					beginUpdate();
 				}
 			});
-			
+
 			cancelButton = new JButton("Cancel");
 			cancelButton.addActionListener(new ActionListener()
 			{
@@ -127,37 +128,37 @@ public class Updater
 					dispose();
 				}
 			});
-			
+
 			mainPanel.setLayout(new GridBagLayout());
 			GridBagConstraints c = new GridBagConstraints();
-			
+
 			c.gridx = 0;
 			c.gridy = 0;
 			c.gridwidth = 2;
 			c.insets = new Insets(10, 10, 10, 10);
 			mainPanel.add(new JLabel("A new version of MCEA is available."), c);
-			
+
 			c.gridy = 1;
 			c.gridwidth = 1;
 			mainPanel.add(new JLabel("Current version: v" + modVersion), c);
-			
+
 			c.gridx = 1;
 			c.gridy = 1;
 			mainPanel.add(new JLabel("New version: v" + serverVersion), c);
-			
+
 			c.gridx = 0;
 			c.gridy = 2;
 			c.gridwidth = 2;
 			mainPanel.add(output, c);
-			
+
 			c.gridx = 0;
 			c.gridy = 3;
 			c.gridwidth = 1;
 			mainPanel.add(updateButton, c);
-			
+
 			c.gridx = 1;
 			mainPanel.add(cancelButton, c);
-			
+
 			setContentPane(mainPanel);
 			pack();
 			setLocationRelativeTo(null);
@@ -165,8 +166,8 @@ public class Updater
 			setVisible(true);
 			setAlwaysOnTop(true);
 		}
-		
-		
+
+
 		private void removeButtons()
 		{
 			mainPanel.remove(updateButton);
@@ -175,9 +176,9 @@ public class Updater
 			repaint();
 			pack();
 		}
-		
+
 	}
-	
+
 	private void installUpdater()
 	{
 		setOutputText("Updater not found, installing...");
@@ -186,7 +187,7 @@ public class Updater
 		updaterFrame.pack();
 		new Downloader(this);
 	}
-	
+
 	public void beginUpdate()
 	{
 		setOutputText("Stopping Minecraft and loading updater...");
@@ -196,7 +197,7 @@ public class Updater
 		ShutdownThread t = new ShutdownThread();
 		t.start();
 	}
-	
+
 	private class ShutdownThread extends Thread
 	{
 
@@ -211,16 +212,16 @@ public class Updater
 			{
 				e.printStackTrace();
 			}
-            try 
-            {
+			try 
+			{
 				Runtime.getRuntime().exec("java -jar MCEA_Updater.jar");
 			} 
-            catch (IOException e) 
-            {
+			catch (IOException e) 
+			{
 				e.printStackTrace();
 			}
-            Minecraft.getMinecraft().shutdown();
+			Minecraft.getMinecraft().shutdown();
 		}
-		
+
 	}
 }

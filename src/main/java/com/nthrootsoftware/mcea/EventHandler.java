@@ -7,6 +7,8 @@ import com.nthrootsoftware.mcea.gui.GuiBlack;
 import com.nthrootsoftware.mcea.gui.GuiHandler;
 import com.nthrootsoftware.mcea.gui.animation.LoginGUI;
 import com.nthrootsoftware.mcea.gui.stance.GuiAnimationMainMenu;
+import com.nthrootsoftware.mcea.updater.ServerConfig;
+import com.nthrootsoftware.mcea.updater.Updater;
 
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
@@ -30,6 +32,7 @@ public class EventHandler
 		{
 			if(event.gui instanceof GuiMainMenu && !updateChecked && ServerAccess.testConnection())
 			{
+				ServerConfig.init();
 				new Updater().checkForUpdate(MCEA_Main.version);
 				updateChecked = true;
 			}
