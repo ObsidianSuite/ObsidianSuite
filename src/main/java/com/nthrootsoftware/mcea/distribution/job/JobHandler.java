@@ -21,15 +21,27 @@ public class JobHandler
 	public void queueJob(Job job)
 	{
 		jobQueue.add(job);
-		jobThread.notify();
+		synchronized (jobThread) 
+		{
+			jobThread.notify();
+		}
 	}
 	
+	public void dispose()
+	{
+		synchronized (jobThread)
+		{
+			jobThread.run = false;
+			jobThread.notify();
+		}
+	}
 	
 	private class JobThread implements Runnable 
 	{
+		boolean run = true;
 	    public void run() 
 	    {
-	        while(true)
+	        while(run)
 	        {
 	        	while(jobQueue.peek() != null)
 	        	{
@@ -49,7 +61,10 @@ public class JobHandler
 	        	
 	        	try
 	        	{
-					wait();
+	        		synchronized (jobThread) 
+	        		{
+	        			wait();
+	        		}
 				} 
 	        	catch (InterruptedException e) 
 	        	{

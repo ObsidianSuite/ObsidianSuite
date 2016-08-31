@@ -38,7 +38,6 @@ public class DataHandler
 	public static final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
 	private static List<FileInfo> fileList = new ArrayList<FileInfo>();
-	public static JobHandler jobHandler = new JobHandler();
 
 	public static void generateFileList(String username)
 	{
