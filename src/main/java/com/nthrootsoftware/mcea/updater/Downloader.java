@@ -1,4 +1,4 @@
-package com.nthrootsoftware.mcea;
+package com.nthrootsoftware.mcea.updater;
 
 import java.awt.Desktop;
 import java.io.BufferedInputStream;
