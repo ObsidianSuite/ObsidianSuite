@@ -20,8 +20,7 @@ import net.minecraft.client.Minecraft;
 public class Updater 
 {
 
-	private final static String versionURL = "http://nthrootsoftware.com/MCEA/version.html";
-	private final static String historyURL = "http://nthrootsoftware.com/MCEA/history.html";
+	private final static String logURL = "http://nthrootsoftware.com/MCEA/mcea.log";
 
 	private String modVersion;
 	private String serverVersion;
@@ -43,20 +42,17 @@ public class Updater
 		}
 		else
 			updaterFrame.dispose();	
-			
-	
 	}
 
 	public String getLatestVersion() throws IOException
 	{
-		String data = getData(versionURL);
-		return data.substring(data.indexOf("[version]")+9, data.indexOf("[/version]"));
-	}
-
-	public String getWhatsNew() throws IOException
-	{
-		String data = getData(historyURL);
-		return data.substring(data.indexOf("[history]")+9,data.indexOf("[/history]"));
+		String data = getData(logURL);
+		for(String line : data.split("\n"))
+		{
+			if(line.startsWith("Version"))
+				return line.substring(9).trim();
+		}
+		throw new RuntimeException("Unable to get latest version number from server.");
 	}
 
 	public String getData(String address) throws IOException

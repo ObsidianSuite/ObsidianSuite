@@ -36,7 +36,7 @@ public class DataHandler
 	public static final String userPath = MCEA_Main.animationPath + "/user";
 	public static final String sharedPath = MCEA_Main.animationPath + "/shared";
 	public static final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
+	public static JobHandler jobHandler = new JobHandler();
 	private static List<FileInfo> fileList = new ArrayList<FileInfo>();
 
 	public static void generateFileList(String username)
@@ -268,6 +268,12 @@ public class DataHandler
 	private static File getGUIFile()
 	{
 		return new File(MCEA_Main.animationPath + "/data/GuiData.data");
+	}
+	
+	public static void stopJobHandler()
+	{
+		if(jobHandler != null)
+			jobHandler.dispose();
 	}
 
 	/**

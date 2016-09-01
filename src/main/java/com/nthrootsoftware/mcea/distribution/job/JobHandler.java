@@ -20,56 +20,46 @@ public class JobHandler
 	
 	public void queueJob(Job job)
 	{
-		jobQueue.add(job);
-		synchronized (jobThread) 
-		{
-			jobThread.notify();
-		}
+		jobQueue.add(job);	
 	}
 	
 	public void dispose()
 	{
-		synchronized (jobThread)
-		{
+		if(jobThread != null)
 			jobThread.run = false;
-			jobThread.notify();
-		}
 	}
+	
 	
 	private class JobThread implements Runnable 
 	{
-		boolean run = true;
+		private boolean reset = false;
+		private boolean run = true;
+		
 	    public void run() 
 	    {
 	        while(run)
 	        {
-	        	while(jobQueue.peek() != null)
+	        	Job currentJob = jobQueue.poll();
+	        	if(currentJob != null)
 	        	{
-		        	Job currentJob = jobQueue.poll();
-		     		GuiHandler.mainGui.jobPanel.updateJobNumberLabel(jobQueue.size() + 1);
+	        		GuiHandler.mainGui.jobPanel.updateJobNumberLabel(jobQueue.size() + 1);
 	        		GuiHandler.mainGui.jobPanel.updateCurrentJobLabel(currentJob.getName());
 	        		currentJob.run();
 	        		currentJob.completeJob();
+	        		reset = false;
 	        	}
-
-	        	if(GuiHandler.mainGui != null)
+	        	else if(!reset && GuiHandler.mainGui != null)
 	        	{
 	        		GuiHandler.mainGui.jobPanel.updateJobNumberLabel(0);
 	        		GuiHandler.mainGui.jobPanel.updateCurrentJobLabel("-");
 	        		GuiHandler.mainGui.jobPanel.updateCurrentJobStatusLabel("-");
+	        		reset = true;
 	        	}
-	        	
-	        	try
+	        	try 
 	        	{
-	        		synchronized (jobThread) 
-	        		{
-	        			wait();
-	        		}
+					Thread.sleep(500);
 				} 
-	        	catch (InterruptedException e) 
-	        	{
-	        		e.printStackTrace();
-	        	}
+	        	catch (InterruptedException e) {e.printStackTrace();}
 	        }
 	    }
 	}
