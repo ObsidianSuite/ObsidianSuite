@@ -5,6 +5,8 @@ import java.io.File;
 
 import org.lwjgl.opengl.GL11;
 
+import com.nthrootsoftware.mcea.distribution.DataHandler;
+
 import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
@@ -44,6 +46,10 @@ public class GuiAnimationMainMenu extends GuiMainMenu
     {
     	super.actionPerformed(button);
     	
+    	//Exit button
+        if(button.id == 4)
+	        DataHandler.stopJobHandler();
+
         if(button.id == 10)
 		{
 			String s = "mcea_animation_world";

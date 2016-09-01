@@ -63,8 +63,6 @@ public class MainGUI extends JFrame
 	JPanel mainPanel;
 	public JobPanel jobPanel;
 	private JTable table;
-	public static JobHandler jobHandler;
-
 
 	public MainGUI()
 	{
@@ -72,7 +70,6 @@ public class MainGUI extends JFrame
 
 		mainPanel = new JPanel();
 		mainPanel.setLayout(new GridBagLayout());
-		jobHandler = new JobHandler();
 
 		createGUI(mainPanel, "");
 		refreshTable();
@@ -121,12 +118,10 @@ public class MainGUI extends JFrame
 
 	private void onClose()
 	{
-		jobHandler.dispose();
 		GuiHandler.loginGUI = null;
 		Minecraft mc = Minecraft.getMinecraft();
 		if(mc.currentScreen instanceof GuiBlack)
 			((GuiBlack) mc.currentScreen).initateClose();
-		dispose();
 	}
 
 	private JPanel createButtonPanel()
@@ -143,7 +138,7 @@ public class MainGUI extends JFrame
 			@Override
 			public void actionPerformed(ActionEvent arg0) 
 			{
-				onClose();		
+				dispose();		
 				new AnimationNewGUI();
 			}
 		});
@@ -173,7 +168,7 @@ public class MainGUI extends JFrame
 					}
 					if(seq != null)
 					{
-						onClose();
+						dispose();
 						Minecraft.getMinecraft().displayGuiScreen(new GuiAnimationTimeline(entityToEdit,seq));
 					}
 					else
@@ -182,7 +177,7 @@ public class MainGUI extends JFrame
 				else
 				{
 					entityToEdit = editSelection.substring(0, editSelection.indexOf("setup") - 1);
-					onClose();
+					dispose();
 					Minecraft.getMinecraft().displayGuiScreen(new GuiPartSetup(entityToEdit));
 				}
 			}
@@ -222,7 +217,7 @@ public class MainGUI extends JFrame
 						remoteAddress = "/home/shared/animation/" + path + ".data";
 					}
 					JobPush job = new JobPush(fileInfo.getFileHRF(), localAddress, remoteAddress);
-					jobHandler.queueJob(job);
+					DataHandler.jobHandler.queueJob(job);
 				}		
 			}
 		});
@@ -242,7 +237,7 @@ public class MainGUI extends JFrame
 					{
 						localAddress = "animation/user/" + path;
 						remoteAddress = "animation/" + path;
-						jobHandler.queueJob(new JobPull(fileInfo.getFileHRF(), localAddress, remoteAddress));
+						DataHandler.jobHandler.queueJob(new JobPull(fileInfo.getFileHRF(), localAddress, remoteAddress));
 					}
 					else
 					{
@@ -251,7 +246,7 @@ public class MainGUI extends JFrame
 						{
 							localAddress = "animation/shared/" + path + "." + ext;
 							remoteAddress = "/home/shared/animation/" + path + "."  + ext;
-							jobHandler.queueJob(new JobPull(fileInfo.getFileHRF(), localAddress, remoteAddress));
+							DataHandler.jobHandler.queueJob(new JobPull(fileInfo.getFileHRF(), localAddress, remoteAddress));
 						}
 					}
 				}
@@ -420,7 +415,7 @@ public class MainGUI extends JFrame
 						localAddress = "animation/shared/" + path + ".data";
 						remoteAddress = "/home/shared/animation/" + path + ".data";
 					}
-					jobHandler.queueJob(new JobPush(fileInfo.getFileHRF(), localAddress, remoteAddress));
+					DataHandler.jobHandler.queueJob(new JobPush(fileInfo.getFileHRF(), localAddress, remoteAddress));
 				}
 				else if(action == StatusAction.Pull)
 				{
@@ -429,7 +424,7 @@ public class MainGUI extends JFrame
 					{
 						localAddress = "animation/user/" + path;
 						remoteAddress = "animation/" + path;
-						jobHandler.queueJob(new JobPull(fileInfo.getFileHRF(), localAddress, remoteAddress));
+						DataHandler.jobHandler.queueJob(new JobPull(fileInfo.getFileHRF(), localAddress, remoteAddress));
 					}
 					else
 					{
@@ -438,7 +433,7 @@ public class MainGUI extends JFrame
 						{
 							localAddress = "animation/shared/" + path + "." + ext;
 							remoteAddress = "/home/shared/animation/" + path + "."  + ext;
-							jobHandler.queueJob(new JobPull(fileInfo.getFileHRF(), localAddress, remoteAddress));
+							DataHandler.jobHandler.queueJob(new JobPull(fileInfo.getFileHRF(), localAddress, remoteAddress));
 						}
 					}
 				}
