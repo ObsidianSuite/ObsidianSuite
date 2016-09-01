@@ -25,7 +25,8 @@ public class JobHandler
 	
 	public void dispose()
 	{
-		jobThread.run = false;
+		if(jobThread != null)
+			jobThread.run = false;
 	}
 	
 	

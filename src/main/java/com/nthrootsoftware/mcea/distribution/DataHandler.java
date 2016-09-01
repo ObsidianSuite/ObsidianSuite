@@ -269,6 +269,12 @@ public class DataHandler
 	{
 		return new File(MCEA_Main.animationPath + "/data/GuiData.data");
 	}
+	
+	public static void stopJobHandler()
+	{
+		if(jobHandler != null)
+			jobHandler.dispose();
+	}
 
 	/**
 	 * Get an entity file from the shared folder
