@@ -24,7 +24,7 @@ public class MCEA_Main
 	
 	public static final String homePath = Minecraft.getMinecraft().mcDataDir.getAbsolutePath();
 	public static final String animationPath = homePath + "/animation";
-	public static final String version = "4.4.2";
+	public static final String version = "4.4.3";
 	
 	@Mod.Instance("MCEA")
 	public static MCEA_Main instance;
