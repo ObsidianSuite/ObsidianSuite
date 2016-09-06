@@ -82,6 +82,12 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 
 	private boolean boolPlay;	
 	private boolean boolLoop;
+	
+	//Nano time at which the animation started playing (play button pressed).
+	private long playStartTimeNano;
+	//Frame time at which the animation started playing (play button pressed).
+	private float playStartTimeFrame;
+	
 
 	public GuiAnimationTimeline(String entityName, AnimationSequence animation)
 	{
@@ -201,12 +207,16 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 	{				
 		if(boolPlay)
 		{
-			time += timeIncrement;
+			time = Util.getAnimationFrameTime(playStartTimeNano, playStartTimeFrame, 25);
 			exceptionPartName = "";
 			if(time >= currentAnimation.getTotalTime())
 			{
 				if(boolLoop)
+				{
 					time = 0.0F;
+					playStartTimeNano = System.nanoTime();
+					playStartTimeFrame = 0;
+				}
 				else
 				{
 					boolPlay = false;
@@ -218,8 +228,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 		}
 
 		this.currentAnimation.animateAll(time, entityModel, exceptionPartName);
-
-
+		
 		updateExternalFrameFromDisplay();
 		timelineFrame.optionsPanel.updatePlayPauseButton();
 		timelineFrame.optionsPanel.updatePartLabels();
@@ -929,6 +938,12 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 					if(time >= currentAnimation.getTotalTime())
 						time = 0;
 					boolPlay = !boolPlay; 		
+					if(boolPlay)
+					{
+						playStartTimeNano = System.nanoTime();
+						playStartTimeFrame = time;
+					}
+						
 					updatePlayPauseButton();
 				}
 			});
