@@ -950,6 +950,8 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 
 			JPanel sliderPanel = new JPanel();
 
+			JLabel fpsLabel = new JLabel("FPS: 30");
+			
 			final JLabel valueLabel = new JLabel();
 			valueLabel.setPreferredSize(new Dimension(30, 16));
 			valueLabel.setText("100%");
@@ -980,17 +982,39 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 
 			c.gridx = 0;
 			c.gridy = 0;
-			c.gridwidth = 2;	
-			c.anchor = c.CENTER;
-			sliderPanel.add(slider, c);
-			c.gridy = 1;
-			c.gridwidth = 1;		
 			c.weightx = 1;
+			c.gridwidth = 2;		
+			c.anchor = c.CENTER;
+			c.insets = new Insets(2,2,2,2);
+			sliderPanel.add(new JLabel("Length"), c);
+			
+			c.gridwidth = 1;
+			c.gridy = 1;
+			sliderPanel.add(new JLabel("10 frames"), c);
+			c.gridx = 1;
+			sliderPanel.add(new JLabel("0.4 seconds"), c);
+			
+			c.gridx = 0;
+			c.gridy = 2;
+			sliderPanel.add(new JLabel("25 FPS"), c);
+			c.gridx = 1;
+			sliderPanel.add(new JButton("Set FPS"), c);
+			
+			c.gridwidth = 2;
+			c.gridx = 0;
+			c.gridy = 3;
+			sliderPanel.add(new JLabel("Play speed"), c);
+			
+			c.gridy = 4;
+			sliderPanel.add(slider, c);
+			
+			c.gridwidth = 1;
+			c.gridy = 5;
 			sliderPanel.add(valueLabel,c);
 			c.gridx = 1;
 			sliderPanel.add(resetButton,c);
 
-			sliderPanel.setBorder(BorderFactory.createTitledBorder("Speed"));
+			sliderPanel.setBorder(BorderFactory.createTitledBorder("Animation"));
 
 			JPanel partPanel = new JPanel();
 
@@ -1014,42 +1038,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 			partPanel.add(partZ,c);
 
 			partPanel.setBorder(BorderFactory.createTitledBorder("Part"));
-
-			JPanel buttonPanel = new JPanel();
-			buttonPanel.setLayout(new GridBagLayout());
-
-			c.gridx = 0;
-			c.gridy = 0;
-			c.insets = new Insets(2,5,2,5);
-			c.ipadx = 10;
-			c.fill = GridBagConstraints.BOTH;
-
-			JButton itemButton = new JButton("Choose Right Hand Item");
-			itemButton.addActionListener(new ActionListener()
-			{
-				@Override
-				public void actionPerformed(ActionEvent e) 
-				{
-					mc.displayGuiScreen(new GuiInventoryChooseItem(GuiAnimationTimeline.this, (EntityObj) entityToRender));
-				}
-			});
-			buttonPanel.add(itemButton, c);
-
-			c.gridy = 1;
-			JButton emptyItemButton = new JButton("Empty Right Hand");
-			emptyItemButton.addActionListener(new ActionListener()
-			{
-				@Override
-				public void actionPerformed(ActionEvent e) 
-				{
-					AnimationData.setAnimationItem(currentAnimation.getName(), -1);
-					((EntityObj) entityToRender).setCurrentItem(null); 
-				}
-			});
-			buttonPanel.add(emptyItemButton, c);
-
-			buttonPanel.setBorder(BorderFactory.createTitledBorder("Item"));
-
+			
 			JPanel checkboxPanel = new JPanel();
 			checkboxPanel.setLayout(new GridBagLayout());
 			c.gridx = 0;
@@ -1109,6 +1098,40 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 				checkboxPanel.add(new JLabel(s),c);
 			}
 			checkboxPanel.setBorder(BorderFactory.createTitledBorder("Render"));
+
+			JPanel buttonPanel = new JPanel();
+			buttonPanel.setLayout(new GridBagLayout());
+
+			c.gridx = 0;
+			c.gridy = 0;
+			c.insets = new Insets(2,5,2,5);
+			c.ipadx = 10;
+			c.fill = GridBagConstraints.BOTH;
+
+			JButton itemButton = new JButton("Choose Right Hand Item");
+			itemButton.addActionListener(new ActionListener()
+			{
+				@Override
+				public void actionPerformed(ActionEvent e) 
+				{
+					mc.displayGuiScreen(new GuiInventoryChooseItem(GuiAnimationTimeline.this, (EntityObj) entityToRender));
+				}
+			});
+			buttonPanel.add(itemButton, c);
+
+			c.gridy = 1;
+			JButton emptyItemButton = new JButton("Empty Right Hand");
+			emptyItemButton.addActionListener(new ActionListener()
+			{
+				@Override
+				public void actionPerformed(ActionEvent e) 
+				{
+					AnimationData.setAnimationItem(currentAnimation.getName(), -1);
+					((EntityObj) entityToRender).setCurrentItem(null); 
+				}
+			});
+			buttonPanel.add(emptyItemButton, c);
+			buttonPanel.setBorder(BorderFactory.createTitledBorder("Item"));
 
 			JButton duplicateButton = new JButton("Duplicate");
 			duplicateButton.addActionListener(new ActionListener()
