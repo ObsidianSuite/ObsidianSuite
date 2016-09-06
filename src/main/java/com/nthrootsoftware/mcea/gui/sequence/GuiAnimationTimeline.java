@@ -54,7 +54,6 @@ import com.nthrootsoftware.mcea.Util;
 import com.nthrootsoftware.mcea.animation.AnimationData;
 import com.nthrootsoftware.mcea.animation.AnimationPart;
 import com.nthrootsoftware.mcea.animation.AnimationSequence;
-import com.nthrootsoftware.mcea.distribution.ServerAccess;
 import com.nthrootsoftware.mcea.gui.GuiBlack;
 import com.nthrootsoftware.mcea.gui.GuiHandler;
 import com.nthrootsoftware.mcea.gui.GuiInventoryChooseItem;
@@ -957,10 +956,20 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 				}
 			});
 
-			JPanel sliderPanel = new JPanel();
+			JPanel animationPanel = new JPanel();
 			
 			lengthFrameLabel = new JLabel();
 			lengthSecondsLabel = new JLabel();
+			
+			JButton fpsButton = new JButton("Set FPS");
+			fpsButton.addActionListener(new ActionListener()
+			{
+				@Override
+				public void actionPerformed(ActionEvent e) 
+				{
+					getUserFPS();
+				}
+			});
 			
 			final JLabel valueLabel = new JLabel();
 			valueLabel.setPreferredSize(new Dimension(30, 16));
@@ -987,7 +996,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 				}
 			});
 
-			sliderPanel.setLayout(new GridBagLayout());
+			animationPanel.setLayout(new GridBagLayout());
 			GridBagConstraints c = new GridBagConstraints();
 
 			c.gridx = 0;
@@ -996,35 +1005,35 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 			c.gridwidth = 2;		
 			c.anchor = c.CENTER;
 			c.insets = new Insets(2,2,2,2);
-			sliderPanel.add(new JLabel("Length"), c);
+			animationPanel.add(new JLabel("Length"), c);
 			
 			c.gridwidth = 1;
 			c.gridy = 1;
-			sliderPanel.add(lengthFrameLabel, c);
+			animationPanel.add(lengthFrameLabel, c);
 			c.gridx = 1;
-			sliderPanel.add(lengthSecondsLabel, c);
+			animationPanel.add(lengthSecondsLabel, c);
 			
 			c.gridx = 0;
 			c.gridy = 2;
-			sliderPanel.add(new JLabel("25 FPS"), c);
+			animationPanel.add(new JLabel("25 FPS"), c);
 			c.gridx = 1;
-			sliderPanel.add(new JButton("Set FPS"), c);
+			animationPanel.add(fpsButton, c);
 			
 			c.gridwidth = 2;
 			c.gridx = 0;
 			c.gridy = 3;
-			sliderPanel.add(new JLabel("Play speed"), c);
+			animationPanel.add(new JLabel("Play speed"), c);
 			
 			c.gridy = 4;
-			sliderPanel.add(slider, c);
+			animationPanel.add(slider, c);
 			
 			c.gridwidth = 1;
 			c.gridy = 5;
-			sliderPanel.add(valueLabel,c);
+			animationPanel.add(valueLabel,c);
 			c.gridx = 1;
-			sliderPanel.add(resetButton,c);
+			animationPanel.add(resetButton,c);
 
-			sliderPanel.setBorder(BorderFactory.createTitledBorder("Animation"));
+			animationPanel.setBorder(BorderFactory.createTitledBorder("Animation"));
 
 			JPanel partPanel = new JPanel();
 
@@ -1182,7 +1191,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 			add(playPauseButton,c);
 			c.insets = new Insets(0,2,0,2);
 			c.gridy = 1;
-			add(sliderPanel,c);
+			add(animationPanel,c);
 			c.gridy = 2;
 			add(partPanel,c);
 			c.gridy = 3;
@@ -1217,6 +1226,41 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 		private void updatePlayPauseButton()
 		{
 			playPauseButton.setText(boolPlay ? "Pause" : "Play");
+		}
+		
+		private void getUserFPS()
+		{
+			Integer fps = null;			
+			while(true)
+			{
+				String input = JOptionPane.showInputDialog(timelineFrame, "Set FPS (20-60)");
+				if(input == null)
+					break;
+				fps = getFPSFromString(input);
+				if(fps != null)
+					break;
+				else
+					JOptionPane.showMessageDialog(timelineFrame, "Invalid input");
+			}
+			System.out.println(fps);
+		}
+		
+		private Integer getFPSFromString(String input)
+		{
+			Integer fps = null;
+			
+			try
+			{
+				fps = Integer.parseInt(input);
+				if(fps < 20 || fps > 60)
+					fps = null;
+			}
+			catch(NumberFormatException e)
+			{
+				//e.printStackTrace();
+			}
+			
+			return fps;
 		}
 	}
 
