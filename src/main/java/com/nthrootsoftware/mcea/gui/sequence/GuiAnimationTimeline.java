@@ -73,8 +73,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 
 	private DecimalFormat df = new DecimalFormat("#.##");
 	private float time = 0.0F;
-	private final float defaultTimeIncrement = 0.4F;
-	private float timeIncrement = defaultTimeIncrement;
+	private float timeMultiplier = 1.0F;
 	private TimelineFrame timelineFrame;
 	protected Map<String, List<Keyframe>> keyframes = new HashMap<String, List<Keyframe>>();
 
@@ -207,7 +206,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 	{				
 		if(boolPlay)
 		{
-			time = Util.getAnimationFrameTime(playStartTimeNano, playStartTimeFrame, 25);
+			time = Util.getAnimationFrameTime(playStartTimeNano, playStartTimeFrame, 25, timeMultiplier);
 			exceptionPartName = "";
 			if(time >= currentAnimation.getTotalTime())
 			{
@@ -956,14 +955,14 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 			valueLabel.setPreferredSize(new Dimension(30, 16));
 			valueLabel.setText("100%");
 
-			final JSlider slider = new JSlider(0, 300, 100);
+			final JSlider slider = new JSlider(0, 200, 100);
 			slider.addChangeListener(new ChangeListener()
 			{
 				@Override
 				public void stateChanged(ChangeEvent e)
 				{
 					valueLabel.setText(slider.getValue() + "%");
-					timeIncrement = defaultTimeIncrement*slider.getValue()/100F;
+					timeMultiplier = slider.getValue()/100F;
 				}
 			});
 
