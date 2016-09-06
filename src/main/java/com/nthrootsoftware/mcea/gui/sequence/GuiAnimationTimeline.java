@@ -416,6 +416,8 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 
 		//Update animation sequence in AnimationData.
 		AnimationData.addSequence(entityName, currentAnimation);
+		
+		onAnimationLengthChange();
 	}
 
 	/* ---------------------------------------------------- *
@@ -545,6 +547,14 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 	{
 		mc.displayGuiScreen(new GuiBlack());
 		GuiHandler.mainGui = new MainGUI();
+	}
+	
+	public void onAnimationLengthChange()
+	{
+		System.out.println(timelineFrame);
+		timelineFrame.optionsPanel.lengthFrameLabel.setText((int)currentAnimation.getTotalTime() + " frames");
+		//TODO substitute 25F for FPS
+		timelineFrame.optionsPanel.lengthSecondsLabel.setText(currentAnimation.getTotalTime()/25F + " seconds");
 	}
 
 	/* ---------------------------------------------------- *
@@ -924,7 +934,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 	private class OptionsPanel extends JPanel
 	{
 		JButton playPauseButton;
-		JLabel partName, partX, partY, partZ;
+		JLabel partName, partX, partY, partZ, lengthFrameLabel, lengthSecondsLabel;
 
 		private OptionsPanel()
 		{				
@@ -948,8 +958,9 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 			});
 
 			JPanel sliderPanel = new JPanel();
-
-			JLabel fpsLabel = new JLabel("FPS: 30");
+			
+			lengthFrameLabel = new JLabel();
+			lengthSecondsLabel = new JLabel();
 			
 			final JLabel valueLabel = new JLabel();
 			valueLabel.setPreferredSize(new Dimension(30, 16));
@@ -989,9 +1000,9 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 			
 			c.gridwidth = 1;
 			c.gridy = 1;
-			sliderPanel.add(new JLabel("10 frames"), c);
+			sliderPanel.add(lengthFrameLabel, c);
 			c.gridx = 1;
-			sliderPanel.add(new JLabel("0.4 seconds"), c);
+			sliderPanel.add(lengthSecondsLabel, c);
 			
 			c.gridx = 0;
 			c.gridy = 2;
