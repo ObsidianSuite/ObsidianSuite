@@ -27,22 +27,6 @@ public class Util
         tessellator.draw();
 	}
 	
-	//rotationChange in degrees
-	public static float calculateSwing(float rotationChange, float timeChange)
-	{
-		return rotationChange/timeChange;
-	}
-	
-//	public static ArrayList<ModelRenderer> convertBoxListToModelRendererArray(List boxList) 
-//	{
-//		ArrayList<ModelRenderer> mrs = new ArrayList<ModelRenderer>();
-//		for(int i = 0; i < boxList.size(); i++)
-//		{
-//			mrs.add((ModelRenderer) boxList.get(i));
-//		}
-//		return mrs;
-//	}
-	
 	public static String getDisplayName(String partName, ArrayList<Part> parts) 
 	{
 		Part p = getPartFromName(partName, parts);
@@ -79,42 +63,17 @@ public class Util
 		throw new RuntimeException("No part obj found for " + name + ".");
 	}
 	
-	public static GuiButton getButtonFromID(int id, List buttonList)
+	/**
+	 * Calculate which frame an animation is on based on the time that it started at, which frame it started at, and its FPS.
+	 * @param startTimeNano - Nano time the aniamtion starting being played on.
+	 * @param startTimeFrame - Frame the animation started being played on.
+	 * @param fps - FPS the animation is running at. 
+	 * @param multiplier - Speed multiplier so the animation is rendered slower or faster
+	 * @return Frame time.
+	 */
+	public static float getAnimationFrameTime(long startTimeNano, float startTimeFrame, int fps, float multiplier)
 	{
-		for(Object obj : buttonList)
-		{
-			if(obj instanceof GuiButton)
-			{
-				GuiButton b = (GuiButton) obj;
-				if(b.id == id)
-				{
-					return b;
-				}
-			}
-		}
-		return null;
-	}
-
-	public static ArrayList<PartObj> removeDuplicates(ArrayList<PartObj> mrs) 
-	{
-		ArrayList<PartObj> temp = new ArrayList<PartObj>();
-		for(PartObj mr : mrs)
-		{
-			if(!temp.contains(mr))
-			{
-				temp.add(mr);
-			}
-		}
-		return temp;
-	}
-	
-	public static float[] getEntityPosition(Entity e)
-	{
-		float[] pos = new float[3];
-		pos[0] = (float) e.posX;
-		pos[1] = (float) e.posY;
-		pos[2] = (float) e.posZ;
-		return pos;
+		return (System.nanoTime() - startTimeNano)/1000000000F*fps*multiplier + startTimeFrame;
 	}
 	
 }

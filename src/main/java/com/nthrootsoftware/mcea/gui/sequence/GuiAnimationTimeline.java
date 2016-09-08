@@ -54,7 +54,6 @@ import com.nthrootsoftware.mcea.Util;
 import com.nthrootsoftware.mcea.animation.AnimationData;
 import com.nthrootsoftware.mcea.animation.AnimationPart;
 import com.nthrootsoftware.mcea.animation.AnimationSequence;
-import com.nthrootsoftware.mcea.distribution.ServerAccess;
 import com.nthrootsoftware.mcea.gui.GuiBlack;
 import com.nthrootsoftware.mcea.gui.GuiHandler;
 import com.nthrootsoftware.mcea.gui.GuiInventoryChooseItem;
@@ -73,8 +72,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 
 	private DecimalFormat df = new DecimalFormat("#.##");
 	private float time = 0.0F;
-	private final float defaultTimeIncrement = 0.4F;
-	private float timeIncrement = defaultTimeIncrement;
+	private float timeMultiplier = 1.0F;
 	private TimelineFrame timelineFrame;
 	protected Map<String, List<Keyframe>> keyframes = new HashMap<String, List<Keyframe>>();
 
@@ -82,6 +80,12 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 
 	private boolean boolPlay;	
 	private boolean boolLoop;
+
+	//Nano time at which the animation started playing (play button pressed).
+	private long playStartTimeNano;
+	//Frame time at which the animation started playing (play button pressed).
+	private float playStartTimeFrame;
+
 
 	public GuiAnimationTimeline(String entityName, AnimationSequence animation)
 	{
@@ -95,7 +99,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 
 		animationVersion = 0;
 		animationVersions = new ArrayList<AnimationSequence>();
-		updateAnimation();
+		updateAnimationParts();
 
 		((EntityObj) entityToRender).setCurrentItem(AnimationData.getAnimationItem(animation.getName()));   	
 
@@ -201,12 +205,16 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 	{				
 		if(boolPlay)
 		{
-			time += timeIncrement;
+			time = Util.getAnimationFrameTime(playStartTimeNano, playStartTimeFrame, currentAnimation.getFPS(), timeMultiplier);
 			exceptionPartName = "";
 			if(time >= currentAnimation.getTotalTime())
 			{
 				if(boolLoop)
+				{
 					time = 0.0F;
+					playStartTimeNano = System.nanoTime();
+					playStartTimeFrame = 0;
+				}
 				else
 				{
 					boolPlay = false;
@@ -218,7 +226,6 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 		}
 
 		this.currentAnimation.animateAll(time, entityModel, exceptionPartName);
-
 
 		updateExternalFrameFromDisplay();
 		timelineFrame.optionsPanel.updatePlayPauseButton();
@@ -264,7 +271,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 		partKeyframes.add(kf);
 		keyframes.put(kf.partName, partKeyframes);
 		timelineFrame.refresthLineColours();
-		updateAnimation();
+		updateAnimationParts();
 	}
 
 	private void deleteKeyframe()
@@ -289,7 +296,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 			if(keyframeRemoved)
 			{
 				exceptionPartName = "";
-				updateAnimation();
+				updateAnimationParts();
 			}
 		}
 		timelineFrame.refresh();
@@ -366,7 +373,8 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 	 * 				   Animation manipulation				*
 	 * ---------------------------------------------------- */
 
-	private void updateAnimation()
+
+	private void updateAnimationParts()
 	{
 		//Create new animation object if new version
 		AnimationSequence sequence = new AnimationSequence(currentAnimation.getName());
@@ -389,6 +397,21 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 				}
 			}
 		}
+		sequence.setFPS(currentAnimation.getFPS());
+		updateAnimation(sequence);
+	}
+
+	private void updateAnimationFPS(int fps)
+	{
+		AnimationSequence sequence = new AnimationSequence(currentAnimation.getName());
+		sequence.setAnimations(currentAnimation.getAnimations());
+		sequence.setFPS(fps);
+		updateAnimation(sequence);
+	}
+
+
+	private void updateAnimation(AnimationSequence sequence)
+	{
 		//Remove all animations in front of current animation.
 		//If undo has been called and then changes made, the state that was undone from is now out of sync, so remove it.
 		//Several undo's could have been done together, so remove all in front.
@@ -408,6 +431,8 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 
 		//Update animation sequence in AnimationData.
 		AnimationData.addSequence(entityName, currentAnimation);
+
+		onAnimationLengthChange();
 	}
 
 	/* ---------------------------------------------------- *
@@ -435,6 +460,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 			AnimationData.addSequence(entityName, currentAnimation);
 			loadKeyframes();
 			timelineFrame.refresh();
+			onFPSChange(currentAnimation.getFPS());
 		}
 		else
 			Toolkit.getDefaultToolkit().beep();
@@ -449,6 +475,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 			AnimationData.addSequence(entityName, currentAnimation);
 			loadKeyframes();
 			timelineFrame.refresh();
+			onFPSChange(currentAnimation.getFPS());
 		}
 		else
 			Toolkit.getDefaultToolkit().beep();
@@ -537,6 +564,18 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 	{
 		mc.displayGuiScreen(new GuiBlack());
 		GuiHandler.mainGui = new MainGUI();
+	}
+
+	private void onFPSChange(int fps)
+	{
+		timelineFrame.optionsPanel.fpsLabel.setText(fps + " FPS");
+		updateAnimationFPS(fps);
+	}
+
+	public void onAnimationLengthChange()
+	{
+		timelineFrame.optionsPanel.lengthFrameLabel.setText((int)currentAnimation.getTotalTime() + " frames");
+		timelineFrame.optionsPanel.lengthSecondsLabel.setText(df.format(currentAnimation.getTotalTime()/(float)currentAnimation.getFPS()) + " seconds");
 	}
 
 	/* ---------------------------------------------------- *
@@ -698,16 +737,16 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 
 			setVisible(true);
 			setResizable(false);
-			
+
 			addWindowListener(new WindowAdapter()
 			{
-				
+
 				@Override
 				public void windowClosing(WindowEvent e)
 				{
 					close();
 				}
-				
+
 			});
 		}
 
@@ -811,7 +850,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 					public void mouseReleased(MouseEvent e) 
 					{
 						if(keyframeTimeChanged)
-							updateAnimation();
+							updateAnimationParts();
 						keyframeTimeChanged = false;
 					}		
 				});
@@ -916,7 +955,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 	private class OptionsPanel extends JPanel
 	{
 		JButton playPauseButton;
-		JLabel partName, partX, partY, partZ;
+		JLabel partName, partX, partY, partZ, lengthFrameLabel, lengthSecondsLabel, fpsLabel;
 
 		private OptionsPanel()
 		{				
@@ -929,24 +968,44 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 					if(time >= currentAnimation.getTotalTime())
 						time = 0;
 					boolPlay = !boolPlay; 		
+					if(boolPlay)
+					{
+						playStartTimeNano = System.nanoTime();
+						playStartTimeFrame = time;
+					}
+
 					updatePlayPauseButton();
 				}
 			});
 
-			JPanel sliderPanel = new JPanel();
+			JPanel animationPanel = new JPanel();
+
+			lengthFrameLabel = new JLabel();
+			lengthSecondsLabel = new JLabel();
+			fpsLabel = new JLabel(currentAnimation.getFPS() + " FPS");
+
+			JButton fpsButton = new JButton("Set FPS");
+			fpsButton.addActionListener(new ActionListener()
+			{
+				@Override
+				public void actionPerformed(ActionEvent e) 
+				{
+					getUserFPS();
+				}
+			});
 
 			final JLabel valueLabel = new JLabel();
 			valueLabel.setPreferredSize(new Dimension(30, 16));
 			valueLabel.setText("100%");
 
-			final JSlider slider = new JSlider(0, 300, 100);
+			final JSlider slider = new JSlider(0, 200, 100);
 			slider.addChangeListener(new ChangeListener()
 			{
 				@Override
 				public void stateChanged(ChangeEvent e)
 				{
 					valueLabel.setText(slider.getValue() + "%");
-					timeIncrement = defaultTimeIncrement*slider.getValue()/100F;
+					timeMultiplier = slider.getValue()/100F;
 				}
 			});
 
@@ -960,22 +1019,44 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 				}
 			});
 
-			sliderPanel.setLayout(new GridBagLayout());
+			animationPanel.setLayout(new GridBagLayout());
 			GridBagConstraints c = new GridBagConstraints();
 
 			c.gridx = 0;
 			c.gridy = 0;
-			c.gridwidth = 2;	
-			c.anchor = c.CENTER;
-			sliderPanel.add(slider, c);
-			c.gridy = 1;
-			c.gridwidth = 1;		
 			c.weightx = 1;
-			sliderPanel.add(valueLabel,c);
-			c.gridx = 1;
-			sliderPanel.add(resetButton,c);
+			c.gridwidth = 2;		
+			c.anchor = c.CENTER;
+			c.insets = new Insets(2,2,2,2);
+			animationPanel.add(new JLabel("Length"), c);
 
-			sliderPanel.setBorder(BorderFactory.createTitledBorder("Speed"));
+			c.gridwidth = 1;
+			c.gridy = 1;
+			animationPanel.add(lengthFrameLabel, c);
+			c.gridx = 1;
+			animationPanel.add(lengthSecondsLabel, c);
+
+			c.gridx = 0;
+			c.gridy = 2;
+			animationPanel.add(fpsLabel, c);
+			c.gridx = 1;
+			animationPanel.add(fpsButton, c);
+
+			c.gridwidth = 2;
+			c.gridx = 0;
+			c.gridy = 3;
+			animationPanel.add(new JLabel("Play speed"), c);
+
+			c.gridy = 4;
+			animationPanel.add(slider, c);
+
+			c.gridwidth = 1;
+			c.gridy = 5;
+			animationPanel.add(valueLabel,c);
+			c.gridx = 1;
+			animationPanel.add(resetButton,c);
+
+			animationPanel.setBorder(BorderFactory.createTitledBorder("Animation"));
 
 			JPanel partPanel = new JPanel();
 
@@ -999,41 +1080,6 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 			partPanel.add(partZ,c);
 
 			partPanel.setBorder(BorderFactory.createTitledBorder("Part"));
-
-			JPanel buttonPanel = new JPanel();
-			buttonPanel.setLayout(new GridBagLayout());
-
-			c.gridx = 0;
-			c.gridy = 0;
-			c.insets = new Insets(2,5,2,5);
-			c.ipadx = 10;
-			c.fill = GridBagConstraints.BOTH;
-
-			JButton itemButton = new JButton("Choose Right Hand Item");
-			itemButton.addActionListener(new ActionListener()
-			{
-				@Override
-				public void actionPerformed(ActionEvent e) 
-				{
-					mc.displayGuiScreen(new GuiInventoryChooseItem(GuiAnimationTimeline.this, (EntityObj) entityToRender));
-				}
-			});
-			buttonPanel.add(itemButton, c);
-
-			c.gridy = 1;
-			JButton emptyItemButton = new JButton("Empty Right Hand");
-			emptyItemButton.addActionListener(new ActionListener()
-			{
-				@Override
-				public void actionPerformed(ActionEvent e) 
-				{
-					AnimationData.setAnimationItem(currentAnimation.getName(), -1);
-					((EntityObj) entityToRender).setCurrentItem(null); 
-				}
-			});
-			buttonPanel.add(emptyItemButton, c);
-
-			buttonPanel.setBorder(BorderFactory.createTitledBorder("Item"));
 
 			JPanel checkboxPanel = new JPanel();
 			checkboxPanel.setLayout(new GridBagLayout());
@@ -1095,6 +1141,40 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 			}
 			checkboxPanel.setBorder(BorderFactory.createTitledBorder("Render"));
 
+			JPanel buttonPanel = new JPanel();
+			buttonPanel.setLayout(new GridBagLayout());
+
+			c.gridx = 0;
+			c.gridy = 0;
+			c.insets = new Insets(2,5,2,5);
+			c.ipadx = 10;
+			c.fill = GridBagConstraints.BOTH;
+
+			JButton itemButton = new JButton("Choose Right Hand Item");
+			itemButton.addActionListener(new ActionListener()
+			{
+				@Override
+				public void actionPerformed(ActionEvent e) 
+				{
+					mc.displayGuiScreen(new GuiInventoryChooseItem(GuiAnimationTimeline.this, (EntityObj) entityToRender));
+				}
+			});
+			buttonPanel.add(itemButton, c);
+
+			c.gridy = 1;
+			JButton emptyItemButton = new JButton("Empty Right Hand");
+			emptyItemButton.addActionListener(new ActionListener()
+			{
+				@Override
+				public void actionPerformed(ActionEvent e) 
+				{
+					AnimationData.setAnimationItem(currentAnimation.getName(), -1);
+					((EntityObj) entityToRender).setCurrentItem(null); 
+				}
+			});
+			buttonPanel.add(emptyItemButton, c);
+			buttonPanel.setBorder(BorderFactory.createTitledBorder("Item"));
+
 			JButton duplicateButton = new JButton("Duplicate");
 			duplicateButton.addActionListener(new ActionListener()
 			{
@@ -1134,7 +1214,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 			add(playPauseButton,c);
 			c.insets = new Insets(0,2,0,2);
 			c.gridy = 1;
-			add(sliderPanel,c);
+			add(animationPanel,c);
 			c.gridy = 2;
 			add(partPanel,c);
 			c.gridy = 3;
@@ -1169,6 +1249,50 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 		private void updatePlayPauseButton()
 		{
 			playPauseButton.setText(boolPlay ? "Pause" : "Play");
+		}
+
+		/**
+		 * Ask the user for an FPS value, and set the aniamtion's FPS value to it 
+		 * if an appropriate value is supplied.
+		 */
+		private void getUserFPS()
+		{
+			Integer fps = null;			
+			while(true)
+			{
+				String input = JOptionPane.showInputDialog(timelineFrame, "Set FPS (20-60)");
+				if(input == null)
+					break;
+				fps = getFPSFromString(input);
+				if(fps != null)
+				{
+					onFPSChange(fps);
+					break;
+				}
+				else
+					JOptionPane.showMessageDialog(timelineFrame, "Invalid input");
+			}
+		}
+
+		/**
+		 * Get an FPS value from a string.
+		 * The FPS value must be between 20 and 60 (inclusive)
+		 * @param input - String to parse.
+		 * @return FPS value or null if string is invalid.
+		 */
+		private Integer getFPSFromString(String input)
+		{
+			Integer fps = null;
+
+			try
+			{
+				fps = Integer.parseInt(input);
+				if(fps < 20 || fps > 60)
+					fps = null;
+			}
+			catch(NumberFormatException e){}
+
+			return fps;
 		}
 	}
 
