@@ -475,6 +475,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 			AnimationData.addSequence(entityName, currentAnimation);
 			loadKeyframes();
 			timelineFrame.refresh();
+			onFPSChange(currentAnimation.getFPS());
 		}
 		else
 			Toolkit.getDefaultToolkit().beep();
