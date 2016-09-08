@@ -34,6 +34,7 @@ import javax.swing.BorderFactory;
 import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -59,11 +60,9 @@ import com.nthrootsoftware.mcea.gui.GuiBlack;
 import com.nthrootsoftware.mcea.gui.GuiHandler;
 import com.nthrootsoftware.mcea.gui.GuiInventoryChooseItem;
 import com.nthrootsoftware.mcea.gui.animation.MainGUI;
+import com.nthrootsoftware.mcea.gui.sequence.EntityAutoMove.Direction;
 import com.nthrootsoftware.mcea.render.objRendering.EntityObj;
 import com.nthrootsoftware.mcea.render.objRendering.parts.Part;
-import com.nthrootsoftware.mcea.render.objRendering.parts.PartEntityPos;
-import com.nthrootsoftware.mcea.render.objRendering.parts.PartObj;
-import com.nthrootsoftware.mcea.render.objRendering.parts.PartRotation;
 
 import net.minecraft.client.Minecraft;
 
@@ -90,7 +89,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 	//Frame time at which the animation started playing (play button pressed).
 	private float playStartTimeFrame;
 
-	private EntityAutoMove testMove = new EntityAutoMove(4.3F, 0, 1.0F, 25);
+	private EntityAutoMove testMove = new EntityAutoMove(4.3F, Direction.Foward, 25);
 
 	public GuiAnimationTimeline(String entityName, AnimationSequence animation)
 	{
@@ -1027,6 +1026,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 					timeMultiplier = slider.getValue()/100F;
 				}
 			});
+			slider.setPreferredSize(new Dimension(100,20));
 
 			JButton resetButton = new JButton("Reset");
 			resetButton.addActionListener(new ActionListener()
@@ -1044,33 +1044,28 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 			c.gridx = 0;
 			c.gridy = 0;
 			c.weightx = 1;
-			c.gridwidth = 2;		
 			c.anchor = c.CENTER;
 			c.insets = new Insets(2,2,2,2);
-			animationPanel.add(new JLabel("Length"), c);
-
 			c.gridwidth = 1;
-			c.gridy = 1;
 			animationPanel.add(lengthFrameLabel, c);
 			c.gridx = 1;
 			animationPanel.add(lengthSecondsLabel, c);
 
 			c.gridx = 0;
-			c.gridy = 2;
+			c.gridy = 1;
 			animationPanel.add(fpsLabel, c);
 			c.gridx = 1;
 			animationPanel.add(fpsButton, c);
 
-			c.gridwidth = 2;
 			c.gridx = 0;
-			c.gridy = 3;
+			c.gridy = 2;
 			animationPanel.add(new JLabel("Play speed"), c);
 
-			c.gridy = 4;
+			c.gridx = 1;
 			animationPanel.add(slider, c);
 
-			c.gridwidth = 1;
-			c.gridy = 5;
+			c.gridx = 0;
+			c.gridy = 3;
 			animationPanel.add(valueLabel,c);
 			c.gridx = 1;
 			animationPanel.add(resetButton,c);
@@ -1090,25 +1085,61 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 			c = new GridBagConstraints();
 			c.gridx = 0;
 			c.gridy = 0;
+			c.weightx = 1;
+			c.anchor = c.CENTER;
+			c.insets = new Insets(1,1,1,1);
 			partPanel.add(partName,c);
-			c.gridy = 1;
+			c.gridx = 1;
 			partPanel.add(partX,c);
-			c.gridy = 2;
+			c.gridx = 2;
 			partPanel.add(partY,c);
-			c.gridy = 3;
+			c.gridx = 3;
 			partPanel.add(partZ,c);
 
 			partPanel.setBorder(BorderFactory.createTitledBorder("Part"));
 
+			JPanel movementPanel = new JPanel();
+			
+			movementPanel.setLayout(new GridBagLayout());
+			c = new GridBagConstraints();
+			
+			c.gridx = 0;
+			c.gridy = 0;
+			c.weightx = 1;
+			c.weighty = 1;
+			c.insets = new Insets(2,2,2,2);
+			c.anchor = c.CENTER;
+			movementPanel.add(new JComboBox(Direction.values()), c);
+			
+			c.gridx = 1;
+			movementPanel.add(new JLabel("Active"), c);
+			
+			c.gridx = 2;
+			movementPanel.add(new JCheckBox(), c);
+			
+			c.gridwidth = 1;
+			c.gridx = 0;
+			c.gridy = 1;
+			movementPanel.add(new JLabel("4.3 blocks/sec"), c);
+			
+			c.gridx = 1;
+			c.gridwidth = 2;
+			movementPanel.add(new JButton("Set"), c);
+			
+			movementPanel.setBorder(BorderFactory.createTitledBorder("Movement"));
+			
+			
 			JPanel checkboxPanel = new JPanel();
 			checkboxPanel.setLayout(new GridBagLayout());
+			c = new GridBagConstraints();
 			c.gridx = 0;
 			c.gridy = 0;
 			c.ipadx = 0;
 			for(int i = 0; i < 4; i++)
 			{	
-				c.gridx = 0;
-				c.gridy = i;
+				c.gridx = i%2*2;
+				c.gridy = i/2;
+				System.out.println(i%2 + " " + i/2);
 				c.anchor = GridBagConstraints.EAST;
 				JCheckBox cb = new JCheckBox();
 				cb.setHorizontalAlignment(JCheckBox.RIGHT);
@@ -1154,7 +1185,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 					});
 					break;
 				}
-				c.gridx = 1;
+				c.gridx = i%2*2 + 1;
 				c.anchor = GridBagConstraints.WEST;
 				checkboxPanel.add(new JLabel(s),c);
 			}
@@ -1237,13 +1268,16 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 			c.gridy = 2;
 			add(partPanel,c);
 			c.gridy = 3;
-			add(checkboxPanel,c);
+			add(movementPanel,c);
 			c.gridy = 4;
-			add(buttonPanel,c);
+			add(checkboxPanel,c);
 			c.gridy = 5;
+			add(buttonPanel,c);
+			c.gridy = 6;
 			c.insets = new Insets(2,5,2,5);
 			add(duplicateButton,c);
-			c.gridy = 6;
+			c.gridy = 7;
+			c.insets = new Insets(2,5,10,5);
 			add(backButton,c);
 		}
 

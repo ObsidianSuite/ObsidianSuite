@@ -13,13 +13,34 @@ public class EntityAutoMove
 	private float moveZ;
 	private float moveTotal;
 	private int fps;
+	
+	public enum Direction
+	{
+		Foward (0,0,1),
+		FowardLeft (1,0,1),
+		FowardRight (-1,0,1),
+		Left (1,0,0),
+		Right (-1,0,0),
+		BackwardLeft (1,0,-1),
+		BackwardRight (-1,0,-1),
+		Backward (0,0,-1);
+		
+		private final float x,y,z;
+		
+		Direction(float x, float y, float z)
+		{
+			this.x = x;
+			this.y = y;
+			this.z = z;
+		}
+	}
 
-	public EntityAutoMove(float speed, float moveX, float moveZ, int fps)
+	public EntityAutoMove(float speed, Direction direction, int fps)
 	{
 		this.speed = speed;
-		this.moveX = moveX;
-		this.moveY = 0.0F;
-		this.moveZ = moveZ;
+		this.moveX = direction.x;
+		this.moveY = direction.y;
+		this.moveZ = direction.z;
 		this.fps = fps;
 		this.moveTotal = moveX + moveY + moveZ;
 	}
