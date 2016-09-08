@@ -37,6 +37,11 @@ public class AnimationSequence
 		return animationName;
 	}
 	
+	public void setAnimations(List<AnimationPart> animations)
+	{
+		this.animations = animations;
+	}
+	
 	public List<AnimationPart> getAnimations() 
 	{
 		return animations;
@@ -170,6 +175,7 @@ public class AnimationSequence
 		sequenceData.setTag("Animations", animationList);
 		sequenceData.setString("Name", animationName);
 		sequenceData.setFloat("ActionPoint", actionPoint);
+		sequenceData.setInteger("FPS", fps);
 		return sequenceData;
 	}
 
