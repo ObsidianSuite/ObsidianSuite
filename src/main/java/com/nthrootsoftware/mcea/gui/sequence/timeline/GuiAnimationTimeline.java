@@ -1,4 +1,4 @@
-package com.nthrootsoftware.mcea.gui.sequence;
+package com.nthrootsoftware.mcea.gui.sequence.timeline;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -60,7 +60,10 @@ import com.nthrootsoftware.mcea.gui.GuiBlack;
 import com.nthrootsoftware.mcea.gui.GuiHandler;
 import com.nthrootsoftware.mcea.gui.GuiInventoryChooseItem;
 import com.nthrootsoftware.mcea.gui.animation.MainGUI;
+import com.nthrootsoftware.mcea.gui.sequence.EntityAutoMove;
 import com.nthrootsoftware.mcea.gui.sequence.EntityAutoMove.Direction;
+import com.nthrootsoftware.mcea.gui.sequence.ExternalFrame;
+import com.nthrootsoftware.mcea.gui.sequence.GuiEntityRendererWithTranslation;
 import com.nthrootsoftware.mcea.render.objRendering.EntityObj;
 import com.nthrootsoftware.mcea.render.objRendering.parts.Part;
 
@@ -74,20 +77,20 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 	private List<AnimationSequence> animationVersions;
 
 	private DecimalFormat df = new DecimalFormat("#.##");
-	private float time = 0.0F;
-	private float timeMultiplier = 1.0F;
-	private TimelineFrame timelineFrame;
+	float time = 0.0F;
+	float timeMultiplier = 1.0F;
+	TimelineFrame timelineFrame;
 	protected Map<String, List<Keyframe>> keyframes = new HashMap<String, List<Keyframe>>();
 
 	private String exceptionPartName = "";
 
-	private boolean boolPlay;	
-	private boolean boolLoop;
+	boolean boolPlay;	
+	boolean boolLoop;
 
 	//Nano time at which the animation started playing (play button pressed).
-	private long playStartTimeNano;
+	long playStartTimeNano;
 	//Frame time at which the animation started playing (play button pressed).
-	private float playStartTimeFrame;
+	float playStartTimeFrame;
 
 	private EntityAutoMove testMove = new EntityAutoMove(4.3F, Direction.Foward, 25);
 
@@ -233,8 +236,8 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 		this.currentAnimation.animateAll(time, entityModel, exceptionPartName);
 
 		updateExternalFrameFromDisplay();
-		timelineFrame.optionsPanel.updatePlayPauseButton();
-		timelineFrame.optionsPanel.updatePartLabels();
+		timelineFrame.controlPanel.updatePlayPauseButton();
+		timelineFrame.controlPanel.partPanel.updatePartLabels();
 
 		super.drawScreen(par1, par2, par3);
 	}
@@ -578,22 +581,22 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 		timelineFrame.setAlwaysOnTop(Display.isActive());
 	}
 
-	private void close()
+	void close()
 	{
 		mc.displayGuiScreen(new GuiBlack());
 		GuiHandler.mainGui = new MainGUI();
 	}
 
-	private void onFPSChange(int fps)
+	void onFPSChange(int fps)
 	{
-		timelineFrame.optionsPanel.fpsLabel.setText(fps + " FPS");
+		timelineFrame.controlPanel.animationPanel.fpsLabel.setText(fps + " FPS");
 		updateAnimationFPS(fps);
 	}
 
 	public void onAnimationLengthChange()
 	{
-		timelineFrame.optionsPanel.lengthFrameLabel.setText((int)currentAnimation.getTotalTime() + " frames");
-		timelineFrame.optionsPanel.lengthSecondsLabel.setText(df.format(currentAnimation.getTotalTime()/(float)currentAnimation.getFPS()) + " seconds");
+		timelineFrame.controlPanel.animationPanel.lengthFrameLabel.setText((int)currentAnimation.getTotalTime() + " frames");
+		timelineFrame.controlPanel.animationPanel.lengthSecondsLabel.setText(df.format(currentAnimation.getTotalTime()/(float)currentAnimation.getFPS()) + " seconds");
 	}
 
 	/* ---------------------------------------------------- *
@@ -609,7 +612,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 		int timelineLengthMin = 50;
 		JPanel mainPanel;
 		JLabel[] partLabels;
-		OptionsPanel optionsPanel;
+		ControlPanel controlPanel;
 		CopyLabel copyLabel;
 
 		private TimelineFrame()
@@ -624,7 +627,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 
 
 			mainPanel = new JPanel();
-			optionsPanel = new OptionsPanel();
+			controlPanel = new ControlPanel(GuiAnimationTimeline.this);
 
 			JPanel timelinePanel = new JPanel();
 			final JTextField timeTextField = new JTextField("0");
@@ -733,7 +736,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 			scrollPane.setPreferredSize(new Dimension(700,400));
 			scrollPane.setWheelScrollingEnabled(false);
 
-			mainPanel.add(optionsPanel);
+			mainPanel.add(controlPanel);
 			mainPanel.add(scrollPane);
 
 			setContentPane(mainPanel);
@@ -770,8 +773,8 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 
 		private void refresh()
 		{
-			optionsPanel.updatePlayPauseButton();
-			optionsPanel.updatePartLabels();
+			controlPanel.updatePlayPauseButton();
+			controlPanel.partPanel.updatePartLabels();
 			refresthLineColours();
 			revalidate();
 			repaint();
@@ -963,389 +966,6 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 					}
 				}
 			}
-		}
-	}
-
-	/* ---------------------------------------------------- *
-	 * 				  	   Options panel					*
-	 * ---------------------------------------------------- */
-
-	private class OptionsPanel extends JPanel
-	{
-		JButton playPauseButton;
-		JLabel partName, partX, partY, partZ, lengthFrameLabel, lengthSecondsLabel, fpsLabel;
-
-		private OptionsPanel()
-		{				
-			playPauseButton = new JButton("Play");
-			playPauseButton.addActionListener(new ActionListener()
-			{
-				@Override
-				public void actionPerformed(ActionEvent e) 
-				{
-					if(time >= currentAnimation.getTotalTime())
-						time = 0;
-					boolPlay = !boolPlay; 		
-					if(boolPlay)
-					{
-						playStartTimeNano = System.nanoTime();
-						playStartTimeFrame = time;
-					}
-
-					updatePlayPauseButton();
-				}
-			});
-
-			JPanel animationPanel = new JPanel();
-
-			lengthFrameLabel = new JLabel();
-			lengthSecondsLabel = new JLabel();
-			fpsLabel = new JLabel(currentAnimation.getFPS() + " FPS");
-
-			JButton fpsButton = new JButton("Set FPS");
-			fpsButton.addActionListener(new ActionListener()
-			{
-				@Override
-				public void actionPerformed(ActionEvent e) 
-				{
-					getUserFPS();
-				}
-			});
-
-			final JLabel valueLabel = new JLabel();
-			valueLabel.setPreferredSize(new Dimension(30, 16));
-			valueLabel.setText("100%");
-
-			final JSlider slider = new JSlider(0, 200, 100);
-			slider.addChangeListener(new ChangeListener()
-			{
-				@Override
-				public void stateChanged(ChangeEvent e)
-				{
-					valueLabel.setText(slider.getValue() + "%");
-					timeMultiplier = slider.getValue()/100F;
-				}
-			});
-			slider.setPreferredSize(new Dimension(100,20));
-
-			JButton resetButton = new JButton("Reset");
-			resetButton.addActionListener(new ActionListener()
-			{
-				@Override
-				public void actionPerformed(ActionEvent e) 
-				{
-					slider.setValue(100);
-				}
-			});
-
-			animationPanel.setLayout(new GridBagLayout());
-			GridBagConstraints c = new GridBagConstraints();
-
-			c.gridx = 0;
-			c.gridy = 0;
-			c.weightx = 1;
-			c.anchor = c.CENTER;
-			c.insets = new Insets(2,2,2,2);
-			c.gridwidth = 1;
-			animationPanel.add(lengthFrameLabel, c);
-			c.gridx = 1;
-			animationPanel.add(lengthSecondsLabel, c);
-
-			c.gridx = 0;
-			c.gridy = 1;
-			animationPanel.add(fpsLabel, c);
-			c.gridx = 1;
-			animationPanel.add(fpsButton, c);
-
-			c.gridx = 0;
-			c.gridy = 2;
-			animationPanel.add(new JLabel("Play speed"), c);
-
-			c.gridx = 1;
-			animationPanel.add(slider, c);
-
-			c.gridx = 0;
-			c.gridy = 3;
-			animationPanel.add(valueLabel,c);
-			c.gridx = 1;
-			animationPanel.add(resetButton,c);
-
-			animationPanel.setBorder(BorderFactory.createTitledBorder("Animation"));
-
-			JPanel partPanel = new JPanel();
-
-			partName = new JLabel();
-			partX = new JLabel();
-			partY = new JLabel();
-			partZ = new JLabel();
-
-			updatePartLabels();
-
-			partPanel.setLayout(new GridBagLayout());
-			c = new GridBagConstraints();
-			c.gridx = 0;
-			c.gridy = 0;
-			c.weightx = 1;
-			c.anchor = c.CENTER;
-			c.insets = new Insets(1,1,1,1);
-			partPanel.add(partName,c);
-			c.gridx = 1;
-			partPanel.add(partX,c);
-			c.gridx = 2;
-			partPanel.add(partY,c);
-			c.gridx = 3;
-			partPanel.add(partZ,c);
-
-			partPanel.setBorder(BorderFactory.createTitledBorder("Part"));
-
-			JPanel movementPanel = new JPanel();
-			
-			movementPanel.setLayout(new GridBagLayout());
-			c = new GridBagConstraints();
-			
-			c.gridx = 0;
-			c.gridy = 0;
-			c.weightx = 1;
-			c.weighty = 1;
-			c.insets = new Insets(2,2,2,2);
-			c.anchor = c.CENTER;
-			movementPanel.add(new JComboBox(Direction.values()), c);
-			
-			c.gridx = 1;
-			movementPanel.add(new JLabel("Active"), c);
-			
-			c.gridx = 2;
-			movementPanel.add(new JCheckBox(), c);
-			
-			c.gridwidth = 1;
-			c.gridx = 0;
-			c.gridy = 1;
-			movementPanel.add(new JLabel("4.3 blocks/sec"), c);
-			
-			c.gridx = 1;
-			c.gridwidth = 2;
-			movementPanel.add(new JButton("Set"), c);
-			
-			movementPanel.setBorder(BorderFactory.createTitledBorder("Movement"));
-			
-			
-			JPanel checkboxPanel = new JPanel();
-			checkboxPanel.setLayout(new GridBagLayout());
-			c = new GridBagConstraints();
-			c.gridx = 0;
-			c.gridy = 0;
-			c.ipadx = 0;
-			for(int i = 0; i < 4; i++)
-			{	
-				c.gridx = i%2*2;
-				c.gridy = i/2;
-				System.out.println(i%2 + " " + i/2);
-				c.anchor = GridBagConstraints.EAST;
-				JCheckBox cb = new JCheckBox();
-				cb.setHorizontalAlignment(JCheckBox.RIGHT);
-				checkboxPanel.add(cb, c);
-				String s = "";
-				switch(i)
-				{
-				case 0: 
-					s = "Loop"; 
-					cb.setSelected(boolLoop);
-					cb.addActionListener(new ActionListener()
-					{
-						public void actionPerformed(ActionEvent actionEvent) 
-						{
-							AbstractButton abstractButton = (AbstractButton) actionEvent.getSource();
-							boolLoop = abstractButton.getModel().isSelected();
-						}
-					});
-					break;
-				case 1: s = "Shield"; break; //TODO shield??
-				case 2: 
-					s = "Base";
-					cb.setSelected(boolBase);
-					cb.addActionListener(new ActionListener()
-					{
-						public void actionPerformed(ActionEvent actionEvent) 
-						{
-							AbstractButton abstractButton = (AbstractButton) actionEvent.getSource();
-							boolBase = abstractButton.getModel().isSelected();
-						}
-					});
-					break;
-				case 3:
-					s = "Grid";
-					cb.setSelected(boolGrid);
-					cb.addActionListener(new ActionListener()
-					{
-						public void actionPerformed(ActionEvent actionEvent) 
-						{
-							AbstractButton abstractButton = (AbstractButton) actionEvent.getSource();
-							boolGrid = abstractButton.getModel().isSelected();
-						}
-					});
-					break;
-				}
-				c.gridx = i%2*2 + 1;
-				c.anchor = GridBagConstraints.WEST;
-				checkboxPanel.add(new JLabel(s),c);
-			}
-			checkboxPanel.setBorder(BorderFactory.createTitledBorder("Render"));
-
-			JPanel buttonPanel = new JPanel();
-			buttonPanel.setLayout(new GridBagLayout());
-
-			c.gridx = 0;
-			c.gridy = 0;
-			c.insets = new Insets(2,5,2,5);
-			c.ipadx = 10;
-			c.fill = GridBagConstraints.BOTH;
-
-			JButton itemButton = new JButton("Choose Right Hand Item");
-			itemButton.addActionListener(new ActionListener()
-			{
-				@Override
-				public void actionPerformed(ActionEvent e) 
-				{
-					mc.displayGuiScreen(new GuiInventoryChooseItem(GuiAnimationTimeline.this, (EntityObj) entityToRender));
-				}
-			});
-			buttonPanel.add(itemButton, c);
-
-			c.gridy = 1;
-			JButton emptyItemButton = new JButton("Empty Right Hand");
-			emptyItemButton.addActionListener(new ActionListener()
-			{
-				@Override
-				public void actionPerformed(ActionEvent e) 
-				{
-					AnimationData.setAnimationItem(currentAnimation.getName(), -1);
-					((EntityObj) entityToRender).setCurrentItem(null); 
-				}
-			});
-			buttonPanel.add(emptyItemButton, c);
-			buttonPanel.setBorder(BorderFactory.createTitledBorder("Item"));
-
-			JButton duplicateButton = new JButton("Duplicate");
-			duplicateButton.addActionListener(new ActionListener()
-			{
-				@Override
-				public void actionPerformed(ActionEvent e) 
-				{
-					String newName = JOptionPane.showInputDialog(timelineFrame, "Name of duplicate animation: ");
-					if(newName == null || newName.equals("") || newName.equals(" "))
-						JOptionPane.showMessageDialog(timelineFrame, "Invalid name");
-					else if(AnimationData.sequenceExists(entityName, newName))
-						JOptionPane.showMessageDialog(timelineFrame, "An animation with this name already exists.");
-					else
-					{
-						AnimationSequence sequence = currentAnimation.copy(newName);
-						AnimationData.addSequence(entityName, sequence);
-						Minecraft.getMinecraft().displayGuiScreen(new GuiAnimationTimeline(entityName, sequence));
-					}
-				}
-			});
-
-			JButton backButton = new JButton("Back");
-			backButton.addActionListener(new ActionListener()
-			{
-				@Override
-				public void actionPerformed(ActionEvent e) 
-				{
-					close();
-				}
-			});
-
-			setLayout(new GridBagLayout());
-			c = new GridBagConstraints();
-			c.fill = GridBagConstraints.BOTH;
-			c.gridx = 0;
-			c.gridy = 0;
-			c.insets = new Insets(2,5,2,5);
-			add(playPauseButton,c);
-			c.insets = new Insets(0,2,0,2);
-			c.gridy = 1;
-			add(animationPanel,c);
-			c.gridy = 2;
-			add(partPanel,c);
-			c.gridy = 3;
-			add(movementPanel,c);
-			c.gridy = 4;
-			add(checkboxPanel,c);
-			c.gridy = 5;
-			add(buttonPanel,c);
-			c.gridy = 6;
-			c.insets = new Insets(2,5,2,5);
-			add(duplicateButton,c);
-			c.gridy = 7;
-			c.insets = new Insets(2,5,10,5);
-			add(backButton,c);
-		}
-
-		private void updatePartLabels()
-		{
-			String name = "No part selected";
-			String x="-",y="-",z="-";
-			if(currentPartName != null && !currentPartName.equals(""))
-			{
-				Part part = Util.getPartFromName(currentPartName, entityModel.parts);
-				name = part.getDisplayName();
-				x = df.format(part.getValue(0));
-				y = df.format(part.getValue(1));
-				z = df.format(part.getValue(2));
-			}
-			partName.setText(name);
-			partX.setText("X: " + x);
-			partY.setText("Y: " + y);
-			partZ.setText("Z: " + z);
-		}
-
-		private void updatePlayPauseButton()
-		{
-			playPauseButton.setText(boolPlay ? "Pause" : "Play");
-		}
-
-		/**
-		 * Ask the user for an FPS value, and set the aniamtion's FPS value to it 
-		 * if an appropriate value is supplied.
-		 */
-		private void getUserFPS()
-		{
-			Integer fps = null;			
-			while(true)
-			{
-				String input = JOptionPane.showInputDialog(timelineFrame, "Set FPS (20-60)");
-				if(input == null)
-					break;
-				fps = getFPSFromString(input);
-				if(fps != null)
-				{
-					onFPSChange(fps);
-					break;
-				}
-				else
-					JOptionPane.showMessageDialog(timelineFrame, "Invalid input");
-			}
-		}
-
-		/**
-		 * Get an FPS value from a string.
-		 * The FPS value must be between 20 and 60 (inclusive)
-		 * @param input - String to parse.
-		 * @return FPS value or null if string is invalid.
-		 */
-		private Integer getFPSFromString(String input)
-		{
-			Integer fps = null;
-
-			try
-			{
-				fps = Integer.parseInt(input);
-				if(fps < 20 || fps > 60)
-					fps = null;
-			}
-			catch(NumberFormatException e){}
-
-			return fps;
 		}
 	}
 

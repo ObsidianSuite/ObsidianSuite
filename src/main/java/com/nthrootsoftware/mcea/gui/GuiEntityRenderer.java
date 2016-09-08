@@ -35,13 +35,15 @@ import net.minecraft.util.Vec3;
 public class GuiEntityRenderer extends GuiBlack
 {
 
-	protected String entityName;
+	public String entityName;
 	public EntityLivingBase entityToRender;
-	protected ModelObj entityModel;
+	public ModelObj entityModel;
 	protected List<String> parts = new ArrayList<String>();
-	protected String currentPartName, additionalHighlightPartName;
+	public String currentPartName;
+	protected String additionalHighlightPartName;
 
-	protected boolean boolBase, boolGrid;
+	public boolean boolBase;
+	public boolean boolGrid;
 
 	private int prevMouseMoveX = 0, prevMouseMoveY = 0;
 

@@ -16,6 +16,7 @@ public class EntityAutoMove
 	
 	public enum Direction
 	{
+		None (0,0,0),
 		Foward (0,0,1),
 		FowardLeft (1,0,1),
 		FowardRight (-1,0,1),
