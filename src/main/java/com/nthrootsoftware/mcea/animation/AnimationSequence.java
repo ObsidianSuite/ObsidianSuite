@@ -19,10 +19,12 @@ public class AnimationSequence
 	private String animationName;
 	List<AnimationPart> animations = new ArrayList<AnimationPart>();
 	private float actionPoint = 0.0F;
+	private int fps;
 
 	public AnimationSequence(String par0Str) 
 	{
 		this.animationName = par0Str;
+		fps = 25;
 	}
 	
 	public AnimationSequence(String entityName, NBTTagCompound compound) 
@@ -53,6 +55,16 @@ public class AnimationSequence
 	public float getActionPoint()
 	{
 		return actionPoint;
+	}
+	
+	public int getFPS()
+	{
+		return fps;
+	}
+	
+	public void setFPS(int fps)
+	{
+		this.fps = fps;
 	}
 	
 	/**
@@ -170,7 +182,8 @@ public class AnimationSequence
 			animations.add(animation);
 		}		
 		animationName = compound.getString("Name");
-		actionPoint= compound.getFloat("ActionPoint");
+		actionPoint = compound.getFloat("ActionPoint");
+		fps = compound.hasKey("FPS") ? compound.getInteger("FPS") : 25;
 	}
 
 }

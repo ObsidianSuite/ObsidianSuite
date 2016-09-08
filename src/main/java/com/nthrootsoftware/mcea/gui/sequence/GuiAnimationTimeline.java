@@ -205,7 +205,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 	{				
 		if(boolPlay)
 		{
-			time = Util.getAnimationFrameTime(playStartTimeNano, playStartTimeFrame, 25, timeMultiplier);
+			time = Util.getAnimationFrameTime(playStartTimeNano, playStartTimeFrame, currentAnimation.getFPS(), timeMultiplier);
 			exceptionPartName = "";
 			if(time >= currentAnimation.getTotalTime())
 			{
@@ -548,12 +548,17 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 		GuiHandler.mainGui = new MainGUI();
 	}
 	
+	private void onFPSChange()
+	{
+		timelineFrame.optionsPanel.fpsLabel.setText(currentAnimation.getFPS() + " FPS");
+		onAnimationLengthChange();
+	}
+	
 	public void onAnimationLengthChange()
 	{
 		System.out.println(timelineFrame);
 		timelineFrame.optionsPanel.lengthFrameLabel.setText((int)currentAnimation.getTotalTime() + " frames");
-		//TODO substitute 25F for FPS
-		timelineFrame.optionsPanel.lengthSecondsLabel.setText(currentAnimation.getTotalTime()/25F + " seconds");
+		timelineFrame.optionsPanel.lengthSecondsLabel.setText(df.format(currentAnimation.getTotalTime()/(float)currentAnimation.getFPS()) + " seconds");
 	}
 
 	/* ---------------------------------------------------- *
@@ -933,7 +938,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 	private class OptionsPanel extends JPanel
 	{
 		JButton playPauseButton;
-		JLabel partName, partX, partY, partZ, lengthFrameLabel, lengthSecondsLabel;
+		JLabel partName, partX, partY, partZ, lengthFrameLabel, lengthSecondsLabel, fpsLabel;
 
 		private OptionsPanel()
 		{				
@@ -960,6 +965,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 			
 			lengthFrameLabel = new JLabel();
 			lengthSecondsLabel = new JLabel();
+			fpsLabel = new JLabel(currentAnimation.getFPS() + " FPS");
 			
 			JButton fpsButton = new JButton("Set FPS");
 			fpsButton.addActionListener(new ActionListener()
@@ -1015,7 +1021,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 			
 			c.gridx = 0;
 			c.gridy = 2;
-			animationPanel.add(new JLabel("25 FPS"), c);
+			animationPanel.add(fpsLabel, c);
 			c.gridx = 1;
 			animationPanel.add(fpsButton, c);
 			
@@ -1228,6 +1234,10 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 			playPauseButton.setText(boolPlay ? "Pause" : "Play");
 		}
 		
+		/**
+		 * Ask the user for an FPS value, and set the aniamtion's FPS value to it 
+		 * if an appropriate value is supplied.
+		 */
 		private void getUserFPS()
 		{
 			Integer fps = null;			
@@ -1238,13 +1248,22 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 					break;
 				fps = getFPSFromString(input);
 				if(fps != null)
+				{
+					currentAnimation.setFPS(fps);
+					onFPSChange();
 					break;
+				}
 				else
 					JOptionPane.showMessageDialog(timelineFrame, "Invalid input");
 			}
-			System.out.println(fps);
 		}
 		
+		/**
+		 * Get an FPS value from a string.
+		 * The FPS value must be between 20 and 60 (inclusive)
+		 * @param input - String to parse.
+		 * @return FPS value or null if string is invalid.
+		 */
 		private Integer getFPSFromString(String input)
 		{
 			Integer fps = null;
@@ -1255,10 +1274,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 				if(fps < 20 || fps > 60)
 					fps = null;
 			}
-			catch(NumberFormatException e)
-			{
-				//e.printStackTrace();
-			}
+			catch(NumberFormatException e){}
 			
 			return fps;
 		}
