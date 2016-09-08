@@ -49,6 +49,7 @@ import javax.swing.event.ChangeListener;
 
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
+import org.lwjgl.opengl.GL11;
 
 import com.nthrootsoftware.mcea.Util;
 import com.nthrootsoftware.mcea.animation.AnimationData;
@@ -60,6 +61,9 @@ import com.nthrootsoftware.mcea.gui.GuiInventoryChooseItem;
 import com.nthrootsoftware.mcea.gui.animation.MainGUI;
 import com.nthrootsoftware.mcea.render.objRendering.EntityObj;
 import com.nthrootsoftware.mcea.render.objRendering.parts.Part;
+import com.nthrootsoftware.mcea.render.objRendering.parts.PartEntityPos;
+import com.nthrootsoftware.mcea.render.objRendering.parts.PartObj;
+import com.nthrootsoftware.mcea.render.objRendering.parts.PartRotation;
 
 import net.minecraft.client.Minecraft;
 
@@ -86,6 +90,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 	//Frame time at which the animation started playing (play button pressed).
 	private float playStartTimeFrame;
 
+	private EntityAutoMove testMove = new EntityAutoMove(4.3F, 0, 1.0F, 25);
 
 	public GuiAnimationTimeline(String entityName, AnimationSequence animation)
 	{
@@ -225,6 +230,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 			timelineFrame.repaint();
 		}
 
+		testMove.moveEntity(time, entityToRender);
 		this.currentAnimation.animateAll(time, entityModel, exceptionPartName);
 
 		updateExternalFrameFromDisplay();
@@ -479,6 +485,19 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 		}
 		else
 			Toolkit.getDefaultToolkit().beep();
+	}
+
+	/* ---------------------------------------------------- *
+	 * 					  Ray Trace							*
+	 * ---------------------------------------------------- */
+
+	@Override
+	public void processRay()
+	{
+		GL11.glPushMatrix();
+		testMove.matrixTranslate(time);
+		super.processRay();
+		GL11.glPopMatrix();
 	}
 
 	/* ---------------------------------------------------- *
