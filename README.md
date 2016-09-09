@@ -23,7 +23,7 @@
 6. Delete working branch.
 7. Push changes to repo (including tag).
 8. Export mod (gradlew build) and add to exports folder.
-9. Add to mcea.log on server.
-10. Add new version to server.
-11. Run addLatest.sh.
-12. Check it works!
+9. Add new version to server.
+10. Run addLatest.sh.
+11. Write new update information to mcea.log on server.
+12. Check updater.cfg settings.
