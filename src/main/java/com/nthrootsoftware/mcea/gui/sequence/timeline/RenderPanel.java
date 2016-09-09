@@ -7,6 +7,7 @@ import java.awt.event.ActionListener;
 
 import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -14,7 +15,9 @@ import javax.swing.JPanel;
 public class RenderPanel extends JPanel
 {
 	
-	private final GuiAnimationTimeline timeline;
+	public final GuiAnimationTimeline timeline;
+	private JCheckBox loopCB, baseCB, gridCB; 
+	private BaseSizeFrame baseSizeFrame;
 	
 	public RenderPanel(GuiAnimationTimeline gui)
 	{
@@ -22,63 +25,75 @@ public class RenderPanel extends JPanel
 		
 		setLayout(new GridBagLayout());
 		
+		loopCB = new JCheckBox();
+		loopCB.setSelected(timeline.boolLoop);
+		loopCB.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent actionEvent) 
+			{
+				AbstractButton abstractButton = (AbstractButton) actionEvent.getSource();
+				timeline.boolLoop = abstractButton.getModel().isSelected();
+			}
+		});
+		
+		baseCB = new JCheckBox();
+		baseCB.setSelected(timeline.boolBase);
+		baseCB.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent actionEvent) 
+			{
+				AbstractButton abstractButton = (AbstractButton) actionEvent.getSource();
+				timeline.boolBase = abstractButton.getModel().isSelected();
+			}
+		});
+		
+		gridCB = new JCheckBox();
+		gridCB.setSelected(timeline.boolGrid);
+		gridCB.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent actionEvent) 
+			{
+				AbstractButton abstractButton = (AbstractButton) actionEvent.getSource();
+				timeline.boolGrid = abstractButton.getModel().isSelected();
+			}
+		});
+		
+		JButton setGridSizeButton = new JButton("Set Base Size");
+		setGridSizeButton.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				if(baseSizeFrame != null)
+					baseSizeFrame.dispose();
+				baseSizeFrame = new BaseSizeFrame(RenderPanel.this);
+			}
+		});
+		
 		GridBagConstraints c = new GridBagConstraints();
 		c.gridx = 0;
 		c.gridy = 0;
-		c.ipadx = 0;
-		for(int i = 0; i < 4; i++)
-		{	
-			c.gridx = i%2*2;
-			c.gridy = i/2;
-			c.anchor = GridBagConstraints.EAST;
-			JCheckBox cb = new JCheckBox();
-			cb.setHorizontalAlignment(JCheckBox.RIGHT);
-			add(cb, c);
-			String s = "";
-			switch(i)
-			{
-			case 0: 
-				s = "Loop"; 
-				cb.setSelected(timeline.boolLoop);
-				cb.addActionListener(new ActionListener()
-				{
-					public void actionPerformed(ActionEvent actionEvent) 
-					{
-						AbstractButton abstractButton = (AbstractButton) actionEvent.getSource();
-						timeline.boolLoop = abstractButton.getModel().isSelected();
-					}
-				});
-				break;
-			case 1: s = "Shield"; break; //TODO shield??
-			case 2: 
-				s = "Base";
-				cb.setSelected(timeline.boolBase);
-				cb.addActionListener(new ActionListener()
-				{
-					public void actionPerformed(ActionEvent actionEvent) 
-					{
-						AbstractButton abstractButton = (AbstractButton) actionEvent.getSource();
-						timeline.boolBase = abstractButton.getModel().isSelected();
-					}
-				});
-				break;
-			case 3:
-				s = "Grid";
-				cb.setSelected(timeline.boolGrid);
-				cb.addActionListener(new ActionListener()
-				{
-					public void actionPerformed(ActionEvent actionEvent) 
-					{
-						AbstractButton abstractButton = (AbstractButton) actionEvent.getSource();
-						timeline.boolGrid = abstractButton.getModel().isSelected();
-					}
-				});
-				break;
-			}
-			c.gridx = i%2*2 + 1;
-			c.anchor = GridBagConstraints.WEST;
-			add(new JLabel(s),c);
-		}
+		
+		add(new JLabel("Loop"),c);
+		c.gridx = 1;
+		add(loopCB, c);
+		
+		c.gridx = 2;
+		add(new JLabel("Base"),c);
+		c.gridx = 3;
+		add(baseCB, c);
+		
+		c.gridx = 4;
+		add(new JLabel("Grid"),c);
+		c.gridx = 5;
+		add(gridCB, c);
+		
+		c.gridx = 0;
+		c.gridy = 1;
+		c.gridwidth = 6;
+		add(setGridSizeButton,c);
+		
+		
 		setBorder(BorderFactory.createTitledBorder("Render"));
 	}
 

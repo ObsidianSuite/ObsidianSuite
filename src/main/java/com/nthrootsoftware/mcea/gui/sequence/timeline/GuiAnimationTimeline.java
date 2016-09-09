@@ -748,7 +748,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 			pack();
 			setAlwaysOnTop(true);
 			if(Display.isVisible())
-				setLocation(Display.getX() + 50, Display.getY() + 520);
+				setLocation(Display.getX() + 50, Display.getY() + 500);
 			else
 			{
 				setLocationRelativeTo(null);
