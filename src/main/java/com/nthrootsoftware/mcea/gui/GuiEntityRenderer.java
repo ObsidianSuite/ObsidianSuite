@@ -35,13 +35,15 @@ import net.minecraft.util.Vec3;
 public class GuiEntityRenderer extends GuiBlack
 {
 
-	protected String entityName;
+	public String entityName;
 	public EntityLivingBase entityToRender;
-	protected ModelObj entityModel;
+	public ModelObj entityModel;
 	protected List<String> parts = new ArrayList<String>();
-	protected String currentPartName, additionalHighlightPartName;
+	public String currentPartName;
+	protected String additionalHighlightPartName;
 
-	protected boolean boolBase, boolGrid;
+	public boolean boolBase;
+	public boolean boolGrid;
 
 	private int prevMouseMoveX = 0, prevMouseMoveY = 0;
 
@@ -54,6 +56,8 @@ public class GuiEntityRenderer extends GuiBlack
 
 	private List<View> views;
 
+	public int gridMinX = -1, gridMaxX = 1, gridMinZ = -1, gridMaxZ = 1;
+	
 	public GuiEntityRenderer(String entityName)
 	{
 		super();
@@ -318,11 +322,11 @@ public class GuiEntityRenderer extends GuiBlack
 
 
 		mc.getTextureManager().bindTexture(TextureMap.locationBlocksTexture);
-
-		GL11.glTranslatef(-1.0F, -0.5F, -1.0F);
-		for(int x = 0; x < 3; x++)
+		
+		GL11.glTranslatef(gridMinX + 0.5F, -0.5F, gridMinZ + 0.5F);
+		for(int z = gridMinZ; z < gridMaxZ; z++)
 		{
-			for(int y = 0; y < 3; y++)
+			for(int x = gridMinX; x < gridMaxX; x++)
 			{
 				GL11.glPushMatrix();
 				Block block = MCEA_Main.Base;
@@ -331,7 +335,7 @@ public class GuiEntityRenderer extends GuiBlack
 				GL11.glPopMatrix();
 				GL11.glTranslatef(1.0F, 0.0F, 0.0F);
 			}
-			GL11.glTranslatef(-3.0F, 0.0F, 1.0F);
+			GL11.glTranslatef(gridMinX - gridMaxX, 0.0F, 1.0F);
 		}
 
 		GL11.glPopMatrix();

@@ -21,7 +21,7 @@ import com.nthrootsoftware.mcea.animation.AnimationData;
 import com.nthrootsoftware.mcea.animation.AnimationSequence;
 import com.nthrootsoftware.mcea.distribution.DataHandler;
 import com.nthrootsoftware.mcea.gui.GuiHandler;
-import com.nthrootsoftware.mcea.gui.sequence.GuiAnimationTimeline;
+import com.nthrootsoftware.mcea.gui.sequence.timeline.GuiAnimationTimeline;
 
 import net.minecraft.client.Minecraft;
 

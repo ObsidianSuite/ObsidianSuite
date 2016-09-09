@@ -48,7 +48,7 @@ import com.nthrootsoftware.mcea.gui.GuiBlack;
 import com.nthrootsoftware.mcea.gui.GuiHandler;
 import com.nthrootsoftware.mcea.gui.GuiPartSetup;
 import com.nthrootsoftware.mcea.gui.animation.table.ButtonColumn;
-import com.nthrootsoftware.mcea.gui.sequence.GuiAnimationTimeline;
+import com.nthrootsoftware.mcea.gui.sequence.timeline.GuiAnimationTimeline;
 
 import net.minecraft.client.Minecraft;
 
