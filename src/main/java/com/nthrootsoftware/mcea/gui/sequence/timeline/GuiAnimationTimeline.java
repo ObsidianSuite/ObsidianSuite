@@ -86,13 +86,14 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 
 	boolean boolPlay;	
 	boolean boolLoop;
-
+	boolean boolMovementActive;
+	
 	//Nano time at which the animation started playing (play button pressed).
 	long playStartTimeNano;
 	//Frame time at which the animation started playing (play button pressed).
 	float playStartTimeFrame;
 
-	private EntityAutoMove testMove = new EntityAutoMove(4.3F, Direction.Foward, 25);
+	EntityAutoMove entityMovement;
 
 	public GuiAnimationTimeline(String entityName, AnimationSequence animation)
 	{
@@ -100,7 +101,8 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 
 		this.currentAnimation = animation;
 		boolPlay = false;
-
+		boolMovementActive = false;
+		
 		loadKeyframes();
 		loadFrames();
 
@@ -232,7 +234,8 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 			timelineFrame.repaint();
 		}
 
-		testMove.moveEntity(time, entityToRender);
+		if(entityMovement != null && boolMovementActive)
+			entityMovement.moveEntity(time, entityToRender);
 		this.currentAnimation.animateAll(time, entityModel, exceptionPartName);
 
 		updateExternalFrameFromDisplay();
@@ -497,7 +500,8 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 	public void processRay()
 	{
 		GL11.glPushMatrix();
-		testMove.matrixTranslate(time);
+		if(entityMovement != null && boolMovementActive)
+			entityMovement.matrixTranslate(time);
 		super.processRay();
 		GL11.glPopMatrix();
 	}
@@ -590,6 +594,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 	void onFPSChange(int fps)
 	{
 		timelineFrame.controlPanel.animationPanel.fpsLabel.setText(fps + " FPS");
+		timelineFrame.controlPanel.movementPanel.updateEntityMovement(fps);
 		updateAnimationFPS(fps);
 	}
 

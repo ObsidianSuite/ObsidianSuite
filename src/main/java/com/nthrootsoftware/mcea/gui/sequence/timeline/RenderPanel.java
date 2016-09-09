@@ -30,7 +30,6 @@ public class RenderPanel extends JPanel
 		{	
 			c.gridx = i%2*2;
 			c.gridy = i/2;
-			System.out.println(i%2 + " " + i/2);
 			c.anchor = GridBagConstraints.EAST;
 			JCheckBox cb = new JCheckBox();
 			cb.setHorizontalAlignment(JCheckBox.RIGHT);
