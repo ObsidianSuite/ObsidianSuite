@@ -1,7 +1,7 @@
 package com.nthrootsoftware.mcea.gui;
 
 import com.nthrootsoftware.mcea.animation.AnimationData;
-import com.nthrootsoftware.mcea.gui.sequence.GuiAnimationTimeline;
+import com.nthrootsoftware.mcea.gui.sequence.timeline.GuiAnimationTimeline;
 import com.nthrootsoftware.mcea.render.objRendering.EntityObj;
 
 import cpw.mods.fml.relauncher.Side;

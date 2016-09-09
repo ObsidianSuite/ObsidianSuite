@@ -1,4 +1,4 @@
-package com.nthrootsoftware.mcea.gui.sequence;
+package com.nthrootsoftware.mcea.gui.sequence.timeline;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -34,6 +34,7 @@ import javax.swing.BorderFactory;
 import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -49,16 +50,20 @@ import javax.swing.event.ChangeListener;
 
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
+import org.lwjgl.opengl.GL11;
 
 import com.nthrootsoftware.mcea.Util;
 import com.nthrootsoftware.mcea.animation.AnimationData;
 import com.nthrootsoftware.mcea.animation.AnimationPart;
 import com.nthrootsoftware.mcea.animation.AnimationSequence;
-import com.nthrootsoftware.mcea.distribution.ServerAccess;
 import com.nthrootsoftware.mcea.gui.GuiBlack;
 import com.nthrootsoftware.mcea.gui.GuiHandler;
 import com.nthrootsoftware.mcea.gui.GuiInventoryChooseItem;
 import com.nthrootsoftware.mcea.gui.animation.MainGUI;
+import com.nthrootsoftware.mcea.gui.sequence.EntityAutoMove;
+import com.nthrootsoftware.mcea.gui.sequence.EntityAutoMove.Direction;
+import com.nthrootsoftware.mcea.gui.sequence.ExternalFrame;
+import com.nthrootsoftware.mcea.gui.sequence.GuiEntityRendererWithTranslation;
 import com.nthrootsoftware.mcea.render.objRendering.EntityObj;
 import com.nthrootsoftware.mcea.render.objRendering.parts.Part;
 
@@ -72,16 +77,23 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 	private List<AnimationSequence> animationVersions;
 
 	private DecimalFormat df = new DecimalFormat("#.##");
-	private float time = 0.0F;
-	private final float defaultTimeIncrement = 0.4F;
-	private float timeIncrement = defaultTimeIncrement;
-	private TimelineFrame timelineFrame;
+	float time = 0.0F;
+	float timeMultiplier = 1.0F;
+	TimelineFrame timelineFrame;
 	protected Map<String, List<Keyframe>> keyframes = new HashMap<String, List<Keyframe>>();
 
 	private String exceptionPartName = "";
 
-	private boolean boolPlay;	
-	private boolean boolLoop;
+	boolean boolPlay;	
+	boolean boolLoop;
+	boolean boolMovementActive;
+	
+	//Nano time at which the animation started playing (play button pressed).
+	long playStartTimeNano;
+	//Frame time at which the animation started playing (play button pressed).
+	float playStartTimeFrame;
+
+	EntityAutoMove entityMovement;
 
 	public GuiAnimationTimeline(String entityName, AnimationSequence animation)
 	{
@@ -89,13 +101,14 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 
 		this.currentAnimation = animation;
 		boolPlay = false;
-
+		boolMovementActive = false;
+		
 		loadKeyframes();
 		loadFrames();
 
 		animationVersion = 0;
 		animationVersions = new ArrayList<AnimationSequence>();
-		updateAnimation();
+		updateAnimationParts();
 
 		((EntityObj) entityToRender).setCurrentItem(AnimationData.getAnimationItem(animation.getName()));   	
 
@@ -201,12 +214,16 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 	{				
 		if(boolPlay)
 		{
-			time += timeIncrement;
+			time = Util.getAnimationFrameTime(playStartTimeNano, playStartTimeFrame, currentAnimation.getFPS(), timeMultiplier);
 			exceptionPartName = "";
 			if(time >= currentAnimation.getTotalTime())
 			{
 				if(boolLoop)
+				{
 					time = 0.0F;
+					playStartTimeNano = System.nanoTime();
+					playStartTimeFrame = 0;
+				}
 				else
 				{
 					boolPlay = false;
@@ -217,12 +234,13 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 			timelineFrame.repaint();
 		}
 
+		if(entityMovement != null && boolMovementActive)
+			entityMovement.moveEntity(time, entityToRender);
 		this.currentAnimation.animateAll(time, entityModel, exceptionPartName);
 
-
 		updateExternalFrameFromDisplay();
-		timelineFrame.optionsPanel.updatePlayPauseButton();
-		timelineFrame.optionsPanel.updatePartLabels();
+		timelineFrame.controlPanel.updatePlayPauseButton();
+		timelineFrame.controlPanel.partPanel.updatePartLabels();
 
 		super.drawScreen(par1, par2, par3);
 	}
@@ -264,7 +282,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 		partKeyframes.add(kf);
 		keyframes.put(kf.partName, partKeyframes);
 		timelineFrame.refresthLineColours();
-		updateAnimation();
+		updateAnimationParts();
 	}
 
 	private void deleteKeyframe()
@@ -289,7 +307,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 			if(keyframeRemoved)
 			{
 				exceptionPartName = "";
-				updateAnimation();
+				updateAnimationParts();
 			}
 		}
 		timelineFrame.refresh();
@@ -366,7 +384,8 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 	 * 				   Animation manipulation				*
 	 * ---------------------------------------------------- */
 
-	private void updateAnimation()
+
+	private void updateAnimationParts()
 	{
 		//Create new animation object if new version
 		AnimationSequence sequence = new AnimationSequence(currentAnimation.getName());
@@ -389,6 +408,21 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 				}
 			}
 		}
+		sequence.setFPS(currentAnimation.getFPS());
+		updateAnimation(sequence);
+	}
+
+	private void updateAnimationFPS(int fps)
+	{
+		AnimationSequence sequence = new AnimationSequence(currentAnimation.getName());
+		sequence.setAnimations(currentAnimation.getAnimations());
+		sequence.setFPS(fps);
+		updateAnimation(sequence);
+	}
+
+
+	private void updateAnimation(AnimationSequence sequence)
+	{
 		//Remove all animations in front of current animation.
 		//If undo has been called and then changes made, the state that was undone from is now out of sync, so remove it.
 		//Several undo's could have been done together, so remove all in front.
@@ -408,6 +442,8 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 
 		//Update animation sequence in AnimationData.
 		AnimationData.addSequence(entityName, currentAnimation);
+
+		onAnimationLengthChange();
 	}
 
 	/* ---------------------------------------------------- *
@@ -435,6 +471,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 			AnimationData.addSequence(entityName, currentAnimation);
 			loadKeyframes();
 			timelineFrame.refresh();
+			onFPSChange(currentAnimation.getFPS());
 		}
 		else
 			Toolkit.getDefaultToolkit().beep();
@@ -449,9 +486,24 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 			AnimationData.addSequence(entityName, currentAnimation);
 			loadKeyframes();
 			timelineFrame.refresh();
+			onFPSChange(currentAnimation.getFPS());
 		}
 		else
 			Toolkit.getDefaultToolkit().beep();
+	}
+
+	/* ---------------------------------------------------- *
+	 * 					  Ray Trace							*
+	 * ---------------------------------------------------- */
+
+	@Override
+	public void processRay()
+	{
+		GL11.glPushMatrix();
+		if(entityMovement != null && boolMovementActive)
+			entityMovement.matrixTranslate(time);
+		super.processRay();
+		GL11.glPopMatrix();
 	}
 
 	/* ---------------------------------------------------- *
@@ -533,10 +585,23 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 		timelineFrame.setAlwaysOnTop(Display.isActive());
 	}
 
-	private void close()
+	void close()
 	{
 		mc.displayGuiScreen(new GuiBlack());
 		GuiHandler.mainGui = new MainGUI();
+	}
+
+	void onFPSChange(int fps)
+	{
+		timelineFrame.controlPanel.animationPanel.fpsLabel.setText(fps + " FPS");
+		timelineFrame.controlPanel.movementPanel.updateEntityMovement(fps);
+		updateAnimationFPS(fps);
+	}
+
+	public void onAnimationLengthChange()
+	{
+		timelineFrame.controlPanel.animationPanel.lengthFrameLabel.setText((int)currentAnimation.getTotalTime() + " frames");
+		timelineFrame.controlPanel.animationPanel.lengthSecondsLabel.setText(df.format(currentAnimation.getTotalTime()/(float)currentAnimation.getFPS()) + " seconds");
 	}
 
 	/* ---------------------------------------------------- *
@@ -552,7 +617,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 		int timelineLengthMin = 50;
 		JPanel mainPanel;
 		JLabel[] partLabels;
-		OptionsPanel optionsPanel;
+		ControlPanel controlPanel;
 		CopyLabel copyLabel;
 
 		private TimelineFrame()
@@ -567,7 +632,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 
 
 			mainPanel = new JPanel();
-			optionsPanel = new OptionsPanel();
+			controlPanel = new ControlPanel(GuiAnimationTimeline.this);
 
 			JPanel timelinePanel = new JPanel();
 			final JTextField timeTextField = new JTextField("0");
@@ -676,14 +741,14 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 			scrollPane.setPreferredSize(new Dimension(700,400));
 			scrollPane.setWheelScrollingEnabled(false);
 
-			mainPanel.add(optionsPanel);
+			mainPanel.add(controlPanel);
 			mainPanel.add(scrollPane);
 
 			setContentPane(mainPanel);
 			pack();
 			setAlwaysOnTop(true);
 			if(Display.isVisible())
-				setLocation(Display.getX() + 50, Display.getY() + 520);
+				setLocation(Display.getX() + 50, Display.getY() + 500);
 			else
 			{
 				setLocationRelativeTo(null);
@@ -698,23 +763,23 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 
 			setVisible(true);
 			setResizable(false);
-			
+
 			addWindowListener(new WindowAdapter()
 			{
-				
+
 				@Override
 				public void windowClosing(WindowEvent e)
 				{
 					close();
 				}
-				
+
 			});
 		}
 
 		private void refresh()
 		{
-			optionsPanel.updatePlayPauseButton();
-			optionsPanel.updatePartLabels();
+			controlPanel.updatePlayPauseButton();
+			controlPanel.partPanel.updatePartLabels();
 			refresthLineColours();
 			revalidate();
 			repaint();
@@ -811,7 +876,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 					public void mouseReleased(MouseEvent e) 
 					{
 						if(keyframeTimeChanged)
-							updateAnimation();
+							updateAnimationParts();
 						keyframeTimeChanged = false;
 					}		
 				});
@@ -906,269 +971,6 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 					}
 				}
 			}
-		}
-	}
-
-	/* ---------------------------------------------------- *
-	 * 				  	   Options panel					*
-	 * ---------------------------------------------------- */
-
-	private class OptionsPanel extends JPanel
-	{
-		JButton playPauseButton;
-		JLabel partName, partX, partY, partZ;
-
-		private OptionsPanel()
-		{				
-			playPauseButton = new JButton("Play");
-			playPauseButton.addActionListener(new ActionListener()
-			{
-				@Override
-				public void actionPerformed(ActionEvent e) 
-				{
-					if(time >= currentAnimation.getTotalTime())
-						time = 0;
-					boolPlay = !boolPlay; 		
-					updatePlayPauseButton();
-				}
-			});
-
-			JPanel sliderPanel = new JPanel();
-
-			final JLabel valueLabel = new JLabel();
-			valueLabel.setPreferredSize(new Dimension(30, 16));
-			valueLabel.setText("100%");
-
-			final JSlider slider = new JSlider(0, 300, 100);
-			slider.addChangeListener(new ChangeListener()
-			{
-				@Override
-				public void stateChanged(ChangeEvent e)
-				{
-					valueLabel.setText(slider.getValue() + "%");
-					timeIncrement = defaultTimeIncrement*slider.getValue()/100F;
-				}
-			});
-
-			JButton resetButton = new JButton("Reset");
-			resetButton.addActionListener(new ActionListener()
-			{
-				@Override
-				public void actionPerformed(ActionEvent e) 
-				{
-					slider.setValue(100);
-				}
-			});
-
-			sliderPanel.setLayout(new GridBagLayout());
-			GridBagConstraints c = new GridBagConstraints();
-
-			c.gridx = 0;
-			c.gridy = 0;
-			c.gridwidth = 2;	
-			c.anchor = c.CENTER;
-			sliderPanel.add(slider, c);
-			c.gridy = 1;
-			c.gridwidth = 1;		
-			c.weightx = 1;
-			sliderPanel.add(valueLabel,c);
-			c.gridx = 1;
-			sliderPanel.add(resetButton,c);
-
-			sliderPanel.setBorder(BorderFactory.createTitledBorder("Speed"));
-
-			JPanel partPanel = new JPanel();
-
-			partName = new JLabel();
-			partX = new JLabel();
-			partY = new JLabel();
-			partZ = new JLabel();
-
-			updatePartLabels();
-
-			partPanel.setLayout(new GridBagLayout());
-			c = new GridBagConstraints();
-			c.gridx = 0;
-			c.gridy = 0;
-			partPanel.add(partName,c);
-			c.gridy = 1;
-			partPanel.add(partX,c);
-			c.gridy = 2;
-			partPanel.add(partY,c);
-			c.gridy = 3;
-			partPanel.add(partZ,c);
-
-			partPanel.setBorder(BorderFactory.createTitledBorder("Part"));
-
-			JPanel buttonPanel = new JPanel();
-			buttonPanel.setLayout(new GridBagLayout());
-
-			c.gridx = 0;
-			c.gridy = 0;
-			c.insets = new Insets(2,5,2,5);
-			c.ipadx = 10;
-			c.fill = GridBagConstraints.BOTH;
-
-			JButton itemButton = new JButton("Choose Right Hand Item");
-			itemButton.addActionListener(new ActionListener()
-			{
-				@Override
-				public void actionPerformed(ActionEvent e) 
-				{
-					mc.displayGuiScreen(new GuiInventoryChooseItem(GuiAnimationTimeline.this, (EntityObj) entityToRender));
-				}
-			});
-			buttonPanel.add(itemButton, c);
-
-			c.gridy = 1;
-			JButton emptyItemButton = new JButton("Empty Right Hand");
-			emptyItemButton.addActionListener(new ActionListener()
-			{
-				@Override
-				public void actionPerformed(ActionEvent e) 
-				{
-					AnimationData.setAnimationItem(currentAnimation.getName(), -1);
-					((EntityObj) entityToRender).setCurrentItem(null); 
-				}
-			});
-			buttonPanel.add(emptyItemButton, c);
-
-			buttonPanel.setBorder(BorderFactory.createTitledBorder("Item"));
-
-			JPanel checkboxPanel = new JPanel();
-			checkboxPanel.setLayout(new GridBagLayout());
-			c.gridx = 0;
-			c.gridy = 0;
-			c.ipadx = 0;
-			for(int i = 0; i < 4; i++)
-			{	
-				c.gridx = 0;
-				c.gridy = i;
-				c.anchor = GridBagConstraints.EAST;
-				JCheckBox cb = new JCheckBox();
-				cb.setHorizontalAlignment(JCheckBox.RIGHT);
-				checkboxPanel.add(cb, c);
-				String s = "";
-				switch(i)
-				{
-				case 0: 
-					s = "Loop"; 
-					cb.setSelected(boolLoop);
-					cb.addActionListener(new ActionListener()
-					{
-						public void actionPerformed(ActionEvent actionEvent) 
-						{
-							AbstractButton abstractButton = (AbstractButton) actionEvent.getSource();
-							boolLoop = abstractButton.getModel().isSelected();
-						}
-					});
-					break;
-				case 1: s = "Shield"; break; //TODO shield??
-				case 2: 
-					s = "Base";
-					cb.setSelected(boolBase);
-					cb.addActionListener(new ActionListener()
-					{
-						public void actionPerformed(ActionEvent actionEvent) 
-						{
-							AbstractButton abstractButton = (AbstractButton) actionEvent.getSource();
-							boolBase = abstractButton.getModel().isSelected();
-						}
-					});
-					break;
-				case 3:
-					s = "Grid";
-					cb.setSelected(boolGrid);
-					cb.addActionListener(new ActionListener()
-					{
-						public void actionPerformed(ActionEvent actionEvent) 
-						{
-							AbstractButton abstractButton = (AbstractButton) actionEvent.getSource();
-							boolGrid = abstractButton.getModel().isSelected();
-						}
-					});
-					break;
-				}
-				c.gridx = 1;
-				c.anchor = GridBagConstraints.WEST;
-				checkboxPanel.add(new JLabel(s),c);
-			}
-			checkboxPanel.setBorder(BorderFactory.createTitledBorder("Render"));
-
-			JButton duplicateButton = new JButton("Duplicate");
-			duplicateButton.addActionListener(new ActionListener()
-			{
-				@Override
-				public void actionPerformed(ActionEvent e) 
-				{
-					String newName = JOptionPane.showInputDialog(timelineFrame, "Name of duplicate animation: ");
-					if(newName == null || newName.equals("") || newName.equals(" "))
-						JOptionPane.showMessageDialog(timelineFrame, "Invalid name");
-					else if(AnimationData.sequenceExists(entityName, newName))
-						JOptionPane.showMessageDialog(timelineFrame, "An animation with this name already exists.");
-					else
-					{
-						AnimationSequence sequence = currentAnimation.copy(newName);
-						AnimationData.addSequence(entityName, sequence);
-						Minecraft.getMinecraft().displayGuiScreen(new GuiAnimationTimeline(entityName, sequence));
-					}
-				}
-			});
-
-			JButton backButton = new JButton("Back");
-			backButton.addActionListener(new ActionListener()
-			{
-				@Override
-				public void actionPerformed(ActionEvent e) 
-				{
-					close();
-				}
-			});
-
-			setLayout(new GridBagLayout());
-			c = new GridBagConstraints();
-			c.fill = GridBagConstraints.BOTH;
-			c.gridx = 0;
-			c.gridy = 0;
-			c.insets = new Insets(2,5,2,5);
-			add(playPauseButton,c);
-			c.insets = new Insets(0,2,0,2);
-			c.gridy = 1;
-			add(sliderPanel,c);
-			c.gridy = 2;
-			add(partPanel,c);
-			c.gridy = 3;
-			add(checkboxPanel,c);
-			c.gridy = 4;
-			add(buttonPanel,c);
-			c.gridy = 5;
-			c.insets = new Insets(2,5,2,5);
-			add(duplicateButton,c);
-			c.gridy = 6;
-			add(backButton,c);
-		}
-
-		private void updatePartLabels()
-		{
-			String name = "No part selected";
-			String x="-",y="-",z="-";
-			if(currentPartName != null && !currentPartName.equals(""))
-			{
-				Part part = Util.getPartFromName(currentPartName, entityModel.parts);
-				name = part.getDisplayName();
-				x = df.format(part.getValue(0));
-				y = df.format(part.getValue(1));
-				z = df.format(part.getValue(2));
-			}
-			partName.setText(name);
-			partX.setText("X: " + x);
-			partY.setText("Y: " + y);
-			partZ.setText("Z: " + z);
-		}
-
-		private void updatePlayPauseButton()
-		{
-			playPauseButton.setText(boolPlay ? "Pause" : "Play");
 		}
 	}
 
