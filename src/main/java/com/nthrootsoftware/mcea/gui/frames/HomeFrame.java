@@ -11,21 +11,19 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-public class HomeFrame 
+import com.nthrootsoftware.mcea.gui.animation.AnimationNewGUI;
+
+public class HomeFrame extends MCEAFrame
 {
-	
-	JFrame frame;
-	
+		
 	public HomeFrame()
 	{
-		frame = new JFrame();
-		
-		JPanel mainPanel = new JPanel();
-		mainPanel.setLayout(new GridBagLayout());
-		
-		JLabel titleLabel = new JLabel("MCEA Home");
-		titleLabel.setHorizontalAlignment(JLabel.CENTER);
-		
+		super("Home");
+	}
+	
+	@Override
+	protected void addComponents() 
+	{
 		JButton newAnimationButton = new JButton("New Animation");
 		newAnimationButton.addActionListener(new ActionListener() 
 		{	
@@ -66,35 +64,19 @@ public class HomeFrame
 			}
 		});
 		
-		GridBagConstraints c = new GridBagConstraints();
-		
-		c.gridx = 0;
-		c.gridy = 0;
-		c.fill = GridBagConstraints.BOTH;
-		c.insets = new Insets(5,5,5,5);
-		mainPanel.add(titleLabel,c);
-		c.gridy = 1;
 		mainPanel.add(newAnimationButton,c);
-		c.gridy = 2;
+		c.gridy = 1;
 		mainPanel.add(openAnimationButton,c);
-		c.gridy = 3;
+		c.gridy = 2;
 		mainPanel.add(openEntityButton,c);
-		c.gridy = 4;
-		mainPanel.add(importEntityButton,c);
-		
-		frame.setContentPane(mainPanel);
-		frame.pack();
-		frame.setLocationRelativeTo(null);
-	}
-	
-	public void display()
-	{
-		frame.setVisible(true);
+		c.gridy = 3;
+		mainPanel.add(importEntityButton,c);		
 	}
 	
 	private void newAnimationPressed()
 	{
-		
+		frame.dispose();
+		new AnimationNewGUI();
 	}
 
 	private void openAnimationPressed()
@@ -111,5 +93,6 @@ public class HomeFrame
 	{
 		
 	}
+
 	
 }
