@@ -62,6 +62,9 @@ public class MCEA_Main
         {
             FMLCommonHandler.instance().bus().register(eventHandler);
         }
+        
+        Minecraft.getMinecraft().gameSettings.showInventoryAchievementHint = false;
+        Minecraft.getMinecraft().gameSettings.saveOptions();
 	}
 	
 	public static File getEntityAnimationFolder(String entityName)

@@ -3,7 +3,6 @@ package com.nthrootsoftware.mcea.gui;
 import org.lwjgl.opengl.GL11;
 
 import com.nthrootsoftware.mcea.Util;
-import com.nthrootsoftware.mcea.gui.stance.GuiAnimationMainMenu;
 
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.multiplayer.WorldClient;
