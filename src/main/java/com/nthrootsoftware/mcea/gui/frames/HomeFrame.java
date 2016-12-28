@@ -11,7 +11,9 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import com.nthrootsoftware.mcea.gui.animation.AnimationNewGUI;
+import com.nthrootsoftware.mcea.gui.GuiBlack;
+
+import net.minecraft.client.Minecraft;
 
 public class HomeFrame extends MCEAFrame
 {
@@ -19,6 +21,7 @@ public class HomeFrame extends MCEAFrame
 	public HomeFrame()
 	{
 		super("Home");
+		addComponents();
 	}
 	
 	@Override
@@ -64,6 +67,21 @@ public class HomeFrame extends MCEAFrame
 			}
 		});
 		
+		JButton closeButton = new JButton("Close");
+		closeButton.addActionListener(new ActionListener() 
+		{	
+			@Override
+			public void actionPerformed(ActionEvent e) 
+			{
+				closePressed();
+			}
+		});
+		
+		GridBagConstraints c = new GridBagConstraints();
+		c.gridx = 0;
+		c.gridy = 0;
+		c.fill = GridBagConstraints.BOTH;
+		c.insets = new Insets(5,5,5,5);
 		mainPanel.add(newAnimationButton,c);
 		c.gridy = 1;
 		mainPanel.add(openAnimationButton,c);
@@ -71,12 +89,14 @@ public class HomeFrame extends MCEAFrame
 		mainPanel.add(openEntityButton,c);
 		c.gridy = 3;
 		mainPanel.add(importEntityButton,c);		
+		c.gridy = 4;
+		mainPanel.add(closeButton,c);		
 	}
 	
 	private void newAnimationPressed()
 	{
 		frame.dispose();
-		new AnimationNewGUI();
+		new AnimationNewFrame().display();;
 	}
 
 	private void openAnimationPressed()
@@ -94,5 +114,12 @@ public class HomeFrame extends MCEAFrame
 		
 	}
 
+	private void closePressed()
+	{
+		frame.dispose();
+		Minecraft mc = Minecraft.getMinecraft();
+		if(mc.currentScreen instanceof GuiBlack)
+			((GuiBlack) mc.currentScreen).initateClose();
+	}
 	
 }

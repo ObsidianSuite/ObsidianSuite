@@ -86,7 +86,7 @@ public class GuiAnimationMainMenu extends GuiMainMenu
         int k = this.width / 2 - short1 / 2;
         byte b0 = 30;
         
-        this.drawTexturedModalRect(k + 50, b0 + 46, 0, 0, 170, 50);    
+        this.drawTexturedModalRect(k + 50, b0 + 60, 0, 0, 170, 50);    
 	}
 
 }

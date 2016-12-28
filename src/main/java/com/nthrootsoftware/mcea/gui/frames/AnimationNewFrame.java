@@ -1,4 +1,4 @@
-package com.nthrootsoftware.mcea.gui.animation;
+package com.nthrootsoftware.mcea.gui.frames;
 
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -9,7 +9,6 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -25,66 +24,52 @@ import com.nthrootsoftware.mcea.gui.sequence.timeline.GuiAnimationTimeline;
 
 import net.minecraft.client.Minecraft;
 
-public class AnimationNewGUI extends JFrame
+public class AnimationNewFrame extends MCEAFrame
 {
 
-	private static final long serialVersionUID = 679735101553823485L;
+	private Insets narrowInsets = new Insets(2,10,2,10);
+	private Insets wideInsets = new Insets(2,25,2,10);
+	private Insets deepInsets = new Insets(2,10,4,10);
+	
+	private JComboBox<String> entityDropDown;
+	private JTextField nameTextField;
+	
+	private String[] entites = DataHandler.getEntities().toArray(new String[0]);
 
-	private static final Insets narrowInsets = new Insets(2,10,2,10);
-	private static final Insets wideInsets = new Insets(2,25,2,10);
-	private static final Insets deepInsets = new Insets(2,10,4,10);
-	
-	private static final String[] entites = DataHandler.getEntities().toArray(new String[0]);
-	
-	public AnimationNewGUI()
+	public AnimationNewFrame()
 	{
 		super("New Animation");
-		
-		JPanel mainPanel = new JPanel();
-		mainPanel.setLayout(new GridBagLayout());
-		GridBagConstraints c = new GridBagConstraints();
-		mainPanel.setPreferredSize(new Dimension(300, 170));
-		
-		final JComboBox<String> entityDropDown = new JComboBox<String>(entites);
+		entityDropDown = new JComboBox<String>(entites);
+		nameTextField = new JTextField();
+		addComponents();
+	}
+
+	@Override
+	protected void addComponents()
+	{
 		entityDropDown.setPreferredSize(new Dimension(100,25));
-		
-	    final JTextField nameTextField = new JTextField();
-		
+
 		JButton create = new JButton("Create");
 		create.addActionListener(new ActionListener()
 		{
-
 			@Override
 			public void actionPerformed(ActionEvent e) 
 			{
-				String animationName = nameTextField.getText();
-				String entityName = (String) entityDropDown.getSelectedItem();
-				if(!animationName.equals(""))
-				{
-					if(!AnimationData.sequenceExists(entityName, animationName))
-					{
-						AnimationSequence sequence = new AnimationSequence(animationName);
-						AnimationData.addSequence(entityName, sequence);
-						dispose();
-						Minecraft.getMinecraft().displayGuiScreen(new GuiAnimationTimeline(entityName, sequence));
-					}
-					else
-						JOptionPane.showMessageDialog(AnimationNewGUI.this, "An animation with that name already exists.");
-				}
+				createPressed();
 			}
 		});
-		
+
 		JButton cancel = new JButton("Cancel");
 		cancel.addActionListener(new ActionListener()
 		{
 			@Override
 			public void actionPerformed(ActionEvent e) 
 			{
-				dispose();
-				GuiHandler.mainGui = new MainGUI();
+				cancelPressed();
 			}
 		});
-		
+
+		GridBagConstraints c = new GridBagConstraints();
 		c.gridx = 0;
 		c.gridy = 0;
 		c.gridheight = 1;
@@ -109,14 +94,30 @@ public class AnimationNewGUI extends JFrame
 		c.insets = deepInsets;
 		mainPanel.add(cancel,c);
 
-		setContentPane(mainPanel);
-		pack();
-		setVisible(true);
-		setResizable(false);
-		setAlwaysOnTop(true);
-		setLocationRelativeTo(null);
-		setLocation(Display.getX() + Display.getWidth()/2 - this.getWidth()/2, Display.getY() + Display.getHeight()/2 - this.getHeight()/2);
-
 	}
-	
+
+	private void createPressed()
+	{
+		String animationName = nameTextField.getText();
+		String entityName = (String) entityDropDown.getSelectedItem();
+		if(!animationName.equals(""))
+		{
+			if(!AnimationData.sequenceExists(entityName, animationName))
+			{
+				AnimationSequence sequence = new AnimationSequence(animationName);
+				AnimationData.addSequence(entityName, sequence);
+				frame.dispose();
+				Minecraft.getMinecraft().displayGuiScreen(new GuiAnimationTimeline(entityName, sequence));
+			}
+			else
+				JOptionPane.showMessageDialog(frame, "An animation with that name already exists.");
+		}
+	}
+
+	private void cancelPressed()
+	{
+		frame.dispose();
+		new HomeFrame().display();
+	}
+
 }
