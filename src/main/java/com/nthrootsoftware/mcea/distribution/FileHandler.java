@@ -17,13 +17,13 @@ import net.minecraft.nbt.NBTTagCompound;
 public class FileHandler 
 {
 
-	public static final String modelExtension = ".obj";
-	public static final String entityExtension = ".mce";
-	public static final String animationExtension = ".mca";
+	public static final String modelExtension = "obj";
+	public static final String entityExtension = "mce";
+	public static final String animationExtension = "mca";
 	
-	public static final FileNameExtensionFilter modelFilter = new FileNameExtensionFilter("MCEA Models", ".obj");
-	public static final FileNameExtensionFilter entityFilter = new FileNameExtensionFilter("MCEA Entities", ".mce");
-	public static final FileNameExtensionFilter animationFilter = new FileNameExtensionFilter("MCEA Animations", ".mca");
+	public static final FileNameExtensionFilter modelFilter = new FileNameExtensionFilter("MCEA Models", modelExtension);
+	public static final FileNameExtensionFilter entityFilter = new FileNameExtensionFilter("MCEA Entities", entityExtension);
+	public static final FileNameExtensionFilter animationFilter = new FileNameExtensionFilter("MCEA Animations", animationExtension);
 
 	public static File lastModelDirectory;
 	public static File lastEntityDirectory;
@@ -52,7 +52,7 @@ public class FileHandler
 	
 	public static File generateAnimationFile(File animationFolder, String animationName)
 	{
-		return new File(animationFolder, animationName + animationExtension);
+		return new File(animationFolder, animationName + "." + animationExtension);
 	}
 	
 }
