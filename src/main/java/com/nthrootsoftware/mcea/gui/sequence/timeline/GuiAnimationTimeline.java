@@ -8,7 +8,6 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -19,6 +18,7 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.File;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,13 +28,8 @@ import java.util.List;
 import java.util.Map;
 
 import javax.swing.AbstractAction;
-import javax.swing.AbstractButton;
 import javax.swing.ActionMap;
-import javax.swing.BorderFactory;
 import javax.swing.InputMap;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -56,18 +51,15 @@ import com.nthrootsoftware.mcea.Util;
 import com.nthrootsoftware.mcea.animation.AnimationData;
 import com.nthrootsoftware.mcea.animation.AnimationPart;
 import com.nthrootsoftware.mcea.animation.AnimationSequence;
+import com.nthrootsoftware.mcea.distribution.FileHandler;
 import com.nthrootsoftware.mcea.gui.GuiBlack;
 import com.nthrootsoftware.mcea.gui.GuiHandler;
-import com.nthrootsoftware.mcea.gui.GuiInventoryChooseItem;
 import com.nthrootsoftware.mcea.gui.animation.MainGUI;
 import com.nthrootsoftware.mcea.gui.sequence.EntityAutoMove;
-import com.nthrootsoftware.mcea.gui.sequence.EntityAutoMove.Direction;
 import com.nthrootsoftware.mcea.gui.sequence.ExternalFrame;
 import com.nthrootsoftware.mcea.gui.sequence.GuiEntityRendererWithTranslation;
 import com.nthrootsoftware.mcea.render.objRendering.EntityObj;
 import com.nthrootsoftware.mcea.render.objRendering.parts.Part;
-
-import net.minecraft.client.Minecraft;
 
 public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation implements ExternalFrame
 {
@@ -94,12 +86,15 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 	float playStartTimeFrame;
 
 	EntityAutoMove entityMovement;
+	
+	private File animationFile;
 
-	public GuiAnimationTimeline(String entityName, AnimationSequence animation)
+	public GuiAnimationTimeline(File animationFile, String entityName, AnimationSequence animation)
 	{
 		super(entityName);
 
 		this.currentAnimation = animation;
+		this.animationFile = animationFile;
 		boolPlay = false;
 		boolMovementActive = false;
 		
@@ -206,8 +201,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 	{
 		super.onGuiClosed();
 		timelineFrame.dispose();
-		if(animationVersion != 0)
-			AnimationData.addChangedSequence(entityName, currentAnimation.getName());
+		FileHandler.saveAnimationSequence(animationFile, currentAnimation);
 	}
 
 	public void drawScreen(int par1, int par2, float par3)

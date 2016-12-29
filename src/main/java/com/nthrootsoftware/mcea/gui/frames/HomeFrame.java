@@ -4,11 +4,13 @@ import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 
 import javax.swing.JButton;
 
 import com.nthrootsoftware.mcea.animation.AnimationSequence;
-import com.nthrootsoftware.mcea.distribution.FileIO;
+import com.nthrootsoftware.mcea.distribution.FileChooser;
+import com.nthrootsoftware.mcea.distribution.FileHandler;
 import com.nthrootsoftware.mcea.gui.GuiBlack;
 import com.nthrootsoftware.mcea.gui.sequence.timeline.GuiAnimationTimeline;
 
@@ -100,9 +102,10 @@ public class HomeFrame extends MCEAFrame
 
 	private void openAnimationPressed()
 	{
-		AnimationSequence sequence = FileIO.loadAnimationSequence(frame);
+		File animationFile = FileChooser.loadAnimationFile(frame);
+		AnimationSequence sequence = FileHandler.getAnimationFromFile(animationFile);
 		frame.dispose();
-		Minecraft.getMinecraft().displayGuiScreen(new GuiAnimationTimeline("player", sequence));
+		Minecraft.getMinecraft().displayGuiScreen(new GuiAnimationTimeline(animationFile, "player", sequence));
 	}
 	
 	private void openEntityPressed()

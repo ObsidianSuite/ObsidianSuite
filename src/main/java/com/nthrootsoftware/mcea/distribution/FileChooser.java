@@ -9,42 +9,34 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class FileChooser
 {
-	
-	private static final FileNameExtensionFilter modelFilter = new FileNameExtensionFilter("MCEA Models", ".obj");
-	private static final FileNameExtensionFilter entityFilter = new FileNameExtensionFilter("MCEA Entities", ".mce");
-	private static final FileNameExtensionFilter animationFilter = new FileNameExtensionFilter("MCEA Animations", ".mca");
-
-	private static File lastModelDirectory;
-	private static File lastEntityDirectory;
-	private static File lastAnimationDirectory;
 
 	private static JFileChooser fc = new JFileChooser();
 
 	public static File loadModelFile(Component parent)
 	{
-		File modelFile = getLoadLocationFromUser(parent, lastModelDirectory, modelFilter, JFileChooser.FILES_ONLY);
-		lastModelDirectory = fc.getCurrentDirectory();
+		File modelFile = getLoadLocationFromUser(parent, FileHandler.lastModelDirectory, FileHandler.modelFilter, JFileChooser.FILES_ONLY);
+		FileHandler.lastModelDirectory = fc.getCurrentDirectory();
 		return modelFile;
 	}
 	
 	public static File loadEntityFile(Component parent)
 	{
-		File entityFile = getLoadLocationFromUser(parent, lastEntityDirectory, entityFilter, JFileChooser.FILES_ONLY);
-		lastEntityDirectory = fc.getCurrentDirectory();
+		File entityFile = getLoadLocationFromUser(parent, FileHandler.lastEntityDirectory, FileHandler.entityFilter, JFileChooser.FILES_ONLY);
+		FileHandler.lastEntityDirectory = fc.getCurrentDirectory();
 		return entityFile;
 	}
 	
 	public static File loadAnimationFile(Component parent)
 	{
-		File animationFile = getLoadLocationFromUser(parent, lastAnimationDirectory, animationFilter, JFileChooser.FILES_ONLY);
-		lastAnimationDirectory = fc.getCurrentDirectory();
+		File animationFile = getLoadLocationFromUser(parent, FileHandler.lastAnimationDirectory, FileHandler.animationFilter, JFileChooser.FILES_ONLY);
+		FileHandler.lastAnimationDirectory = fc.getCurrentDirectory();
 		return animationFile;
 	}
 	
 	public static File chooseAnimationFolder(Component parentComponent)
 	{
-		File animationFolder = getLoadLocationFromUser(parentComponent, lastAnimationDirectory, null, JFileChooser.DIRECTORIES_ONLY);
-		lastAnimationDirectory = fc.getCurrentDirectory();
+		File animationFolder = getLoadLocationFromUser(parentComponent, FileHandler.lastAnimationDirectory, null, JFileChooser.DIRECTORIES_ONLY);
+		FileHandler.lastAnimationDirectory = fc.getCurrentDirectory();
 		return animationFolder;
 	}
 	
@@ -70,8 +62,8 @@ public class FileChooser
 	{
 		File animationFile = null;
 		
-		if(lastAnimationDirectory != null)
-			fc.setCurrentDirectory(lastAnimationDirectory);
+		if(FileHandler.lastAnimationDirectory != null)
+			fc.setCurrentDirectory(FileHandler.lastAnimationDirectory);
 		
 		int returnVal = fc.showSaveDialog(parent);
 		
@@ -79,9 +71,9 @@ public class FileChooser
 			animationFile = fc.getSelectedFile();
 		
 		if(animationFile != null)
-			lastAnimationDirectory = animationFile.getParentFile();
+			FileHandler.lastAnimationDirectory = animationFile.getParentFile();
 		else
-			lastAnimationDirectory = fc.getCurrentDirectory();
+			FileHandler.lastAnimationDirectory = fc.getCurrentDirectory();
 		
 		return animationFile;
 	}

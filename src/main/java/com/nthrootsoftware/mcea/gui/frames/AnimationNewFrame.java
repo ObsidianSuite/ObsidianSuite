@@ -17,6 +17,7 @@ import com.nthrootsoftware.mcea.animation.AnimationData;
 import com.nthrootsoftware.mcea.animation.AnimationSequence;
 import com.nthrootsoftware.mcea.distribution.DataHandler;
 import com.nthrootsoftware.mcea.distribution.FileChooser;
+import com.nthrootsoftware.mcea.distribution.FileHandler;
 import com.nthrootsoftware.mcea.gui.sequence.timeline.GuiAnimationTimeline;
 
 import net.minecraft.client.Minecraft;
@@ -29,6 +30,8 @@ public class AnimationNewFrame extends MCEAFrame
 	private JLabel locationLabel;
 	
 	private String[] entites = DataHandler.getEntities().toArray(new String[0]);
+	
+	private File animationFolder;
 
 	public AnimationNewFrame()
 	{
@@ -120,8 +123,8 @@ public class AnimationNewFrame extends MCEAFrame
 	
 	private void chooseFolderPressed()
 	{
-		File folder = FileChooser.chooseAnimationFolder(frame);
-		String path = folder.getAbsolutePath();
+		animationFolder = FileChooser.chooseAnimationFolder(frame);
+		String path = animationFolder.getAbsolutePath();
 		locationLabel.setText(path);
 		locationLabel.setToolTipText(path);
 		frame.revalidate();
@@ -139,7 +142,7 @@ public class AnimationNewFrame extends MCEAFrame
 				AnimationSequence sequence = new AnimationSequence(entityName, animationName);
 				AnimationData.addSequence(entityName, sequence);
 				frame.dispose();
-				Minecraft.getMinecraft().displayGuiScreen(new GuiAnimationTimeline(entityName, sequence));
+				Minecraft.getMinecraft().displayGuiScreen(new GuiAnimationTimeline(FileHandler.generateAnimationFile(animationFolder, animationName), entityName, sequence));
 			}
 			else
 				JOptionPane.showMessageDialog(frame, "An animation with that name already exists.");
