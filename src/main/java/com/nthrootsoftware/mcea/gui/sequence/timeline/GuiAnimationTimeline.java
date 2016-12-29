@@ -434,9 +434,6 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 		animationVersion = animationVersions.size() - 1;
 		currentAnimation = sequence;
 
-		//Update animation sequence in AnimationData.
-		AnimationData.addSequence(entityName, currentAnimation);
-
 		onAnimationLengthChange();
 	}
 
@@ -462,7 +459,6 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 		{
 			animationVersion --;
 			currentAnimation = animationVersions.get(animationVersion);
-			AnimationData.addSequence(entityName, currentAnimation);
 			loadKeyframes();
 			timelineFrame.refresh();
 			onFPSChange(currentAnimation.getFPS());
@@ -477,7 +473,6 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 		{
 			animationVersion ++;
 			currentAnimation = animationVersions.get(animationVersion);
-			AnimationData.addSequence(entityName, currentAnimation);
 			loadKeyframes();
 			timelineFrame.refresh();
 			onFPSChange(currentAnimation.getFPS());

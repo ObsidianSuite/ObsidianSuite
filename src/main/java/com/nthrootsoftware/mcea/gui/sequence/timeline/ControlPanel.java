@@ -71,26 +71,6 @@ public class ControlPanel extends JPanel
 			}
 		});
 
-		JButton duplicateButton = new JButton("Duplicate");
-		duplicateButton.addActionListener(new ActionListener()
-		{
-			@Override
-			public void actionPerformed(ActionEvent e) 
-			{
-				String newName = JOptionPane.showInputDialog(timeline.timelineFrame, "Name of duplicate animation: ");
-				if(newName == null || newName.equals("") || newName.equals(" "))
-					JOptionPane.showMessageDialog(timeline.timelineFrame, "Invalid name");
-				else if(AnimationData.sequenceExists(timeline.entityName, newName))
-					JOptionPane.showMessageDialog(timeline.timelineFrame, "An animation with this name already exists.");
-				else
-				{
-					AnimationSequence sequence = timeline.currentAnimation.copy(newName);
-					AnimationData.addSequence(timeline.entityName, sequence);
-					Minecraft.getMinecraft().displayGuiScreen(new GuiAnimationTimeline(timeline.entityName, sequence));
-				}
-			}
-		});
-
 		JButton backButton = new JButton("Back");
 		backButton.addActionListener(new ActionListener()
 		{
@@ -120,9 +100,6 @@ public class ControlPanel extends JPanel
 		c.gridy = 5;
 		add(itemPanel,c);
 		c.gridy = 6;
-		c.insets = new Insets(2,5,2,5);
-		add(duplicateButton,c);
-		c.gridy = 7;
 		c.insets = new Insets(2,5,10,5);
 		add(backButton,c);
 	}

@@ -58,7 +58,7 @@ public class HomeFrame extends MCEAFrame
 			}
 		});
 		
-		JButton importEntityButton = new JButton("Import Entity");
+		JButton importEntityButton = new JButton("Import Model");
 		importEntityButton.addActionListener(new ActionListener() 
 		{	
 			@Override

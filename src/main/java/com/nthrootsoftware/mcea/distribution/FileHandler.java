@@ -55,4 +55,8 @@ public class FileHandler
 		return new File(animationFolder, animationName + "." + animationExtension);
 	}
 	
+	public static boolean animationFileExists(File animationFile)
+	{
+		return animationFile.exists();
+	}
 }

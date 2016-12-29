@@ -137,12 +137,12 @@ public class AnimationNewFrame extends MCEAFrame
 		String entityName = (String) entityDropDown.getSelectedItem();
 		if(!animationName.equals(""))
 		{
-			if(!AnimationData.sequenceExists(entityName, animationName))
+			File animationFile = FileHandler.generateAnimationFile(animationFolder, animationName);
+			if(!FileHandler.animationFileExists(animationFile))
 			{
 				AnimationSequence sequence = new AnimationSequence(entityName, animationName);
-				AnimationData.addSequence(entityName, sequence);
 				frame.dispose();
-				Minecraft.getMinecraft().displayGuiScreen(new GuiAnimationTimeline(FileHandler.generateAnimationFile(animationFolder, animationName), entityName, sequence));
+				Minecraft.getMinecraft().displayGuiScreen(new GuiAnimationTimeline(animationFile, entityName, sequence));
 			}
 			else
 				JOptionPane.showMessageDialog(frame, "An animation with that name already exists.");

@@ -23,9 +23,6 @@ import net.minecraft.nbt.NBTTagList;
 public class AnimationData 
 {	
 
-	//All sequences, stances and parenting data.
-	private static Map<String, List<AnimationSequence>> sequences = Maps.newHashMap();	
-	private static Map<String, List<String>> changedSequences = Maps.newHashMap();	
 
 	private static Map<String, List<AnimationStance>> stances = Maps.newHashMap();	
 	private static Map<String, AnimationParenting> parenting = Maps.newHashMap();
@@ -64,76 +61,6 @@ public class AnimationData
 		changedEntitySetups.clear();
 	}
 
-	/**
-	 * Adds the sequence to the list of sequences for the given entity.
-	 * Will overwrite any sequence with the same name.
-	 */
-	public static void addSequence(String entityName, AnimationSequence sequence)
-	{
-		List<AnimationSequence> sqs = sequences.get(entityName);
-		if(sqs == null)
-			sqs = new ArrayList<AnimationSequence>();
-		AnimationSequence existingSeq = getSequenceFromName(entityName, sequence.getName());
-		if(existingSeq != null)
-			sqs.remove(existingSeq);
-		sqs.add(sequence);
-		sequences.put(entityName, sqs);
-	}
-
-	public static void addChangedSequence(String entityName, String sequenceName)
-	{
-		List<String> sqs = changedSequences.get(entityName);
-		if(sqs == null)
-			sqs = new ArrayList<String>();
-		if(!sqs.contains(sequenceName))	
-			sqs.add(sequenceName);
-		changedSequences.put(entityName, sqs);
-	}	
-
-	public static List<String> getChangedSequences(String entityName)
-	{
-		List<String> sqs = changedSequences.get(entityName);
-		if(sqs == null)
-			sqs = new ArrayList<String>();
-		return sqs;
-	}
-
-	public static void clearChangedSequences(String entityName)
-	{
-		changedSequences.put(entityName, new ArrayList<String>());
-	}
-
-	public static AnimationSequence getSequenceFromName(String entityName, String animationName)
-	{
-		if(sequences.get(entityName) != null)
-		{
-			for(AnimationSequence s : sequences.get(entityName))
-			{
-				if(s.getName().equals(animationName))
-				{
-					return s;
-				}
-			}
-		}
-		return null;
-	}
-
-	public static List<AnimationSequence> getSequences(String entityName) 
-	{
-		return sequences.get(entityName) == null ? new ArrayList<AnimationSequence>() : sequences.get(entityName);
-	}
-
-	public static boolean sequenceExists(String entityName, String animationName)
-	{
-		List<AnimationSequence> seqs = getSequences(entityName);
-		for(AnimationSequence seq : seqs)
-		{
-			if(seq.getName().equals(animationName))
-				return true;
-		}
-		return false;
-	}
-
 	public static void addNewStance(String entityName, AnimationStance stance)
 	{
 		List<AnimationStance> sts = stances.get(entityName);
@@ -145,13 +72,6 @@ public class AnimationData
 	public static List<AnimationStance> getStances(String entityName) 
 	{
 		return stances.get(entityName) == null ? new ArrayList<AnimationStance>() : stances.get(entityName);
-	}
-
-	public static void deleteSequence(String entityName, AnimationSequence sequence) 
-	{
-		List<AnimationSequence> temp = sequences.get(entityName);
-		temp.remove(sequence);
-		sequences.put(entityName, temp);
 	}
 
 	public static void deleteStance(String entityName, AnimationStance stance) 
@@ -275,8 +195,6 @@ public class AnimationData
 
 	public static void clear() 
 	{
-		sequences.clear();
-		changedSequences.clear();
 		stances.clear();
 		parenting.clear();
 		changedEntitySetups.clear();

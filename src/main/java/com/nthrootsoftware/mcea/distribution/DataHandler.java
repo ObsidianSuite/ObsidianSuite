@@ -135,16 +135,16 @@ public class DataHandler
 				writeNBTToFile(AnimationData.getEntityDataTag(entityName), getEntityFile(entityName, "data"));
 			//Sequences
 
-			List<String> changeSequences = AnimationData.getChangedSequences(entityName);
-			for(AnimationSequence s : AnimationData.getSequences(entityName))
-			{
-				if(changeSequences.contains(s.getName()))
-				{
-					System.out.println("Saving " + s.getName());
-					writeNBTToFile(s.getSaveData(), getAnimationFile(entityName, s.getName()));
-				}
-			}
-			AnimationData.clearChangedSequences(entityName);
+//			List<String> changeSequences = AnimationData.getChangedSequences(entityName);
+//			for(AnimationSequence s : AnimationData.getSequences(entityName))
+//			{
+//				if(changeSequences.contains(s.getName()))
+//				{
+//					System.out.println("Saving " + s.getName());
+//					writeNBTToFile(s.getSaveData(), getAnimationFile(entityName, s.getName()));
+//				}
+//			}
+//			AnimationData.clearChangedSequences(entityName);
 		}
 		AnimationData.clearEntitySetupChanged();
 	}
