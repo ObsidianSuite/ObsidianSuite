@@ -23,8 +23,6 @@ import net.minecraft.nbt.NBTTagList;
 public class AnimationData 
 {	
 
-
-	private static Map<String, List<AnimationStance>> stances = Maps.newHashMap();	
 	private static Map<String, AnimationParenting> parenting = Maps.newHashMap();
 	private static List<String> changedEntitySetups = new ArrayList<String>();
 
@@ -59,26 +57,6 @@ public class AnimationData
 	public static void clearEntitySetupChanged()
 	{
 		changedEntitySetups.clear();
-	}
-
-	public static void addNewStance(String entityName, AnimationStance stance)
-	{
-		List<AnimationStance> sts = stances.get(entityName);
-		if(sts == null){sts = new ArrayList<AnimationStance>();}
-		sts.add(stance);
-		stances.put(entityName, sts);
-	}
-
-	public static List<AnimationStance> getStances(String entityName) 
-	{
-		return stances.get(entityName) == null ? new ArrayList<AnimationStance>() : stances.get(entityName);
-	}
-
-	public static void deleteStance(String entityName, AnimationStance stance) 
-	{
-		List<AnimationStance> temp = stances.get(entityName);
-		temp.remove(stance);
-		stances.put(entityName, temp);
 	}
 
 	public static void setGUISetup(String entityName, String setup)
@@ -195,7 +173,6 @@ public class AnimationData
 
 	public static void clear() 
 	{
-		stances.clear();
 		parenting.clear();
 		changedEntitySetups.clear();
 		guiSetup.clear();
