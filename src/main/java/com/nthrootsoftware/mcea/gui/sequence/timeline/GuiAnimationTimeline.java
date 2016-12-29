@@ -388,7 +388,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 	private void updateAnimationParts()
 	{
 		//Create new animation object if new version
-		AnimationSequence sequence = new AnimationSequence(currentAnimation.getName());
+		AnimationSequence sequence = new AnimationSequence(entityName, currentAnimation.getName());
 		//Generate animation from keyframes.
 		for(String partName : keyframes.keySet())
 		{
@@ -414,7 +414,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 
 	private void updateAnimationFPS(int fps)
 	{
-		AnimationSequence sequence = new AnimationSequence(currentAnimation.getName());
+		AnimationSequence sequence = new AnimationSequence(entityName, currentAnimation.getName());
 		sequence.setAnimations(currentAnimation.getAnimations());
 		sequence.setFPS(fps);
 		updateAnimation(sequence);

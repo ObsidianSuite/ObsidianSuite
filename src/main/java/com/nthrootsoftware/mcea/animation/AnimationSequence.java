@@ -20,16 +20,18 @@ public class AnimationSequence
 	List<AnimationPart> animations = new ArrayList<AnimationPart>();
 	private float actionPoint = 0.0F;
 	private int fps;
+	private String entityName;
 
-	public AnimationSequence(String par0Str) 
+	public AnimationSequence(String entityName, String animationName) 
 	{
-		this.animationName = par0Str;
-		fps = 25;
+		this.entityName = entityName;
+		this.animationName = animationName;
+		this.fps = 25;
 	}
 	
-	public AnimationSequence(String entityName, NBTTagCompound compound) 
+	public AnimationSequence(NBTTagCompound compound) 
 	{
-		this.loadData(entityName, compound);
+		this.loadData(compound);
 	}
 
 	public String getName() 
@@ -156,7 +158,7 @@ public class AnimationSequence
 	
 	public AnimationSequence copy(String newName)
 	{
-		AnimationSequence seq = new AnimationSequence(newName);
+		AnimationSequence seq = new AnimationSequence(entityName, newName);
 		
 		for(AnimationPart p : animations)
 			seq.addAnimation(p.copy());
@@ -169,18 +171,18 @@ public class AnimationSequence
 		NBTTagCompound sequenceData = new NBTTagCompound();
 		NBTTagList animationList = new NBTTagList();
 		for(AnimationPart animation : animations)
-		{
 			animationList.appendTag(animation.getSaveData());
-		}
 		sequenceData.setTag("Animations", animationList);
+		sequenceData.setString("EntityName", "player");
 		sequenceData.setString("Name", animationName);
 		sequenceData.setFloat("ActionPoint", actionPoint);
 		sequenceData.setInteger("FPS", fps);
 		return sequenceData;
 	}
 
-	public void loadData(String entityName, NBTTagCompound compound) 
+	public void loadData(NBTTagCompound compound) 
 	{
+		entityName = compound.getString("EntityName");
 		NBTTagList segmentList = compound.getTagList("Animations", 10);
 		for(int i = 0; i < segmentList.tagCount(); i++)
 		{

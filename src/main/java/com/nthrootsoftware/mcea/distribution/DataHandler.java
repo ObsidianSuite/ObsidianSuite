@@ -140,6 +140,7 @@ public class DataHandler
 			{
 				if(changeSequences.contains(s.getName()))
 				{
+					System.out.println("Saving " + s.getName());
 					writeNBTToFile(s.getSaveData(), getAnimationFile(entityName, s.getName()));
 				}
 			}
@@ -178,8 +179,8 @@ public class DataHandler
 
 	public static void loadEntityAnimation(String entityName, String animationName)
 	{
-		AnimationSequence sequence = new AnimationSequence(entityName, getNBTFromFile(getAnimationFile(entityName, animationName)));
-		AnimationData.addSequence(entityName, sequence);
+//		AnimationSequence sequence = new AnimationSequence(entityName, getNBTFromFile(getAnimationFile(entityName, animationName)));
+//		AnimationData.addSequence(entityName, sequence);
 	}
 
 	/**

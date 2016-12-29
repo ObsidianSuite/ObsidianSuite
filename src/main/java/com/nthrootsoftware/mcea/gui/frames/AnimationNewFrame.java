@@ -104,7 +104,7 @@ public class AnimationNewFrame extends MCEAFrame
 		{
 			if(!AnimationData.sequenceExists(entityName, animationName))
 			{
-				AnimationSequence sequence = new AnimationSequence(animationName);
+				AnimationSequence sequence = new AnimationSequence(entityName, animationName);
 				AnimationData.addSequence(entityName, sequence);
 				frame.dispose();
 				Minecraft.getMinecraft().displayGuiScreen(new GuiAnimationTimeline(entityName, sequence));
