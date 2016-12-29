@@ -22,26 +22,33 @@ public class FileChooser
 
 	public static File loadModelFile(Component parent)
 	{
-		File modelFile = getLoadLocationFromUser(parent, lastModelDirectory, modelFilter);
+		File modelFile = getLoadLocationFromUser(parent, lastModelDirectory, modelFilter, JFileChooser.FILES_ONLY);
 		lastModelDirectory = fc.getCurrentDirectory();
 		return modelFile;
 	}
 	
 	public static File loadEntityFile(Component parent)
 	{
-		File entityFile = getLoadLocationFromUser(parent, lastEntityDirectory, entityFilter);
+		File entityFile = getLoadLocationFromUser(parent, lastEntityDirectory, entityFilter, JFileChooser.FILES_ONLY);
 		lastEntityDirectory = fc.getCurrentDirectory();
 		return entityFile;
 	}
 	
 	public static File loadAnimationFile(Component parent)
 	{
-		File animationFile = getLoadLocationFromUser(parent, lastAnimationDirectory, animationFilter);
+		File animationFile = getLoadLocationFromUser(parent, lastAnimationDirectory, animationFilter, JFileChooser.FILES_ONLY);
 		lastAnimationDirectory = fc.getCurrentDirectory();
 		return animationFile;
 	}
 	
-	private static File getLoadLocationFromUser(Component parentComponent, File parentDirectory, FileNameExtensionFilter fileExtensionFilter)
+	public static File chooseAnimationFolder(Component parentComponent)
+	{
+		File animationFolder = getLoadLocationFromUser(parentComponent, lastAnimationDirectory, null, JFileChooser.DIRECTORIES_ONLY);
+		lastAnimationDirectory = fc.getCurrentDirectory();
+		return animationFolder;
+	}
+	
+	private static File getLoadLocationFromUser(Component parentComponent, File parentDirectory, FileNameExtensionFilter fileExtensionFilter, int fileSelectionMode)
 	{
 		File file = null;
 		
@@ -49,6 +56,7 @@ public class FileChooser
 			fc.setCurrentDirectory(parentDirectory);
 		
 		fc.setFileFilter(fileExtensionFilter);
+		fc.setFileSelectionMode(fileSelectionMode);
 		
 		int returnVal = fc.showOpenDialog(parentComponent);
 		
