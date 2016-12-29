@@ -20,7 +20,7 @@ public class FileIO
 
 		try 
 		{
-			return new AnimationSequence("", CompressedStreamTools.readCompressed(new FileInputStream(animationFile)));
+			return new AnimationSequence("player", CompressedStreamTools.readCompressed(new FileInputStream(animationFile)));
 		} 
 		catch (FileNotFoundException e) {throw new RuntimeException(e);}
 		catch (IOException e) {throw new RuntimeException(e);}
