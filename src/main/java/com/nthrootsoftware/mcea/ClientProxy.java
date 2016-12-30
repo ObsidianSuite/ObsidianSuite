@@ -2,7 +2,7 @@ package com.nthrootsoftware.mcea;
 
 import java.util.List;
 
-import com.nthrootsoftware.mcea.distribution.ModelHandler;
+import com.nthrootsoftware.mcea.data.ModelHandler;
 import com.nthrootsoftware.mcea.render.MCEAResourcePack;
 import com.nthrootsoftware.mcea.render.objRendering.EntityObj;
 
@@ -19,11 +19,11 @@ public class ClientProxy extends CommonProxy
 		//Entities
         RenderingRegistry.registerEntityRenderingHandler(EntityObj.class, ModelHandler.modelRenderer);
         
-        List<IResourcePack> resourcePackList = ObfuscationReflectionHelper.getPrivateValue(FMLClientHandler.class, FMLClientHandler.instance(), "resourcePackList");
-        //new File(MCEA_Main.modDir, "models/assets/models/skins").mkdirs();
-       // IResourcePack pack = new FolderResourcePack(new File(MCEA_Main.modDir, "models"));
-        
-        resourcePackList.add(new MCEAResourcePack());
+//        List<IResourcePack> resourcePackList = ObfuscationReflectionHelper.getPrivateValue(FMLClientHandler.class, FMLClientHandler.instance(), "resourcePackList");
+//        //new File(MCEA_Main.modDir, "models/assets/models/skins").mkdirs();
+//       // IResourcePack pack = new FolderResourcePack(new File(MCEA_Main.modDir, "models"));
+//        
+//        resourcePackList.add(new MCEAResourcePack());
 	}
 }
 

@@ -9,9 +9,9 @@ import java.io.File;
 import javax.swing.JButton;
 
 import com.nthrootsoftware.mcea.animation.AnimationSequence;
-import com.nthrootsoftware.mcea.distribution.FileChooser;
-import com.nthrootsoftware.mcea.distribution.FileHandler;
-import com.nthrootsoftware.mcea.distribution.ModelHandler;
+import com.nthrootsoftware.mcea.data.ModelHandler;
+import com.nthrootsoftware.mcea.file.FileChooser;
+import com.nthrootsoftware.mcea.file.FileHandler;
 import com.nthrootsoftware.mcea.gui.GuiBlack;
 import com.nthrootsoftware.mcea.gui.GuiPartSetup;
 import com.nthrootsoftware.mcea.gui.sequence.timeline.GuiAnimationTimeline;
@@ -102,11 +102,7 @@ public class HomeFrame extends MCEAFrame
 	private void importModelPressed()
 	{
 		File modelFile = FileChooser.loadModelFile(frame);
-		String fileName = modelFile.getName();
-		String entityName = fileName.substring(0,fileName.indexOf("."));
-		ModelObj model = new ModelObj(entityName, modelFile);
-		ModelHandler.importModel(model);
-		ModelHandler.updateRenderer(entityName);
+		String entityName = ModelHandler.importModelFile(modelFile);
 		frame.dispose();
 		Minecraft.getMinecraft().displayGuiScreen(new GuiPartSetup(entityName));
 	}

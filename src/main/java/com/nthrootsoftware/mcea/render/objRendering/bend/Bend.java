@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.lwjgl.opengl.GL11;
 
-import com.nthrootsoftware.mcea.animation.AnimationData;
 import com.nthrootsoftware.mcea.animation.AnimationParenting;
 import com.nthrootsoftware.mcea.render.MathHelper;
 import com.nthrootsoftware.mcea.render.objRendering.RayTrace;

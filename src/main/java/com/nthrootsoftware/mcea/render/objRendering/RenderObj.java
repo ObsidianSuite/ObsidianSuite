@@ -3,7 +3,7 @@ package com.nthrootsoftware.mcea.render.objRendering;
 import org.lwjgl.opengl.GL11;
 
 import com.nthrootsoftware.mcea.Util;
-import com.nthrootsoftware.mcea.distribution.ModelHandler;
+import com.nthrootsoftware.mcea.data.ModelHandler;
 import com.nthrootsoftware.mcea.item.ModelLargeShield;
 import com.nthrootsoftware.mcea.render.objRendering.parts.PartObj;
 import com.nthrootsoftware.mcea.render.objRendering.parts.PartRotation;

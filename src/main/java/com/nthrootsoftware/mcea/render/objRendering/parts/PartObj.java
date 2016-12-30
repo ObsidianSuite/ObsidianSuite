@@ -1,8 +1,5 @@
 package com.nthrootsoftware.mcea.render.objRendering.parts;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -10,21 +7,14 @@ import java.util.Map;
 
 import org.lwjgl.opengl.GL11;
 
-import com.nthrootsoftware.mcea.animation.AnimationData;
 import com.nthrootsoftware.mcea.animation.AnimationParenting;
 import com.nthrootsoftware.mcea.render.MathHelper;
 import com.nthrootsoftware.mcea.render.objRendering.ModelObj;
 import com.nthrootsoftware.mcea.render.objRendering.RayTrace;
 import com.nthrootsoftware.mcea.render.objRendering.bend.Bend;
-import com.sun.org.apache.xpath.internal.operations.Variable;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.OpenGlHelper;
-import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.Vec3;
 import net.minecraftforge.client.model.obj.Face;
 import net.minecraftforge.client.model.obj.GroupObject;
 import net.minecraftforge.client.model.obj.TextureCoordinate;

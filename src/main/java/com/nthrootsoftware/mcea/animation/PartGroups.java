@@ -136,7 +136,7 @@ public class PartGroups
 		}
 	}
 
-	public NBTTagCompound getSaveData(String entityName) 
+	public NBTTagCompound getSaveData() 
 	{	
 		NBTTagCompound nbtToReturn = new NBTTagCompound();
 		NBTTagList partList = new NBTTagList();

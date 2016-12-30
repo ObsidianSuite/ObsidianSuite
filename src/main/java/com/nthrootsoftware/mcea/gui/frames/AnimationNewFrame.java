@@ -13,11 +13,10 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 
-import com.nthrootsoftware.mcea.animation.AnimationData;
 import com.nthrootsoftware.mcea.animation.AnimationSequence;
-import com.nthrootsoftware.mcea.distribution.DataHandler;
-import com.nthrootsoftware.mcea.distribution.FileChooser;
-import com.nthrootsoftware.mcea.distribution.FileHandler;
+import com.nthrootsoftware.mcea.data.ModelHandler;
+import com.nthrootsoftware.mcea.file.FileChooser;
+import com.nthrootsoftware.mcea.file.FileHandler;
 import com.nthrootsoftware.mcea.gui.sequence.timeline.GuiAnimationTimeline;
 
 import net.minecraft.client.Minecraft;
@@ -29,7 +28,7 @@ public class AnimationNewFrame extends MCEAFrame
 	private JTextField nameTextField;
 	private JLabel locationLabel;
 	
-	private String[] entites = DataHandler.getEntities().toArray(new String[0]);
+	private String[] entites = ModelHandler.getModelList().toArray(new String[0]);
 	
 	private File animationFolder;
 
@@ -137,8 +136,8 @@ public class AnimationNewFrame extends MCEAFrame
 		String entityName = (String) entityDropDown.getSelectedItem();
 		if(!animationName.equals(""))
 		{
-			File animationFile = FileHandler.generateAnimationFile(animationFolder, animationName);
-			if(!FileHandler.animationFileExists(animationFile))
+			File animationFile = new File(animationFolder, animationName + "." + FileHandler.animationExtension);
+			if(animationFile.exists())
 			{
 				AnimationSequence sequence = new AnimationSequence(entityName, animationName);
 				frame.dispose();

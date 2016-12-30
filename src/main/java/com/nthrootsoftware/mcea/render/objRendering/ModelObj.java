@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -18,17 +17,14 @@ import org.lwjgl.opengl.GL11;
 
 import com.google.common.collect.Maps;
 import com.nthrootsoftware.mcea.Util;
-import com.nthrootsoftware.mcea.animation.AnimationData;
 import com.nthrootsoftware.mcea.animation.AnimationParenting;
 import com.nthrootsoftware.mcea.animation.PartGroups;
-import com.nthrootsoftware.mcea.distribution.DataHandler;
 import com.nthrootsoftware.mcea.render.objRendering.bend.Bend;
 import com.nthrootsoftware.mcea.render.objRendering.parts.Part;
 import com.nthrootsoftware.mcea.render.objRendering.parts.PartEntityPos;
 import com.nthrootsoftware.mcea.render.objRendering.parts.PartObj;
 import com.nthrootsoftware.mcea.render.objRendering.parts.PartRotation;
 
-import cpw.mods.fml.client.registry.RenderingRegistry;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.entity.Entity;
@@ -58,8 +54,6 @@ public class ModelObj extends ModelBase
 
 	private final ResourceLocation txtRL;
 	
-	public final boolean textureExists;
-
 	private boolean partSetupComplete;
 
 	public static final ResourceLocation pinkResLoc = new ResourceLocation("mod_mcea:defaultModelTextures/pink.png");
@@ -75,9 +69,7 @@ public class ModelObj extends ModelBase
 		
 		loadFromFile(file);
 		
-		File textureFile = DataHandler.getEntityFile(entityName, "png");
-		textureExists = textureFile.exists();
-		txtRL = DataHandler.getEntityResourceLocation(entityName);
+		txtRL = whiteResLoc;//DataHandler.getEntityResourceLocation(entityName);
 				
 		init();
 	}
@@ -458,6 +450,14 @@ public class ModelObj extends ModelBase
 			parts.add(new PartObj(model, gObj));
 		}
 		return parts;
+	}
+	
+	public NBTTagCompound createNBTTag()
+	{
+		NBTTagCompound nbt = new NBTTagCompound();
+		nbt.setTag("Parenting", parenting.getSaveData());
+		nbt.setTag("PartGroups", partGroups.getSaveData());
+		return nbt;
 	}
 
 }

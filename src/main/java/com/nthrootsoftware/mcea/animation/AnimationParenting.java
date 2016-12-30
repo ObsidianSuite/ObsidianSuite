@@ -128,7 +128,7 @@ public class AnimationParenting
 		}
 	}
 
-	public NBTTagCompound getSaveData(String entityName) 
+	public NBTTagCompound getSaveData() 
 	{	
 		NBTTagCompound parentNBT = new NBTTagCompound();
 		NBTTagList parentNBTList = new NBTTagList();

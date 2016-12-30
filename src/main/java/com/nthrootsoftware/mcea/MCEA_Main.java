@@ -4,7 +4,6 @@ import java.io.File;
 
 import com.nthrootsoftware.mcea.block.BlockBase;
 import com.nthrootsoftware.mcea.block.BlockGrid;
-import com.nthrootsoftware.mcea.distribution.DataHandler;
 import com.nthrootsoftware.mcea.item.ItemWeapon;
 
 import cpw.mods.fml.common.FMLCommonHandler;
@@ -13,7 +12,6 @@ import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.texture.TextureUtil;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraftforge.common.MinecraftForge;

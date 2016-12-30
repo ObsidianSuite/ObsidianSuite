@@ -1,18 +1,13 @@
 package com.nthrootsoftware.mcea.gui;
 
-import java.awt.Color;
 import java.io.File;
 
 import org.lwjgl.opengl.GL11;
 
-import com.nthrootsoftware.mcea.distribution.DataHandler;
-
 import cpw.mods.fml.client.FMLClientHandler;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiButtonLanguage;
 import net.minecraft.client.gui.GuiMainMenu;
-import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.WorldSettings;
 import net.minecraft.world.WorldType;
@@ -44,10 +39,6 @@ public class GuiAnimationMainMenu extends GuiMainMenu
     protected void actionPerformed(GuiButton button)
     {
     	super.actionPerformed(button);
-    	
-    	//Exit button
-        if(button.id == 4)
-	        DataHandler.stopJobHandler();
 
         if(button.id == 10)
 		{

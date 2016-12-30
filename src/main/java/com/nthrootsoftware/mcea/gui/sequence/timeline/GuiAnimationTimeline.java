@@ -48,18 +48,15 @@ import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 
 import com.nthrootsoftware.mcea.Util;
-import com.nthrootsoftware.mcea.animation.AnimationData;
 import com.nthrootsoftware.mcea.animation.AnimationPart;
 import com.nthrootsoftware.mcea.animation.AnimationSequence;
-import com.nthrootsoftware.mcea.distribution.FileHandler;
+import com.nthrootsoftware.mcea.file.FileHandler;
 import com.nthrootsoftware.mcea.gui.GuiBlack;
-import com.nthrootsoftware.mcea.gui.GuiHandler;
-import com.nthrootsoftware.mcea.gui.animation.MainGUI;
+import com.nthrootsoftware.mcea.gui.frames.HomeFrame;
 import com.nthrootsoftware.mcea.gui.sequence.EntityAutoMove;
 import com.nthrootsoftware.mcea.gui.sequence.ExternalFrame;
 import com.nthrootsoftware.mcea.gui.sequence.GuiEntityRendererWithTranslation;
 import com.nthrootsoftware.mcea.render.objRendering.EntityObj;
-import com.nthrootsoftware.mcea.render.objRendering.ModelObj;
 import com.nthrootsoftware.mcea.render.objRendering.parts.Part;
 
 public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation implements ExternalFrame
@@ -106,7 +103,8 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 		animationVersions = new ArrayList<AnimationSequence>();
 		updateAnimationParts();
 
-		((EntityObj) entityToRender).setCurrentItem(AnimationData.getAnimationItem(animation.getName()));   	
+		//Animation Item
+//		((EntityObj) entityToRender).setCurrentItem(AnimationData.getAnimationItem(animation.getName()));   	
 
 	}
 
@@ -577,7 +575,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 	void close()
 	{
 		mc.displayGuiScreen(new GuiBlack());
-		GuiHandler.mainGui = new MainGUI();
+		new HomeFrame().display();
 	}
 
 	void onFPSChange(int fps)

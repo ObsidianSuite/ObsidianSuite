@@ -1,4 +1,4 @@
-package com.nthrootsoftware.mcea.distribution;
+package com.nthrootsoftware.mcea.file;
 
 
 import java.awt.Component;
@@ -17,13 +17,6 @@ public class FileChooser
 		File modelFile = getLoadLocationFromUser(parent, FileHandler.lastModelDirectory, FileHandler.modelFilter, JFileChooser.FILES_ONLY);
 		FileHandler.lastModelDirectory = fc.getCurrentDirectory();
 		return modelFile;
-	}
-	
-	public static File loadEntityFile(Component parent)
-	{
-		File entityFile = getLoadLocationFromUser(parent, FileHandler.lastEntityDirectory, FileHandler.entityFilter, JFileChooser.FILES_ONLY);
-		FileHandler.lastEntityDirectory = fc.getCurrentDirectory();
-		return entityFile;
 	}
 	
 	public static File loadAnimationFile(Component parent)

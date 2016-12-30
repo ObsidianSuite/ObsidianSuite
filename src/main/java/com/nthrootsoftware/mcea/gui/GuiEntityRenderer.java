@@ -10,8 +10,7 @@ import org.lwjgl.opengl.GL12;
 
 import com.nthrootsoftware.mcea.MCEA_Main;
 import com.nthrootsoftware.mcea.Util;
-import com.nthrootsoftware.mcea.animation.AnimationData;
-import com.nthrootsoftware.mcea.distribution.ModelHandler;
+import com.nthrootsoftware.mcea.data.ModelHandler;
 import com.nthrootsoftware.mcea.render.objRendering.EntityObj;
 import com.nthrootsoftware.mcea.render.objRendering.ModelObj;
 import com.nthrootsoftware.mcea.render.objRendering.parts.Part;
@@ -86,16 +85,17 @@ public class GuiEntityRenderer extends GuiBlack
 
 	public void loadSetup()
 	{
-		String setup = AnimationData.getGUISetup(entityName);
-		if(setup != null)
-		{
-			String[] split = setup.split(",");
-			horizontalPan = Integer.parseInt(split[0]);
-			verticalPan = Integer.parseInt(split[1]);
-			horizontalRotation = Float.parseFloat(split[2]);
-			verticalRotation = Float.parseFloat(split[3]);
-			scaleModifier = Integer.parseInt(split[4]);
-		}
+		//TODO GUI setup
+//		String setup = AnimationData.getGUISetup(entityName);
+//		if(setup != null)
+//		{
+//			String[] split = setup.split(",");
+//			horizontalPan = Integer.parseInt(split[0]);
+//			verticalPan = Integer.parseInt(split[1]);
+//			horizontalRotation = Float.parseFloat(split[2]);
+//			verticalRotation = Float.parseFloat(split[3]);
+//			scaleModifier = Integer.parseInt(split[4]);
+//		}
 	}
 
 	@Override
@@ -107,9 +107,10 @@ public class GuiEntityRenderer extends GuiBlack
 
 	public void saveSetup()
 	{
-		String data = horizontalPan + "," + verticalPan + "," + horizontalRotation + "," 
-				+ verticalRotation + "," + scaleModifier;
-		AnimationData.setGUISetup(entityName, data);
+		//TODO GUI setup
+//		String data = horizontalPan + "," + verticalPan + "," + horizontalRotation + "," 
+//				+ verticalRotation + "," + scaleModifier;
+//		AnimationData.setGUISetup(entityName, data);
 	}
 
 	/**
