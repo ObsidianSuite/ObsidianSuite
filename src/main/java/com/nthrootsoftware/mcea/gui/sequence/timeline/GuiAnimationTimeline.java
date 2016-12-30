@@ -943,7 +943,6 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 				g.drawLine((int)(time/(float)timelineLength*(getWidth() - 10)), 0, (int)(time/(float)timelineLength*(getWidth() - 10)), getHeight());
 
 				//Draw keyframes for this line.
-				//TODO when name has changed (dropboxes..)
 				if(keyframes.get(partName) != null)
 				{
 					for(Keyframe kf : keyframes.get(partName))

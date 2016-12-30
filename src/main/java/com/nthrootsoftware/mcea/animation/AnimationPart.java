@@ -49,6 +49,7 @@ public class AnimationPart
 			if(dT == 0)
 				dT = 1;
 			float dif = endPos[i] - startPos[i];
+			//Keep rotation within range.
 			if(part instanceof PartObj)
 			{
 				if(Math.abs(dif) > Math.PI)
