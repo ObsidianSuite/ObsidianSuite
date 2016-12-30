@@ -133,7 +133,7 @@ public class PartObj extends PartRotation
 		GL11.glPushMatrix();
 
 		//Get all parents that need compensating for.
-		AnimationParenting anipar = AnimationData.getAnipar(modelObj.getEntityType());
+		AnimationParenting anipar = modelObj.parenting;
 		List<PartObj> parents = new ArrayList<PartObj>();
 		PartObj p = this;
 		parents.add(p);
@@ -240,7 +240,7 @@ public class PartObj extends PartRotation
 		if(visible)
 			groupObj.render();
 		//Do for children - rotation for parent compensated for!
-		List<PartObj> children = AnimationData.getAnipar(modelObj.getEntityType()).getChildren(this);
+		List<PartObj> children = modelObj.parenting.getChildren(this);
 		if(children != null)
 		{
 			for(PartObj child : children)
@@ -289,7 +289,7 @@ public class PartObj extends PartRotation
 	public float[] postRenderParent()
 	{
 		//Generate a list of parents: {topParent, topParent - 1,..., parent}
-		AnimationParenting anipar = AnimationData.getAnipar(modelObj.getEntityType());
+		AnimationParenting anipar = modelObj.parenting;
 		List<PartObj> parts = new ArrayList<PartObj>();
 		PartObj child = this;
 		PartObj parent;

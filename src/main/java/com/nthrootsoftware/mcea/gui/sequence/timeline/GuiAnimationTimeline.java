@@ -59,6 +59,7 @@ import com.nthrootsoftware.mcea.gui.sequence.EntityAutoMove;
 import com.nthrootsoftware.mcea.gui.sequence.ExternalFrame;
 import com.nthrootsoftware.mcea.gui.sequence.GuiEntityRendererWithTranslation;
 import com.nthrootsoftware.mcea.render.objRendering.EntityObj;
+import com.nthrootsoftware.mcea.render.objRendering.ModelObj;
 import com.nthrootsoftware.mcea.render.objRendering.parts.Part;
 
 public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation implements ExternalFrame
@@ -89,9 +90,9 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 	
 	private File animationFile;
 
-	public GuiAnimationTimeline(File animationFile, String entityName, AnimationSequence animation)
+	public GuiAnimationTimeline(File animationFile, ModelObj model, AnimationSequence animation)
 	{
-		super(entityName);
+		super(model);
 
 		this.currentAnimation = animation;
 		this.animationFile = animationFile;
@@ -163,12 +164,12 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 		keyframes.clear();
 		for(AnimationPart animpart : currentAnimation.getAnimations())
 		{
-			String partName = animpart.getPart().getName();
+			String partName = animpart.getPartName();
 			List<Keyframe> partKfs = keyframes.get(partName);
 			if(keyframes.get(partName) == null)
 				partKfs = new ArrayList<Keyframe>();			
-			Part mr = Util.getPartFromName(animpart.getPart().getName(), entityModel.parts);	
-			float[] defaults = animpart.getPart().getOriginalValues();
+			Part mr = Util.getPartFromName(animpart.getPartName(), entityModel.parts);	
+			float[] defaults = mr.getOriginalValues();
 			//If the movement starts at time zero, and the part isn't in its original position, add a keyframe at time zero.
 			if(animpart.getStartTime() == 0.0F)
 			{
@@ -386,19 +387,18 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 		//Generate animation from keyframes.
 		for(String partName : keyframes.keySet())
 		{
-			Part part = Util.getPartFromName(partName, entityModel.parts);
 			for(Keyframe kf : keyframes.get(partName))
 			{
 				if(kf.frameTime != 0.0F)
 				{
 					Keyframe prevKf = kf.getPreviousKeyframe();
-					sequence.addAnimation(new AnimationPart(prevKf.frameTime, kf.frameTime, prevKf.values, kf.values, part));
+					sequence.addAnimation(new AnimationPart(prevKf.frameTime, kf.frameTime, prevKf.values, kf.values, partName));
 				}
-				else if(doesPartOnlyHaveOneKeyframe(part.getName()))
+				else if(doesPartOnlyHaveOneKeyframe(partName))
 				{
 					//Used for parts that only have one keyframe and where that keyframe is at the beginning 
 					//The part will maintain that rotation throughout the whole animation.
-					sequence.addAnimation(new AnimationPart(0.0F, getLastKeyFrameTime(), kf.values, kf.values, part));
+					sequence.addAnimation(new AnimationPart(0.0F, getLastKeyFrameTime(), kf.values, kf.values, partName));
 				}
 			}
 		}

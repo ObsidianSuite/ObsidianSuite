@@ -1,22 +1,11 @@
 package com.nthrootsoftware.mcea.gui.sequence;
 
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.nio.IntBuffer;
-
-import javax.imageio.ImageIO;
-
-import org.lwjgl.BufferUtils;
-import org.lwjgl.LWJGLException;
-import org.lwjgl.input.Cursor;
-import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
-import com.nthrootsoftware.mcea.MCEA_Main;
 import com.nthrootsoftware.mcea.Util;
 import com.nthrootsoftware.mcea.gui.GuiEntityRenderer;
 import com.nthrootsoftware.mcea.render.MathHelper;
+import com.nthrootsoftware.mcea.render.objRendering.ModelObj;
 import com.nthrootsoftware.mcea.render.objRendering.RayTrace;
 import com.nthrootsoftware.mcea.render.objRendering.parts.Part;
 import com.nthrootsoftware.mcea.render.objRendering.parts.PartObj;
@@ -42,9 +31,9 @@ public class GuiEntityRendererWithRotation extends GuiEntityRenderer
 	private Vec3 initialRotationGuidePoint;
 	private double prevRotationWheelDelta = 0.0F;
 
-	public GuiEntityRendererWithRotation(String entityName)
+	public GuiEntityRendererWithRotation(ModelObj modelObj)
 	{
-		super(entityName);
+		super(modelObj);
 	}
 
 	/* ---------------------------------------------------- *

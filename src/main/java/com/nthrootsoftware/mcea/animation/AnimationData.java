@@ -164,11 +164,11 @@ public class AnimationData
 
 	public static void loadEntityData(String entityName, NBTTagCompound compound)
 	{
-		AnimationParenting anipar = getAnipar(entityName);
-		anipar.loadData(compound.getCompoundTag("Parenting"), entityName);
-
-		PartGroups p = partGroups.get(entityName);
-		p.loadData(compound.getCompoundTag("Groups"), entityName);
+//		AnimationParenting anipar = getAnipar(entityName);
+//		anipar.loadData(compound.getCompoundTag("Parenting"), entityName);
+//
+//		PartGroups p = partGroups.get(entityName);
+//		p.loadData(compound.getCompoundTag("Groups"), entityName);
 	}
 
 	public static void clear() 

@@ -31,20 +31,20 @@ public class PartGroups
 	private ModelObj model;
 	//A mapping of group names to a list of parts in that group.
 	private Map<String, List<PartObj>> groups;
-	
+
 	public PartGroups(ModelObj modelObj)
 	{
 		this.model = modelObj;
-		
+
 		groups = new HashMap<String, List<PartObj>>();
-		
+
 		addGroup("Default");
 		for(PartObj part : model.getPartObjs())
 		{
 			setPartGroup("Default", part);
 		}
 	}
-	
+
 	/**
 	 * @return A list of the groups.
 	 */
@@ -59,7 +59,7 @@ public class PartGroups
 		}
 		return strArr;
 	}
-	
+
 	/**
 	 * @return A csv string of the groups.
 	 */
@@ -74,7 +74,7 @@ public class PartGroups
 			list = list.substring(0, list.length() - 2);
 		return list;
 	}
-	
+
 	/**
 	 * Add a new group to the group map if it is unique. 
 	 * Will assign an empty array list to the group name.
@@ -85,7 +85,7 @@ public class PartGroups
 		if(!groups.keySet().contains(groupName))
 			groups.put(groupName, new ArrayList<PartObj>());
 	}
-	
+
 	public void setPartGroup(String groupName, PartObj part)
 	{
 		if(groups.containsKey(groupName))
@@ -98,14 +98,14 @@ public class PartGroups
 					currentParts.remove(part);
 				groups.put(group, currentParts);
 			}
-			
+
 			//Add part to new group.
 			List<PartObj> currentParts = groups.get(groupName);
 			currentParts.add(part);
 			groups.put(groupName, currentParts);
 		}	
 	}
-	
+
 	public String getPartGroup(PartObj part)
 	{
 		for(Entry<String, List<PartObj>> s : groups.entrySet())
@@ -115,7 +115,7 @@ public class PartGroups
 		}
 		return "Default";
 	}
-	
+
 	public void changeOrder(Part part, int change)
 	{
 		int currentPos = 0;
@@ -135,7 +135,7 @@ public class PartGroups
 			model.parts.add(currentPos + change, part);
 		}
 	}
-	
+
 	public NBTTagCompound getSaveData(String entityName) 
 	{	
 		NBTTagCompound nbtToReturn = new NBTTagCompound();
@@ -152,27 +152,23 @@ public class PartGroups
 		nbtToReturn.setString("PartOrder", model.getPartOrderAsString());
 		return nbtToReturn;
 	}
-	
-	public void loadData(NBTTagCompound compound, String entityName) 
+
+	public void loadData(NBTTagCompound compound, ModelObj model) 
 	{	
+		//TODO look at this
 		NBTTagList partList = compound.getTagList("Groups", 10);
-		EntityObj entity = new EntityObj(Minecraft.getMinecraft().theWorld, entityName);
-		if(entity != null)
+		model.setPartOrderFromString(compound.getString("PartOrder"));
+		for (int i = 0; i < partList.tagCount(); i++)
 		{
-			ModelObj entityModel = ((RenderObj) RenderManager.instance.getEntityRenderObject(entity)).getModel(entityName);
-			entityModel.setPartOrderFromString(compound.getString("PartOrder"));
-			for (int i = 0; i < partList.tagCount(); i++)
-			{
-				NBTTagCompound partCompound = partList.getCompoundTagAt(i);
-				PartObj part = Util.getPartObjFromName(partCompound.getString("Name"), entityModel.parts);
-				part.setDisplayName(partCompound.getString("DisplayName"));
-				String group = partCompound.getString("Group");
-				if(!groups.containsKey(group))
-					addGroup(group);
-				setPartGroup(group, part);
-			}
+			NBTTagCompound partCompound = partList.getCompoundTagAt(i);
+			PartObj part = Util.getPartObjFromName(partCompound.getString("Name"), model.parts);
+			part.setDisplayName(partCompound.getString("DisplayName"));
+			String group = partCompound.getString("Group");
+			if(!groups.containsKey(group))
+				addGroup(group);
+			setPartGroup(group, part);
 		}
 	}
 
-	
+
 }

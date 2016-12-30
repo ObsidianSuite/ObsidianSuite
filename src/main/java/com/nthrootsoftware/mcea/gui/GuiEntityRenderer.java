@@ -58,14 +58,14 @@ public class GuiEntityRenderer extends GuiBlack
 
 	public int gridMinX = -1, gridMaxX = 1, gridMinZ = -1, gridMaxZ = 1;
 	
-	public GuiEntityRenderer(String entityName)
+	public GuiEntityRenderer(ModelObj model)
 	{
 		super();
 
 		//Init variables.
-		this.entityName = entityName;
+		this.entityName = model.entityName;
+		this.entityModel = model;
 		entityToRender = new EntityObj(Minecraft.getMinecraft().theWorld, entityName);
-		entityModel = ((RenderObj) RenderManager.instance.getEntityRenderObject(entityToRender)).getModel(entityName);
 
 		//Setup parts list.
 		for(Part part : entityModel.parts)

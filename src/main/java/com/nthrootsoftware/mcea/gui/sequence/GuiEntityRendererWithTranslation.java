@@ -4,6 +4,7 @@ import org.lwjgl.opengl.GL11;
 
 import com.nthrootsoftware.mcea.Util;
 import com.nthrootsoftware.mcea.render.MathHelper;
+import com.nthrootsoftware.mcea.render.objRendering.ModelObj;
 import com.nthrootsoftware.mcea.render.objRendering.RayTrace;
 import com.nthrootsoftware.mcea.render.objRendering.parts.Part;
 import com.nthrootsoftware.mcea.render.objRendering.parts.PartEntityPos;
@@ -27,9 +28,9 @@ public class GuiEntityRendererWithTranslation extends GuiEntityRendererWithRotat
 	private Vec3 initialTranslationGuidePoint;
 	private double prevTranslationDelta = 0.0F;
 
-	public GuiEntityRendererWithTranslation(String entityName) 
+	public GuiEntityRendererWithTranslation(ModelObj model) 
 	{
-		super(entityName);
+		super(model);
 	}
 
 	/* ---------------------------------------------------- *

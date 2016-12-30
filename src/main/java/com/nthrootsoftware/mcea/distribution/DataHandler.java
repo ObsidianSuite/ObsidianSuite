@@ -171,10 +171,10 @@ public class DataHandler
 
 	public static void loadEntityData(String entityName)
 	{
-		ClientProxy.renderObj.loadModel(entityName);
-		File entityDataFile = getEntityFile(entityName, "data");
-		if(entityDataFile.exists())
-			AnimationData.loadEntityData(entityName, getNBTFromFile(entityDataFile));
+//		ClientProxy.renderObj.loadModel(entityName);
+//		File entityDataFile = getEntityFile(entityName, "data");
+//		if(entityDataFile.exists())
+//			AnimationData.loadEntityData(entityName, getNBTFromFile(entityDataFile));
 	}
 
 	public static void loadEntityAnimation(String entityName, String animationName)

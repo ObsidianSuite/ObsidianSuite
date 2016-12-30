@@ -21,8 +21,8 @@ import org.lwjgl.input.Mouse;
 
 import com.nthrootsoftware.mcea.Util;
 import com.nthrootsoftware.mcea.animation.AnimationData;
-import com.nthrootsoftware.mcea.distribution.ServerAccess;
 import com.nthrootsoftware.mcea.gui.animation.MainGUI;
+import com.nthrootsoftware.mcea.render.objRendering.ModelObj;
 import com.nthrootsoftware.mcea.render.objRendering.bend.Bend;
 import com.nthrootsoftware.mcea.render.objRendering.parts.Part;
 import com.nthrootsoftware.mcea.render.objRendering.parts.PartObj;
@@ -36,9 +36,9 @@ public class GuiAnimationParenting extends GuiEntityRenderer
 	private ParentingFrame parentingFrame;
 	private RelationFrame relationFrame;
 
-	public GuiAnimationParenting(String entityName)
+	public GuiAnimationParenting(ModelObj entityModel)
 	{
-		super(entityName);
+		super(entityModel);
 		parentingFrame = new ParentingFrame();
 		relationFrame = new RelationFrame();
 	}

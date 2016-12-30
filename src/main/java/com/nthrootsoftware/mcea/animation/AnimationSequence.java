@@ -82,7 +82,7 @@ public class AnimationSequence
 		boolean one = false;
 		for(AnimationPart s : this.animations)
 		{
-			if(s.getPart().getName().equals(partName))
+			if(s.getPartName().equals(partName))
 			{
 				//If one is true, another animation part having this part name implies two or more.
 				if(one)
@@ -105,21 +105,23 @@ public class AnimationSequence
 	 */
 	public void animateAll(float time, ModelObj entityModel, String exceptionPartName) 
 	{
+		//TODO this could be more efficient, currently O(num_anim_parts*num_body_parts)
 		for(Part part : entityModel.parts)
 		{
 			if(!part.getName().equals(exceptionPartName))
 			{
 				AnimationPart lastAnimation = getLastAnimation(part.getName());
 				if(lastAnimation != null && time > lastAnimation.getEndTime())
-					lastAnimation.animatePart(lastAnimation.getEndTime() - lastAnimation.getStartTime());
+					lastAnimation.animatePart(part, lastAnimation.getEndTime() - lastAnimation.getStartTime());
 				else
-					part.setToOriginalValues();
+				{
+					for(AnimationPart s : this.animations)
+					{
+						if(!s.getPartName().equals(exceptionPartName) && time >= s.getStartTime() && time <= s.getEndTime())
+							s.animatePart(part, time - s.getStartTime());
+					}
+				}
 			}
-		}
-		for(AnimationPart s : this.animations)
-		{
-			if(!s.getPart().getName().equals(exceptionPartName) && time >= s.getStartTime() && time <= s.getEndTime())
-				s.animatePart(time - s.getStartTime());
 		}
 	}
 
@@ -144,7 +146,7 @@ public class AnimationSequence
 		AnimationPart lastAnimation = null;
 		for(AnimationPart s : this.animations)
 		{
-			if(s.getPart().getName().equals(partName))
+			if(s.getPartName().equals(partName))
 				if(lastAnimation != null)
 				{
 					if(s.getEndTime() > lastAnimation.getEndTime())
@@ -186,7 +188,7 @@ public class AnimationSequence
 		NBTTagList segmentList = compound.getTagList("Animations", 10);
 		for(int i = 0; i < segmentList.tagCount(); i++)
 		{
-			AnimationPart animation = new AnimationPart(entityName, segmentList.getCompoundTagAt(i));
+			AnimationPart animation = new AnimationPart(segmentList.getCompoundTagAt(i));
 			animations.add(animation);
 		}		
 		animationName = compound.getString("Name");

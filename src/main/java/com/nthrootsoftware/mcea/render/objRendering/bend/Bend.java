@@ -288,7 +288,7 @@ public class Bend
 		}
 
 		//Get all parents that need compensating for.
-		AnimationParenting anipar = AnimationData.getAnipar(parent.modelObj.getEntityType());
+		AnimationParenting anipar = parent.modelObj.parenting;
 		List<PartObj> parents = new ArrayList<PartObj>();
 		PartObj p = child;
 		while(anipar.hasParent(p))
