@@ -18,21 +18,28 @@ public class ModelHandler
 
 	public static RenderObj modelRenderer = new RenderObj();
 	
-	public static String importModelFile(File file)
+	public static String loadModelFile(File file)
 	{
 		copyFileToPersistentMemory(file);
+		ModelObj model = importModel(file);
+		updateRenderer(model.entityName);
+		return model.entityName;
+	}
+	
+	public static void loadFileFromPersistence(File file)
+	{
+		importModel(file);
+	}
+	
+	private static ModelObj importModel(File file)
+	{
 		String fileName = file.getName();
 		String entityName = fileName.substring(0,fileName.indexOf("."));
 		ModelObj model = new ModelObj(entityName, file);
-		importModel(model);
-		updateRenderer(entityName);
-		return entityName;
+		models.put(model.entityName, model);
+		return model;
 	}
 	
-	private static void importModel(ModelObj model)
-	{
-		models.put(model.entityName, model);
-	}
 
 	private static void updateRenderer(String entityName)
 	{

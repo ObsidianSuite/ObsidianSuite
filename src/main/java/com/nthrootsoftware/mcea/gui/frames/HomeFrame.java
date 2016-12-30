@@ -102,7 +102,7 @@ public class HomeFrame extends MCEAFrame
 	private void importModelPressed()
 	{
 		File modelFile = FileChooser.loadModelFile(frame);
-		String entityName = ModelHandler.importModelFile(modelFile);
+		String entityName = ModelHandler.loadModelFile(modelFile);
 		frame.dispose();
 		Minecraft.getMinecraft().displayGuiScreen(new GuiPartSetup(entityName));
 	}

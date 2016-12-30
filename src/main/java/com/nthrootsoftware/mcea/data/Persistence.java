@@ -26,7 +26,7 @@ public class Persistence
 		if(modelFolder.exists())
 		{
 			for(File f : modelFolder.listFiles())
-				ModelHandler.importModelFile(f);
+				ModelHandler.loadFileFromPersistence(f);
 		}
 		else
 			modelFolder.mkdirs();
