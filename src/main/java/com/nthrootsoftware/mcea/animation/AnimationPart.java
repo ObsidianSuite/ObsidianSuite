@@ -1,19 +1,13 @@
 package com.nthrootsoftware.mcea.animation;
 
 import java.text.DecimalFormat;
-import java.util.ArrayList;
 
 import org.lwjgl.util.vector.Quaternion;
 
-import com.nthrootsoftware.mcea.Util;
 import com.nthrootsoftware.mcea.render.MathHelper;
-import com.nthrootsoftware.mcea.render.objRendering.EntityObj;
-import com.nthrootsoftware.mcea.render.objRendering.RenderObj;
 import com.nthrootsoftware.mcea.render.objRendering.parts.Part;
 import com.nthrootsoftware.mcea.render.objRendering.parts.PartObj;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 
@@ -27,21 +21,22 @@ public class AnimationPart
 	private float[] startPosition;
 	private float[] endPosition;
 	private float[] movement = new float[3];
+	private String partName;
 	private DecimalFormat df = new DecimalFormat("##.##");
-	private Part part;
 	private Quaternion startQuart, endQuart;
 
-	public AnimationPart(String entityName, NBTTagCompound compound) 
+	public AnimationPart(NBTTagCompound compound) 
 	{
-		loadData(entityName, compound);
+		loadData(compound);
 	}
 
-	public AnimationPart(float startTime, float endTime, float[] startPos, float[] endPos, Part part)
+	public AnimationPart(float startTime, float endTime, float[] startPos, float[] endPos, String partName)
 	{
 		this.startTime = startTime;
 		this.endTime = endTime;
 		this.startPosition = startPos;
 		this.endPosition = endPos;
+		this.partName = partName;
 
 		this.startQuart = MathHelper.eulerToQuarternion(startPos[0]/180F*Math.PI, startPos[1]/180F*Math.PI, startPos[2]/180F*Math.PI);
 		this.endQuart = MathHelper.eulerToQuarternion(endPos[0]/180F*Math.PI, endPos[1]/180F*Math.PI, endPos[2]/180F*Math.PI);
@@ -54,22 +49,22 @@ public class AnimationPart
 			if(dT == 0)
 				dT = 1;
 			float dif = endPos[i] - startPos[i];
-			if(part instanceof PartObj)
-			{
-				if(Math.abs(dif) > Math.PI)
-				{
-					if(dif < 0)
-						dif += 2*Math.PI;
-					else
-						dif -= 2*Math.PI;
-				}
-			}
+			//TODO is this needed?
+//			if(part instanceof PartObj)
+//			{
+//				if(Math.abs(dif) > Math.PI)
+//				{
+//					if(dif < 0)
+//						dif += 2*Math.PI;
+//					else
+//						dif -= 2*Math.PI;
+//				}
+//			}
 			this.movement[i] = dif/dT;
 		}
-		this.part = part;
 	}
 
-	public void animatePart(float time) 
+	public void animatePart(Part part, float time) 
 	{		
 		boolean useQuarternions = false;
 
@@ -106,11 +101,6 @@ public class AnimationPart
 
 
 		part.setValues(values);
-	}
-
-	public Part getPart()
-	{
-		return part;
 	}
 
 	public float[] getStartPosition() 
@@ -159,7 +149,12 @@ public class AnimationPart
 
 	public AnimationPart copy() 
 	{
-		return new AnimationPart(startTime, endTime, startPosition.clone(), endPosition.clone(), part);
+		return new AnimationPart(startTime, endTime, startPosition.clone(), endPosition.clone(), partName);
+	}
+	
+	public String getPartName() 
+	{
+		return partName;
 	}
 
 	public NBTBase getSaveData() 
@@ -173,14 +168,12 @@ public class AnimationPart
 		animationData.setFloat("ZEnd", Float.parseFloat(df.format(this.endPosition[2])));
 		animationData.setFloat("StartTime", Float.parseFloat(df.format(this.startTime)));
 		animationData.setFloat("FinishTime", Float.parseFloat(df.format(this.endTime)));
-		animationData.setString("Part", this.part.getName());
+		animationData.setString("PartName", partName);
 		return animationData;
 	}
 
-	public void loadData(String entityName, NBTTagCompound compound) 
+	public void loadData(NBTTagCompound compound) 
 	{
-		EntityObj entity = new EntityObj(Minecraft.getMinecraft().theWorld, entityName);
-		ArrayList<Part> parts = ((RenderObj) RenderManager.instance.getEntityRenderObject(entity)).getModel(entityName).parts;
 		this.startPosition = new float[3];
 		this.endPosition = new float[3];
 		this.startPosition[0] = compound.getFloat("XStart");
@@ -191,7 +184,7 @@ public class AnimationPart
 		this.endPosition[2] = compound.getFloat("ZEnd");
 		this.startTime = compound.getFloat("StartTime");
 		this.endTime = compound.getFloat("FinishTime");
-		this.part = Util.getPartFromName(compound.getString("Part"), parts);
+		this.partName = compound.getString("PartName");
 	}
 
 

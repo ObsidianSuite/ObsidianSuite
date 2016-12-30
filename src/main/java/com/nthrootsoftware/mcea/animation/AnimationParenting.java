@@ -24,7 +24,7 @@ public class AnimationParenting
 {
 
 	private Map<PartObj, List<PartObj>> parentingMap = new HashMap<PartObj, List<PartObj>>();
-	
+
 	/**
 	 * Get the parent of a child, or null if it doesn't exist.
 	 */
@@ -80,7 +80,7 @@ public class AnimationParenting
 		allParents.addAll(parentingMap.keySet());
 		return allParents;
 	}
-	
+
 	public List<PartObj> getAllChildren()
 	{
 		List<PartObj> allChildren = new ArrayList<PartObj>();
@@ -128,7 +128,7 @@ public class AnimationParenting
 		}
 	}
 
-	public NBTTagCompound getSaveData(String entityName) 
+	public NBTTagCompound getSaveData() 
 	{	
 		NBTTagCompound parentNBT = new NBTTagCompound();
 		NBTTagList parentNBTList = new NBTTagList();
@@ -152,39 +152,34 @@ public class AnimationParenting
 		return parentNBT;
 	}
 
-	public void loadData(NBTTagCompound compound, String entityName) 
+	public void loadData(NBTTagCompound compound, ModelObj model) 
 	{	
-		EntityObj entity = new EntityObj(Minecraft.getMinecraft().theWorld, entityName);
-		if(entity != null)
-		{
-			ModelObj entityModel = ((RenderObj) RenderManager.instance.getEntityRenderObject(entity)).getModel(entityName);
-			NBTTagList parentNBTList = compound.getTagList("Parenting", 10);	
+		NBTTagList parentNBTList = compound.getTagList("Parenting", 10);	
 
-			for (int i = 0; i < parentNBTList.tagCount(); i++)
+		for (int i = 0; i < parentNBTList.tagCount(); i++)
+		{
+			NBTTagCompound parentCompound = parentNBTList.getCompoundTagAt(i);
+			PartObj parent = Util.getPartObjFromName(parentCompound.getString("Parent"), model.parts);
+			int j = 0;
+			while(parentCompound.hasKey("Child" + j))
 			{
-				NBTTagCompound parentCompound = parentNBTList.getCompoundTagAt(i);
-				PartObj parent = Util.getPartObjFromName(parentCompound.getString("Parent"), entityModel.parts);
-				int j = 0;
-				while(parentCompound.hasKey("Child" + j))
+				String name = parentCompound.getString("Child" + j);
+				boolean hasBend = false;
+				if(name.endsWith("*"))
 				{
-					String name = parentCompound.getString("Child" + j);
-					boolean hasBend = false;
-					if(name.endsWith("*"))
-					{
-						name = name.substring(0, name.length() - 1);
-						hasBend = true;
-					}
-					PartObj child = Util.getPartObjFromName(name, entityModel.parts);
-					try 
-					{
-						entityModel.setParent(child, parent, hasBend);
-					} 
-					catch (Exception e) 
-					{
-						e.printStackTrace();
-					}
-					j++;
+					name = name.substring(0, name.length() - 1);
+					hasBend = true;
 				}
+				PartObj child = Util.getPartObjFromName(name, model.parts);
+				try 
+				{
+					model.setParent(child, parent, hasBend);
+				} 
+				catch (Exception e) 
+				{
+					e.printStackTrace();
+				}
+				j++;
 			}
 		}
 	}
@@ -199,7 +194,7 @@ public class AnimationParenting
 			unParent(child);
 			childrenIterator.remove();
 		}
-		
+
 	}
-	
+
 }

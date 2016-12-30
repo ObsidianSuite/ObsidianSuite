@@ -1,7 +1,15 @@
 package com.nthrootsoftware.mcea.render.objRendering;
 
-import java.util.HashMap;
+import org.lwjgl.opengl.GL11;
 
+import com.nthrootsoftware.mcea.Util;
+import com.nthrootsoftware.mcea.data.ModelHandler;
+import com.nthrootsoftware.mcea.item.ModelLargeShield;
+import com.nthrootsoftware.mcea.render.objRendering.parts.PartObj;
+import com.nthrootsoftware.mcea.render.objRendering.parts.PartRotation;
+
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderBlocks;
@@ -9,69 +17,36 @@ import net.minecraft.client.renderer.entity.RenderLiving;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.EnumAction;
-import net.minecraft.item.Item.ToolMaterial;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemSword;
 import net.minecraft.util.ResourceLocation;
-
-import org.lwjgl.opengl.GL11;
-
-import com.nthrootsoftware.mcea.Util;
-import com.nthrootsoftware.mcea.item.ModelLargeShield;
-import com.nthrootsoftware.mcea.render.objRendering.parts.PartObj;
-import com.nthrootsoftware.mcea.render.objRendering.parts.PartRotation;
-
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 
 
 @SideOnly(Side.CLIENT)
 public class RenderObj extends RenderLiving
 {
-	static ModelObj modelObj;
-	
-	private HashMap<String, ModelObj> models;
-	
+	private ModelObj modelObj;
+		
 	private static final ModelLargeShield shieldModel = new ModelLargeShield();
 	private static final ResourceLocation shieldTexture = new ResourceLocation("mod_pxy:textures/models/L_shield.png");
-	private static final ResourceLocation defaultTexture = new ResourceLocation("mod_mcea:defaultModelTextures/grey.png");
-	private ResourceLocation properTexture;
 	
 	public RenderObj() 
 	{
 		super(null, 0.5F);
-        models = new HashMap<String, ModelObj>();	
 	}
 
 	@Override
 	protected ResourceLocation getEntityTexture(Entity entity) 
 	{
-		return getModel(((EntityObj) entity).getType()).textureExists ? properTexture : defaultTexture;
+		return modelObj.getTexture();
 	}
 	
-	public void loadModel(String entityType)
+	public void setModel(ModelObj model)
 	{
-		ModelObj m = new ModelObj(entityType);
-		models.put(entityType, m);
-	}
-
-	public void updateModel(String entityType)
-	{
-		if(!models.containsKey(entityType))
-			loadModel(entityType);
-		mainModel = models.get(entityType);
-		modelObj = models.get(entityType);
-        properTexture = modelObj.getTexture();
-	}
-	
-	public ModelObj getModel(String entityType) 
-	{
-		this.updateModel(entityType);
-		return modelObj;
+		modelObj = model;
+		mainModel = model;
 	}
 	
 	@Override

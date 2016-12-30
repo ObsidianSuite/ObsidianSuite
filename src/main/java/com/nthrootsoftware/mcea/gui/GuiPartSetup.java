@@ -28,6 +28,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import com.nthrootsoftware.mcea.animation.PartGroups;
+import com.nthrootsoftware.mcea.render.objRendering.ModelObj;
 import com.nthrootsoftware.mcea.render.objRendering.parts.PartObj;
 
 public class GuiPartSetup extends GuiEntityRenderer

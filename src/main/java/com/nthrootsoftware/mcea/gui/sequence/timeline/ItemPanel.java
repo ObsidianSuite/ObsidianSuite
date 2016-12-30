@@ -10,7 +10,6 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
-import com.nthrootsoftware.mcea.animation.AnimationData;
 import com.nthrootsoftware.mcea.gui.GuiInventoryChooseItem;
 import com.nthrootsoftware.mcea.render.objRendering.EntityObj;
 
@@ -52,8 +51,9 @@ public class ItemPanel extends JPanel
 			@Override
 			public void actionPerformed(ActionEvent e) 
 			{
-				AnimationData.setAnimationItem(timeline.currentAnimation.getName(), -1);
-				((EntityObj) timeline.entityToRender).setCurrentItem(null); 
+				//TODO animation item
+//				AnimationData.setAnimationItem(timeline.currentAnimation.getName(), -1);
+//				((EntityObj) timeline.entityToRender).setCurrentItem(null); 
 			}
 		});
 		add(emptyItemButton, c);

@@ -2,11 +2,9 @@ package com.nthrootsoftware.mcea;
 
 import java.io.IOException;
 
-import com.nthrootsoftware.mcea.distribution.ServerAccess;
+import com.nthrootsoftware.mcea.gui.GuiAnimationMainMenu;
 import com.nthrootsoftware.mcea.gui.GuiBlack;
-import com.nthrootsoftware.mcea.gui.GuiHandler;
-import com.nthrootsoftware.mcea.gui.animation.LoginGUI;
-import com.nthrootsoftware.mcea.gui.stance.GuiAnimationMainMenu;
+import com.nthrootsoftware.mcea.gui.frames.HomeFrame;
 import com.nthrootsoftware.mcea.updater.ServerConfig;
 import com.nthrootsoftware.mcea.updater.Updater;
 
@@ -30,7 +28,7 @@ public class EventHandler
 	{
 		try 
 		{
-			if(event.gui instanceof GuiMainMenu && !updateChecked && ServerAccess.testConnection())
+			if(event.gui instanceof GuiMainMenu && !updateChecked)
 			{
 				ServerConfig.init();
 				new Updater().checkForUpdate(MCEA_Main.version);
@@ -53,8 +51,9 @@ public class EventHandler
 		if(Minecraft.getMinecraft().inGameHasFocus && Minecraft.getMinecraft().currentScreen == null)
 		{
 			Minecraft.getMinecraft().displayGuiScreen(new GuiBlack());
-			if(GuiHandler.loginGUI == null)
-				GuiHandler.loginGUI = new LoginGUI();
+			new HomeFrame().display();
+//			if(GuiHandler.loginGUI == null)
+//				GuiHandler.loginGUI = new LoginGUI();
 		}
 	}
 

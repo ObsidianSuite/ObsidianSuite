@@ -1,33 +1,13 @@
 package com.nthrootsoftware.mcea.gui.sequence.timeline;
 
-import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.AbstractButton;
-import javax.swing.BorderFactory;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JSlider;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
-import com.nthrootsoftware.mcea.Util;
-import com.nthrootsoftware.mcea.animation.AnimationData;
-import com.nthrootsoftware.mcea.animation.AnimationSequence;
-import com.nthrootsoftware.mcea.gui.GuiInventoryChooseItem;
-import com.nthrootsoftware.mcea.gui.sequence.EntityAutoMove.Direction;
-import com.nthrootsoftware.mcea.render.objRendering.EntityObj;
-import com.nthrootsoftware.mcea.render.objRendering.parts.Part;
-
-import net.minecraft.client.Minecraft;
 
 public class ControlPanel extends JPanel
 {
@@ -71,26 +51,6 @@ public class ControlPanel extends JPanel
 			}
 		});
 
-		JButton duplicateButton = new JButton("Duplicate");
-		duplicateButton.addActionListener(new ActionListener()
-		{
-			@Override
-			public void actionPerformed(ActionEvent e) 
-			{
-				String newName = JOptionPane.showInputDialog(timeline.timelineFrame, "Name of duplicate animation: ");
-				if(newName == null || newName.equals("") || newName.equals(" "))
-					JOptionPane.showMessageDialog(timeline.timelineFrame, "Invalid name");
-				else if(AnimationData.sequenceExists(timeline.entityName, newName))
-					JOptionPane.showMessageDialog(timeline.timelineFrame, "An animation with this name already exists.");
-				else
-				{
-					AnimationSequence sequence = timeline.currentAnimation.copy(newName);
-					AnimationData.addSequence(timeline.entityName, sequence);
-					Minecraft.getMinecraft().displayGuiScreen(new GuiAnimationTimeline(timeline.entityName, sequence));
-				}
-			}
-		});
-
 		JButton backButton = new JButton("Back");
 		backButton.addActionListener(new ActionListener()
 		{
@@ -120,9 +80,6 @@ public class ControlPanel extends JPanel
 		c.gridy = 5;
 		add(itemPanel,c);
 		c.gridy = 6;
-		c.insets = new Insets(2,5,2,5);
-		add(duplicateButton,c);
-		c.gridy = 7;
 		c.insets = new Insets(2,5,10,5);
 		add(backButton,c);
 	}

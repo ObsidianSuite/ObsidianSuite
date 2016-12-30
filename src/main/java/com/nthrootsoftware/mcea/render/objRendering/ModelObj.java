@@ -1,11 +1,14 @@
 package com.nthrootsoftware.mcea.render.objRendering;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -13,12 +16,9 @@ import java.util.Map;
 import org.lwjgl.opengl.GL11;
 
 import com.google.common.collect.Maps;
-import com.nthrootsoftware.mcea.MCEA_Main;
 import com.nthrootsoftware.mcea.Util;
-import com.nthrootsoftware.mcea.animation.AnimationData;
 import com.nthrootsoftware.mcea.animation.AnimationParenting;
 import com.nthrootsoftware.mcea.animation.PartGroups;
-import com.nthrootsoftware.mcea.distribution.DataHandler;
 import com.nthrootsoftware.mcea.render.objRendering.bend.Bend;
 import com.nthrootsoftware.mcea.render.objRendering.parts.Part;
 import com.nthrootsoftware.mcea.render.objRendering.parts.PartEntityPos;
@@ -28,6 +28,8 @@ import com.nthrootsoftware.mcea.render.objRendering.parts.PartRotation;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.entity.Entity;
+import net.minecraft.nbt.CompressedStreamTools;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.ModelFormatException;
 import net.minecraftforge.client.model.obj.GroupObject;
@@ -36,11 +38,11 @@ import net.minecraftforge.client.model.obj.WavefrontObject;
 public class ModelObj extends ModelBase
 {
 
-	private String entityType;
+	public final String entityName;
 	public WavefrontObject model;
 	public ArrayList<Part> parts;
 	private ArrayList<Bend> bends;
-	private AnimationParenting parenting;
+	public AnimationParenting parenting;
 	public PartGroups partGroups;
 	private Map<PartObj, float[]> defaults;
 
@@ -51,48 +53,24 @@ public class ModelObj extends ModelBase
 	public static final float offsetFixY = -1.5F;
 
 	private final ResourceLocation txtRL;
-	private final File pxyFile;
-
-	public final boolean textureExists;
-
+	
 	private boolean partSetupComplete;
 
 	public static final ResourceLocation pinkResLoc = new ResourceLocation("mod_mcea:defaultModelTextures/pink.png");
 	public static final ResourceLocation whiteResLoc = new ResourceLocation("mod_mcea:defaultModelTextures/white.png");
 
-	public ModelObj(String par0Str)
-	{	
-		entityType = par0Str;
+	public ModelObj(String entityName, File file)
+	{			
+		this.entityName = entityName;
 		
-		File modelFile = DataHandler.getEntityFile(entityType, "obj");
-		File textureFile = DataHandler.getEntityFile(entityType, "png");
-		textureExists = textureFile.exists();
-		txtRL = DataHandler.getEntityResourceLocation(entityType);
-		
-		pxyFile = DataHandler.getEntityFile(entityType, "pxy");
-
-		try 
-		{
-			model = new WavefrontObject(entityType + ".obj", new FileInputStream(modelFile));
-		}
-		catch (ModelFormatException e) {e.printStackTrace();} 
-		catch (FileNotFoundException e) {e.printStackTrace();}
-
-		parts = createPartObjList(this, model.groupObjects);
-		parts.add(new PartEntityPos(this));
-		if(par0Str.equals("player"))
-		{
-			parts.add(new PartRotation(this, "prop_rot"));
-			parts.add(new Part(this, "prop_trans"));
-		}
-		parenting = AnimationData.getAnipar(par0Str);
 		hightlightedParts = new ArrayList<PartObj>();
 		bends = new ArrayList<Bend>();
 		defaults = Maps.newHashMap();
-		loadFromFile();
-		partSetupComplete = true;
-		partGroups = AnimationData.getPartGroups(entityType, this);
-
+		
+		loadFromFile(file);
+		
+		txtRL = whiteResLoc;//DataHandler.getEntityResourceLocation(entityName);
+				
 		init();
 	}
 
@@ -122,64 +100,123 @@ public class ModelObj extends ModelBase
 		return defaults.get(part).clone();
 	}
 
-	public String getEntityType()
+	private void loadFromFile(File file) 
 	{
-		return entityType;
-	}
-
-	private void loadFromFile() 
-	{
-		try
+		try 
 		{
-			BufferedReader reader = new BufferedReader(new FileReader(pxyFile));
-			String currentLine;
-			PartObj currentPart = null;
-			int i = 0;
-			boolean readingRotation = true;
+			BufferedReader reader = new BufferedReader(new FileReader(file));
+			
+			String nbtData = "";
+			String modelData = "";
+			String partData = "";
 
-			while ((currentLine = reader.readLine()) != null)
-			{
-				if(currentLine.equals("PART SETUP"))
-					readingRotation = false;
-
-				if(readingRotation)
+			int targetString = 0;
+			String currentLine = "";
+			while((currentLine = reader.readLine()) != null)
+			{				
+				if(currentLine.contains("# Model #"))
+					targetString = 1;
+				else if(currentLine.contains("# Part #"))
+					targetString = 2;
+				else
 				{
-					switch(i)
+					switch(targetString)
 					{
-					case 0: 
-						for(Part p : parts)
-						{
-							if(p instanceof PartObj)
-							{
-								PartObj obj = (PartObj) p;
-								if(obj.getName().equals(currentLine))
-								{
-									currentPart = obj;
-									break;
-								}
-							}
-						}
-						i++;
-						break;
-					case 1:
-						currentPart.setRotationPoint(read3Floats(currentLine));
-						i++;
-						break;
-					case 2:
-						float[] rot = read3Floats(currentLine);
-						currentPart.setOriginalValues(rot);
-						currentPart.setValues(rot);
-						i = 0;
-						break;
+					case 0: nbtData += currentLine + "\n"; break;
+					case 1: modelData += currentLine + "\n"; break;
+					case 2: partData += currentLine + "\n"; break;
 					}
 				}
 			}
+
+			//Write nbt data to temp file so it can be read by compressed stream tools.
+			File tmp = new File("tmp");
+			if(!tmp.exists())
+				tmp.createNewFile();
+			
+			FileWriter fw = new FileWriter(tmp);
+			BufferedWriter bw = new BufferedWriter(fw);
+			bw.write(nbtData);
+			bw.close();
+			fw.close();
+			
+			loadModel(modelData);
+			
+			parts = createPartObjList(this, model.groupObjects);
+			parts.add(new PartEntityPos(this));
+			if(entityName.equals("player"))
+			{
+				parts.add(new PartRotation(this, "prop_rot"));
+				parts.add(new Part(this, "prop_trans"));
+			}
+			
+			loadAdditionalPartData(partData);
+			loadSetup(CompressedStreamTools.read(tmp));
+			
 			reader.close();
-		}
-		catch (IOException e)
+			tmp.delete();
+		} 
+		catch (FileNotFoundException e) {e.printStackTrace();} 
+		catch (IOException e) {e.printStackTrace();}
+	}
+	
+	private void loadModel(String modelData) throws ModelFormatException, UnsupportedEncodingException
+	{
+		model = new WavefrontObject("Test file", new ByteArrayInputStream(modelData.getBytes("UTF-8")));
+	}
+	
+	private void loadAdditionalPartData(String partData)
+	{
+		PartObj currentPart = null;
+		int i = 0;
+		boolean readingRotation = true;
+
+		for(String currentLine : partData.split("\n"))
 		{
-			throw new ModelFormatException("IO Exception reading model format", e);
+			if(currentLine.equals("PART SETUP"))
+				readingRotation = false;
+
+			if(readingRotation)
+			{
+				switch(i)
+				{
+				case 0: 
+					for(Part p : parts)
+					{
+						if(p instanceof PartObj)
+						{
+							PartObj obj = (PartObj) p;
+							if(obj.getName().equals(currentLine))
+							{
+								currentPart = obj;
+								break;
+							}
+						}
+					}
+					i++;
+					break;
+				case 1:
+					currentPart.setRotationPoint(read3Floats(currentLine));
+					i++;
+					break;
+				case 2:
+					float[] rot = read3Floats(currentLine);
+					currentPart.setOriginalValues(rot);
+					currentPart.setValues(rot);
+					i = 0;
+					break;
+				}
+			}
 		}
+	}
+	
+	private void loadSetup(NBTTagCompound nbt)
+	{
+		parenting = new AnimationParenting();
+		parenting.loadData(nbt.getCompoundTag("Parenting"), this);
+
+		partGroups = new PartGroups(this);
+		partGroups.loadData(nbt.getCompoundTag("Groups"), this);
 	}
 
 	//----------------------------------------------------------------
@@ -413,6 +450,14 @@ public class ModelObj extends ModelBase
 			parts.add(new PartObj(model, gObj));
 		}
 		return parts;
+	}
+	
+	public NBTTagCompound createNBTTag()
+	{
+		NBTTagCompound nbt = new NBTTagCompound();
+		nbt.setTag("Parenting", parenting.getSaveData());
+		nbt.setTag("PartGroups", partGroups.getSaveData());
+		return nbt;
 	}
 
 }

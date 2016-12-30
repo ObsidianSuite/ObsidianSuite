@@ -20,9 +20,7 @@ import javax.swing.plaf.basic.BasicComboBoxRenderer;
 import org.lwjgl.input.Mouse;
 
 import com.nthrootsoftware.mcea.Util;
-import com.nthrootsoftware.mcea.animation.AnimationData;
-import com.nthrootsoftware.mcea.distribution.ServerAccess;
-import com.nthrootsoftware.mcea.gui.animation.MainGUI;
+import com.nthrootsoftware.mcea.gui.frames.HomeFrame;
 import com.nthrootsoftware.mcea.render.objRendering.bend.Bend;
 import com.nthrootsoftware.mcea.render.objRendering.parts.Part;
 import com.nthrootsoftware.mcea.render.objRendering.parts.PartObj;
@@ -49,7 +47,6 @@ public class GuiAnimationParenting extends GuiEntityRenderer
 		super.onGuiClosed();
 		parentingFrame.dispose();
 		relationFrame.dispose();
-		AnimationData.setEntitySetupChanged(entityName);
 	}
 
 	@Override
@@ -65,14 +62,14 @@ public class GuiAnimationParenting extends GuiEntityRenderer
 		PartObj child = getChild();
 		if(parent.getName().equals(child.getName()))
 			JOptionPane.showMessageDialog(parentingFrame, "Cannot parent a part to itself.", "Parenting issue", JOptionPane.ERROR_MESSAGE);
-		else if(AnimationData.getAnipar(entityName).hasParent(child))
+		else if(entityModel.parenting.hasParent(child))
 		{
 			Object[] options = {"OK", "Remove bend"};
 			int n = JOptionPane.showOptionDialog(parentingFrame, child.getDisplayName() + " already has a parent.", "Parenting issue",
 						JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE,null,options,options[0]);
 			if(n == 1)
 			{
-				AnimationData.getAnipar(entityName).unParent(child);
+				entityModel.parenting.unParent(child);
 				relationFrame.updateLabels();
 			}
 		}
@@ -180,7 +177,7 @@ public class GuiAnimationParenting extends GuiEntityRenderer
 				@Override
 				public void actionPerformed(ActionEvent e) 
 				{
-					AnimationData.getAnipar(entityName).clear();
+					entityModel.parenting.clear();
 					relationFrame.updateLabels();
 				}
 			});
@@ -192,7 +189,7 @@ public class GuiAnimationParenting extends GuiEntityRenderer
 				public void actionPerformed(ActionEvent e) 
 				{
 					Minecraft.getMinecraft().displayGuiScreen(new GuiBlack());
-					GuiHandler.mainGui = new MainGUI();
+					new HomeFrame().display();
 				}
 			});
 
@@ -272,14 +269,14 @@ public class GuiAnimationParenting extends GuiEntityRenderer
 			mainPanel.add(new JLabel("Children"),c);
 			
 			int h = 1;
-			for(PartObj parent : AnimationData.getAnipar(entityName).getAllParents())
+			for(PartObj parent : entityModel.parenting.getAllParents())
 			{
 				c.gridx = 0;
 				c.gridy = h;
 				mainPanel.add(new JLabel(parent.getDisplayName()),c);
 				c.gridx = 1;
 				String s = "";
-				for(PartObj child : AnimationData.getAnipar(entityName).getChildren(parent))
+				for(PartObj child : entityModel.parenting.getChildren(parent))
 				{
 					s = s + child.getDisplayName() + ",";
 				}

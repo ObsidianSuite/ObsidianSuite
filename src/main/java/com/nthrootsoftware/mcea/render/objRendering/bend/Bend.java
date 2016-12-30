@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.lwjgl.opengl.GL11;
 
-import com.nthrootsoftware.mcea.animation.AnimationData;
 import com.nthrootsoftware.mcea.animation.AnimationParenting;
 import com.nthrootsoftware.mcea.render.MathHelper;
 import com.nthrootsoftware.mcea.render.objRendering.RayTrace;
@@ -288,7 +287,7 @@ public class Bend
 		}
 
 		//Get all parents that need compensating for.
-		AnimationParenting anipar = AnimationData.getAnipar(parent.modelObj.getEntityType());
+		AnimationParenting anipar = parent.modelObj.parenting;
 		List<PartObj> parents = new ArrayList<PartObj>();
 		PartObj p = child;
 		while(anipar.hasParent(p))

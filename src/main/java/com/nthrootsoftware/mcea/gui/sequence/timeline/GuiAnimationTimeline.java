@@ -8,7 +8,6 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -19,6 +18,7 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.File;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,13 +28,8 @@ import java.util.List;
 import java.util.Map;
 
 import javax.swing.AbstractAction;
-import javax.swing.AbstractButton;
 import javax.swing.ActionMap;
-import javax.swing.BorderFactory;
 import javax.swing.InputMap;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -53,21 +48,16 @@ import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 
 import com.nthrootsoftware.mcea.Util;
-import com.nthrootsoftware.mcea.animation.AnimationData;
 import com.nthrootsoftware.mcea.animation.AnimationPart;
 import com.nthrootsoftware.mcea.animation.AnimationSequence;
+import com.nthrootsoftware.mcea.file.FileHandler;
 import com.nthrootsoftware.mcea.gui.GuiBlack;
-import com.nthrootsoftware.mcea.gui.GuiHandler;
-import com.nthrootsoftware.mcea.gui.GuiInventoryChooseItem;
-import com.nthrootsoftware.mcea.gui.animation.MainGUI;
+import com.nthrootsoftware.mcea.gui.frames.HomeFrame;
 import com.nthrootsoftware.mcea.gui.sequence.EntityAutoMove;
-import com.nthrootsoftware.mcea.gui.sequence.EntityAutoMove.Direction;
 import com.nthrootsoftware.mcea.gui.sequence.ExternalFrame;
 import com.nthrootsoftware.mcea.gui.sequence.GuiEntityRendererWithTranslation;
 import com.nthrootsoftware.mcea.render.objRendering.EntityObj;
 import com.nthrootsoftware.mcea.render.objRendering.parts.Part;
-
-import net.minecraft.client.Minecraft;
 
 public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation implements ExternalFrame
 {
@@ -94,12 +84,15 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 	float playStartTimeFrame;
 
 	EntityAutoMove entityMovement;
+	
+	private File animationFile;
 
-	public GuiAnimationTimeline(String entityName, AnimationSequence animation)
+	public GuiAnimationTimeline(File animationFile, String entityName, AnimationSequence animation)
 	{
 		super(entityName);
 
 		this.currentAnimation = animation;
+		this.animationFile = animationFile;
 		boolPlay = false;
 		boolMovementActive = false;
 		
@@ -110,7 +103,8 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 		animationVersions = new ArrayList<AnimationSequence>();
 		updateAnimationParts();
 
-		((EntityObj) entityToRender).setCurrentItem(AnimationData.getAnimationItem(animation.getName()));   	
+		//Animation Item
+//		((EntityObj) entityToRender).setCurrentItem(AnimationData.getAnimationItem(animation.getName()));   	
 
 	}
 
@@ -168,12 +162,12 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 		keyframes.clear();
 		for(AnimationPart animpart : currentAnimation.getAnimations())
 		{
-			String partName = animpart.getPart().getName();
+			String partName = animpart.getPartName();
 			List<Keyframe> partKfs = keyframes.get(partName);
 			if(keyframes.get(partName) == null)
 				partKfs = new ArrayList<Keyframe>();			
-			Part mr = Util.getPartFromName(animpart.getPart().getName(), entityModel.parts);	
-			float[] defaults = animpart.getPart().getOriginalValues();
+			Part mr = Util.getPartFromName(animpart.getPartName(), entityModel.parts);	
+			float[] defaults = mr.getOriginalValues();
 			//If the movement starts at time zero, and the part isn't in its original position, add a keyframe at time zero.
 			if(animpart.getStartTime() == 0.0F)
 			{
@@ -206,8 +200,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 	{
 		super.onGuiClosed();
 		timelineFrame.dispose();
-		if(animationVersion != 0)
-			AnimationData.addChangedSequence(entityName, currentAnimation.getName());
+		FileHandler.saveAnimationSequence(animationFile, currentAnimation);
 	}
 
 	public void drawScreen(int par1, int par2, float par3)
@@ -388,23 +381,22 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 	private void updateAnimationParts()
 	{
 		//Create new animation object if new version
-		AnimationSequence sequence = new AnimationSequence(currentAnimation.getName());
+		AnimationSequence sequence = new AnimationSequence(entityName, currentAnimation.getName());
 		//Generate animation from keyframes.
 		for(String partName : keyframes.keySet())
 		{
-			Part part = Util.getPartFromName(partName, entityModel.parts);
 			for(Keyframe kf : keyframes.get(partName))
 			{
 				if(kf.frameTime != 0.0F)
 				{
 					Keyframe prevKf = kf.getPreviousKeyframe();
-					sequence.addAnimation(new AnimationPart(prevKf.frameTime, kf.frameTime, prevKf.values, kf.values, part));
+					sequence.addAnimation(new AnimationPart(prevKf.frameTime, kf.frameTime, prevKf.values, kf.values, partName));
 				}
-				else if(doesPartOnlyHaveOneKeyframe(part.getName()))
+				else if(doesPartOnlyHaveOneKeyframe(partName))
 				{
 					//Used for parts that only have one keyframe and where that keyframe is at the beginning 
 					//The part will maintain that rotation throughout the whole animation.
-					sequence.addAnimation(new AnimationPart(0.0F, getLastKeyFrameTime(), kf.values, kf.values, part));
+					sequence.addAnimation(new AnimationPart(0.0F, getLastKeyFrameTime(), kf.values, kf.values, partName));
 				}
 			}
 		}
@@ -414,7 +406,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 
 	private void updateAnimationFPS(int fps)
 	{
-		AnimationSequence sequence = new AnimationSequence(currentAnimation.getName());
+		AnimationSequence sequence = new AnimationSequence(entityName, currentAnimation.getName());
 		sequence.setAnimations(currentAnimation.getAnimations());
 		sequence.setFPS(fps);
 		updateAnimation(sequence);
@@ -439,9 +431,6 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 		animationVersions.add(sequence);
 		animationVersion = animationVersions.size() - 1;
 		currentAnimation = sequence;
-
-		//Update animation sequence in AnimationData.
-		AnimationData.addSequence(entityName, currentAnimation);
 
 		onAnimationLengthChange();
 	}
@@ -468,7 +457,6 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 		{
 			animationVersion --;
 			currentAnimation = animationVersions.get(animationVersion);
-			AnimationData.addSequence(entityName, currentAnimation);
 			loadKeyframes();
 			timelineFrame.refresh();
 			onFPSChange(currentAnimation.getFPS());
@@ -483,7 +471,6 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 		{
 			animationVersion ++;
 			currentAnimation = animationVersions.get(animationVersion);
-			AnimationData.addSequence(entityName, currentAnimation);
 			loadKeyframes();
 			timelineFrame.refresh();
 			onFPSChange(currentAnimation.getFPS());
@@ -588,7 +575,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 	void close()
 	{
 		mc.displayGuiScreen(new GuiBlack());
-		GuiHandler.mainGui = new MainGUI();
+		new HomeFrame().display();
 	}
 
 	void onFPSChange(int fps)

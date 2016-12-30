@@ -1,6 +1,5 @@
 package com.nthrootsoftware.mcea.gui;
 
-import com.nthrootsoftware.mcea.animation.AnimationData;
 import com.nthrootsoftware.mcea.gui.sequence.timeline.GuiAnimationTimeline;
 import com.nthrootsoftware.mcea.render.objRendering.EntityObj;
 
@@ -32,7 +31,8 @@ public class GuiInventoryChooseItem extends GuiInventory
     public void setItemStack(ItemStack itemStack)
     {
     	this.entity.setCurrentItem(itemStack); 
-    	AnimationData.setAnimationItem(parentGui.currentAnimation.getName(), Item.getIdFromItem(itemStack.getItem()));
+    	//TODO animation item
+//    	AnimationData.setAnimationItem(parentGui.currentAnimation.getName(), Item.getIdFromItem(itemStack.getItem()));
     	this.mc.displayGuiScreen(this.parentGui);
     	this.parentGui.loadFrames();
     }
