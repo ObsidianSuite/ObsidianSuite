@@ -1,6 +1,10 @@
 package com.nthrootsoftware.mcea.data;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -8,8 +12,11 @@ import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
 
+import com.nthrootsoftware.mcea.file.FileHandler;
 import com.nthrootsoftware.mcea.render.objRendering.ModelObj;
 import com.nthrootsoftware.mcea.render.objRendering.RenderObj;
+
+import net.minecraft.nbt.CompressedStreamTools;
 
 public class ModelHandler 
 {
@@ -17,7 +24,7 @@ public class ModelHandler
 	private static Map<String, ModelObj> models = new HashMap<String, ModelObj>();
 
 	public static RenderObj modelRenderer = new RenderObj();
-	
+
 	public static String loadModelFile(File file)
 	{
 		copyFileToPersistentMemory(file);
@@ -25,12 +32,12 @@ public class ModelHandler
 		updateRenderer(model.entityName);
 		return model.entityName;
 	}
-	
+
 	public static void loadFileFromPersistence(File file)
 	{
 		importModel(file);
 	}
-	
+
 	private static ModelObj importModel(File file)
 	{
 		String fileName = file.getName();
@@ -39,7 +46,6 @@ public class ModelHandler
 		models.put(model.entityName, model);
 		return model;
 	}
-	
 
 	public static void updateRenderer(String entityName)
 	{
@@ -50,20 +56,69 @@ public class ModelHandler
 	{
 		return models.get(entityName);
 	}
-	
+
 	public static Set<String> getModelList()
 	{
 		return models.keySet();
 	}
-	
+
 	private static void copyFileToPersistentMemory(File file)
 	{			
 		File copy = new File(Persistence.modelFolder, file.getName());
 		try 
 		{
+			if(copy.exists())
+				copy.delete();
 			FileUtils.copyFile(file, copy);
 		} 
 		catch (IOException e) {e.printStackTrace();}
 	}
+
+	public static void saveFiles()
+	{
+		for(String s : models.keySet())
+			makeModelFile(s);
+	}
 	
+	private static void makeModelFile(String entityName)
+	{
+		File f = new File(Persistence.modelFolder, entityName + "." + FileHandler.modelExtension);
+		String textAfterNBT = getTextAfterNBT(f);
+		
+		try 
+		{
+			CompressedStreamTools.write(ModelHandler.getModel(entityName).createNBTTag(), f);
+			FileWriter fw = new FileWriter(f, true);
+			fw.write(textAfterNBT);
+			fw.close();
+		} 
+		catch (IOException e) {e.printStackTrace();}
+	}
+
+	private static String getTextAfterNBT(File f)
+	{
+		String text = "\n";
+		
+		try 
+		{
+			BufferedReader reader = new BufferedReader(new FileReader(f));
+
+			boolean nbtFinished = false;
+			String currentLine;
+			while((currentLine = reader.readLine()) != null)
+			{
+				if(currentLine.contains("# Model #"))
+					nbtFinished = true;
+				
+				if(nbtFinished)
+					text += currentLine + "\n";
+			}
+			reader.close();
+		} 
+		catch (FileNotFoundException e) {e.printStackTrace();} 
+		catch (IOException e) {e.printStackTrace();}
+		
+		return text;
+	}
+
 }

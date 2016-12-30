@@ -5,6 +5,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.nthrootsoftware.mcea.MCEA_Main;
 import com.nthrootsoftware.mcea.file.FileHandler;
@@ -20,6 +22,8 @@ public class Persistence
 
 	public static void save()
 	{
+		ModelHandler.saveFiles();
+		
 		NBTTagCompound nbt = new NBTTagCompound();
 		if(FileHandler.lastModelDirectory != null)
 			nbt.setString("lastModelDir", FileHandler.lastModelDirectory.getAbsolutePath());
@@ -52,11 +56,12 @@ public class Persistence
 		else
 			modelFolder.mkdirs();
 	}
+	
 
 	/**
 	 * Write an NBTTagCompound to a file.
 	 */
-	private static void writeNBTToFile(NBTTagCompound nbt, File file)
+	public static void writeNBTToFile(NBTTagCompound nbt, File file)
 	{
 		try 
 		{
