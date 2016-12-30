@@ -390,13 +390,13 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 				if(kf.frameTime != 0.0F)
 				{
 					Keyframe prevKf = kf.getPreviousKeyframe();
-					sequence.addAnimation(new AnimationPart(prevKf.frameTime, kf.frameTime, prevKf.values, kf.values, partName));
+					sequence.addAnimation(new AnimationPart(prevKf.frameTime, kf.frameTime, prevKf.values, kf.values, Util.getPartFromName(partName, entityModel.parts)));
 				}
 				else if(doesPartOnlyHaveOneKeyframe(partName))
 				{
 					//Used for parts that only have one keyframe and where that keyframe is at the beginning 
 					//The part will maintain that rotation throughout the whole animation.
-					sequence.addAnimation(new AnimationPart(0.0F, getLastKeyFrameTime(), kf.values, kf.values, partName));
+					sequence.addAnimation(new AnimationPart(0.0F, getLastKeyFrameTime(), kf.values, kf.values, Util.getPartFromName(partName, entityModel.parts)));
 				}
 			}
 		}

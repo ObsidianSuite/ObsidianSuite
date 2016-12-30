@@ -3,6 +3,7 @@ package com.nthrootsoftware.mcea.animation;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.nthrootsoftware.mcea.Util;
 import com.nthrootsoftware.mcea.render.objRendering.ModelObj;
 import com.nthrootsoftware.mcea.render.objRendering.parts.Part;
 
@@ -156,16 +157,6 @@ public class AnimationSequence
 					lastAnimation = s;
 		}
 		return lastAnimation;
-	}
-	
-	public AnimationSequence copy(String newName)
-	{
-		AnimationSequence seq = new AnimationSequence(entityName, newName);
-		
-		for(AnimationPart p : animations)
-			seq.addAnimation(p.copy());
-		
-		return seq;
 	}
 
 	public NBTTagCompound getSaveData() 
