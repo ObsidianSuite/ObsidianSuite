@@ -52,8 +52,6 @@ public class EventHandler
 		{
 			Minecraft.getMinecraft().displayGuiScreen(new GuiBlack());
 			new HomeFrame().display();
-//			if(GuiHandler.loginGUI == null)
-//				GuiHandler.loginGUI = new LoginGUI();
 		}
 	}
 

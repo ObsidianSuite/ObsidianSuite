@@ -3,8 +3,6 @@ package com.nthrootsoftware.mcea.render.objRendering;
 import org.lwjgl.opengl.GL11;
 
 import com.nthrootsoftware.mcea.Util;
-import com.nthrootsoftware.mcea.data.ModelHandler;
-import com.nthrootsoftware.mcea.item.ModelLargeShield;
 import com.nthrootsoftware.mcea.render.objRendering.parts.PartObj;
 import com.nthrootsoftware.mcea.render.objRendering.parts.PartRotation;
 
@@ -23,15 +21,11 @@ import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 
-
 @SideOnly(Side.CLIENT)
 public class RenderObj extends RenderLiving
 {
 	private ModelObj modelObj;
-		
-	private static final ModelLargeShield shieldModel = new ModelLargeShield();
-	private static final ResourceLocation shieldTexture = new ResourceLocation("mod_pxy:textures/models/L_shield.png");
-	
+			
 	public RenderObj() 
 	{
 		super(null, 0.5F);
@@ -166,22 +160,4 @@ public class RenderObj extends RenderLiving
 			GL11.glPopMatrix();
 		}
 	}
-
-	public void renderShield()
-	{
-		Minecraft mc = Minecraft.getMinecraft();
-		EntityPlayer player = mc.thePlayer;
-
-		GL11.glPushMatrix();
-		Minecraft.getMinecraft().renderEngine.bindTexture(shieldTexture);
-//		Util.getPartObjFromName("chest", modelObj.parts).postRender(0.0625f);
-//		Util.getPartObjFromName("armupl", modelObj.parts).postRender(0.0625f);
-//		Util.getPartObjFromName("armlwl", modelObj.parts).postRender(0.0625f);
-		GL11.glTranslatef(-0.375F, 0.0F, 0.0F); 
-		shieldModel.render(player, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0625F);
-		GL11.glPopMatrix();
-	}
-	
-	
-
 }
