@@ -117,7 +117,7 @@ public class AnimationSequence
 				{
 					for(AnimationPart s : this.animations)
 					{
-						if(!s.getPartName().equals(exceptionPartName) && time >= s.getStartTime() && time <= s.getEndTime())
+						if(s.getPartName().equals(part.getName()) && time >= s.getStartTime() && time <= s.getEndTime())
 							s.animatePart(part, time - s.getStartTime());
 					}
 				}

@@ -41,7 +41,7 @@ public class ModelHandler
 	}
 	
 
-	private static void updateRenderer(String entityName)
+	public static void updateRenderer(String entityName)
 	{
 		modelRenderer.setModel(models.get(entityName));
 	}
