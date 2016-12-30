@@ -17,19 +17,20 @@ import com.nthrootsoftware.mcea.animation.AnimationSequence;
 import com.nthrootsoftware.mcea.data.ModelHandler;
 import com.nthrootsoftware.mcea.file.FileChooser;
 import com.nthrootsoftware.mcea.file.FileHandler;
+import com.nthrootsoftware.mcea.file.FileNotChosenException;
 import com.nthrootsoftware.mcea.gui.sequence.timeline.GuiAnimationTimeline;
 
 import net.minecraft.client.Minecraft;
 
 public class AnimationNewFrame extends MCEAFrame
 {
-	
+
 	private JComboBox<String> entityDropDown;
 	private JTextField nameTextField;
 	private JLabel locationLabel;
-	
+
 	private String[] entites = ModelHandler.getModelList().toArray(new String[0]);
-	
+
 	private File animationFolder;
 
 	public AnimationNewFrame()
@@ -44,7 +45,7 @@ public class AnimationNewFrame extends MCEAFrame
 		entityDropDown = new JComboBox<String>(entites);
 		nameTextField = new JTextField();
 		locationLabel = new JLabel("No location set");
-		
+
 		entityDropDown.setPreferredSize(new Dimension(100,25));
 		locationLabel.setPreferredSize(new Dimension(100,25));
 
@@ -57,7 +58,7 @@ public class AnimationNewFrame extends MCEAFrame
 				chooseFolderPressed();
 			}
 		});
-		
+
 		JButton create = new JButton("Create");
 		create.addActionListener(new ActionListener()
 		{
@@ -77,7 +78,7 @@ public class AnimationNewFrame extends MCEAFrame
 				cancelPressed();
 			}
 		});
-		
+
 		create.setPreferredSize(chooseFolder.getPreferredSize());
 
 		GridBagConstraints c = new GridBagConstraints();
@@ -88,12 +89,12 @@ public class AnimationNewFrame extends MCEAFrame
 		c.anchor = GridBagConstraints.WEST;
 		c.fill = GridBagConstraints.BOTH;
 		c.insets = new Insets(2,5,2,5);
-		
+
 		//Entity
 		mainPanel.add(new JLabel("Entity"),c);
 		c.gridy = 1;
 		mainPanel.add(entityDropDown, c);
-		
+
 		//Folder location
 		c.gridy = 2;
 		mainPanel.add(new JLabel("Location"), c);
@@ -102,7 +103,7 @@ public class AnimationNewFrame extends MCEAFrame
 		mainPanel.add(locationLabel, c);
 		c.gridx = 1;
 		mainPanel.add(chooseFolder, c);
-		
+
 		//Animation name
 		c.gridx = 0;
 		c.gridy = 4;
@@ -110,7 +111,7 @@ public class AnimationNewFrame extends MCEAFrame
 		mainPanel.add(new JLabel("Name"),c);
 		c.gridy = 5;
 		mainPanel.add(nameTextField, c);
-		
+
 		//Buttons
 		c.gridwidth = 1;
 		c.gridy = 6;
@@ -119,15 +120,19 @@ public class AnimationNewFrame extends MCEAFrame
 		mainPanel.add(cancel,c);
 
 	}
-	
+
 	private void chooseFolderPressed()
 	{
-		animationFolder = FileChooser.chooseAnimationFolder(frame);
-		String path = animationFolder.getAbsolutePath();
-		locationLabel.setText(path);
-		locationLabel.setToolTipText(path);
-		frame.revalidate();
-		frame.repaint();
+		try
+		{
+			animationFolder = FileChooser.chooseAnimationFolder(frame);
+			String path = animationFolder.getAbsolutePath();
+			locationLabel.setText(path);
+			locationLabel.setToolTipText(path);
+			frame.revalidate();
+			frame.repaint();
+		}
+		catch(FileNotChosenException e){}
 	}
 
 	private void createPressed()

@@ -12,28 +12,28 @@ public class FileChooser
 
 	private static JFileChooser fc = new JFileChooser();
 
-	public static File loadModelFile(Component parent)
+	public static File loadModelFile(Component parent) throws FileNotChosenException
 	{
 		File modelFile = getLoadLocationFromUser(parent, FileHandler.lastModelDirectory, FileHandler.modelFilter, JFileChooser.FILES_ONLY);
 		FileHandler.lastModelDirectory = fc.getCurrentDirectory();
 		return modelFile;
 	}
 	
-	public static File loadAnimationFile(Component parent)
+	public static File loadAnimationFile(Component parent) throws FileNotChosenException
 	{
 		File animationFile = getLoadLocationFromUser(parent, FileHandler.lastAnimationDirectory, FileHandler.animationFilter, JFileChooser.FILES_ONLY);
 		FileHandler.lastAnimationDirectory = fc.getCurrentDirectory();
 		return animationFile;
 	}
 	
-	public static File chooseAnimationFolder(Component parentComponent)
+	public static File chooseAnimationFolder(Component parentComponent) throws FileNotChosenException
 	{
 		File animationFolder = getLoadLocationFromUser(parentComponent, FileHandler.lastAnimationDirectory, null, JFileChooser.DIRECTORIES_ONLY);
 		FileHandler.lastAnimationDirectory = fc.getCurrentDirectory();
 		return animationFolder;
 	}
 	
-	private static File getLoadLocationFromUser(Component parentComponent, File parentDirectory, FileNameExtensionFilter fileExtensionFilter, int fileSelectionMode)
+	private static File getLoadLocationFromUser(Component parentComponent, File parentDirectory, FileNameExtensionFilter fileExtensionFilter, int fileSelectionMode) throws FileNotChosenException
 	{
 		File file = null;
 		
@@ -47,28 +47,10 @@ public class FileChooser
 		
 		if (returnVal == JFileChooser.APPROVE_OPTION) 
 			file = fc.getSelectedFile();
+		else
+			throw new FileNotChosenException();
 		
 		return file;
-	}
-
-	private static File getSaveLocationFromUser(Component parent, File parentDirectory, FileNameExtensionFilter fileExtensionFilter)
-	{
-		File animationFile = null;
-		
-		if(FileHandler.lastAnimationDirectory != null)
-			fc.setCurrentDirectory(FileHandler.lastAnimationDirectory);
-		
-		int returnVal = fc.showSaveDialog(parent);
-		
-		if (returnVal == JFileChooser.APPROVE_OPTION) 
-			animationFile = fc.getSelectedFile();
-		
-		if(animationFile != null)
-			FileHandler.lastAnimationDirectory = animationFile.getParentFile();
-		else
-			FileHandler.lastAnimationDirectory = fc.getCurrentDirectory();
-		
-		return animationFile;
 	}
 	
 }

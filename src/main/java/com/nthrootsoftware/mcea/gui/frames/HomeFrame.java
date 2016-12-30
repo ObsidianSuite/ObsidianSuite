@@ -12,6 +12,7 @@ import com.nthrootsoftware.mcea.animation.AnimationSequence;
 import com.nthrootsoftware.mcea.data.ModelHandler;
 import com.nthrootsoftware.mcea.file.FileChooser;
 import com.nthrootsoftware.mcea.file.FileHandler;
+import com.nthrootsoftware.mcea.file.FileNotChosenException;
 import com.nthrootsoftware.mcea.gui.GuiBlack;
 import com.nthrootsoftware.mcea.gui.GuiPartSetup;
 import com.nthrootsoftware.mcea.gui.sequence.timeline.GuiAnimationTimeline;
@@ -21,13 +22,13 @@ import net.minecraft.client.Minecraft;
 
 public class HomeFrame extends MCEAFrame
 {
-		
+
 	public HomeFrame()
 	{
 		super("Home");
 		addComponents();
 	}
-	
+
 	@Override
 	protected void addComponents() 
 	{
@@ -40,7 +41,7 @@ public class HomeFrame extends MCEAFrame
 				newAnimationPressed();
 			}
 		});
-		
+
 		JButton openAnimationButton = new JButton("Open Animation");
 		openAnimationButton.addActionListener(new ActionListener() 
 		{	
@@ -50,7 +51,7 @@ public class HomeFrame extends MCEAFrame
 				openAnimationPressed();
 			}
 		});
-		
+
 		JButton importEntityButton = new JButton("Import Model");
 		importEntityButton.addActionListener(new ActionListener() 
 		{	
@@ -60,7 +61,7 @@ public class HomeFrame extends MCEAFrame
 				importModelPressed();
 			}
 		});
-		
+
 		JButton closeButton = new JButton("Close");
 		closeButton.addActionListener(new ActionListener() 
 		{	
@@ -70,7 +71,7 @@ public class HomeFrame extends MCEAFrame
 				closePressed();
 			}
 		});
-		
+
 		GridBagConstraints c = new GridBagConstraints();
 		c.gridx = 0;
 		c.gridy = 0;
@@ -84,7 +85,7 @@ public class HomeFrame extends MCEAFrame
 		c.gridy = 3;
 		mainPanel.add(closeButton,c);		
 	}
-	
+
 	private void newAnimationPressed()
 	{
 		frame.dispose();
@@ -93,18 +94,26 @@ public class HomeFrame extends MCEAFrame
 
 	private void openAnimationPressed()
 	{
-		File animationFile = FileChooser.loadAnimationFile(frame);
-		AnimationSequence sequence = FileHandler.getAnimationFromFile(animationFile);
-		frame.dispose();
-		Minecraft.getMinecraft().displayGuiScreen(new GuiAnimationTimeline(animationFile, "player", sequence));
+		try
+		{
+			File animationFile = FileChooser.loadAnimationFile(frame);
+			AnimationSequence sequence = FileHandler.getAnimationFromFile(animationFile);
+			frame.dispose();
+			Minecraft.getMinecraft().displayGuiScreen(new GuiAnimationTimeline(animationFile, "player", sequence));
+		}
+		catch(FileNotChosenException e){}
 	}
-	
+
 	private void importModelPressed()
 	{
-		File modelFile = FileChooser.loadModelFile(frame);
-		String entityName = ModelHandler.loadModelFile(modelFile);
-		frame.dispose();
-		Minecraft.getMinecraft().displayGuiScreen(new GuiPartSetup(entityName));
+		try
+		{
+			File modelFile = FileChooser.loadModelFile(frame);
+			String entityName = ModelHandler.loadModelFile(modelFile);
+			frame.dispose();
+			Minecraft.getMinecraft().displayGuiScreen(new GuiPartSetup(entityName));
+		}
+		catch(FileNotChosenException e){}
 	}
 
 	private void closePressed()
@@ -114,5 +123,5 @@ public class HomeFrame extends MCEAFrame
 		if(mc.currentScreen instanceof GuiBlack)
 			((GuiBlack) mc.currentScreen).initateClose();
 	}
-	
+
 }
