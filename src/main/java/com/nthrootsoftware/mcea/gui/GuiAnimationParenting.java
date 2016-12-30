@@ -36,9 +36,9 @@ public class GuiAnimationParenting extends GuiEntityRenderer
 	private ParentingFrame parentingFrame;
 	private RelationFrame relationFrame;
 
-	public GuiAnimationParenting(ModelObj entityModel)
+	public GuiAnimationParenting(String entityName)
 	{
-		super(entityModel);
+		super(entityName);
 		parentingFrame = new ParentingFrame();
 		relationFrame = new RelationFrame();
 	}

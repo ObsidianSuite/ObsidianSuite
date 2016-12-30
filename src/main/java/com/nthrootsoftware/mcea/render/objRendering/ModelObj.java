@@ -28,6 +28,7 @@ import com.nthrootsoftware.mcea.render.objRendering.parts.PartEntityPos;
 import com.nthrootsoftware.mcea.render.objRendering.parts.PartObj;
 import com.nthrootsoftware.mcea.render.objRendering.parts.PartRotation;
 
+import cpw.mods.fml.client.registry.RenderingRegistry;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.entity.Entity;
@@ -64,27 +65,20 @@ public class ModelObj extends ModelBase
 	public static final ResourceLocation pinkResLoc = new ResourceLocation("mod_mcea:defaultModelTextures/pink.png");
 	public static final ResourceLocation whiteResLoc = new ResourceLocation("mod_mcea:defaultModelTextures/white.png");
 
-	public ModelObj(String par0Str, File file)
-	{	
-		entityName = par0Str;
-		
-		File textureFile = DataHandler.getEntityFile(entityName, "png");
-		textureExists = textureFile.exists();
-		txtRL = DataHandler.getEntityResourceLocation(entityName);
-
-		parts = createPartObjList(this, model.groupObjects);
-		parts.add(new PartEntityPos(this));
-		if(par0Str.equals("player"))
-		{
-			parts.add(new PartRotation(this, "prop_rot"));
-			parts.add(new Part(this, "prop_trans"));
-		}
+	public ModelObj(String entityName, File file)
+	{			
+		this.entityName = entityName;
 		
 		hightlightedParts = new ArrayList<PartObj>();
 		bends = new ArrayList<Bend>();
 		defaults = Maps.newHashMap();
 		
 		loadFromFile(file);
+		
+		File textureFile = DataHandler.getEntityFile(entityName, "png");
+		textureExists = textureFile.exists();
+		txtRL = DataHandler.getEntityResourceLocation(entityName);
+				
 		init();
 	}
 
@@ -155,6 +149,15 @@ public class ModelObj extends ModelBase
 			fw.close();
 			
 			loadModel(modelData);
+			
+			parts = createPartObjList(this, model.groupObjects);
+			parts.add(new PartEntityPos(this));
+			if(entityName.equals("player"))
+			{
+				parts.add(new PartRotation(this, "prop_rot"));
+				parts.add(new Part(this, "prop_trans"));
+			}
+			
 			loadAdditionalPartData(partData);
 			loadSetup(CompressedStreamTools.read(tmp));
 			

@@ -1,11 +1,9 @@
 package com.nthrootsoftware.mcea.render.objRendering;
 
-import java.io.File;
-import java.util.HashMap;
-
 import org.lwjgl.opengl.GL11;
 
 import com.nthrootsoftware.mcea.Util;
+import com.nthrootsoftware.mcea.distribution.ModelHandler;
 import com.nthrootsoftware.mcea.item.ModelLargeShield;
 import com.nthrootsoftware.mcea.render.objRendering.parts.PartObj;
 import com.nthrootsoftware.mcea.render.objRendering.parts.PartRotation;
@@ -33,18 +31,22 @@ public class RenderObj extends RenderLiving
 		
 	private static final ModelLargeShield shieldModel = new ModelLargeShield();
 	private static final ResourceLocation shieldTexture = new ResourceLocation("mod_pxy:textures/models/L_shield.png");
-	private ResourceLocation properTexture;
 	
-	public RenderObj(ModelObj obj) 
+	public RenderObj() 
 	{
 		super(null, 0.5F);
-		this.modelObj = obj;
 	}
 
 	@Override
 	protected ResourceLocation getEntityTexture(Entity entity) 
 	{
 		return modelObj.getTexture();
+	}
+	
+	public void setModel(ModelObj model)
+	{
+		modelObj = model;
+		mainModel = model;
 	}
 	
 	@Override

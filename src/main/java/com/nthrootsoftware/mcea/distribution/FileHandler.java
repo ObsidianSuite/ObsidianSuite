@@ -17,7 +17,7 @@ import net.minecraft.nbt.NBTTagCompound;
 public class FileHandler 
 {
 
-	public static final String modelExtension = "obj";
+	public static final String modelExtension = "mcm";
 	public static final String entityExtension = "mce";
 	public static final String animationExtension = "mca";
 	

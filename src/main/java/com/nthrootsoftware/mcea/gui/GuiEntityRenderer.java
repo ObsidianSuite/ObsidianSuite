@@ -1,24 +1,19 @@
 package com.nthrootsoftware.mcea.gui;
 
-import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.lwjgl.BufferUtils;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
-import org.lwjgl.util.glu.GLU;
 
 import com.nthrootsoftware.mcea.MCEA_Main;
 import com.nthrootsoftware.mcea.Util;
 import com.nthrootsoftware.mcea.animation.AnimationData;
+import com.nthrootsoftware.mcea.distribution.ModelHandler;
 import com.nthrootsoftware.mcea.render.objRendering.EntityObj;
 import com.nthrootsoftware.mcea.render.objRendering.ModelObj;
-import com.nthrootsoftware.mcea.render.objRendering.RayTrace;
-import com.nthrootsoftware.mcea.render.objRendering.RenderObj;
 import com.nthrootsoftware.mcea.render.objRendering.parts.Part;
 import com.nthrootsoftware.mcea.render.objRendering.parts.PartObj;
 
@@ -30,7 +25,6 @@ import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.util.Vec3;
 
 public class GuiEntityRenderer extends GuiBlack
 {
@@ -58,13 +52,13 @@ public class GuiEntityRenderer extends GuiBlack
 
 	public int gridMinX = -1, gridMaxX = 1, gridMinZ = -1, gridMaxZ = 1;
 	
-	public GuiEntityRenderer(ModelObj model)
+	public GuiEntityRenderer(String entityName)
 	{
 		super();
 
 		//Init variables.
-		this.entityName = model.entityName;
-		this.entityModel = model;
+		this.entityName = entityName;
+		this.entityModel = ModelHandler.getModel(entityName);
 		entityToRender = new EntityObj(Minecraft.getMinecraft().theWorld, entityName);
 
 		//Setup parts list.

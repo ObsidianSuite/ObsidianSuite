@@ -31,9 +31,9 @@ public class GuiEntityRendererWithRotation extends GuiEntityRenderer
 	private Vec3 initialRotationGuidePoint;
 	private double prevRotationWheelDelta = 0.0F;
 
-	public GuiEntityRendererWithRotation(ModelObj modelObj)
+	public GuiEntityRendererWithRotation(String entityName)
 	{
-		super(modelObj);
+		super(entityName);
 	}
 
 	/* ---------------------------------------------------- *

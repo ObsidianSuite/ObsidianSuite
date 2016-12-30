@@ -90,9 +90,9 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 	
 	private File animationFile;
 
-	public GuiAnimationTimeline(File animationFile, ModelObj model, AnimationSequence animation)
+	public GuiAnimationTimeline(File animationFile, String entityName, AnimationSequence animation)
 	{
-		super(model);
+		super(entityName);
 
 		this.currentAnimation = animation;
 		this.animationFile = animationFile;

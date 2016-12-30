@@ -11,8 +11,11 @@ import javax.swing.JButton;
 import com.nthrootsoftware.mcea.animation.AnimationSequence;
 import com.nthrootsoftware.mcea.distribution.FileChooser;
 import com.nthrootsoftware.mcea.distribution.FileHandler;
+import com.nthrootsoftware.mcea.distribution.ModelHandler;
 import com.nthrootsoftware.mcea.gui.GuiBlack;
+import com.nthrootsoftware.mcea.gui.GuiPartSetup;
 import com.nthrootsoftware.mcea.gui.sequence.timeline.GuiAnimationTimeline;
+import com.nthrootsoftware.mcea.render.objRendering.ModelObj;
 
 import net.minecraft.client.Minecraft;
 
@@ -48,23 +51,13 @@ public class HomeFrame extends MCEAFrame
 			}
 		});
 		
-		JButton openEntityButton = new JButton("Open Entity");
-		openEntityButton.addActionListener(new ActionListener() 
-		{	
-			@Override
-			public void actionPerformed(ActionEvent e) 
-			{
-				openEntityPressed();
-			}
-		});
-		
 		JButton importEntityButton = new JButton("Import Model");
 		importEntityButton.addActionListener(new ActionListener() 
 		{	
 			@Override
 			public void actionPerformed(ActionEvent e) 
 			{
-				importEntityPressed();
+				importModelPressed();
 			}
 		});
 		
@@ -87,10 +80,8 @@ public class HomeFrame extends MCEAFrame
 		c.gridy = 1;
 		mainPanel.add(openAnimationButton,c);
 		c.gridy = 2;
-		mainPanel.add(openEntityButton,c);
-		c.gridy = 3;
 		mainPanel.add(importEntityButton,c);		
-		c.gridy = 4;
+		c.gridy = 3;
 		mainPanel.add(closeButton,c);		
 	}
 	
@@ -108,14 +99,14 @@ public class HomeFrame extends MCEAFrame
 		Minecraft.getMinecraft().displayGuiScreen(new GuiAnimationTimeline(animationFile, "player", sequence));
 	}
 	
-	private void openEntityPressed()
+	private void importModelPressed()
 	{
-		
-	}
-	
-	private void importEntityPressed()
-	{
-		
+		File animationFile = FileChooser.loadModelFile(frame);
+		ModelObj model = new ModelObj("player", animationFile);
+		ModelHandler.importModel(model);
+		ModelHandler.updateRenderer("player");
+		frame.dispose();
+		Minecraft.getMinecraft().displayGuiScreen(new GuiPartSetup("player"));
 	}
 
 	private void closePressed()

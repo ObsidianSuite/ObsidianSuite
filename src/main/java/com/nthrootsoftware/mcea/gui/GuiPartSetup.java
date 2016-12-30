@@ -37,9 +37,9 @@ public class GuiPartSetup extends GuiEntityRenderer
 	private PartGroups partGroups;
 	private SetupFrame setupFrame;
 
-	public GuiPartSetup(ModelObj model) 
+	public GuiPartSetup(String entityName) 
 	{
-		super(model);		
+		super(entityName);		
 		partGroups = entityModel.partGroups;
 		setupFrame = new SetupFrame();
 	}

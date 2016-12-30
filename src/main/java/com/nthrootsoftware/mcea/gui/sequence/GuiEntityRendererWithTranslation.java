@@ -28,9 +28,9 @@ public class GuiEntityRendererWithTranslation extends GuiEntityRendererWithRotat
 	private Vec3 initialTranslationGuidePoint;
 	private double prevTranslationDelta = 0.0F;
 
-	public GuiEntityRendererWithTranslation(ModelObj model) 
+	public GuiEntityRendererWithTranslation(String entityName) 
 	{
-		super(model);
+		super(entityName);
 	}
 
 	/* ---------------------------------------------------- *
