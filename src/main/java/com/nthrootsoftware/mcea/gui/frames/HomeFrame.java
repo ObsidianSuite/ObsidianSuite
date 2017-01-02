@@ -52,6 +52,16 @@ public class HomeFrame extends MCEAFrame
 			}
 		});
 
+		JButton modelListButton = new JButton("Model List");
+		modelListButton.addActionListener(new ActionListener() 
+		{	
+			@Override
+			public void actionPerformed(ActionEvent e) 
+			{
+				modelListPressed();
+			}
+		});		
+		
 		JButton importEntityButton = new JButton("Import Model");
 		importEntityButton.addActionListener(new ActionListener() 
 		{	
@@ -60,7 +70,7 @@ public class HomeFrame extends MCEAFrame
 			{
 				importModelPressed();
 			}
-		});
+		});		
 
 		JButton closeButton = new JButton("Close");
 		closeButton.addActionListener(new ActionListener() 
@@ -81,8 +91,10 @@ public class HomeFrame extends MCEAFrame
 		c.gridy = 1;
 		mainPanel.add(openAnimationButton,c);
 		c.gridy = 2;
-		mainPanel.add(importEntityButton,c);		
+		mainPanel.add(modelListButton,c);	
 		c.gridy = 3;
+		mainPanel.add(importEntityButton,c);		
+		c.gridy = 4;
 		mainPanel.add(closeButton,c);		
 	}
 
@@ -104,6 +116,12 @@ public class HomeFrame extends MCEAFrame
 		catch(FileNotChosenException e){}
 	}
 
+	private void modelListPressed()
+	{
+		frame.dispose();
+		new ModelListFrame().display();
+	}
+	
 	private void importModelPressed()
 	{
 		frame.dispose();
