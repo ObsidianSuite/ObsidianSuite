@@ -142,7 +142,7 @@ public class AnimationNewFrame extends MCEAFrame
 		if(!animationName.equals(""))
 		{
 			File animationFile = new File(animationFolder, animationName + "." + FileHandler.animationExtension);
-			if(animationFile.exists())
+			if(!animationFile.exists())
 			{
 				AnimationSequence sequence = new AnimationSequence(entityName, animationName);
 				frame.dispose();
