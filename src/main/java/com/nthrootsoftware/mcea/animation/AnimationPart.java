@@ -162,7 +162,7 @@ public class AnimationPart
 		animationData.setFloat("ZEnd", Float.parseFloat(df.format(this.endPosition[2])));
 		animationData.setFloat("StartTime", Float.parseFloat(df.format(this.startTime)));
 		animationData.setFloat("FinishTime", Float.parseFloat(df.format(this.endTime)));
-		animationData.setString("PartName", partName);
+		animationData.setString("Part", partName);
 		return animationData;
 	}
 
@@ -178,7 +178,7 @@ public class AnimationPart
 		this.endPosition[2] = compound.getFloat("ZEnd");
 		this.startTime = compound.getFloat("StartTime");
 		this.endTime = compound.getFloat("FinishTime");
-		this.partName = compound.getString("PartName");
+		this.partName = compound.getString("Part");
 	}
 
 

@@ -26,6 +26,13 @@ public class FileChooser
 		return animationFile;
 	}
 	
+	public static File loadImportFile(Component parent, FileNameExtensionFilter filter) throws FileNotChosenException
+	{
+		File modelFile = getLoadLocationFromUser(parent, FileHandler.lastModelDirectory, filter, JFileChooser.FILES_ONLY);
+		FileHandler.lastModelDirectory = fc.getCurrentDirectory();
+		return modelFile;
+	}
+	
 	public static File chooseAnimationFolder(Component parentComponent) throws FileNotChosenException
 	{
 		File animationFolder = getLoadLocationFromUser(parentComponent, FileHandler.lastAnimationDirectory, null, JFileChooser.DIRECTORIES_ONLY);

@@ -27,6 +27,7 @@ public class ModelHandler
 
 	public static String loadModelFile(File file)
 	{
+		System.out.println(file.getAbsolutePath());
 		copyFileToPersistentMemory(file);
 		ModelObj model = importModel(file);
 		updateRenderer(model.entityName);

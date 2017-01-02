@@ -141,7 +141,7 @@ public class ModelObj extends ModelBase
 			fw.close();
 			
 			loadModel(modelData);
-			
+						
 			parts = createPartObjList(this, model.groupObjects);
 			parts.add(new PartEntityPos(this));
 			if(entityName.equals("player"))
@@ -212,6 +212,8 @@ public class ModelObj extends ModelBase
 	
 	private void loadSetup(NBTTagCompound nbt)
 	{
+		System.out.println(nbt);
+		
 		parenting = new AnimationParenting();
 		parenting.loadData(nbt.getCompoundTag("Parenting"), this);
 
@@ -446,9 +448,7 @@ public class ModelObj extends ModelBase
 	{
 		ArrayList<Part> parts = new ArrayList<Part>();
 		for(GroupObject gObj : groupObjects)
-		{
 			parts.add(new PartObj(model, gObj));
-		}
 		return parts;
 	}
 	
@@ -456,7 +456,7 @@ public class ModelObj extends ModelBase
 	{
 		NBTTagCompound nbt = new NBTTagCompound();
 		nbt.setTag("Parenting", parenting.getSaveData());
-		nbt.setTag("PartGroups", partGroups.getSaveData());
+		nbt.setTag("Groups", partGroups.getSaveData());
 		return nbt;
 	}
 
