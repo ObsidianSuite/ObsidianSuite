@@ -19,9 +19,12 @@ public class FileHandler
 
 	public static final String modelExtension = "mcm";
 	public static final String animationExtension = "mca";
+	public static final String textureExtension = "png";
+
 	
 	public static final FileNameExtensionFilter modelFilter = new FileNameExtensionFilter("MCEA Models", modelExtension);
 	public static final FileNameExtensionFilter animationFilter = new FileNameExtensionFilter("MCEA Animations", animationExtension);
+	public static final FileNameExtensionFilter textureFilter = new FileNameExtensionFilter("PNG", textureExtension);
 
 	public static File lastModelDirectory;
 	public static File lastAnimationDirectory;

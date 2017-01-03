@@ -44,7 +44,7 @@ public class Util
 				return part;
 			}
 		}
-		throw new RuntimeException("No part found for " + name + ".");
+		throw new RuntimeException("No part found for '" + name + "'");
 	}
 	
 	public static PartObj getPartObjFromName(String name, ArrayList<Part> parts) 

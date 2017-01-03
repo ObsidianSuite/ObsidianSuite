@@ -30,13 +30,13 @@ public class AnimationPart
 		loadData(compound);
 	}
 
-	public AnimationPart(float startTime, float endTime, float[] startPos, float[] endPos, String partName)
+	public AnimationPart(float startTime, float endTime, float[] startPos, float[] endPos, Part part)
 	{
 		this.startTime = startTime;
 		this.endTime = endTime;
 		this.startPosition = startPos;
 		this.endPosition = endPos;
-		this.partName = partName;
+		this.partName = part.getName();
 
 		this.startQuart = MathHelper.eulerToQuarternion(startPos[0]/180F*Math.PI, startPos[1]/180F*Math.PI, startPos[2]/180F*Math.PI);
 		this.endQuart = MathHelper.eulerToQuarternion(endPos[0]/180F*Math.PI, endPos[1]/180F*Math.PI, endPos[2]/180F*Math.PI);
@@ -49,17 +49,17 @@ public class AnimationPart
 			if(dT == 0)
 				dT = 1;
 			float dif = endPos[i] - startPos[i];
-			//TODO is this needed?
-//			if(part instanceof PartObj)
-//			{
-//				if(Math.abs(dif) > Math.PI)
-//				{
-//					if(dif < 0)
-//						dif += 2*Math.PI;
-//					else
-//						dif -= 2*Math.PI;
-//				}
-//			}
+			//Keep rotation within range.
+			if(part instanceof PartObj)
+			{
+				if(Math.abs(dif) > Math.PI)
+				{
+					if(dif < 0)
+						dif += 2*Math.PI;
+					else
+						dif -= 2*Math.PI;
+				}
+			}
 			this.movement[i] = dif/dT;
 		}
 	}
@@ -146,12 +146,6 @@ public class AnimationPart
 		return false;
 	}
 	
-
-	public AnimationPart copy() 
-	{
-		return new AnimationPart(startTime, endTime, startPosition.clone(), endPosition.clone(), partName);
-	}
-	
 	public String getPartName() 
 	{
 		return partName;
@@ -168,7 +162,7 @@ public class AnimationPart
 		animationData.setFloat("ZEnd", Float.parseFloat(df.format(this.endPosition[2])));
 		animationData.setFloat("StartTime", Float.parseFloat(df.format(this.startTime)));
 		animationData.setFloat("FinishTime", Float.parseFloat(df.format(this.endTime)));
-		animationData.setString("PartName", partName);
+		animationData.setString("Part", partName);
 		return animationData;
 	}
 
@@ -184,7 +178,7 @@ public class AnimationPart
 		this.endPosition[2] = compound.getFloat("ZEnd");
 		this.startTime = compound.getFloat("StartTime");
 		this.endTime = compound.getFloat("FinishTime");
-		this.partName = compound.getString("PartName");
+		this.partName = compound.getString("Part");
 	}
 
 

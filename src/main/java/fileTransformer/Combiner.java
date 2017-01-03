@@ -22,9 +22,7 @@ public class Combiner
 	{
 		try {
 			new Combiner().combine();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (IOException e) {			e.printStackTrace();
 		}
 	}
 

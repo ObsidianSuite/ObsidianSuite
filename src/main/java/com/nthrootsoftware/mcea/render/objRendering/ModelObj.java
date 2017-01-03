@@ -59,17 +59,18 @@ public class ModelObj extends ModelBase
 	public static final ResourceLocation pinkResLoc = new ResourceLocation("mod_mcea:defaultModelTextures/pink.png");
 	public static final ResourceLocation whiteResLoc = new ResourceLocation("mod_mcea:defaultModelTextures/white.png");
 
-	public ModelObj(String entityName, File file)
+	public ModelObj(String entityName, File modelFile, ResourceLocation texture)
 	{			
 		this.entityName = entityName;
 		
 		hightlightedParts = new ArrayList<PartObj>();
 		bends = new ArrayList<Bend>();
 		defaults = Maps.newHashMap();
+		parenting = new AnimationParenting();
 		
-		loadFromFile(file);
+		loadFromFile(modelFile);
 		
-		txtRL = whiteResLoc;//DataHandler.getEntityResourceLocation(entityName);
+		txtRL = texture;
 				
 		init();
 	}
@@ -128,33 +129,30 @@ public class ModelObj extends ModelBase
 					}
 				}
 			}
-
-			//Write nbt data to temp file so it can be read by compressed stream tools.
-			File tmp = new File("tmp");
-			if(!tmp.exists())
-				tmp.createNewFile();
-			
-			FileWriter fw = new FileWriter(tmp);
-			BufferedWriter bw = new BufferedWriter(fw);
-			bw.write(nbtData);
-			bw.close();
-			fw.close();
 			
 			loadModel(modelData);
-			
-			parts = createPartObjList(this, model.groupObjects);
-			parts.add(new PartEntityPos(this));
-			if(entityName.equals("player"))
-			{
-				parts.add(new PartRotation(this, "prop_rot"));
-				parts.add(new Part(this, "prop_trans"));
-			}
-			
 			loadAdditionalPartData(partData);
-			loadSetup(CompressedStreamTools.read(tmp));
 			
+			//Only load setup if it exists - it won't if file is fresh from Blender.
+			System.out.println("NBTData = '" + nbtData + "'");
+			if(!nbtData.equals(""))
+			{
+				//Write nbt data to temp file so it can be read by compressed stream tools.
+				File tmp = new File("tmp");
+				if(!tmp.exists())
+					tmp.createNewFile();
+				
+				FileWriter fw = new FileWriter(tmp);
+				BufferedWriter bw = new BufferedWriter(fw);
+				bw.write(nbtData);
+				bw.close();
+				fw.close();
+				
+				loadSetup(CompressedStreamTools.read(tmp));
+				
+				tmp.delete();				
+			}
 			reader.close();
-			tmp.delete();
 		} 
 		catch (FileNotFoundException e) {e.printStackTrace();} 
 		catch (IOException e) {e.printStackTrace();}
@@ -163,6 +161,14 @@ public class ModelObj extends ModelBase
 	private void loadModel(String modelData) throws ModelFormatException, UnsupportedEncodingException
 	{
 		model = new WavefrontObject("Test file", new ByteArrayInputStream(modelData.getBytes("UTF-8")));
+		parts = createPartObjList(this, model.groupObjects);
+		parts.add(new PartEntityPos(this));
+		if(entityName.equals("player"))
+		{
+			parts.add(new PartRotation(this, "prop_rot"));
+			parts.add(new Part(this, "prop_trans"));
+		}
+		partGroups = new PartGroups(this);
 	}
 	
 	private void loadAdditionalPartData(String partData)
@@ -211,11 +217,8 @@ public class ModelObj extends ModelBase
 	}
 	
 	private void loadSetup(NBTTagCompound nbt)
-	{
-		parenting = new AnimationParenting();
+	{		
 		parenting.loadData(nbt.getCompoundTag("Parenting"), this);
-
-		partGroups = new PartGroups(this);
 		partGroups.loadData(nbt.getCompoundTag("Groups"), this);
 	}
 
@@ -446,9 +449,7 @@ public class ModelObj extends ModelBase
 	{
 		ArrayList<Part> parts = new ArrayList<Part>();
 		for(GroupObject gObj : groupObjects)
-		{
 			parts.add(new PartObj(model, gObj));
-		}
 		return parts;
 	}
 	
@@ -456,7 +457,7 @@ public class ModelObj extends ModelBase
 	{
 		NBTTagCompound nbt = new NBTTagCompound();
 		nbt.setTag("Parenting", parenting.getSaveData());
-		nbt.setTag("PartGroups", partGroups.getSaveData());
+		nbt.setTag("Groups", partGroups.getSaveData());
 		return nbt;
 	}
 

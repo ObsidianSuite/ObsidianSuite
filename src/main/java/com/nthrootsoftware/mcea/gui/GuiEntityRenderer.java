@@ -69,6 +69,8 @@ public class GuiEntityRenderer extends GuiBlack
 
 		currentPartName = parts.get(0);
 		setupViews();
+		
+		ModelHandler.updateRenderer(entityName);
 	}
 
 	/* ---------------------------------------------------- *
