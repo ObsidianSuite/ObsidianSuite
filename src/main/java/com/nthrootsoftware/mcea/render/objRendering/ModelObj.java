@@ -59,7 +59,7 @@ public class ModelObj extends ModelBase
 	public static final ResourceLocation pinkResLoc = new ResourceLocation("mod_mcea:defaultModelTextures/pink.png");
 	public static final ResourceLocation whiteResLoc = new ResourceLocation("mod_mcea:defaultModelTextures/white.png");
 
-	public ModelObj(String entityName, File file)
+	public ModelObj(String entityName, File modelFile, ResourceLocation texture)
 	{			
 		this.entityName = entityName;
 		
@@ -67,9 +67,9 @@ public class ModelObj extends ModelBase
 		bends = new ArrayList<Bend>();
 		defaults = Maps.newHashMap();
 		
-		loadFromFile(file);
+		loadFromFile(modelFile);
 		
-		txtRL = whiteResLoc;//DataHandler.getEntityResourceLocation(entityName);
+		txtRL = texture;
 				
 		init();
 	}
@@ -211,9 +211,7 @@ public class ModelObj extends ModelBase
 	}
 	
 	private void loadSetup(NBTTagCompound nbt)
-	{
-		System.out.println(nbt);
-		
+	{		
 		parenting = new AnimationParenting();
 		parenting.loadData(nbt.getCompoundTag("Parenting"), this);
 

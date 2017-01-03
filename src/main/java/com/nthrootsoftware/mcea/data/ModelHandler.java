@@ -17,6 +17,7 @@ import com.nthrootsoftware.mcea.render.objRendering.ModelObj;
 import com.nthrootsoftware.mcea.render.objRendering.RenderObj;
 
 import net.minecraft.nbt.CompressedStreamTools;
+import net.minecraft.util.ResourceLocation;
 
 public class ModelHandler 
 {
@@ -25,27 +26,32 @@ public class ModelHandler
 
 	public static RenderObj modelRenderer = new RenderObj();
 
-	public static String loadModelFile(File file)
+	public static String importModel(File modelFile, File textureFile)
 	{
-		System.out.println(file.getAbsolutePath());
-		copyFileToPersistentMemory(file);
-		ModelObj model = importModel(file);
+		copyFileToPersistentMemory(modelFile);
+		copyFileToPersistentMemory(textureFile);
+		ModelObj model = loadModel(modelFile);
 		updateRenderer(model.entityName);
 		return model.entityName;
 	}
 
 	public static void loadFileFromPersistence(File file)
 	{
-		importModel(file);
+		loadModel(file);
 	}
 
-	private static ModelObj importModel(File file)
+	private static ModelObj loadModel(File modelFile)
 	{
-		String fileName = file.getName();
+		String fileName = modelFile.getName();
 		String entityName = fileName.substring(0,fileName.indexOf("."));
-		ModelObj model = new ModelObj(entityName, file);
+		ModelObj model = new ModelObj(entityName, modelFile, generateTextureResourceLocation(entityName));
 		models.put(model.entityName, model);
 		return model;
+	}
+	
+	private static ResourceLocation generateTextureResourceLocation(String entityName)
+	{
+		return new ResourceLocation(String.format("animation:models/%s.png", entityName));
 	}
 
 	public static void updateRenderer(String entityName)

@@ -100,7 +100,7 @@ public class ImportModelFrame extends MCEAFrame
 	
 	private void importPressed()
 	{
-		String entityName = ModelHandler.loadModelFile(modelFile);
+		String entityName = ModelHandler.importModel(modelFile, textureFile);
 		frame.dispose();
 		Minecraft.getMinecraft().displayGuiScreen(new GuiPartSetup(entityName));
 	}

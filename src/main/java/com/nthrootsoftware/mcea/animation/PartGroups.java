@@ -155,9 +155,7 @@ public class PartGroups
 
 	public void loadData(NBTTagCompound compound, ModelObj model) 
 	{	
-		System.out.println(compound);
 		NBTTagList partList = compound.getTagList("Groups", 10);
-		System.out.println(compound.getString("PartOrder"));
 		model.setPartOrderFromString(compound.getString("PartOrder"));
 		for (int i = 0; i < partList.tagCount(); i++)
 		{
