@@ -19,12 +19,12 @@
 # <pep8-80 compliant>
 
 bl_info = {
-    "name": "MCM Format",
-    "author": "Joe Early (DaBigJoe)",
+    "name": "Obsidian Model Format",
+    "author": "DaBigJoe",
     "version": (1, 0, 0),
     "blender": (2, 74, 0),
     "location": "File > Import-Export",
-    "description": "Export MCM files",
+    "description": "Export Obsidian Model files",
     "warning": "",
     "wiki_url": "",
     "support": 'COMMUNITY',
@@ -56,15 +56,15 @@ from bpy_extras.io_utils import (
 IOOBJOrientationHelper = orientation_helper_factory("IOOBJOrientationHelper", axis_forward='-Z', axis_up='Y')
 
 class ExportMCM(bpy.types.Operator, ExportHelper, IOOBJOrientationHelper):
-    """Save an MCM File"""
+    """Save an Obsidian Model File"""
 
-    bl_idname = "export.mcm"
-    bl_label = 'Export MCM'
+    bl_idname = "export.obm"
+    bl_label = 'Export OBM'
     bl_options = {'PRESET'}
 
-    filename_ext = ".mcm"
+    filename_ext = ".obm"
     filter_glob = StringProperty(
-            default="*.mcm;",
+            default="*.obm;",
             options={'HIDDEN'},
             )
 
@@ -147,7 +147,7 @@ class ExportMCM(bpy.types.Operator, ExportHelper, IOOBJOrientationHelper):
         return {'FINISHED'}
 
 def menu_func(self, context):
-    self.layout.operator(ExportMCM.bl_idname, text="MCM (.mcm)")
+    self.layout.operator(ExportMCM.bl_idname, text="OBM (.obm)")
 
 
 def register():
