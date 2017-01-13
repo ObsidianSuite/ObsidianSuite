@@ -42,9 +42,9 @@ public class Persistence
 	{
 		loadModels();
 
-		NBTTagCompound nbt = getNBTFromFile(saveFile);
 		if(saveFile.exists())
 		{
+			NBTTagCompound nbt = getNBTFromFile(saveFile);
 			if(nbt.hasKey("lastModelDir"))
 				FileHandler.lastModelDirectory = new File(nbt.getString("lastModelDir"));
 			if(nbt.hasKey("lastAnimationDir"))

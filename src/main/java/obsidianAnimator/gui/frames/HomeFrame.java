@@ -110,6 +110,7 @@ public class HomeFrame extends BaseFrame
 			File animationFile = FileChooser.loadAnimationFile(frame);
 			AnimationSequence sequence = FileHandler.getAnimationFromFile(animationFile);
 			frame.dispose();
+			//TODO open for something other than player here.
 			Minecraft.getMinecraft().displayGuiScreen(new GuiAnimationTimeline(animationFile, "player", sequence));
 		}
 		catch(FileNotChosenException e){}
