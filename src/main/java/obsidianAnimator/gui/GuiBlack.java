@@ -10,7 +10,6 @@ import obsidianAnimator.Util;
 public class GuiBlack extends GuiScreen
 {
 
-	private final ResourceLocation texture = new ResourceLocation("mod_MCEA:gui/animation_parenting.png");
 	private boolean closeToMenu = false;
 	
 	@Override
@@ -21,7 +20,6 @@ public class GuiBlack extends GuiScreen
 		
 		
 		GL11.glColor4f(0.0F, 0.0F, 0.0F, 1.0F);
-		this.mc.getTextureManager().bindTexture(texture);		
 		Util.drawCustomGui(0, 0, width, height, 0);	
 		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 		
