@@ -16,8 +16,8 @@ import obsidianAnimator.animation.AnimationSequence;
 public class FileHandler 
 {
 
-	public static final String modelExtension = "mcm";
-	public static final String animationExtension = "mca";
+	public static final String modelExtension = "obm";
+	public static final String animationExtension = "oba";
 	public static final String textureExtension = "png";
 
 	
