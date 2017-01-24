@@ -42,7 +42,7 @@ public class GuiAnimationMainMenu extends GuiMainMenu
 
         if(button.id == 10)
 		{
-			String s = "mcea_animation_world";
+			String s = "animation_world";
 			File dir = new File(FMLClientHandler.instance().getSavesDir(), s);
 
 			if(!dir.exists())
