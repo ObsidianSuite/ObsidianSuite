@@ -15,7 +15,7 @@ import net.minecraft.world.WorldType;
 public class GuiAnimationMainMenu extends GuiMainMenu
 {
 	
-	private static final ResourceLocation titleRL = new ResourceLocation("mod_MCEA:gui/obsidian_animator_title.png");
+	private static final ResourceLocation titleRL = new ResourceLocation("mod_obsidian_animator:gui/obsidian_animator_title.png");
     
 	/**
      * Adds the buttons (and other controls) to the screen in question.

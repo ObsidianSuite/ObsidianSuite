@@ -56,8 +56,8 @@ public class ModelObj extends ModelBase
 	
 	private boolean partSetupComplete;
 
-	public static final ResourceLocation pinkResLoc = new ResourceLocation("mod_mcea:defaultModelTextures/pink.png");
-	public static final ResourceLocation whiteResLoc = new ResourceLocation("mod_mcea:defaultModelTextures/white.png");
+	public static final ResourceLocation pinkResLoc = new ResourceLocation("mod_obsidian_animator:defaultModelTextures/pink.png");
+	public static final ResourceLocation whiteResLoc = new ResourceLocation("mod_obsidian_animator:defaultModelTextures/white.png");
 
 	public ModelObj(String entityName, File modelFile, ResourceLocation texture)
 	{			

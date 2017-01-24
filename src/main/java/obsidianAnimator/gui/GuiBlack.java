@@ -10,7 +10,7 @@ import obsidianAnimator.Util;
 public class GuiBlack extends GuiScreen
 {
 
-	private final ResourceLocation texture = new ResourceLocation("mod_MCEA:gui/gui_black.png");
+	private final ResourceLocation texture = new ResourceLocation("mod_obsidian_animator:gui/gui_black.png");
 	private boolean closeToMenu = false;
 	
 	@Override
