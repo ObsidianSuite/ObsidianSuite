@@ -12,7 +12,7 @@ public class BlockBase extends Block
 	public BlockBase() 
 	{
 		super(Material.glass);
-        this.setBlockTextureName("mod_MCEA:base");
+        this.setBlockTextureName("mod_obsidian_animator:base");
 	}
 
     public boolean renderAsNormalBlock()

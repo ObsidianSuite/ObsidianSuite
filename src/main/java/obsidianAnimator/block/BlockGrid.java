@@ -12,7 +12,7 @@ public class BlockGrid extends Block
 	public BlockGrid() 
 	{
 		super(Material.glass);
-        this.setBlockTextureName("mod_MCEA:grid");
+        this.setBlockTextureName("mod_obsidian_animator:grid");
 	}
 
     public boolean renderAsNormalBlock()

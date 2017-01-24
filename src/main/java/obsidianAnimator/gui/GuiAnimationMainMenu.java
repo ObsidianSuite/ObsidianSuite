@@ -15,7 +15,7 @@ import net.minecraft.world.WorldType;
 public class GuiAnimationMainMenu extends GuiMainMenu
 {
 	
-	private static final ResourceLocation titleRL = new ResourceLocation("mod_MCEA:gui/obsidian_animator_title.png");
+	private static final ResourceLocation titleRL = new ResourceLocation("mod_obsidian_animator:gui/obsidian_animator_title.png");
     
 	/**
      * Adds the buttons (and other controls) to the screen in question.
@@ -42,7 +42,7 @@ public class GuiAnimationMainMenu extends GuiMainMenu
 
         if(button.id == 10)
 		{
-			String s = "mcea_animation_world";
+			String s = "animation_world";
 			File dir = new File(FMLClientHandler.instance().getSavesDir(), s);
 
 			if(!dir.exists())
