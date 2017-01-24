@@ -21,8 +21,8 @@ public class FileHandler
 	public static final String textureExtension = "png";
 
 	
-	public static final FileNameExtensionFilter modelFilter = new FileNameExtensionFilter("MCEA Models", modelExtension);
-	public static final FileNameExtensionFilter animationFilter = new FileNameExtensionFilter("MCEA Animations", animationExtension);
+	public static final FileNameExtensionFilter modelFilter = new FileNameExtensionFilter("Obsidian Models", modelExtension);
+	public static final FileNameExtensionFilter animationFilter = new FileNameExtensionFilter("Obsidian Animations", animationExtension);
 	public static final FileNameExtensionFilter textureFilter = new FileNameExtensionFilter("PNG", textureExtension);
 
 	public static File lastModelDirectory;
