@@ -134,7 +134,6 @@ public class ModelObj extends ModelBase
 			loadAdditionalPartData(partData);
 			
 			//Only load setup if it exists - it won't if file is fresh from Blender.
-			System.out.println("NBTData = '" + nbtData + "'");
 			if(!nbtData.equals(""))
 			{
 				//Write nbt data to temp file so it can be read by compressed stream tools.

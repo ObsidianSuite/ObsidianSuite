@@ -22,7 +22,7 @@ public class Persistence
 	{
 	    public boolean accept(File dir, String name) 
 	    {
-	        return name.toLowerCase().endsWith(".mcm");
+	        return name.toLowerCase().endsWith(".obm");
 	    }
 	};
 
