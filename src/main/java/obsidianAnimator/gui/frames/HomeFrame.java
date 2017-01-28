@@ -7,6 +7,7 @@ import java.awt.event.ActionListener;
 import java.io.File;
 
 import javax.swing.JButton;
+import javax.swing.JOptionPane;
 
 import net.minecraft.client.Minecraft;
 import obsidianAnimator.animation.AnimationSequence;
@@ -109,9 +110,13 @@ public class HomeFrame extends BaseFrame
 		{
 			File animationFile = FileChooser.loadAnimationFile(frame);
 			AnimationSequence sequence = FileHandler.getAnimationFromFile(animationFile);
-			frame.dispose();
-			//TODO open for something other than player here.
-			Minecraft.getMinecraft().displayGuiScreen(new GuiAnimationTimeline(animationFile, "player", sequence));
+			if(ModelHandler.isModelImported(sequence.getEntityName()))
+			{
+				frame.dispose();
+				Minecraft.getMinecraft().displayGuiScreen(new GuiAnimationTimeline(animationFile, sequence));
+			}
+			else
+				JOptionPane.showMessageDialog(frame, "You must import the " + sequence.getEntityName() + " model first.");
 		}
 		catch(FileNotChosenException e){}
 	}

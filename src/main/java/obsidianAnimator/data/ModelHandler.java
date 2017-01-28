@@ -57,6 +57,11 @@ public class ModelHandler
 	{
 		modelRenderer.setModel(models.get(entityName));
 	}
+	
+	public static boolean isModelImported(String entityName)
+	{
+		return models.containsKey(entityName);
+	}
 
 	public static ModelObj getModel(String entityName)
 	{

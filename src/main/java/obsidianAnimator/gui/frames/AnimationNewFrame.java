@@ -145,7 +145,7 @@ public class AnimationNewFrame extends BaseFrame
 			{
 				AnimationSequence sequence = new AnimationSequence(entityName, animationName);
 				frame.dispose();
-				Minecraft.getMinecraft().displayGuiScreen(new GuiAnimationTimeline(animationFile, entityName, sequence));
+				Minecraft.getMinecraft().displayGuiScreen(new GuiAnimationTimeline(animationFile, sequence));
 			}
 			else
 				JOptionPane.showMessageDialog(frame, "An animation with that name already exists.");

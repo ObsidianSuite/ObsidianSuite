@@ -34,6 +34,11 @@ public class AnimationSequence
 		this.loadData(compound);
 	}
 
+	public String getEntityName()
+	{
+		return entityName;
+	}
+	
 	public String getName() 
 	{
 		return animationName;
@@ -165,7 +170,7 @@ public class AnimationSequence
 		for(AnimationPart animation : animations)
 			animationList.appendTag(animation.getSaveData());
 		sequenceData.setTag("Animations", animationList);
-		sequenceData.setString("EntityName", "player");
+		sequenceData.setString("EntityName", entityName);
 		sequenceData.setString("Name", animationName);
 		sequenceData.setFloat("ActionPoint", actionPoint);
 		sequenceData.setInteger("FPS", fps);
