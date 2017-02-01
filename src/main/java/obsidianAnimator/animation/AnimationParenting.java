@@ -7,17 +7,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.swing.JOptionPane;
-
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import obsidianAPI.render.ModelObj;
 import obsidianAPI.render.part.PartObj;
 import obsidianAnimator.Util;
-import obsidianAnimator.render.objRendering.EntityObj;
-import obsidianAnimator.render.objRendering.ModelObj;
-import obsidianAnimator.render.objRendering.RenderObj;
 
 public class AnimationParenting 
 {

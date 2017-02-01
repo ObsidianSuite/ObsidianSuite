@@ -6,7 +6,7 @@ import java.nio.FloatBuffer;
 
 import org.lwjgl.opengl.GL11;
 
-import obsidianAnimator.render.objRendering.ModelObj;
+import obsidianAPI.render.ModelObj;
 
 public class PartRotation extends Part
 {

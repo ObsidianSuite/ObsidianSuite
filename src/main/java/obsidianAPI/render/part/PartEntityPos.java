@@ -1,7 +1,7 @@
 package obsidianAPI.render.part;
 
 import net.minecraft.entity.Entity;
-import obsidianAnimator.render.objRendering.ModelObj;
+import obsidianAPI.render.ModelObj;
 
 /**
  * Part for tracking the position of the model.

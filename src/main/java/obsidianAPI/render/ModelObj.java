@@ -1,4 +1,4 @@
-package obsidianAnimator.render.objRendering;
+package obsidianAPI.render;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -44,31 +44,19 @@ public class ModelObj extends ModelBase
 	public PartGroups partGroups;
 	private Map<PartObj, float[]> defaults;
 
-	private PartObj mainHighlight = null;
-	private List<PartObj> hightlightedParts;
-
-	public static final float initRotFix = 180.0F;
-	public static final float offsetFixY = -1.5F;
+	private static final float initRotFix = 180.0F;
+	private static final float offsetFixY = -1.5F;
 
 	private final ResourceLocation txtRL;
-	
-	private boolean partSetupComplete;
-
-	public static final ResourceLocation pinkResLoc = new ResourceLocation("mod_obsidian_animator:defaultModelTextures/pink.png");
-	public static final ResourceLocation whiteResLoc = new ResourceLocation("mod_obsidian_animator:defaultModelTextures/white.png");
 
 	public ModelObj(String entityName, File modelFile, ResourceLocation texture)
 	{			
 		this.entityName = entityName;
-		
-		hightlightedParts = new ArrayList<PartObj>();
 		defaults = Maps.newHashMap();
 		parenting = new AnimationParenting();
-		
-		loadFromFile(modelFile);
-		
 		txtRL = texture;
-				
+
+		loadFromFile(modelFile);
 		init();
 	}
 
@@ -282,69 +270,6 @@ public class ModelObj extends ModelBase
 	public void setRotationAngles(float f, float f1, float f2, float f3, float f4, float f5, Entity entity) 
 	{				
 		super.setRotationAngles(f, f1, f2, f3, f4, f5, entity);
-	}
-
-	//----------------------------------------------------------------
-	// 							 Selection
-	//----------------------------------------------------------------
-
-	public PartObj testRay()
-	{
-		PartObj closestPart = null;
-		Double min = null;
-		for(Part part : parts)
-		{
-			if(part instanceof PartObj_Animator)
-			{
-				PartObj_Animator p = (PartObj_Animator) part;
-				Double d = p.testRay();
-				if(d != null && (min == null || d < min))
-				{
-					closestPart = p;
-					min = d;
-				}
-			}
-		}
-		return closestPart;
-	}
-
-	//----------------------------------------------------------------
-	// 							Highlighting
-	//----------------------------------------------------------------
-
-	/**
-	 * Highlight a part.
-	 * @param part - Part to highlight.
-	 * @param main - True if main highlight (pink).
-	 */
-	public void hightlightPart(PartObj part, boolean main)
-	{
-		if(part != null)
-		{
-			if(main)
-				mainHighlight = part;
-			else
-				hightlightedParts.add(part);
-		}
-	}
-
-	public void clearHighlights()
-	{
-		this.hightlightedParts.clear();
-		this.mainHighlight = null;
-	}
-
-	public boolean isMainHighlight(PartObj partObj) 
-	{
-		return mainHighlight == partObj;
-	}
-
-	/**
-	 * Highlighted but not main highlight (white).
-	 */
-	public boolean isPartHighlighted(PartObj partObj) 
-	{
-		return  hightlightedParts.contains(partObj);
 	}
 
 	//----------------------------------------------------------------

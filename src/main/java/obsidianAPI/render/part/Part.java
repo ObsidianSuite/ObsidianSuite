@@ -1,6 +1,6 @@
 package obsidianAPI.render.part;
 
-import obsidianAnimator.render.objRendering.ModelObj;
+import obsidianAPI.render.ModelObj;
 
 /**
  * An abstract object for tracking information about a part (limb, position of model etc).

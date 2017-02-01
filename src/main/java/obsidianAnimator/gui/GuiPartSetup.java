@@ -29,7 +29,6 @@ import javax.swing.event.DocumentListener;
 import obsidianAPI.render.part.PartObj;
 import obsidianAnimator.animation.PartGroups;
 import obsidianAnimator.gui.sequence.timeline.BlankMouseListener;
-import obsidianAnimator.render.objRendering.ModelObj;
 
 public class GuiPartSetup extends GuiEntityRenderer
 {

@@ -11,7 +11,6 @@ import obsidianAPI.render.part.PartRotation;
 import obsidianAnimator.Util;
 import obsidianAnimator.gui.GuiEntityRenderer;
 import obsidianAnimator.render.MathHelper;
-import obsidianAnimator.render.objRendering.ModelObj;
 import obsidianAnimator.render.objRendering.RayTrace;
 
 public class GuiEntityRendererWithRotation extends GuiEntityRenderer

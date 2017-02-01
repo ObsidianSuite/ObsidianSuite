@@ -1,21 +1,14 @@
 package obsidianAPI.render.part;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.client.model.obj.Face;
 import net.minecraftforge.client.model.obj.GroupObject;
-import net.minecraftforge.client.model.obj.TextureCoordinate;
+import obsidianAPI.render.ModelObj;
 import obsidianAnimator.animation.AnimationParenting;
-import obsidianAnimator.render.MathHelper;
-import obsidianAnimator.render.objRendering.ModelObj;
-import obsidianAnimator.render.objRendering.RayTrace;
 
 /**
  * One partObj for each 'part' of the model.

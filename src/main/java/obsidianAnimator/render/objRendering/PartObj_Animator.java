@@ -12,8 +12,8 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.obj.Face;
 import net.minecraftforge.client.model.obj.GroupObject;
 import net.minecraftforge.client.model.obj.TextureCoordinate;
+import obsidianAPI.render.ModelObj;
 import obsidianAPI.render.part.PartObj;
-import obsidianAPI.render.part.PartRotation;
 import obsidianAnimator.animation.AnimationParenting;
 import obsidianAnimator.render.MathHelper;
 
@@ -25,7 +25,7 @@ public class PartObj_Animator extends PartObj
 {
 	private Map<Face, TextureCoordinate[]> defaultTextureCoords;
 
-	public PartObj_Animator(ModelObj modelObject, GroupObject groupObj) 
+	public PartObj_Animator(ModelObj_Animator modelObject, GroupObject groupObj) 
 	{
 		super(modelObject, groupObj);
 		defaultTextureCoords = new HashMap<Face, TextureCoordinate[]>();
@@ -109,7 +109,7 @@ public class PartObj_Animator extends PartObj
 	@Override
 	public void updateTextureCoordinates()
 	{	
-		updateTextureCoordinates(modelObj.isMainHighlight(this), modelObj.isPartHighlighted(this), true);
+		updateTextureCoordinates(((ModelObj_Animator) modelObj).isMainHighlight(this), ((ModelObj_Animator) modelObj).isPartHighlighted(this), true);
 	}
 
 	/**
@@ -124,9 +124,9 @@ public class PartObj_Animator extends PartObj
 				new TextureCoordinate(0.5F, 0.0F), 
 				new TextureCoordinate(0.0F, 0.5F)};
 		if(mainHighlight)
-			texture = ModelObj.pinkResLoc;
+			texture = ModelObj_Animator.pinkResLoc;
 		else if(otherHighlight)
-			texture = ModelObj.whiteResLoc;
+			texture = ModelObj_Animator.whiteResLoc;
 		else
 		{
 			texture = modelObj.getTexture();

@@ -15,13 +15,13 @@ import org.apache.commons.io.FileUtils;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.util.ResourceLocation;
 import obsidianAnimator.file.FileHandler;
-import obsidianAnimator.render.objRendering.ModelObj;
+import obsidianAnimator.render.objRendering.ModelObj_Animator;
 import obsidianAnimator.render.objRendering.RenderObj;
 
 public class ModelHandler 
 {
 
-	private static Map<String, ModelObj> models = new HashMap<String, ModelObj>();
+	private static Map<String, ModelObj_Animator> models = new HashMap<String, ModelObj_Animator>();
 
 	public static RenderObj modelRenderer = new RenderObj();
 
@@ -29,7 +29,7 @@ public class ModelHandler
 	{
 		copyFileToPersistentMemory(modelFile);
 		copyFileToPersistentMemory(textureFile);
-		ModelObj model = loadModel(modelFile);
+		ModelObj_Animator model = loadModel(modelFile);
 		updateRenderer(model.entityName);
 		return model.entityName;
 	}
@@ -39,11 +39,11 @@ public class ModelHandler
 		loadModel(file);
 	}
 
-	private static ModelObj loadModel(File modelFile)
+	private static ModelObj_Animator loadModel(File modelFile)
 	{
 		String fileName = modelFile.getName();
 		String entityName = fileName.substring(0,fileName.indexOf("."));
-		ModelObj model = new ModelObj(entityName, modelFile, generateTextureResourceLocation(entityName));
+		ModelObj_Animator model = new ModelObj_Animator(entityName, modelFile, generateTextureResourceLocation(entityName));
 		models.put(model.entityName, model);
 		return model;
 	}
@@ -63,7 +63,7 @@ public class ModelHandler
 		return models.containsKey(entityName);
 	}
 
-	public static ModelObj getModel(String entityName)
+	public static ModelObj_Animator getModel(String entityName)
 	{
 		return models.get(entityName);
 	}

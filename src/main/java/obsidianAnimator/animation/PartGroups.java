@@ -1,26 +1,17 @@
 package obsidianAnimator.animation;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.client.resources.IResource;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import obsidianAPI.render.ModelObj;
 import obsidianAPI.render.part.Part;
 import obsidianAPI.render.part.PartObj;
-import obsidianAnimator.ObsidianAnimator;
 import obsidianAnimator.Util;
-import obsidianAnimator.render.objRendering.EntityObj;
-import obsidianAnimator.render.objRendering.ModelObj;
-import obsidianAnimator.render.objRendering.RenderObj;
 
 /**
  * Parts can be grouped together, eg upper and lower arm -> arm.
