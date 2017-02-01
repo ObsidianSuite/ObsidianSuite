@@ -200,6 +200,20 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 	/* ---------------------------------------------------- *
 	 * 				   Keyframe manipulation				*
 	 * ---------------------------------------------------- */
+	private Keyframe getKeyframe(String partName, int frameTime)
+	{
+		List<Keyframe> keyframes = this.keyframes.get(partName);
+		if (keyframes != null)
+		{
+			for (Keyframe keyframe : keyframes)
+			{
+				if (keyframe.frameTime == frameTime)
+					return keyframe;
+			}
+		}
+
+		return null;
+	}
 
 	private void addKeyframe()
 	{
@@ -214,55 +228,45 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 	private void addKeyframe(Keyframe kf)
 	{
 		List<Keyframe> partKeyframes = keyframes.get(kf.partName);
-		boolean keyframeExists = false;
-		if(partKeyframes == null)
-			partKeyframes = new ArrayList<Keyframe>();
-		else 
+
+		if (partKeyframes == null)
 		{
-			Keyframe keyframeToRemove = null;
-			for(Keyframe pkf : partKeyframes)
-			{
-				if(pkf.frameTime == kf.frameTime)
-					keyframeToRemove = pkf;
-			}
-			if(keyframeToRemove != null)
-			{
-				keyframeExists = true;
-				partKeyframes.remove(keyframeToRemove);
-			}
+			partKeyframes = new ArrayList<Keyframe>();
+		} else
+		{
+			deleteKeyframe(kf.partName, kf.frameTime);
 		}
+
 		partKeyframes.add(kf);
-		keyframes.put(kf.partName, partKeyframes);
 		timelineFrame.refresthLineColours();
 		updateAnimationParts();
 	}
 
 	private void deleteKeyframe()
 	{
-		List<Keyframe> partKeyframes = keyframes.get(currentPartName);
-		if(partKeyframes != null)
+		boolean removed = deleteKeyframe(currentPartName, (int) time);
+
+		timelineFrame.repaint();
+
+		if (removed)
 		{
-			Keyframe keyframeToRemove = null;
-			for(Keyframe pkf : partKeyframes)
-			{
-				if(pkf.frameTime == time)
-					keyframeToRemove = pkf;
-			}
-			boolean keyframeRemoved = false;
-			if(keyframeToRemove != null)
-			{
-				keyframeRemoved = true;
-				partKeyframes.remove(keyframeToRemove);
-			}
-			keyframes.put(currentPartName, partKeyframes);
-			timelineFrame.repaint();
-			if(keyframeRemoved)
-			{
-				exceptionPartName = "";
-				updateAnimationParts();
-			}
+			exceptionPartName = "";
+			updateAnimationParts();
 		}
+
 		timelineFrame.refresh();
+	}
+
+	private boolean deleteKeyframe(String partName, int time)
+	{
+		Keyframe toRemove = getKeyframe(partName, time);
+		if (toRemove != null)
+		{
+			keyframes.get(partName).remove(toRemove);
+			return true;
+		}
+
+		return false;
 	}
 
 	private void copyKeyframe(Keyframe kf, String partName, int time)
