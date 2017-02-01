@@ -9,6 +9,7 @@ import obsidianAnimator.gui.frames.HomeFrame;
 import obsidianAnimator.gui.sequence.EntityAutoMove;
 import obsidianAnimator.gui.sequence.ExternalFrame;
 import obsidianAnimator.gui.sequence.GuiEntityRendererWithTranslation;
+import obsidianAnimator.render.objRendering.ModelObj;
 import obsidianAnimator.render.objRendering.parts.Part;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
@@ -338,7 +339,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 			{
 				if(kf.frameTime != 0.0F)
 				{
-					Keyframe prevKf = kf.getPreviousKeyframe();
+					Keyframe prevKf = getPreviousKeyframe(kf);
 					sequence.addAnimation(new AnimationPart(prevKf.frameTime, kf.frameTime, prevKf.values, kf.values, Util.getPartFromName(partName, entityModel.parts)));
 				}
 				else if(doesPartOnlyHaveOneKeyframe(partName))
@@ -351,6 +352,40 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 		}
 		sequence.setFPS(currentAnimation.getFPS());
 		updateAnimation(sequence);
+	}
+
+	/**
+	 * Gets the keyframe that comes before this one, for the same part, or a default keyframe at time zero if none exists.
+	 */
+	private Keyframe getPreviousKeyframe(Keyframe keyframe)
+	{
+		String partName = keyframe.partName;
+		int frameTime = keyframe.frameTime;
+
+		Keyframe previousKf = null;
+		Integer prevFt = null;
+		for(Keyframe kf : keyframes.get(partName))
+		{
+			if(kf.frameTime < frameTime && (prevFt == null || kf.frameTime > prevFt))
+			{
+				previousKf = kf;
+				prevFt = kf.frameTime;
+			}
+		}
+		if(previousKf == null)
+		{
+			if(partName.equals("entitypos"))
+			{
+				previousKf = new Keyframe(0, partName, new float[]{0.0F, 0.0F, 0.0F});
+			}
+			else
+			{
+				Part part = Util.getPartFromName(partName, entityModel.parts);
+				float[] defaults = part.getOriginalValues();
+				previousKf = new Keyframe(0, partName, new float[]{0.0F, 0.0F, 0.0F});
+			}
+		}
+		return previousKf;
 	}
 
 	private void updateAnimationFPS(int fps)
@@ -868,55 +903,6 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 	 * 				   		Keyframe						*
 	 * ---------------------------------------------------- */
 
-	private class Keyframe 
-	{
-		String partName;
-		int frameTime;
-		//Rotation for parts and position for entityPosition
-		float[] values;
-		//Is current keyframe, or is a selected keyframe (multiple selected).
-		boolean isCurrent;
-		boolean isSelected;
-
-		public Keyframe(int frameTime, String partName, float[] values)
-		{
-			this.frameTime = frameTime;		
-			this.partName = partName;
-			this.values = values;
-		}
-
-		/**
-		 * Gets the keyframe that comes before this one, for the same part, or a default keyframe at time zero if none exists. 
-		 */
-		private Keyframe getPreviousKeyframe()
-		{
-			Keyframe previousKf = null;
-			Integer prevFt = null;
-			for(Keyframe kf : keyframes.get(partName))
-			{
-				if(kf.frameTime < frameTime && (prevFt == null || kf.frameTime > prevFt))
-				{
-					previousKf = kf;
-					prevFt = kf.frameTime;
-				}
-			}
-			if(previousKf == null)
-			{
-				if(partName.equals("entitypos"))
-				{
-					previousKf = new Keyframe(0, partName, new float[]{0.0F, 0.0F, 0.0F});
-				}
-				else
-				{
-					Part part = Util.getPartFromName(this.partName, entityModel.parts);
-					float[] defaults = part.getOriginalValues();
-					previousKf = new Keyframe(0, this.partName, new float[]{0.0F, 0.0F, 0.0F});
-				}
-			}
-			return previousKf;
-		}
-	}
-
 	/* ---------------------------------------------------- *
 	 * 				   		Actions							*
 	 * ---------------------------------------------------- */
@@ -1075,25 +1061,6 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 		public void setDoubleValue(double d)
 		{
 			setValue((int) Math.round(d*this.scale));
-		}
-	}
-
-	private class CopyLabel extends JComponent
-	{
-		public int x;
-		public int y;
-		public int time;
-		public boolean draw;
-
-		protected void paintComponent(Graphics g)
-		{
-			super.paintComponent(g);
-			if(draw)
-			{
-				String s = String.valueOf(time);
-				g.setColor(Color.red);
-				g.drawString(s, x, y);
-			}
 		}
 	}
 
