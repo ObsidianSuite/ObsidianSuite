@@ -55,16 +55,6 @@ public class ModelObj extends ModelBase
 
 	private final ResourceLocation txtRL;
 	
-	public ModelObj(String entityName, File modelFile, ResourceLocation textureLocation) throws FileNotFoundException
-	{			
-		this(entityName, new FileInputStream(modelFile), textureLocation);
-	}
-	
-	public ModelObj(String entityName, ResourceLocation modelLocation, ResourceLocation textureLocation) throws IOException
-	{			
-		this(entityName, Minecraft.getMinecraft().getResourceManager().getResource(modelLocation).getInputStream(), textureLocation);
-	}
-	
 	public ModelObj(String entityName, InputStream modelInputStream, ResourceLocation textureLocation)
 	{			
 		this.entityName = entityName;

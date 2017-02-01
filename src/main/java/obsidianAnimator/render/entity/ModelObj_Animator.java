@@ -1,6 +1,7 @@
 package obsidianAnimator.render.entity;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +22,7 @@ public class ModelObj_Animator extends ModelObj
 
 	public ModelObj_Animator(String entityName, File modelFile, ResourceLocation texture) throws FileNotFoundException
 	{			
-		super(entityName, modelFile, texture);
+		super(entityName, new FileInputStream(modelFile), texture);
 		hightlightedParts = new ArrayList<PartObj>();
 	}
 

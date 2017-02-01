@@ -3,7 +3,7 @@ package obsidianAnimations;
 import java.io.IOException;
 
 import net.minecraft.util.ResourceLocation;
-import obsidianAPI.render.ModelObj;
+import obsidianAPI.render.ModelAnimated;
 import obsidianAPI.render.RenderObj;
 
 public class RenderDummyPlayer extends RenderObj
@@ -14,7 +14,7 @@ public class RenderDummyPlayer extends RenderObj
 	
 	public RenderDummyPlayer() throws IOException 
 	{
-		super(new ModelObj("dummy", modelRL, textureRL), null);
+		super(new ModelAnimated("dummy", modelRL, textureRL), null);
 	}
 
 }

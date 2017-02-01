@@ -9,7 +9,7 @@ public class RenderObj extends RenderLiving
 
 	private ResourceLocation texture;
 	
-	public RenderObj(ModelObj model, ResourceLocation texture)
+	public RenderObj(ModelAnimated model, ResourceLocation texture)
 	{
 		//TODO shadow size?
 		super(model, 1.0F);
