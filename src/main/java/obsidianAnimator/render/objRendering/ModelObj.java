@@ -33,7 +33,6 @@ import obsidianAPI.render.PartRotation;
 import obsidianAnimator.Util;
 import obsidianAnimator.animation.AnimationParenting;
 import obsidianAnimator.animation.PartGroups;
-import obsidianAnimator.render.objRendering.parts.PartObj_Animator;
 
 public class ModelObj extends ModelBase
 {

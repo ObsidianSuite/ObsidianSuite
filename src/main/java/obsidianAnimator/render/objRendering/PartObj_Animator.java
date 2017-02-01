@@ -1,4 +1,4 @@
-package obsidianAnimator.render.objRendering.parts;
+package obsidianAnimator.render.objRendering;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,8 +16,6 @@ import obsidianAPI.render.PartObj;
 import obsidianAPI.render.PartRotation;
 import obsidianAnimator.animation.AnimationParenting;
 import obsidianAnimator.render.MathHelper;
-import obsidianAnimator.render.objRendering.ModelObj;
-import obsidianAnimator.render.objRendering.RayTrace;
 
 /**
  * One partObj for each 'part' of the model.
