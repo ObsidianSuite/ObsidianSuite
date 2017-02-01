@@ -1006,40 +1006,4 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 			changeView(numpadNumber);
 		}
 	}
-
-	private class JDoubleSlider extends JSlider 
-	{
-
-		final int scale;
-		private boolean shouldUpdate;
-
-		public JDoubleSlider(int min, int max, int value, int scale, int majorSpacing) 
-		{
-			super(min*scale, max*scale, value*scale);
-			this.scale = scale;
-			this.setMajorTickSpacing(scale*majorSpacing);
-			Hashtable<Integer, JLabel> labels = new Hashtable<Integer, JLabel>();
-			for(int i = min; i <= max; i+=majorSpacing)
-			{
-				labels.put(scale*i, new JLabel(Integer.toString(i)));
-			}
-
-			int width = (int) ((this.getMaximum() - this.getMinimum())*1.5F);
-			this.setPreferredSize(new Dimension(width, 50));
-			this.setLabelTable(labels);
-			this.setPaintLabels(true);
-		}
-
-		public double getScaledValue() 
-		{
-			return ((double)super.getValue()) / this.scale;
-		}
-
-		public void setDoubleValue(double d)
-		{
-			setValue((int) Math.round(d*this.scale));
-		}
-	}
-
-
 }
