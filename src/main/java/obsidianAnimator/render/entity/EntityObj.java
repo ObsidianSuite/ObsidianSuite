@@ -1,4 +1,4 @@
-package obsidianAnimator.render.objRendering;
+package obsidianAnimator.render.entity;
 
 import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.item.Item.ToolMaterial;

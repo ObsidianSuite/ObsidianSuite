@@ -10,7 +10,7 @@ import net.minecraft.client.resources.FolderResourcePack;
 import net.minecraft.client.resources.IResourcePack;
 import obsidianAnimator.data.ModelHandler;
 import obsidianAnimator.render.AnimationResourcePack;
-import obsidianAnimator.render.objRendering.EntityObj;
+import obsidianAnimator.render.entity.EntityObj;
 
 public class ClientProxy extends CommonProxy
 {	

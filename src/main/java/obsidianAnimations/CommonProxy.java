@@ -4,7 +4,7 @@ import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.LanguageRegistry;
 import net.minecraft.util.ResourceLocation;
 import obsidianAPI.AnimationRegistry;
-import obsidianAnimator.render.objRendering.EntityObj;
+import obsidianAnimator.render.entity.EntityObj;
 
 public class CommonProxy
 {	

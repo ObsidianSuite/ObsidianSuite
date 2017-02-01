@@ -15,8 +15,8 @@ import org.apache.commons.io.FileUtils;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.util.ResourceLocation;
 import obsidianAnimator.file.FileHandler;
-import obsidianAnimator.render.objRendering.ModelObj_Animator;
-import obsidianAnimator.render.objRendering.RenderObj;
+import obsidianAnimator.render.entity.ModelObj_Animator;
+import obsidianAnimator.render.entity.RenderObj;
 
 public class ModelHandler 
 {

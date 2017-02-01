@@ -1,4 +1,4 @@
-package obsidianAnimator.render.objRendering;
+package obsidianAnimator.render.entity;
 
 import org.lwjgl.opengl.GL11;
 

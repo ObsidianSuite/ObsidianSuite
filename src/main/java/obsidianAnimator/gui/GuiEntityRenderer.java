@@ -23,8 +23,8 @@ import obsidianAPI.render.part.PartObj;
 import obsidianAnimator.ObsidianAnimator;
 import obsidianAnimator.Util;
 import obsidianAnimator.data.ModelHandler;
-import obsidianAnimator.render.objRendering.EntityObj;
-import obsidianAnimator.render.objRendering.ModelObj_Animator;
+import obsidianAnimator.render.entity.EntityObj;
+import obsidianAnimator.render.entity.ModelObj_Animator;
 
 public class GuiEntityRenderer extends GuiBlack
 {

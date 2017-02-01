@@ -1,4 +1,4 @@
-package obsidianAnimator.render.objRendering;
+package obsidianAnimator.render;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
