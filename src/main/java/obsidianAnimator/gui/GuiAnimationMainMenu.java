@@ -27,7 +27,7 @@ public class GuiAnimationMainMenu extends GuiMainMenu
     	super.initGui();
     	
         int startY = this.height / 4 + 50;
-        int spaceY = 24;
+        int spaceY = 22;
         
         this.buttonList.clear();
         addSingleplayerMultiplayerButtons(startY, spaceY);
