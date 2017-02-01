@@ -29,7 +29,6 @@ import net.minecraftforge.client.model.obj.WavefrontObject;
 import obsidianAnimator.Util;
 import obsidianAnimator.animation.AnimationParenting;
 import obsidianAnimator.animation.PartGroups;
-import obsidianAnimator.render.objRendering.bend.Bend;
 import obsidianAnimator.render.objRendering.parts.Part;
 import obsidianAnimator.render.objRendering.parts.PartEntityPos;
 import obsidianAnimator.render.objRendering.parts.PartObj;
@@ -41,7 +40,6 @@ public class ModelObj extends ModelBase
 	public final String entityName;
 	public WavefrontObject model;
 	public ArrayList<Part> parts;
-	private ArrayList<Bend> bends;
 	public AnimationParenting parenting;
 	public PartGroups partGroups;
 	private Map<PartObj, float[]> defaults;
@@ -64,7 +62,6 @@ public class ModelObj extends ModelBase
 		this.entityName = entityName;
 		
 		hightlightedParts = new ArrayList<PartObj>();
-		bends = new ArrayList<Bend>();
 		defaults = Maps.newHashMap();
 		parenting = new AnimationParenting();
 		
@@ -266,35 +263,10 @@ public class ModelObj extends ModelBase
 	//						Parenting
 	//----------------------------------------------------------------
 
-	public void setParent(PartObj child, PartObj parent, boolean addBend) throws Exception
+	public void setParent(PartObj child, PartObj parent)
 	{
-		if(addBend)
-		{			
-			for(Part p : this.parts)
-			{
-				if(p instanceof PartObj)
-				{
-					PartObj obj = (PartObj) p;
-					obj.updateTextureCoordinates(false, false, false);
-				}
-			}
-
-			if(!child.hasBend())
-			{
-				Bend b = new Bend(parent, child);
-				bends.add(b);
-				child.setBend(b);
-			}
-		}
 		parenting.addParenting(parent, child);
 	}
-
-
-	public void removeBend(Bend bend) 
-	{
-		bends.remove(bend);
-	}
-
 
 	//----------------------------------------------------------------
 	//							Rotation
@@ -331,22 +303,6 @@ public class ModelObj extends ModelBase
 					closestPart = p;
 					min = d;
 				}
-			}
-		}
-				
-		for(Bend bend : bends)
-		{
-			Double d = bend.testRayChild();
-			if(d != null && (min == null || d < min))
-			{
-				closestPart = bend.child;
-				min = d;
-			}
-			Double d2 = bend.testRayParent();
-			if(d2 != null && (min == null || d2 < min))
-			{
-				closestPart = bend.parent;
-				min = d2;
 			}
 		}
 		return closestPart;
@@ -415,9 +371,6 @@ public class ModelObj extends ModelBase
 			else if(p instanceof PartEntityPos)
 				((PartEntityPos) p).move(entity);
 		}
-
-		for(Bend bend : this.bends)
-			bend.render();
 
 		GL11.glPopMatrix();
 	}

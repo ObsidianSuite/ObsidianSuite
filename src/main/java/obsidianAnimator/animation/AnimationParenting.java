@@ -122,8 +122,6 @@ public class AnimationParenting
 				parentingMap.remove(p);
 			else
 				parentingMap.put(p, list);
-			if(child.hasBend())
-				child.removeBend();
 		}
 	}
 
@@ -139,10 +137,6 @@ public class AnimationParenting
 			for(int i = 0; i < children.size(); i++)
 			{
 				String name = children.get(i).getName();
-				if(children.get(i).hasBend())
-				{
-					name = name + "*";
-				}
 				parentCompound.setString("Child" + i, name);
 			}
 			parentNBTList.appendTag(parentCompound);
@@ -163,21 +157,8 @@ public class AnimationParenting
 			while(parentCompound.hasKey("Child" + j))
 			{
 				String name = parentCompound.getString("Child" + j);
-				boolean hasBend = false;
-				if(name.endsWith("*"))
-				{
-					name = name.substring(0, name.length() - 1);
-					hasBend = true;
-				}
 				PartObj child = Util.getPartObjFromName(name, model.parts);
-				try 
-				{
-					model.setParent(child, parent, hasBend);
-				} 
-				catch (Exception e) 
-				{
-					e.printStackTrace();
-				}
+				model.setParent(child, parent);
 				j++;
 			}
 		}

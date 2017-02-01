@@ -16,7 +16,6 @@ import obsidianAnimator.animation.AnimationParenting;
 import obsidianAnimator.render.MathHelper;
 import obsidianAnimator.render.objRendering.ModelObj;
 import obsidianAnimator.render.objRendering.RayTrace;
-import obsidianAnimator.render.objRendering.bend.Bend;
 
 /**
  * One partObj for each 'part' of the model.
@@ -31,7 +30,6 @@ public class PartObj extends PartRotation
 	private Map<Face, TextureCoordinate[]> defaultTextureCoords;
 
 	private boolean visible;
-	private Bend bend = null;
 	public GroupObject groupObj;
 	private String displayName;
 
@@ -88,23 +86,6 @@ public class PartObj extends PartRotation
 	public void setVisible(boolean bool)
 	{
 		visible = bool;
-	}
-
-	public void setBend(Bend b)
-	{
-		bend = b;
-	}
-
-	public boolean hasBend()
-	{
-		return bend != null;
-	}
-
-	public void removeBend()
-	{
-		modelObj.removeBend(bend);
-		bend.remove();
-		bend = null;
 	}
 
 	//----------------------------------------------------------------
