@@ -1,13 +1,5 @@
 package obsidianAnimator.gui;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.lwjgl.input.Keyboard;
-import org.lwjgl.input.Mouse;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
-
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.OpenGlHelper;
@@ -23,6 +15,15 @@ import obsidianAnimator.render.objRendering.EntityObj;
 import obsidianAnimator.render.objRendering.ModelObj;
 import obsidianAnimator.render.objRendering.parts.Part;
 import obsidianAnimator.render.objRendering.parts.PartObj;
+import org.lwjgl.input.Keyboard;
+import org.lwjgl.input.Mouse;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL12;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class GuiEntityRenderer extends GuiBlack
 {
@@ -46,7 +47,7 @@ public class GuiEntityRenderer extends GuiBlack
 
 	private RenderBlocks renderBlocks = new RenderBlocks();
 
-	private List<View> views;
+	private final Map<Integer,View> views = new HashMap<Integer, View>();
 
 	public int gridMinX = -1, gridMaxX = 1, gridMinZ = -1, gridMaxZ = 1;
 	
@@ -119,14 +120,18 @@ public class GuiEntityRenderer extends GuiBlack
 	 */
 	private void setupViews()
 	{
-		views = new ArrayList<View>();
-		views.add(new View("Default", -314, 26, 5));
-		views.add(new View("Front", 0, 0, 7));
-		views.add(new View("Left", 90, 0, 4));
-		views.add(new View("Right", -90, 0, 6));
-		views.add(new View("Back", 180, 0, 1));
-		views.add(new View("Top", 180, 90, 8));
-		views.add(new View("Bottom ", 0, -90, 2));
+		addView("Default", -314, 26, 5);
+		addView("Front", 0, 0, 7);
+		addView("Left", 90, 0, 4);
+		addView("Right", -90, 0, 6);
+		addView("Back", 180, 0, 1);
+		addView("Top", 180, 90, 8);
+		addView("Bottom ", 0, -90, 2);
+	}
+
+	private void addView(String name, float horizontalRotation, float verticalRotation, int numpadKey)
+	{
+		views.put(numpadKey, new View(name, horizontalRotation, verticalRotation, numpadKey));
 	}
 
 	public void drawScreen(int par1, int par2, float par3)
@@ -380,18 +385,16 @@ public class GuiEntityRenderer extends GuiBlack
 	public void changeView(int numpadKey)
 	{
 		boolean viewFound = false;
-		for(View v : views)
+		if (views.containsKey(numpadKey))
 		{
-			if(v.numpadKey == numpadKey)
-			{
-				horizontalRotation = v.horizontalRotation;
-				verticalRotation = v.verticalRotation;
-				viewFound = true;
-				break;
-			}
+			View v = views.get(numpadKey);
+			horizontalRotation = v.horizontalRotation;
+			verticalRotation = v.verticalRotation;
 		}
-		if(!viewFound)
+		else
+		{
 			System.err.println("Could not change to view, numpadkey: " + numpadKey);
+		}
 	}
 
 	private class View
