@@ -27,19 +27,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import javax.swing.AbstractAction;
-import javax.swing.ActionMap;
-import javax.swing.InputMap;
-import javax.swing.JComponent;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JLayeredPane;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSlider;
-import javax.swing.JTextField;
-import javax.swing.KeyStroke;
+import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -118,41 +106,41 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 		super.initGui();
 	}
 
-	public void loadFrames()
-	{
-		timelineFrame = new TimelineFrame();
+    public void loadFrames()
+    {
+        timelineFrame = new TimelineFrame();
 
-		JFrame frame = timelineFrame;
-		InputMap inputMap = frame.getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-		ActionMap actionMap = frame.getRootPane().getActionMap();
+        addKeyAction(KeyEvent.VK_SPACE, "spacePressed", new SpaceAction());
+        addKeyAction(KeyEvent.VK_W, "wPressed", new WAction());
+        addKeyAction(KeyEvent.VK_S, "sPressed", new SAction());
+        addKeyAction(KeyEvent.VK_A, "aPressed", new AAction());
+        addKeyAction(KeyEvent.VK_D, "dPressed", new DAction());
+        addKeyAction(KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.CTRL_DOWN_MASK, true), "undoReleased", new UndoAction());
+        addKeyAction(KeyStroke.getKeyStroke(KeyEvent.VK_Y, InputEvent.CTRL_DOWN_MASK, true), "redoReleased", new RedoAction());
+        addKeyAction(KeyEvent.VK_ESCAPE, "escPressed", new EscAction());
 
-		inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0), "spacePressed");
-		actionMap.put("spacePressed", new SpaceAction());		
-		inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_W, 0), "wPressed");
-		actionMap.put("wPressed", new WAction());
-		inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_S, 0), "sPressed");
-		actionMap.put("sPressed", new SAction());
-		inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_A, 0), "aPressed");
-		actionMap.put("aPressed", new AAction());
-		inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0), "dPressed");
-		actionMap.put("dPressed", new DAction());
-		inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.CTRL_DOWN_MASK, true), "undoReleased");
-		actionMap.put("undoReleased", new UndoAction());
-		inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_Y, InputEvent.CTRL_DOWN_MASK, true), "redoReleased");
-		actionMap.put("redoReleased", new RedoAction());
-		inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), "deletePressed");
-		actionMap.put("deletePressed", new DeleteAction());
-		inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "escPressed");
-		actionMap.put("escPressed", new EscAction());
+        for (int j = 0; j <= 9; j++)
+        {
+            addKeyAction(KeyEvent.VK_NUMPAD0 + j, "numpad" + j, new ChangeViewAction(j));
+        }
 
-		for(int j = 0; j <= 9; j++)
-		{
-			inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_NUMPAD0 + j, 0), "numpad" + j);
-			actionMap.put("numpad" + j, new ChangeViewAction(j));
-		}
+        timelineFrame.refresthLineColours();
+    }
 
-		timelineFrame.refresthLineColours();
-	}
+    private void addKeyAction(int keyCode, String actionMapKey, Action action)
+    {
+        addKeyAction(KeyStroke.getKeyStroke(keyCode, 0), actionMapKey, action);
+    }
+
+    private void addKeyAction(KeyStroke keyStroke, String actionMapKey, Action action)
+    {
+        JFrame frame = timelineFrame;
+        InputMap inputMap = frame.getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+        ActionMap actionMap = frame.getRootPane().getActionMap();
+
+        inputMap.put(keyStroke, actionMapKey);
+        actionMap.put(actionMapKey, action);
+    }
 
 	/**
 	 * Creates keyframes from the animation sequence. 
