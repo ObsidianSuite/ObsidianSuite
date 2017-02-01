@@ -9,7 +9,7 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.GLU;
 
 import net.minecraft.util.Vec3;
-import obsidianAPI.render.PartObj;
+import obsidianAPI.render.part.PartObj;
 
 public class RayTrace 
 {

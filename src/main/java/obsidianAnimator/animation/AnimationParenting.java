@@ -13,7 +13,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import obsidianAPI.render.PartObj;
+import obsidianAPI.render.part.PartObj;
 import obsidianAnimator.Util;
 import obsidianAnimator.render.objRendering.EntityObj;
 import obsidianAnimator.render.objRendering.ModelObj;

@@ -1,4 +1,4 @@
-package obsidianAPI.render;
+package obsidianAPI.render.part;
 
 import java.util.ArrayList;
 import java.util.HashMap;

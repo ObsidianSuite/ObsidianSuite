@@ -8,8 +8,8 @@ import org.lwjgl.util.vector.Quaternion;
 
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
-import obsidianAPI.render.Part;
-import obsidianAPI.render.PartObj;
+import obsidianAPI.render.part.Part;
+import obsidianAPI.render.part.PartObj;
 import obsidianAnimator.render.MathHelper;
 
 /**

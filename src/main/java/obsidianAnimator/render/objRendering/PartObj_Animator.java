@@ -12,8 +12,8 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.obj.Face;
 import net.minecraftforge.client.model.obj.GroupObject;
 import net.minecraftforge.client.model.obj.TextureCoordinate;
-import obsidianAPI.render.PartObj;
-import obsidianAPI.render.PartRotation;
+import obsidianAPI.render.part.PartObj;
+import obsidianAPI.render.part.PartRotation;
 import obsidianAnimator.animation.AnimationParenting;
 import obsidianAnimator.render.MathHelper;
 

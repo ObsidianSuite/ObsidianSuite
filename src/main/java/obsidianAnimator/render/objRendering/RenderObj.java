@@ -16,8 +16,8 @@ import net.minecraft.item.EnumAction;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
-import obsidianAPI.render.PartObj;
-import obsidianAPI.render.PartRotation;
+import obsidianAPI.render.part.PartObj;
+import obsidianAPI.render.part.PartRotation;
 import obsidianAnimator.Util;
 
 @SideOnly(Side.CLIENT)

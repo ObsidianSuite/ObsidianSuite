@@ -14,7 +14,7 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 
-import obsidianAPI.render.Part;
+import obsidianAPI.render.part.Part;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;

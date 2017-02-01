@@ -5,7 +5,7 @@ import java.util.List;
 
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import obsidianAPI.render.Part;
+import obsidianAPI.render.part.Part;
 import obsidianAnimator.Util;
 import obsidianAnimator.render.objRendering.ModelObj;
 

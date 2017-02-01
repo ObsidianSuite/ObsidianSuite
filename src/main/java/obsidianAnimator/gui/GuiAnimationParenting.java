@@ -20,8 +20,8 @@ import javax.swing.plaf.basic.BasicComboBoxRenderer;
 import org.lwjgl.input.Mouse;
 
 import net.minecraft.client.Minecraft;
-import obsidianAPI.render.Part;
-import obsidianAPI.render.PartObj;
+import obsidianAPI.render.part.Part;
+import obsidianAPI.render.part.PartObj;
 import obsidianAnimator.Util;
 import obsidianAnimator.gui.frames.HomeFrame;
 
