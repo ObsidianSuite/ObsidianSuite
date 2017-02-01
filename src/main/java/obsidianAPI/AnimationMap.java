@@ -10,9 +10,14 @@ import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.util.ResourceLocation;
 import obsidianAnimator.animation.AnimationSequence;
 
+/**
+ * A class for storing animation sequences.
+ * Animation sequences are stored in a map with a string key value.
+ */
 class AnimationMap 
 {
-
+	
+	//Map to store animations
 	private Map<String, AnimationSequence> map;
 	
 	AnimationMap()
@@ -20,8 +25,13 @@ class AnimationMap
 		map = new HashMap<String, AnimationSequence>();
 	}
 	
+	/**
+	 * Registers an animation by adding it to the map with a specific binding.
+	 * Can fail is file doesn't exist at resource location.
+	 */
 	void registerAnimation(String binding, ResourceLocation resource)
 	{
+		//Attempt to load sequence from resource location.
 		try
 		{
 			AnimationSequence seq = loadAnimation(resource);
