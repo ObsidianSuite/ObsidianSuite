@@ -267,17 +267,10 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 
 	private void copyKeyframe(Keyframe kf, String partName, int time)
 	{
-		if(partName.equals("entitypos") && !kf.partName.equals("entitypos"))
-			JOptionPane.showMessageDialog(timelineFrame, "Only entitypos can copy to entitypos.");
-		else if(partName.equals("prop_rot") && !kf.partName.equals("prop_rot"))
-			JOptionPane.showMessageDialog(timelineFrame, "Only prop_rot can copy to prop_rot.");
-		else if(partName.equals("prop_trans") && !kf.partName.equals("prop_trans"))
-			JOptionPane.showMessageDialog(timelineFrame, "Only prop_trans can copy to prop_trans.");
-		else if((kf.partName.equals("entitypos") || kf.partName.equals("prop_rot") || kf.partName.equals("prop_trans")) && !kf.partName.equals(partName))
+		if((kf.partName.equals("entitypos") || kf.partName.equals("prop_rot") || kf.partName.equals("prop_trans")) && !kf.partName.equals(partName))
 			JOptionPane.showMessageDialog(timelineFrame, kf.partName + " can only copy to itself.");
 		else
 			addKeyframe(new Keyframe(time, partName, kf.values.clone()));
-
 	}
 
 	private boolean keyframeExists()
