@@ -8,14 +8,16 @@ import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiButtonLanguage;
 import net.minecraft.client.gui.GuiMainMenu;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.WorldSettings;
 import net.minecraft.world.WorldType;
+import net.minecraft.world.storage.ISaveFormat;
+import net.minecraft.world.storage.WorldInfo;
 
 public class GuiAnimationMainMenu extends GuiMainMenu
 {
 	
-	private static final ResourceLocation titleRL = new ResourceLocation("mod_obsidian_animator:gui/obsidian_animator_title.png");
     
 	/**
      * Adds the buttons (and other controls) to the screen in question.
@@ -24,15 +26,31 @@ public class GuiAnimationMainMenu extends GuiMainMenu
     {
     	super.initGui();
     	
-        int i = this.height / 4 + 24;
-		int j = 24;
-
-		this.buttonList.clear();
-
-		this.buttonList.add(new GuiButton(10, this.width / 2 - 100, i + 60, "Load Animator"));
-		this.buttonList.add(new GuiButton(0, this.width / 2 - 100, i + 60 + 24, "Options"));
-		this.buttonList.add(new GuiButton(4, this.width / 2 - 100, i + 60 + 24*2, "Quit"));
-		this.buttonList.add(new GuiButtonLanguage(5, this.width / 2 - 124, i + 60 + 24*2));
+        int startY = this.height / 4 + 50;
+        int spaceY = 24;
+        
+        this.buttonList.clear();
+        addSingleplayerMultiplayerButtons(startY, spaceY);
+		this.buttonList.add(new GuiButton(10, this.width / 2 - 100, startY + spaceY * 2, "Animator"));
+        this.buttonList.add(new GuiButton(0, this.width / 2 - 100, startY + spaceY * 4, 98, 20, I18n.format("menu.options", new Object[0])));
+        this.buttonList.add(new GuiButton(4, this.width / 2 + 2, startY + spaceY * 4, 98, 20, I18n.format("menu.quit", new Object[0])));
+        this.buttonList.add(new GuiButtonLanguage(5, this.width / 2 - 124, startY + spaceY * 4));
+    }
+    
+    /**
+     * Adds Singleplayer and Multiplayer buttons on Main Menu for players who have bought the game.
+     */
+    private void addSingleplayerMultiplayerButtons(int y, int spaceY)
+    {
+        this.buttonList.add(new GuiButton(1, this.width / 2 - 100, y, I18n.format("menu.singleplayer", new Object[0])));
+        this.buttonList.add(new GuiButton(2, this.width / 2 - 100, y + spaceY * 1, I18n.format("menu.multiplayer", new Object[0])));
+        GuiButton realmsButton = new GuiButton(14, this.width / 2 - 100, y + spaceY * 3, I18n.format("menu.online", new Object[0]));
+        GuiButton fmlModButton = new GuiButton(6, this.width / 2 - 100, y + spaceY * 3, "Mods");
+        fmlModButton.xPosition = this.width / 2 + 2;
+        realmsButton.width = 98;
+        fmlModButton.width = 98;
+        this.buttonList.add(realmsButton);
+        this.buttonList.add(fmlModButton);
     }
 	
     @Override
@@ -64,21 +82,5 @@ public class GuiAnimationMainMenu extends GuiMainMenu
 			}
 		}
     }
-
-	@Override
-	public void drawScreen(int x, int y, float f)
-	{
-		super.drawScreen(x, y, f);
-		
-		this.mc.getTextureManager().bindTexture(titleRL);
-        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-        
-        int texWidth = 256;
-        int texHeight = 130;
-        int xPos = this.width / 2 - texWidth / 2;
-        int yPos = 110;
-        
-        this.drawTexturedModalRect(xPos, yPos, 0, 0, texWidth, texHeight);    
-	}
 
 }
