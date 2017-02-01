@@ -12,6 +12,8 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.event.entity.EntityEvent.EntityConstructing;
+import net.minecraftforge.event.world.WorldEvent;
+import obsidianAnimator.data.Persistence;
 import obsidianAnimator.gui.GuiAnimationMainMenu;
 import obsidianAnimator.gui.GuiBlack;
 import obsidianAnimator.gui.frames.HomeFrame;
@@ -54,11 +56,16 @@ public class EventHandler
 			new HomeFrame().display();
 		}
 	}
-
+	
 	@SubscribeEvent
-	public void onEntityConstructing(EntityConstructing event)
+	public void onWorldSave(WorldEvent.Save event)
 	{
-		if(event.entity instanceof EntityPlayer)
-			event.entity.registerExtendedProperties("ExtendedPropertiesAnimation", new ExtendedPropertiesAnimation());
+		Persistence.save();
+	}
+	
+	@SubscribeEvent
+	public void onWorldSave(WorldEvent.Load event)
+	{
+		Persistence.load();
 	}
 }

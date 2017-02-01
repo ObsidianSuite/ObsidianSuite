@@ -36,7 +36,6 @@ public class AnimationResourcePack extends FolderResourcePack
 	private File generateFile(String resourceName)
 	{
 		File file = new File(this.resourcePackFile, resourceName.substring(resourceName.indexOf("/") + 1));
-		System.out.println(file.getAbsolutePath());
 		return file;
 	}
 	

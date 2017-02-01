@@ -15,7 +15,7 @@ import obsidianAnimator.file.FileHandler;
 public class Persistence 
 {
 
-	public static final File saveFile = new File(ObsidianAnimator.animationPath, "save.data");
+	private static final File saveFile = new File(ObsidianAnimator.animationPath, "save.data");
 	public static final File modelFolder = new File(ObsidianAnimator.animationPath + "/models");
 	
 	private static FilenameFilter modelFileFilter = new FilenameFilter() 
