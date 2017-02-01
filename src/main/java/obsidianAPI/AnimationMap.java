@@ -1,0 +1,6 @@
+package obsidianAPI;
+
+class AnimationMap 
+{
+
+}
