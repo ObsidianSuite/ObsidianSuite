@@ -1,4 +1,4 @@
-package obsidianAnimator.render.objRendering.parts;
+package obsidianAPI.render;
 
 import net.minecraft.entity.Entity;
 import obsidianAnimator.render.objRendering.ModelObj;

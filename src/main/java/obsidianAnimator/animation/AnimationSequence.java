@@ -5,9 +5,9 @@ import java.util.List;
 
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import obsidianAPI.render.Part;
 import obsidianAnimator.Util;
 import obsidianAnimator.render.objRendering.ModelObj;
-import obsidianAnimator.render.objRendering.parts.Part;
 
 /**
  * An actual animation. Comprised of animation parts - sections for each part of the model.

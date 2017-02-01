@@ -1,4 +1,4 @@
-package obsidianAnimator.render.objRendering.parts;
+package obsidianAPI.render;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;

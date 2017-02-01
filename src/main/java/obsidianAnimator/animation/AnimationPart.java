@@ -8,9 +8,9 @@ import org.lwjgl.util.vector.Quaternion;
 
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
+import obsidianAPI.render.Part;
+import obsidianAPI.render.PartObj;
 import obsidianAnimator.render.MathHelper;
-import obsidianAnimator.render.objRendering.parts.Part;
-import obsidianAnimator.render.objRendering.parts.PartObj;
 
 /**
  * A section of an animation for a specific part. 

@@ -8,13 +8,14 @@ import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.entity.EntityLivingBase;
+import obsidianAPI.render.Part;
+import obsidianAPI.render.PartObj;
 import obsidianAnimator.ObsidianAnimator;
 import obsidianAnimator.Util;
 import obsidianAnimator.data.ModelHandler;
 import obsidianAnimator.render.objRendering.EntityObj;
 import obsidianAnimator.render.objRendering.ModelObj;
-import obsidianAnimator.render.objRendering.parts.Part;
-import obsidianAnimator.render.objRendering.parts.PartObj;
+
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;

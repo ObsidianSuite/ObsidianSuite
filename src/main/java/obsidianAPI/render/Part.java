@@ -1,12 +1,5 @@
-package obsidianAnimator.render.objRendering.parts;
+package obsidianAPI.render;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.FloatBuffer;
-
-import org.lwjgl.opengl.GL11;
-
-import net.minecraft.entity.Entity;
 import obsidianAnimator.render.objRendering.ModelObj;
 
 /**
@@ -18,7 +11,6 @@ public class Part
 	protected float[] originalValues;
 	private String name;
 	public ModelObj modelObj;
-
 
 	public Part(ModelObj mObj, String name) 
 	{

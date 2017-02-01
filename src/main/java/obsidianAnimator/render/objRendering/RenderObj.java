@@ -16,9 +16,9 @@ import net.minecraft.item.EnumAction;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import obsidianAPI.render.PartObj;
+import obsidianAPI.render.PartRotation;
 import obsidianAnimator.Util;
-import obsidianAnimator.render.objRendering.parts.PartObj;
-import obsidianAnimator.render.objRendering.parts.PartRotation;
 
 @SideOnly(Side.CLIENT)
 public class RenderObj extends RenderLiving

@@ -14,13 +14,13 @@ import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.resources.IResource;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import obsidianAPI.render.Part;
+import obsidianAPI.render.PartObj;
 import obsidianAnimator.ObsidianAnimator;
 import obsidianAnimator.Util;
 import obsidianAnimator.render.objRendering.EntityObj;
 import obsidianAnimator.render.objRendering.ModelObj;
 import obsidianAnimator.render.objRendering.RenderObj;
-import obsidianAnimator.render.objRendering.parts.Part;
-import obsidianAnimator.render.objRendering.parts.PartObj;
 
 /**
  * Parts can be grouped together, eg upper and lower arm -> arm.

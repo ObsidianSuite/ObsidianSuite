@@ -20,10 +20,10 @@ import javax.swing.plaf.basic.BasicComboBoxRenderer;
 import org.lwjgl.input.Mouse;
 
 import net.minecraft.client.Minecraft;
+import obsidianAPI.render.Part;
+import obsidianAPI.render.PartObj;
 import obsidianAnimator.Util;
 import obsidianAnimator.gui.frames.HomeFrame;
-import obsidianAnimator.render.objRendering.parts.Part;
-import obsidianAnimator.render.objRendering.parts.PartObj;
 
 public class GuiAnimationParenting extends GuiEntityRenderer 
 {

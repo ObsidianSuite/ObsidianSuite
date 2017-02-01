@@ -5,14 +5,14 @@ import org.lwjgl.opengl.GL11;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.util.Vec3;
+import obsidianAPI.render.Part;
+import obsidianAPI.render.PartObj;
+import obsidianAPI.render.PartRotation;
 import obsidianAnimator.Util;
 import obsidianAnimator.gui.GuiEntityRenderer;
 import obsidianAnimator.render.MathHelper;
 import obsidianAnimator.render.objRendering.ModelObj;
 import obsidianAnimator.render.objRendering.RayTrace;
-import obsidianAnimator.render.objRendering.parts.Part;
-import obsidianAnimator.render.objRendering.parts.PartObj;
-import obsidianAnimator.render.objRendering.parts.PartRotation;
 
 public class GuiEntityRendererWithRotation extends GuiEntityRenderer
 {

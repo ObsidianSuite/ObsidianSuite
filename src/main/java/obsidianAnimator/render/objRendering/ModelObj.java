@@ -26,13 +26,14 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.ModelFormatException;
 import net.minecraftforge.client.model.obj.GroupObject;
 import net.minecraftforge.client.model.obj.WavefrontObject;
+import obsidianAPI.render.Part;
+import obsidianAPI.render.PartEntityPos;
+import obsidianAPI.render.PartObj;
+import obsidianAPI.render.PartRotation;
 import obsidianAnimator.Util;
 import obsidianAnimator.animation.AnimationParenting;
 import obsidianAnimator.animation.PartGroups;
-import obsidianAnimator.render.objRendering.parts.Part;
-import obsidianAnimator.render.objRendering.parts.PartEntityPos;
-import obsidianAnimator.render.objRendering.parts.PartObj;
-import obsidianAnimator.render.objRendering.parts.PartRotation;
+import obsidianAnimator.render.objRendering.parts.PartObj_Animator;
 
 public class ModelObj extends ModelBase
 {
@@ -294,9 +295,9 @@ public class ModelObj extends ModelBase
 		Double min = null;
 		for(Part part : parts)
 		{
-			if(part instanceof PartObj)
+			if(part instanceof PartObj_Animator)
 			{
-				PartObj p = (PartObj) part;
+				PartObj_Animator p = (PartObj_Animator) part;
 				Double d = p.testRay();
 				if(d != null && (min == null || d < min))
 				{

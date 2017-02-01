@@ -9,10 +9,12 @@ import obsidianAnimator.gui.frames.HomeFrame;
 import obsidianAnimator.gui.sequence.EntityAutoMove;
 import obsidianAnimator.gui.sequence.ExternalFrame;
 import obsidianAnimator.gui.sequence.GuiEntityRendererWithTranslation;
-import obsidianAnimator.render.objRendering.parts.Part;
+
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
+
+import obsidianAPI.render.Part;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
