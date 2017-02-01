@@ -1,28 +1,55 @@
 package obsidianAnimator.gui.sequence.timeline;
 
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.File;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import javax.swing.AbstractAction;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JLayeredPane;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JSlider;
+import javax.swing.JTextField;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+
+import org.lwjgl.input.Keyboard;
+import org.lwjgl.opengl.Display;
+import org.lwjgl.opengl.GL11;
+
+import obsidianAPI.animation.AnimationPart;
+import obsidianAPI.animation.AnimationSequence;
+import obsidianAPI.render.part.Part;
 import obsidianAnimator.Util;
-import obsidianAnimator.animation.AnimationPart;
-import obsidianAnimator.animation.AnimationSequence;
 import obsidianAnimator.file.FileHandler;
 import obsidianAnimator.gui.GuiBlack;
 import obsidianAnimator.gui.frames.HomeFrame;
 import obsidianAnimator.gui.sequence.EntityAutoMove;
 import obsidianAnimator.gui.sequence.ExternalFrame;
 import obsidianAnimator.gui.sequence.GuiEntityRendererWithTranslation;
-import obsidianAnimator.render.objRendering.parts.Part;
-import org.lwjgl.input.Keyboard;
-import org.lwjgl.opengl.Display;
-import org.lwjgl.opengl.GL11;
-
-import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import java.awt.*;
-import java.awt.event.*;
-import java.io.File;
-import java.text.DecimalFormat;
-import java.util.*;
-import java.util.List;
 
 public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation implements ExternalFrame
 {

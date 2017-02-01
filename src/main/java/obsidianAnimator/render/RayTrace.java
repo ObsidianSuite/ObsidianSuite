@@ -1,4 +1,4 @@
-package obsidianAnimator.render.objRendering;
+package obsidianAnimator.render;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
@@ -9,7 +9,7 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.GLU;
 
 import net.minecraft.util.Vec3;
-import obsidianAnimator.render.objRendering.parts.PartObj;
+import obsidianAPI.render.part.PartObj;
 
 public class RayTrace 
 {

@@ -3,7 +3,7 @@ package obsidianAnimator;
 import cpw.mods.fml.common.registry.EntityRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.LanguageRegistry;
-import obsidianAnimator.render.objRendering.EntityObj;
+import obsidianAnimator.render.entity.EntityObj;
 
 public class CommonProxy
 {	

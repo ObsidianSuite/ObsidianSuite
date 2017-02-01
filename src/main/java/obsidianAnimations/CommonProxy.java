@@ -1,4 +1,5 @@
 package obsidianAnimations;
+
 import net.minecraft.util.ResourceLocation;
 import obsidianAPI.registry.AnimationRegistry;
 

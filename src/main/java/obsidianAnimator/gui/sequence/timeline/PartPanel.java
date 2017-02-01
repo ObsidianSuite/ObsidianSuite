@@ -9,8 +9,8 @@ import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import obsidianAPI.render.part.Part;
 import obsidianAnimator.Util;
-import obsidianAnimator.render.objRendering.parts.Part;
 
 public class PartPanel extends JPanel
 {

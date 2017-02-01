@@ -1,4 +1,4 @@
-package obsidianAnimator.animation;
+package obsidianAPI.animation;
 //package com.nthrootsoftware.mcea.animation;
 //
 //import java.util.ArrayList;

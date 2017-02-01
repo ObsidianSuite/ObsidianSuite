@@ -1,4 +1,4 @@
-package obsidianAnimator.render.objRendering.parts;
+package obsidianAPI.render.part;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -6,7 +6,7 @@ import java.nio.FloatBuffer;
 
 import org.lwjgl.opengl.GL11;
 
-import obsidianAnimator.render.objRendering.ModelObj;
+import obsidianAPI.render.ModelObj;
 
 public class PartRotation extends Part
 {
