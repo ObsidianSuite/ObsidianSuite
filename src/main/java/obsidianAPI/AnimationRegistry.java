@@ -7,14 +7,9 @@ public class AnimationRegistry
 {
 	
 	//Map between entity type and the corresponding map of animations.
-	private Map<String, AnimationMap> entityMap;
+	private static Map<String, AnimationMap> entityMap = new HashMap<String, AnimationMap>();
 	
-	public AnimationRegistry()
-	{
-		entityMap = new HashMap<String, AnimationMap>();
-	}
-	
-	public void registerEntity(String entityType)
+	public static void registerEntity(String entityType)
 	{
 		entityMap.put(entityType, new AnimationMap());
 	}

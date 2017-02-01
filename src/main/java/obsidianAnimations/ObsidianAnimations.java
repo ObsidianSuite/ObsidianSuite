@@ -1,16 +1,9 @@
 package obsidianAnimations;
 
-import java.io.File;
-
-import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
-import net.minecraft.block.Block;
-import net.minecraft.client.Minecraft;
-import net.minecraftforge.common.MinecraftForge;
-import obsidianAnimator.block.BlockBase;
-import obsidianAnimator.block.BlockGrid;
+import obsidianAPI.AnimationRegistry;
 
 @Mod(modid = "ObsidianAnimations")
 public class ObsidianAnimations
@@ -21,13 +14,12 @@ public class ObsidianAnimations
 
 	@SidedProxy(serverSide = "obsidianAnimations.CommonProxy", clientSide = "obsidianAnimations.ClientProxy")
 	public static CommonProxy proxy;
-    		
+	    		
 	@Mod.EventHandler
 	public void init(FMLInitializationEvent event)
 	{		
 		instance = this;		
 		proxy.init();
-		proxy.registerBlocks();
-		proxy.registerItems();
+		proxy.registerAnimations();
 	}
 }
