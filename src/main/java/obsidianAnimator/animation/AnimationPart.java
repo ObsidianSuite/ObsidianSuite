@@ -1,6 +1,8 @@
 package obsidianAnimator.animation;
 
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.Locale;
 
 import org.lwjgl.util.vector.Quaternion;
 
@@ -21,7 +23,7 @@ public class AnimationPart
 	private float[] endPosition;
 	private float[] movement = new float[3];
 	private String partName;
-	private DecimalFormat df = new DecimalFormat("##.##");
+	private DecimalFormat df = new DecimalFormat("##.##", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
 	private Quaternion startQuart, endQuart;
 
 	public AnimationPart(NBTTagCompound compound) 
