@@ -298,8 +298,9 @@ public class ModelObj extends ModelBase
 				if(!parenting.hasParent(part))
 					part.render();
 			}
-			else if(p instanceof PartEntityPos)
-				((PartEntityPos) p).move(entity);
+			//TODO entity movement via PartEntityPos
+//			else if(p instanceof PartEntityPos)
+//				((PartEntityPos) p).move(entity);
 		}
 
 		GL11.glPopMatrix();

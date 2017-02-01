@@ -12,7 +12,6 @@ public class ModEntities
 	public static void registerEntities()
 	{
 		registerEntity(EntityDummyPlayer.class, "DummyPlayer");
-		//EntityRegistry.registerGlobalEntityID(EntityDummyPlayer.class, "DummyPlayer", EntityRegistry.findGlobalUniqueEntityId(), 0, 0);
 	}
 
 	public static void registerEntity(Class entityClass, String name)
