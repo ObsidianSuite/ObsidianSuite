@@ -16,9 +16,9 @@ public class AnimationRegistry
 		entityMap.put(entityType, new AnimationMap());
 	}
 	
-	public static void registerAnimation(String entityType)
+	public static void registerAnimation(String entityType, String binding, ResourceLocation resource)
 	{
-		entityMap.get(entityType).registerAnimation();
+		entityMap.get(entityType).registerAnimation(binding, resource);
 	}
 	
 }
