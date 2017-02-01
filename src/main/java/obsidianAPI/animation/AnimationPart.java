@@ -1,4 +1,4 @@
-package obsidianAnimator.animation;
+package obsidianAPI.animation;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -8,9 +8,9 @@ import org.lwjgl.util.vector.Quaternion;
 
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
+import obsidianAPI.render.part.Part;
+import obsidianAPI.render.part.PartObj;
 import obsidianAnimator.render.MathHelper;
-import obsidianAnimator.render.objRendering.parts.Part;
-import obsidianAnimator.render.objRendering.parts.PartObj;
 
 /**
  * A section of an animation for a specific part. 

@@ -20,12 +20,10 @@ import javax.swing.plaf.basic.BasicComboBoxRenderer;
 import org.lwjgl.input.Mouse;
 
 import net.minecraft.client.Minecraft;
+import obsidianAPI.render.part.Part;
+import obsidianAPI.render.part.PartObj;
 import obsidianAnimator.Util;
 import obsidianAnimator.gui.frames.HomeFrame;
-import obsidianAnimator.render.objRendering.bend.Bend;
-import obsidianAnimator.render.objRendering.parts.Part;
-import obsidianAnimator.render.objRendering.parts.PartObj;
-
 
 public class GuiAnimationParenting extends GuiEntityRenderer 
 {
@@ -77,20 +75,15 @@ public class GuiAnimationParenting extends GuiEntityRenderer
 			int n = JOptionPane.showConfirmDialog(parentingFrame, "Parent " + child.getDisplayName() + " to " + parent.getDisplayName() + "?", "Parenting", 
 					JOptionPane.YES_NO_CANCEL_OPTION);
 			if(n == 0)
-			{
-				if(Bend.canCreateBend(child, parent) && JOptionPane.showConfirmDialog(parentingFrame, "Parent with bend?", "Parenting", JOptionPane.YES_NO_OPTION) == 0)
-					parent(parent, child, true);
-				else
-					parent(parent, child, false);
-			}
+				parent(parent, child);
 		}
 	}
 
-	private void parent(PartObj parent, PartObj child, boolean bend) 
+	private void parent(PartObj parent, PartObj child) 
 	{
 		try
 		{
-			entityModel.setParent(child, parent, bend);
+			entityModel.setParent(child, parent);
 			relationFrame.updateLabels();
 		}
 		catch(Exception e)

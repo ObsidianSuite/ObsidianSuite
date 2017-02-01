@@ -1,13 +1,12 @@
-package obsidianAnimator.animation;
+package obsidianAPI.animation;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import obsidianAnimator.Util;
-import obsidianAnimator.render.objRendering.ModelObj;
-import obsidianAnimator.render.objRendering.parts.Part;
+import obsidianAPI.render.ModelObj;
+import obsidianAPI.render.part.Part;
 
 /**
  * An actual animation. Comprised of animation parts - sections for each part of the model.

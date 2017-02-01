@@ -6,8 +6,8 @@ import java.util.List;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.entity.Entity;
-import obsidianAnimator.render.objRendering.parts.Part;
-import obsidianAnimator.render.objRendering.parts.PartObj;
+import obsidianAPI.render.part.Part;
+import obsidianAPI.render.part.PartObj;
 
 public class Util 
 {

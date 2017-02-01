@@ -1,4 +1,4 @@
-package obsidianAnimator;
+package obsidianAnimations;
 
 import java.io.File;
 import java.util.List;
@@ -17,12 +17,7 @@ public class ClientProxy extends CommonProxy
 	
 	public void registerRendering()
 	{
-		//Entities
-        RenderingRegistry.registerEntityRenderingHandler(EntityObj.class, ModelHandler.modelRenderer);
-        
-        //Register animator resource pack, where models and textures are stored.
-        List<IResourcePack> resourcePackList = ObfuscationReflectionHelper.getPrivateValue(FMLClientHandler.class, FMLClientHandler.instance(), "resourcePackList");
-        resourcePackList.add(new AnimationResourcePack());
+
 	}
 }
 

@@ -1,5 +1,15 @@
 package obsidianAnimator.gui;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.lwjgl.input.Keyboard;
+import org.lwjgl.input.Mouse;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL12;
+
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.OpenGlHelper;
@@ -8,29 +18,20 @@ import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.entity.EntityLivingBase;
+import obsidianAPI.render.part.Part;
+import obsidianAPI.render.part.PartObj;
 import obsidianAnimator.ObsidianAnimator;
 import obsidianAnimator.Util;
 import obsidianAnimator.data.ModelHandler;
-import obsidianAnimator.render.objRendering.EntityObj;
-import obsidianAnimator.render.objRendering.ModelObj;
-import obsidianAnimator.render.objRendering.parts.Part;
-import obsidianAnimator.render.objRendering.parts.PartObj;
-import org.lwjgl.input.Keyboard;
-import org.lwjgl.input.Mouse;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import obsidianAnimator.render.entity.EntityObj;
+import obsidianAnimator.render.entity.ModelObj_Animator;
 
 public class GuiEntityRenderer extends GuiBlack
 {
 
 	public String entityName;
 	public EntityLivingBase entityToRender;
-	public ModelObj entityModel;
+	public ModelObj_Animator entityModel;
 	protected List<String> parts = new ArrayList<String>();
 	public String currentPartName;
 	protected String additionalHighlightPartName;
