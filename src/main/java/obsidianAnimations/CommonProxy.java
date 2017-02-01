@@ -1,10 +1,6 @@
 package obsidianAnimations;
-import cpw.mods.fml.common.registry.EntityRegistry;
-import cpw.mods.fml.common.registry.GameRegistry;
-import cpw.mods.fml.common.registry.LanguageRegistry;
 import net.minecraft.util.ResourceLocation;
-import obsidianAPI.AnimationRegistry;
-import obsidianAnimator.render.objRendering.EntityObj;
+import obsidianAPI.registry.AnimationRegistry;
 
 public class CommonProxy
 {	
