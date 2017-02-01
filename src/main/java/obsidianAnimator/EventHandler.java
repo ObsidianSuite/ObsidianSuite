@@ -9,6 +9,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.event.entity.EntityEvent.EntityConstructing;
 import obsidianAnimator.gui.GuiAnimationMainMenu;
@@ -47,7 +48,7 @@ public class EventHandler
 		if(Minecraft.getMinecraft().currentScreen instanceof GuiMainMenu && !(Minecraft.getMinecraft().currentScreen instanceof GuiAnimationMainMenu))
 			Minecraft.getMinecraft().displayGuiScreen(new GuiAnimationMainMenu());
 		
-		if(Minecraft.getMinecraft().inGameHasFocus && Minecraft.getMinecraft().currentScreen == null)
+		if(Minecraft.getMinecraft().inGameHasFocus && Minecraft.getMinecraft().currentScreen == null && MinecraftServer.getServer().getWorldName().equals("animation_world"))
 		{
 			Minecraft.getMinecraft().displayGuiScreen(new GuiBlack());
 			new HomeFrame().display();
