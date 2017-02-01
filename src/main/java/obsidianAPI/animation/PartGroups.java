@@ -1,4 +1,4 @@
-package obsidianAnimator.animation;
+package obsidianAPI.animation;
 
 import java.util.ArrayList;
 import java.util.HashMap;

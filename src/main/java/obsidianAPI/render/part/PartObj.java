@@ -7,8 +7,8 @@ import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.client.model.obj.GroupObject;
+import obsidianAPI.animation.AnimationParenting;
 import obsidianAPI.render.ModelObj;
-import obsidianAnimator.animation.AnimationParenting;
 
 /**
  * One partObj for each 'part' of the model.

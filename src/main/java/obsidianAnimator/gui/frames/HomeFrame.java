@@ -10,7 +10,7 @@ import javax.swing.JButton;
 import javax.swing.JOptionPane;
 
 import net.minecraft.client.Minecraft;
-import obsidianAnimator.animation.AnimationSequence;
+import obsidianAPI.animation.AnimationSequence;
 import obsidianAnimator.data.ModelHandler;
 import obsidianAnimator.file.FileChooser;
 import obsidianAnimator.file.FileHandler;

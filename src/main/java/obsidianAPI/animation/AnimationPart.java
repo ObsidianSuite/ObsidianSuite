@@ -1,4 +1,4 @@
-package obsidianAnimator.animation;
+package obsidianAPI.animation;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;

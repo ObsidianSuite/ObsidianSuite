@@ -26,13 +26,13 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.ModelFormatException;
 import net.minecraftforge.client.model.obj.GroupObject;
 import net.minecraftforge.client.model.obj.WavefrontObject;
+import obsidianAPI.animation.AnimationParenting;
+import obsidianAPI.animation.PartGroups;
 import obsidianAPI.render.part.Part;
 import obsidianAPI.render.part.PartEntityPos;
 import obsidianAPI.render.part.PartObj;
 import obsidianAPI.render.part.PartRotation;
 import obsidianAnimator.Util;
-import obsidianAnimator.animation.AnimationParenting;
-import obsidianAnimator.animation.PartGroups;
 
 public class ModelObj extends ModelBase
 {

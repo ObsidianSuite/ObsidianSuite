@@ -8,7 +8,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.IResource;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.util.ResourceLocation;
-import obsidianAnimator.animation.AnimationSequence;
+import obsidianAPI.animation.AnimationSequence;
 
 /**
  * A class for storing animation sequences.

@@ -26,8 +26,8 @@ import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import obsidianAPI.animation.PartGroups;
 import obsidianAPI.render.part.PartObj;
-import obsidianAnimator.animation.PartGroups;
 import obsidianAnimator.gui.sequence.timeline.BlankMouseListener;
 
 public class GuiPartSetup extends GuiEntityRenderer

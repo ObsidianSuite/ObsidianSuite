@@ -12,9 +12,9 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.obj.Face;
 import net.minecraftforge.client.model.obj.GroupObject;
 import net.minecraftforge.client.model.obj.TextureCoordinate;
+import obsidianAPI.animation.AnimationParenting;
 import obsidianAPI.render.ModelObj;
 import obsidianAPI.render.part.PartObj;
-import obsidianAnimator.animation.AnimationParenting;
 import obsidianAnimator.render.MathHelper;
 
 /**
