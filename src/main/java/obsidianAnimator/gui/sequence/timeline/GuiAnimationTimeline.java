@@ -1,40 +1,5 @@
 package obsidianAnimator.gui.sequence.timeline;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
-import java.awt.event.MouseWheelEvent;
-import java.awt.event.MouseWheelListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.io.File;
-import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
-import org.lwjgl.input.Keyboard;
-import org.lwjgl.opengl.Display;
-import org.lwjgl.opengl.GL11;
-
 import obsidianAnimator.Util;
 import obsidianAnimator.animation.AnimationPart;
 import obsidianAnimator.animation.AnimationSequence;
@@ -44,8 +9,20 @@ import obsidianAnimator.gui.frames.HomeFrame;
 import obsidianAnimator.gui.sequence.EntityAutoMove;
 import obsidianAnimator.gui.sequence.ExternalFrame;
 import obsidianAnimator.gui.sequence.GuiEntityRendererWithTranslation;
-import obsidianAnimator.render.objRendering.EntityObj;
 import obsidianAnimator.render.objRendering.parts.Part;
+import org.lwjgl.input.Keyboard;
+import org.lwjgl.opengl.Display;
+import org.lwjgl.opengl.GL11;
+
+import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import java.awt.*;
+import java.awt.event.*;
+import java.io.File;
+import java.text.DecimalFormat;
+import java.util.*;
+import java.util.List;
 
 public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation implements ExternalFrame
 {
@@ -74,6 +51,8 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 	EntityAutoMove entityMovement;
 	
 	private File animationFile;
+
+	private KeyMappings keyMappings;
 
 	public GuiAnimationTimeline(File animationFile, AnimationSequence animation)
 	{
@@ -109,19 +88,25 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
     public void loadFrames()
     {
         timelineFrame = new TimelineFrame();
+        keyMappings = new KeyMappings(timelineFrame);
 
-        addKeyAction(KeyEvent.VK_SPACE, "spacePressed", new SpaceAction());
-        addKeyAction(KeyEvent.VK_W, "wPressed", new WAction());
-        addKeyAction(KeyEvent.VK_S, "sPressed", new SAction());
-        addKeyAction(KeyEvent.VK_A, "aPressed", new AAction());
-        addKeyAction(KeyEvent.VK_D, "dPressed", new DAction());
-        addKeyAction(KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.CTRL_DOWN_MASK, true), "undoReleased", new UndoAction());
-        addKeyAction(KeyStroke.getKeyStroke(KeyEvent.VK_Y, InputEvent.CTRL_DOWN_MASK, true), "redoReleased", new RedoAction());
-        addKeyAction(KeyEvent.VK_ESCAPE, "escPressed", new EscAction());
+        keyMappings.addKey(KeyEvent.VK_SPACE, Keyboard.KEY_SPACE, "spacePressed", new SpaceAction());
+        keyMappings.addKey(KeyEvent.VK_W, Keyboard.KEY_W, "wPressed", new WAction());
+        keyMappings.addKey(KeyEvent.VK_S, Keyboard.KEY_S, "sPressed", new SAction());
+        keyMappings.addKey(KeyEvent.VK_A, Keyboard.KEY_A, "aPressed", new AAction());
+        keyMappings.addKey(KeyEvent.VK_D, Keyboard.KEY_D,"dPressed", new DAction());
+        keyMappings.addCtrlKey(KeyEvent.VK_Z,Keyboard.KEY_Z, "undoReleased", new UndoAction());
+        keyMappings.addCtrlKey(KeyEvent.VK_Y, Keyboard.KEY_Y,"redoReleased", new RedoAction());
+        keyMappings.addKey(KeyEvent.VK_ESCAPE,Keyboard.KEY_ESCAPE, "escPressed", new EscAction());
 
-        for (int j = 0; j <= 9; j++)
+        int[] numpadKey = new int[] {
+        		Keyboard.KEY_NUMPAD0, Keyboard.KEY_NUMPAD1, Keyboard.KEY_NUMPAD2, Keyboard.KEY_NUMPAD3,
+				Keyboard.KEY_NUMPAD4, Keyboard.KEY_NUMPAD5, Keyboard.KEY_NUMPAD6, Keyboard.KEY_NUMPAD7,
+				Keyboard.KEY_NUMPAD8, Keyboard.KEY_NUMPAD9};
+
+		for (int j = 0; j <= 9; j++)
         {
-            addKeyAction(KeyEvent.VK_NUMPAD0 + j, "numpad" + j, new ChangeViewAction(j));
+			keyMappings.addKey(KeyEvent.VK_NUMPAD0 + j, numpadKey[j], "numpad" + j, new ChangeViewAction(j));
         }
 
         timelineFrame.refresthLineColours();
@@ -136,10 +121,10 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
     {
         JFrame frame = timelineFrame;
         InputMap inputMap = frame.getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        ActionMap actionMap = frame.getRootPane().getActionMap();
+		ActionMap actionMap = frame.getRootPane().getActionMap();
 
-        inputMap.put(keyStroke, actionMapKey);
-        actionMap.put(actionMapKey, action);
+		inputMap.put(keyStroke, actionMapKey);
+		actionMap.put(actionMapKey, action);
     }
 
 	/**
@@ -488,52 +473,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 	@Override
 	protected void keyTyped(char par1, int par2)
 	{
-		switch(par2)
-		{	
-		case Keyboard.KEY_SPACE:
-			new SpaceAction().actionPerformed(new ActionEvent(this, ActionEvent.ACTION_FIRST, ""));
-			break;
-		case Keyboard.KEY_W:
-			new WAction().actionPerformed(new ActionEvent(this, ActionEvent.ACTION_FIRST, ""));
-			break;
-		case Keyboard.KEY_S:
-			new SAction().actionPerformed(new ActionEvent(this, ActionEvent.ACTION_FIRST, ""));
-			break;
-		case Keyboard.KEY_A:
-			new AAction().actionPerformed(new ActionEvent(this, ActionEvent.ACTION_FIRST, ""));
-			break;
-		case Keyboard.KEY_D:
-			new DAction().actionPerformed(new ActionEvent(this, ActionEvent.ACTION_FIRST, ""));
-			break;
-		case Keyboard.KEY_Z:
-			if(this.isCtrlKeyDown())
-				new UndoAction().actionPerformed(new ActionEvent(this, ActionEvent.ACTION_FIRST, ""));
-			break;
-		case Keyboard.KEY_Y:
-			if(this.isCtrlKeyDown())
-				new RedoAction().actionPerformed(new ActionEvent(this, ActionEvent.ACTION_FIRST, ""));
-			break;
-		case Keyboard.KEY_DELETE:
-			new DeleteAction().actionPerformed(new ActionEvent(this, ActionEvent.ACTION_FIRST, ""));
-			break;	
-			//LWJGL's assignment of keys for the numpad is dumb so we have to do this manually...
-		case Keyboard.KEY_NUMPAD1:
-			new ChangeViewAction(1).actionPerformed(new ActionEvent(this, ActionEvent.ACTION_FIRST, "")); break;
-		case Keyboard.KEY_NUMPAD2:
-			new ChangeViewAction(2).actionPerformed(new ActionEvent(this, ActionEvent.ACTION_FIRST, "")); break;
-		case Keyboard.KEY_NUMPAD4:
-			new ChangeViewAction(4).actionPerformed(new ActionEvent(this, ActionEvent.ACTION_FIRST, "")); break;
-		case Keyboard.KEY_NUMPAD5:
-			new ChangeViewAction(5).actionPerformed(new ActionEvent(this, ActionEvent.ACTION_FIRST, "")); break;
-		case Keyboard.KEY_NUMPAD6:
-			new ChangeViewAction(6).actionPerformed(new ActionEvent(this, ActionEvent.ACTION_FIRST, "")); break;
-		case Keyboard.KEY_NUMPAD7:
-			new ChangeViewAction(7).actionPerformed(new ActionEvent(this, ActionEvent.ACTION_FIRST, "")); break;
-		case Keyboard.KEY_NUMPAD8:
-			new ChangeViewAction(8).actionPerformed(new ActionEvent(this, ActionEvent.ACTION_FIRST, "")); break;
-		case Keyboard.KEY_ESCAPE:
-			new EscAction().actionPerformed(new ActionEvent(this, ActionEvent.ACTION_FIRST, ""));
-		}
+		keyMappings.handleMinecraftKey(par2);
 
 		if(par2 != Keyboard.KEY_ESCAPE)
 			super.keyTyped(par1, par2);
