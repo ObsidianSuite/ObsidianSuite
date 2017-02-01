@@ -579,26 +579,13 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 					}
 				}
 			});
-			timeSlider.addMouseListener(new MouseListener()
+			timeSlider.addMouseListener(new BlankMouseListener()
 			{
-
-				@Override
-				public void mouseClicked(MouseEvent arg0) {}
-
-				@Override
-				public void mouseEntered(MouseEvent arg0) {}
-
-				@Override
-				public void mouseExited(MouseEvent arg0) {}
-
 				@Override
 				public void mousePressed(MouseEvent arg0) 
 				{
 					exceptionPartName = "";
 				}
-
-				@Override
-				public void mouseReleased(MouseEvent arg0) {}	
 			});
 			timeTextField.addKeyListener(new KeyAdapter()
 			{
@@ -762,7 +749,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 				this.partName = partName;
 				mouseWithin = false;
 				keyframeTimeChanged = false;
-				this.addMouseListener(new MouseListener()
+				this.addMouseListener(new BlankMouseListener()
 				{
 					@Override
 					public void mouseClicked(MouseEvent e) 
@@ -794,9 +781,6 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 						repaint();
 						additionalHighlightPartName = "";
 					}
-
-					@Override
-					public void mousePressed(MouseEvent e) {}
 
 					@Override
 					public void mouseReleased(MouseEvent e) 
