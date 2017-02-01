@@ -296,16 +296,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 
 	private boolean keyframeExists()
 	{
-		List<Keyframe> partKeyframes = keyframes.get(currentPartName);
-		if(partKeyframes != null)
-		{
-			for(Keyframe kf : partKeyframes)
-			{
-				if((int)kf.frameTime == (int)time)
-					return true;
-			}
-		}
-		return false;
+		return getExistingKeyframe() != null;
 	}
 
 	private Keyframe getExistingKeyframe()
