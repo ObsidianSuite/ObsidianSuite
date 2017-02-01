@@ -112,21 +112,6 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
         timelineFrame.refresthLineColours();
     }
 
-    private void addKeyAction(int keyCode, String actionMapKey, Action action)
-    {
-        addKeyAction(KeyStroke.getKeyStroke(keyCode, 0), actionMapKey, action);
-    }
-
-    private void addKeyAction(KeyStroke keyStroke, String actionMapKey, Action action)
-    {
-        JFrame frame = timelineFrame;
-        InputMap inputMap = frame.getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-		ActionMap actionMap = frame.getRootPane().getActionMap();
-
-		inputMap.put(keyStroke, actionMapKey);
-		actionMap.put(actionMapKey, action);
-    }
-
 	/**
 	 * Creates keyframes from the animation sequence. 
 	 */
