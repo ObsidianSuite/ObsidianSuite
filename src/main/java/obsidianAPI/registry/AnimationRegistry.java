@@ -1,4 +1,4 @@
-package obsidianAPI;
+package obsidianAPI.registry;
 
 import java.util.HashMap;
 import java.util.Map;
