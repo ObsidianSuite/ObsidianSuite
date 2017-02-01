@@ -3,6 +3,8 @@ package obsidianAPI;
 import java.util.HashMap;
 import java.util.Map;
 
+import net.minecraft.util.ResourceLocation;
+
 public class AnimationRegistry 
 {
 	
@@ -13,4 +15,10 @@ public class AnimationRegistry
 	{
 		entityMap.put(entityType, new AnimationMap());
 	}
+	
+	public static void registerAnimation(String entityType)
+	{
+		entityMap.get(entityType).registerAnimation();
+	}
+	
 }
