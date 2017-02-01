@@ -1,15 +1,20 @@
 package obsidianAnimations;
 
-import net.minecraft.util.ResourceLocation;
-import obsidianAPI.render.ModelAnimated;
-import obsidianAPI.render.RenderAnimated;
+import java.io.IOException;
 
-public class RenderDummyPlayer extends RenderAnimated
+import net.minecraft.util.ResourceLocation;
+import obsidianAPI.render.ModelObj;
+import obsidianAPI.render.RenderObj;
+
+public class RenderDummyPlayer extends RenderObj
 {
 
-	public RenderDummyPlayer() 
+	private static final ResourceLocation modelRL = new ResourceLocation("mod_obsidian_animations:models/player/Player.obm");
+	private static final ResourceLocation textureRL = new ResourceLocation("mod_obsidian_animations:models/player/Player.png");
+	
+	public RenderDummyPlayer() throws IOException 
 	{
-		super(null , null);
+		super(new ModelObj("dummy", modelRL, textureRL), null);
 	}
 
 }

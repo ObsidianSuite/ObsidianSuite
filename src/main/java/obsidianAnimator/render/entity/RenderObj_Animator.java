@@ -20,11 +20,11 @@ import obsidianAPI.render.part.PartRotation;
 import obsidianAnimator.Util;
 
 @SideOnly(Side.CLIENT)
-public class RenderObj extends RenderLiving
+public class RenderObj_Animator extends RenderLiving
 {
 	private ModelObj modelObj;
 			
-	public RenderObj() 
+	public RenderObj_Animator() 
 	{
 		super(null, 0.5F);
 	}

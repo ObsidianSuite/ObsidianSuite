@@ -4,12 +4,12 @@ import net.minecraft.client.renderer.entity.RenderLiving;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
 
-public class RenderAnimated extends RenderLiving
+public class RenderObj extends RenderLiving
 {
 
 	private ResourceLocation texture;
 	
-	public RenderAnimated(ModelAnimated model, ResourceLocation texture)
+	public RenderObj(ModelObj model, ResourceLocation texture)
 	{
 		//TODO shadow size?
 		super(model, 1.0F);

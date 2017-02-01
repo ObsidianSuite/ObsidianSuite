@@ -4,10 +4,13 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,8 +20,10 @@ import org.lwjgl.opengl.GL11;
 
 import com.google.common.collect.Maps;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelRenderer;
+import net.minecraft.client.resources.IResource;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
@@ -27,6 +32,7 @@ import net.minecraftforge.client.model.ModelFormatException;
 import net.minecraftforge.client.model.obj.GroupObject;
 import net.minecraftforge.client.model.obj.WavefrontObject;
 import obsidianAPI.animation.AnimationParenting;
+import obsidianAPI.animation.AnimationSequence;
 import obsidianAPI.animation.PartGroups;
 import obsidianAPI.render.part.Part;
 import obsidianAPI.render.part.PartEntityPos;
@@ -48,15 +54,24 @@ public class ModelObj extends ModelBase
 	private static final float offsetFixY = -1.5F;
 
 	private final ResourceLocation txtRL;
-
-	public ModelObj(String entityName, File modelFile, ResourceLocation texture)
+	
+	public ModelObj(String entityName, File modelFile, ResourceLocation textureLocation) throws FileNotFoundException
+	{			
+		this(entityName, new FileInputStream(modelFile), textureLocation);
+	}
+	
+	public ModelObj(String entityName, ResourceLocation modelLocation, ResourceLocation textureLocation) throws IOException
+	{			
+		this(entityName, Minecraft.getMinecraft().getResourceManager().getResource(modelLocation).getInputStream(), textureLocation);
+	}
+	
+	public ModelObj(String entityName, InputStream modelInputStream, ResourceLocation textureLocation)
 	{			
 		this.entityName = entityName;
 		defaults = Maps.newHashMap();
 		parenting = new AnimationParenting();
-		txtRL = texture;
-
-		loadFromFile(modelFile);
+		txtRL = textureLocation;
+		load(modelInputStream);
 		init();
 	}
 
@@ -86,11 +101,11 @@ public class ModelObj extends ModelBase
 		return defaults.get(part).clone();
 	}
 
-	private void loadFromFile(File file) 
+	private void load(InputStream stream) 
 	{
 		try 
 		{
-			BufferedReader reader = new BufferedReader(new FileReader(file));
+			BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
 			
 			String nbtData = "";
 			String modelData = "";
