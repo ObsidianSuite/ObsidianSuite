@@ -21,7 +21,6 @@ import net.minecraft.entity.EntityLivingBase;
 import obsidianAPI.render.part.Part;
 import obsidianAPI.render.part.PartObj;
 import obsidianAnimator.ObsidianAnimator;
-import obsidianAnimator.Util;
 import obsidianAnimator.data.ModelHandler;
 import obsidianAnimator.render.entity.EntityObj;
 import obsidianAnimator.render.entity.ModelObj_Animator;
@@ -32,9 +31,9 @@ public class GuiEntityRenderer extends GuiBlack
 	public String entityName;
 	public EntityLivingBase entityToRender;
 	public ModelObj_Animator entityModel;
-	protected List<String> parts = new ArrayList<String>();
-	public String currentPartName;
-	protected String additionalHighlightPartName;
+	protected List<Part> parts = new ArrayList<Part>();
+	public Part selectedPart;
+	protected Part hoveredPart;
 
 	public boolean boolBase;
 	public boolean boolGrid;
@@ -64,11 +63,11 @@ public class GuiEntityRenderer extends GuiBlack
 		//Setup parts list.
 		for(Part part : entityModel.parts)
 		{
-			parts.add(part.getName());
+			parts.add(part);
 			part.setToOriginalValues();
 		}
 
-		currentPartName = parts.get(0);
+		selectedPart = parts.get(0);
 		setupViews();
 		
 		ModelHandler.updateRenderer(entityName);
@@ -154,18 +153,16 @@ public class GuiEntityRenderer extends GuiBlack
 
 		entityModel.clearHighlights();
 
-		if(currentPartName != null && !currentPartName.equals(""))
+		if(selectedPart != null)
 		{
-			Part currentPart = Util.getPartFromName(currentPartName, entityModel.parts);
-			if(currentPart instanceof PartObj)
-				entityModel.hightlightPart((PartObj) currentPart, true);
+			if(selectedPart instanceof PartObj)
+				entityModel.hightlightPart((PartObj) selectedPart, true);
 		}
 
-		if(additionalHighlightPartName != null && !additionalHighlightPartName.equals(""))
+		if(hoveredPart != null)
 		{
-			Part additionalPart = Util.getPartFromName(additionalHighlightPartName, entityModel.parts);
-			if(additionalPart instanceof PartObj)
-				entityModel.hightlightPart((PartObj) additionalPart, false);
+			if(hoveredPart instanceof PartObj)
+				entityModel.hightlightPart((PartObj) hoveredPart, false);
 		}
 	}
 
@@ -177,10 +174,10 @@ public class GuiEntityRenderer extends GuiBlack
 	protected void mouseClicked(int x, int y, int i) 
 	{
 		super.mouseClicked(x, y, i);
-		if(i == 0 && additionalHighlightPartName != null && !additionalHighlightPartName.equals(""))
-			updatePart(additionalHighlightPartName);
+		if(i == 0 && hoveredPart != null)
+			updatePart(hoveredPart);
 		else if(i == 0)
-			updatePart("");
+			updatePart(null);
 	}
 
 	@Override
@@ -247,9 +244,9 @@ public class GuiEntityRenderer extends GuiBlack
 	 * 		     	   Part Manipulation					*
 	 * ---------------------------------------------------- */
 
-	protected void updatePart(String newPartName)
+	protected void updatePart(Part newPartName)
 	{
-		currentPartName = newPartName;
+		selectedPart = newPartName;
 	}
 
 
@@ -259,11 +256,7 @@ public class GuiEntityRenderer extends GuiBlack
 
 	public void processRay()
 	{
-		PartObj raySelection = entityModel.testRay();
-		if(raySelection != null)
-			additionalHighlightPartName = raySelection.getName();
-		else
-			additionalHighlightPartName = "";
+		hoveredPart = entityModel.testRay();
 	}
 
 	/* ---------------------------------------------------- *

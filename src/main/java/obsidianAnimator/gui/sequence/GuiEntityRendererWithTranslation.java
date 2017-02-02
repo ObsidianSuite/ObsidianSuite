@@ -67,11 +67,11 @@ public class GuiEntityRendererWithTranslation extends GuiEntityRendererWithRotat
 	@Override
 	public void processRay()
 	{
-		if(currentPartName != null && !currentPartName.equals(""))
+		if(selectedPart != null)
 		{
 			GL11.glPushMatrix();
 
-			Part part = Util.getPartFromName(currentPartName, entityModel.parts);
+			Part part = selectedPart;
 			if(part instanceof PartObj || part instanceof PartRotation)
 			{
 				GL11.glPopMatrix();
@@ -101,7 +101,7 @@ public class GuiEntityRendererWithTranslation extends GuiEntityRendererWithRotat
 				}
 				//If it is being hovered over, ensure there is no part highlighted for selection.
 				else
-					additionalHighlightPartName = null;
+					hoveredPart = null;
 			}
 			else
 				onControllerDrag();
@@ -118,7 +118,7 @@ public class GuiEntityRendererWithTranslation extends GuiEntityRendererWithRotat
 		if(dim != null)
 		{
 			GL11.glPushMatrix();
-			Part part = Util.getPartFromName(currentPartName, entityModel.parts);
+			Part part = selectedPart;
 			if(part instanceof PartEntityPos)
 				GL11.glTranslated(-entityToRender.posX, -entityToRender.posY, -entityToRender.posZ);
 			translationAxisMouseOver = true;
@@ -190,7 +190,7 @@ public class GuiEntityRendererWithTranslation extends GuiEntityRendererWithRotat
 			double d = translationDelta - prevTranslationDelta;
 			if(!Double.isNaN(d))
 			{
-				Part part = Util.getPartFromName(currentPartName, entityModel.parts);
+				Part part = selectedPart;
 				if(part instanceof PartEntityPos)
 					d *= -1;
 				updatePartValue(-d, translationAxisPlane);
@@ -202,7 +202,7 @@ public class GuiEntityRendererWithTranslation extends GuiEntityRendererWithRotat
 	@Override
 	protected void onControllerDrag()
 	{
-		Part part = Util.getPartFromName(currentPartName, entityModel.parts);
+		Part part = selectedPart;
 		if(part instanceof PartObj || part instanceof PartRotation)
 			super.onControllerDrag();
 		else

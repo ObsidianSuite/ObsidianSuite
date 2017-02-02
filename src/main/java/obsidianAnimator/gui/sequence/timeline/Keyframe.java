@@ -1,8 +1,10 @@
 package obsidianAnimator.gui.sequence.timeline;
 
+import obsidianAPI.render.part.Part;
+
 class Keyframe
 {
-    final String partName;
+    final Part part;
     int frameTime;
     //Rotation for parts and position for entityPosition
     final float[] values;
@@ -10,10 +12,10 @@ class Keyframe
     boolean isCurrent;
     boolean isSelected;
 
-    public Keyframe(int frameTime, String partName, float[] values)
+    public Keyframe(int frameTime, Part part, float[] values)
     {
         this.frameTime = frameTime;
-        this.partName = partName;
+        this.part = part;
         this.values = values;
     }
 }

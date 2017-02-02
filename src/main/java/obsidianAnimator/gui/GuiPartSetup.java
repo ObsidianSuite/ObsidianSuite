@@ -325,7 +325,7 @@ public class GuiPartSetup extends GuiEntityRenderer
 					@Override
 					public void mouseEntered(MouseEvent e) 
 					{
-						currentPartName = part.getName();
+						selectedPart = part;
 					}
 				});
 			}
@@ -369,7 +369,7 @@ public class GuiPartSetup extends GuiEntityRenderer
 					@Override
 					public void mouseEntered(MouseEvent arg0) 
 					{
-						currentPartName = partPanel.part.getName();
+						selectedPart = partPanel.part;
 					}
 
 					@Override
