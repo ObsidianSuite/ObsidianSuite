@@ -1,22 +1,6 @@
 package obsidianAPI.render;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import org.lwjgl.opengl.GL11;
-
 import com.google.common.collect.Maps;
-
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.entity.Entity;
@@ -33,6 +17,12 @@ import obsidianAPI.render.part.PartEntityPos;
 import obsidianAPI.render.part.PartObj;
 import obsidianAPI.render.part.PartRotation;
 import obsidianAnimator.Util;
+import org.lwjgl.opengl.GL11;
+
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public class ModelObj extends ModelBase
 {
@@ -145,7 +135,7 @@ public class ModelObj extends ModelBase
 	private void loadModel(String modelData) throws ModelFormatException, UnsupportedEncodingException
 	{
 		model = new WavefrontObject("Test file", new ByteArrayInputStream(modelData.getBytes("UTF-8")));
-		parts = createPartObjList(this, model.groupObjects);
+		parts = createPartObjList(model.groupObjects);
 		parts.add(new PartEntityPos(this));
 		if(entityName.equals("player"))
 		{
@@ -322,12 +312,17 @@ public class ModelObj extends ModelBase
 		return arr;
 	}
 
-	public ArrayList<Part> createPartObjList(ModelObj model, ArrayList<GroupObject> groupObjects)
+	public ArrayList<Part> createPartObjList(ArrayList<GroupObject> groupObjects)
 	{
 		ArrayList<Part> parts = new ArrayList<Part>();
 		for(GroupObject gObj : groupObjects)
-			parts.add(new PartObj(model, gObj));
+			parts.add(createPart(gObj));
 		return parts;
+	}
+
+	protected PartObj createPart(GroupObject group)
+	{
+		return new PartObj(this, group);
 	}
 	
 	public NBTTagCompound createNBTTag()

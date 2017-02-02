@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.client.model.obj.GroupObject;
 import obsidianAPI.render.ModelObj;
 import obsidianAPI.render.part.Part;
 import obsidianAPI.render.part.PartObj;
@@ -22,6 +23,12 @@ public class ModelObj_Animator extends ModelObj
 	{			
 		super(entityName, modelFile, texture);
 		hightlightedParts = new ArrayList<PartObj>();
+	}
+
+	@Override
+	protected PartObj createPart(GroupObject group)
+	{
+		return new PartObj_Animator(this, group);
 	}
 
 	//----------------------------------------------------------------
