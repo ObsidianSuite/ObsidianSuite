@@ -110,8 +110,8 @@ public class GuiAnimationParenting extends GuiEntityRenderer
 
 	private class ParentingFrame extends JFrame
 	{
-		JComboBox<String> parentDropDown;
-		JComboBox<String> childDropDown;
+		JComboBox<Part> parentDropDown;
+		JComboBox<Part> childDropDown;
 
 		private ParentingFrame()
 		{
@@ -121,15 +121,14 @@ public class GuiAnimationParenting extends GuiEntityRenderer
 			mainPanel.setLayout(new GridBagLayout());
 			GridBagConstraints c = new GridBagConstraints();
 
-			parentDropDown = new JComboBox<String>();
-			childDropDown = new JComboBox<String>();
-			for(String s : parts)
+			parentDropDown = new JComboBox<Part>();
+			childDropDown = new JComboBox<Part>();
+			for(Part p : parts)
 			{
-				Part p = Util.getPartFromName(s, entityModel.parts);
 				if(p instanceof PartObj)
 				{
-					parentDropDown.addItem(s);
-					childDropDown.addItem(s);
+					parentDropDown.addItem(p);
+					childDropDown.addItem(p);
 				}
 			}
 			parentDropDown.setRenderer(new PartComboBoxRenderer(true));
@@ -140,7 +139,7 @@ public class GuiAnimationParenting extends GuiEntityRenderer
 				@Override
 				public void actionPerformed(ActionEvent e) 
 				{
-					currentPartName = (String) ((JComboBox<String>) e.getSource()).getSelectedItem();
+					selectedPart = (Part) ((JComboBox<String>) e.getSource()).getSelectedItem();
 				}
 			});
 
@@ -149,7 +148,7 @@ public class GuiAnimationParenting extends GuiEntityRenderer
 				@Override
 				public void actionPerformed(ActionEvent e) 
 				{
-					additionalHighlightPartName = (String) ((JComboBox<String>) e.getSource()).getSelectedItem();
+					hoveredPart = (Part) ((JComboBox<String>) e.getSource()).getSelectedItem();
 				}
 			});
 
@@ -301,9 +300,9 @@ public class GuiAnimationParenting extends GuiEntityRenderer
 				if (index > -1) 
 				{
 					if(parentPart)
-						currentPartName = parts.get(index);
+						selectedPart = parts.get(index);
 					else
-						additionalHighlightPartName = parts.get(index);
+						hoveredPart = parts.get(index);
 				}
 			} 
 			else 
@@ -312,7 +311,7 @@ public class GuiAnimationParenting extends GuiEntityRenderer
 				setForeground(list.getForeground());
 			}
 			setFont(list.getFont());
-			setText((value == null) ? "" : Util.getDisplayName(value.toString(), entityModel.parts));
+			setText((value == null) ? "" : ((Part)value).getName());
 			return this;
 		}
 	}

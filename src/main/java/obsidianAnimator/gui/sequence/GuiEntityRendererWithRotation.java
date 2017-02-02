@@ -40,7 +40,7 @@ public class GuiEntityRendererWithRotation extends GuiEntityRenderer
 
 	protected void updatePartValue(double value, int dim)
 	{
-		Part part = Util.getPartFromName(currentPartName, entityModel.parts);
+		Part part = selectedPart;
 		if(part instanceof PartRotation)
 			((PartRotation) part).rotateLocal((float) value, dim);
 		else
@@ -83,11 +83,11 @@ public class GuiEntityRendererWithRotation extends GuiEntityRenderer
 	@Override
 	public void processRay()
 	{
-		if(currentPartName != null && !currentPartName.equals(""))
+		if(selectedPart != null)
 		{
 			GL11.glPushMatrix();
 
-			Part part = Util.getPartFromName(currentPartName, entityModel.parts);
+			Part part = selectedPart;
 			PartObj partObj;
 			if(part instanceof PartObj)
 			{
@@ -123,7 +123,7 @@ public class GuiEntityRendererWithRotation extends GuiEntityRenderer
 				}
 				//If it is being hovered over, ensure there is no part highlighted for selection.
 				else
-					additionalHighlightPartName = null;
+					hoveredPart = null;
 			}
 			else
 				onControllerDrag();
@@ -136,7 +136,6 @@ public class GuiEntityRendererWithRotation extends GuiEntityRenderer
 
 	/**
 	 * Update the rotation wheel states based on the current part.
-	 * @param part - Current partObj.
 	 */
 	private void updateWheelMouseOver()
 	{
@@ -154,7 +153,6 @@ public class GuiEntityRendererWithRotation extends GuiEntityRenderer
 
 	/**
 	 * Test to see if the ray intersects with the rotation wheel at all.
-	 * @param part - Currently selected part
 	 * @return Dimension of wheel that intersection is with. (0-x,1-y,2-z).
 	 */
 	private Integer testRotationRay()
@@ -184,9 +182,9 @@ public class GuiEntityRendererWithRotation extends GuiEntityRenderer
 	public Vec3 getMouseVectorInPlane(int dim)
 	{
 		GL11.glPushMatrix();
-		if(currentPartName != null && !currentPartName.equals(""))
+		if(selectedPart != null)
 		{
-			Part part = Util.getPartFromName(currentPartName, entityModel.parts);
+			Part part = selectedPart;
 			if(part instanceof PartRotation)
 			{
 				GL11.glRotated(-part.getValue(2)/Math.PI*180F, 0, 0, 1);
@@ -269,9 +267,6 @@ public class GuiEntityRendererWithRotation extends GuiEntityRenderer
 	 * @param c - Centre of circle.
 	 * @param r - Radius of circle.
 	 * @param plane - 0,1,2 for x,y and z.
-	 * @param red - red colour (0 - 1F)
-	 * @param green - green colour (0 - 1F)
-	 * @param blue - blue colour (0 - 1F)
 	 */
 	private void drawCircle(Vec3 c, double r, int plane, int colour, float width, float alpha)
 	{		
