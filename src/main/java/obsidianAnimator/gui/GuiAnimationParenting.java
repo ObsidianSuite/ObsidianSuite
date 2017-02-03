@@ -1,29 +1,17 @@
 package obsidianAnimator.gui;
 
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.plaf.basic.BasicComboBoxRenderer;
-
-import org.lwjgl.input.Mouse;
-
 import net.minecraft.client.Minecraft;
 import obsidianAPI.render.part.Part;
 import obsidianAPI.render.part.PartObj;
 import obsidianAnimator.Util;
 import obsidianAnimator.gui.frames.HomeFrame;
+import org.lwjgl.input.Mouse;
+
+import javax.swing.*;
+import javax.swing.plaf.basic.BasicComboBoxRenderer;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 public class GuiAnimationParenting extends GuiEntityRenderer 
 {
@@ -53,12 +41,30 @@ public class GuiAnimationParenting extends GuiEntityRenderer
 		super.handleMouseInput();
 	}
 
-	private void attemptParent()
+	@Override
+	protected void updatePart(Part newPartName)
 	{
-		PartObj parent = getParent();
-		PartObj child = getChild();
+		if (selectedPart != null && newPartName != null && selectedPart instanceof PartObj && newPartName instanceof PartObj)
+		{
+			PartObj parent = (PartObj) this.selectedPart;
+			PartObj child = (PartObj) newPartName;
+			attemptParent(parent, child);
+		}
+		else
+		{
+			super.updatePart(newPartName);
+		}
+	}
+
+	private void attemptParent(PartObj parent, PartObj child)
+	{
 		if(parent.getName().equals(child.getName()))
+		{
 			JOptionPane.showMessageDialog(parentingFrame, "Cannot parent a part to itself.", "Parenting issue", JOptionPane.ERROR_MESSAGE);
+		} else if (!entityModel.parenting.areUnrelated(child, parent) || !entityModel.parenting.areUnrelated(parent, child))
+		{
+			JOptionPane.showMessageDialog(parentingFrame, "Parts are already related.", "Parenting issue", JOptionPane.ERROR_MESSAGE);
+		}
 		else if(entityModel.parenting.hasParent(child))
 		{
 			Object[] options = {"OK", "Remove bend"};
@@ -156,9 +162,9 @@ public class GuiAnimationParenting extends GuiEntityRenderer
 			relationButton.addActionListener(new ActionListener()
 			{
 				@Override
-				public void actionPerformed(ActionEvent e) 
+				public void actionPerformed(ActionEvent e)
 				{
-					attemptParent();
+					attemptParent(GuiAnimationParenting.this.getParent(), getChild());
 				}
 			});
 
