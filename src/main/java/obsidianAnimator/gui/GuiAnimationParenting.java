@@ -1,6 +1,7 @@
 package obsidianAnimator.gui;
 
 import net.minecraft.client.Minecraft;
+import obsidianAPI.animation.AnimationParenting;
 import obsidianAPI.render.part.Part;
 import obsidianAPI.render.part.PartObj;
 import obsidianAnimator.Util;
@@ -61,18 +62,18 @@ public class GuiAnimationParenting extends GuiEntityRenderer
 		if(parent.getName().equals(child.getName()))
 		{
 			JOptionPane.showMessageDialog(parentingFrame, "Cannot parent a part to itself.", "Parenting issue", JOptionPane.ERROR_MESSAGE);
-		} else if (!entityModel.parenting.areUnrelated(child, parent) || !entityModel.parenting.areUnrelated(parent, child))
+		} else if (!AnimationParenting.areUnrelated(child, parent) || !AnimationParenting.areUnrelated(parent, child))
 		{
 			JOptionPane.showMessageDialog(parentingFrame, "Parts are already related.", "Parenting issue", JOptionPane.ERROR_MESSAGE);
 		}
-		else if(entityModel.parenting.hasParent(child))
+		else if(child.getParent() != null)
 		{
 			Object[] options = {"OK", "Remove bend"};
 			int n = JOptionPane.showOptionDialog(parentingFrame, child.getDisplayName() + " already has a parent.", "Parenting issue",
 						JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE,null,options,options[0]);
 			if(n == 1)
 			{
-				entityModel.parenting.unParent(child);
+				entityModel.setParent(child, null);
 				relationFrame.updateLabels();
 			}
 		}
@@ -89,6 +90,7 @@ public class GuiAnimationParenting extends GuiEntityRenderer
 	{
 		try
 		{
+
 			entityModel.setParent(child, parent);
 			relationFrame.updateLabels();
 		}
@@ -174,7 +176,11 @@ public class GuiAnimationParenting extends GuiEntityRenderer
 				@Override
 				public void actionPerformed(ActionEvent e) 
 				{
-					entityModel.parenting.clear();
+					for (PartObj partObj : entityModel.getPartObjs())
+					{
+						entityModel.setParent(partObj, null);
+						partObj.getChildren().clear();
+					}
 					relationFrame.updateLabels();
 				}
 			});
@@ -266,22 +272,25 @@ public class GuiAnimationParenting extends GuiEntityRenderer
 			mainPanel.add(new JLabel("Children"),c);
 			
 			int h = 1;
-			for(PartObj parent : entityModel.parenting.getAllParents())
+			for(PartObj parent : entityModel.getPartObjs())
 			{
-				c.gridx = 0;
-				c.gridy = h;
-				mainPanel.add(new JLabel(parent.getDisplayName()),c);
-				c.gridx = 1;
-				String s = "";
-				for(PartObj child : entityModel.parenting.getChildren(parent))
+				if (!parent.getChildren().isEmpty())
 				{
-					s = s + child.getDisplayName() + ",";
+					c.gridx = 0;
+					c.gridy = h;
+					mainPanel.add(new JLabel(parent.getDisplayName()), c);
+					c.gridx = 1;
+					String s = "";
+					for (PartObj child : parent.getChildren())
+					{
+						s = s + child.getDisplayName() + ",";
+					}
+					if (s.length() > 1)
+						s = s.substring(0, s.length() - 1);
+
+					mainPanel.add(new JLabel(s), c);
+					h++;
 				}
-				if(s.length() > 1)
-					s = s.substring(0, s.length() - 1);
-				
-				mainPanel.add(new JLabel(s),c);
-				h++;
 			}
 			revalidate();
 			pack();

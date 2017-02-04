@@ -19,6 +19,7 @@ import obsidianAPI.render.part.PartRotation;
 import obsidianAnimator.Util;
 import org.lwjgl.opengl.GL11;
 
+import javax.annotation.Nullable;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +31,6 @@ public class ModelObj extends ModelBase
 	public final String entityName;
 	public WavefrontObject model;
 	public ArrayList<Part> parts;
-	public AnimationParenting parenting;
 	public PartGroups partGroups;
 	private Map<PartObj, float[]> defaults;
 
@@ -43,7 +43,6 @@ public class ModelObj extends ModelBase
 	{			
 		this.entityName = entityName;
 		defaults = Maps.newHashMap();
-		parenting = new AnimationParenting();
 		txtRL = texture;
 
 		loadFromFile(modelFile);
@@ -192,7 +191,7 @@ public class ModelObj extends ModelBase
 	
 	private void loadSetup(NBTTagCompound nbt)
 	{		
-		parenting.loadData(nbt.getCompoundTag("Parenting"), this);
+		AnimationParenting.loadData(nbt.getCompoundTag("Parenting"), this);
 		partGroups.loadData(nbt.getCompoundTag("Groups"), this);
 	}
 
@@ -241,9 +240,16 @@ public class ModelObj extends ModelBase
 	//						Parenting
 	//----------------------------------------------------------------
 
-	public void setParent(PartObj child, PartObj parent)
+	public void setParent(PartObj child, @Nullable PartObj parent)
 	{
-		parenting.addParenting(parent, child);
+		if (child.hasParent())
+			child.getParent().removeChild(child);
+
+		child.setParent(parent);
+		if (parent != null)
+		{
+			parent.addChild(child);
+		}
 	}
 
 	//----------------------------------------------------------------
@@ -280,7 +286,7 @@ public class ModelObj extends ModelBase
 			if(p instanceof PartObj)
 			{
 				PartObj part = (PartObj) p;
-				if(!parenting.hasParent(part))
+				if(!part.hasParent())
 					part.render();
 			}
 			else if(p instanceof PartEntityPos)
@@ -328,7 +334,7 @@ public class ModelObj extends ModelBase
 	public NBTTagCompound createNBTTag()
 	{
 		NBTTagCompound nbt = new NBTTagCompound();
-		nbt.setTag("Parenting", parenting.getSaveData());
+		nbt.setTag("Parenting", AnimationParenting.getSaveData(this));
 		nbt.setTag("Groups", partGroups.getSaveData());
 		return nbt;
 	}

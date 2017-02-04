@@ -48,13 +48,12 @@ public class PartObj_Animator extends PartObj
 		GL11.glPushMatrix();
 
 		//Get all parents that need compensating for.
-		AnimationParenting anipar = modelObj.parenting;
 		List<PartObj> parents = new ArrayList<PartObj>();
 		PartObj p = this;
 		parents.add(p);
-		while(anipar.hasParent(p))
+		while(p.hasParent())
 		{
-			p = anipar.getParent(p);
+			p = p.getParent();
 			parents.add(0, p);
 		}
 
