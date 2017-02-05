@@ -156,9 +156,9 @@ public class AnimationSequence
         return null;
 	}
 
-	public float getTotalTime()
+	public int getTotalTime()
 	{
-		float max = 0.0F;
+		int max = 0;
 		for(AnimationPart animation : animations)
 		{
 			if(animation.getEndTime() > max)
