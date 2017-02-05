@@ -196,11 +196,4 @@ public class AnimationSequence
 		actionPoint = compound.getFloat("ActionPoint");
 		fps = compound.hasKey("FPS") ? compound.getInteger("FPS") : 25;
 	}
-
-	private static class TimeRangeKey
-	{
-		private final float start;
-
-		private TimeRangeKey(float start) {this.start = start;}
-	}
 }
