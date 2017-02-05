@@ -288,6 +288,8 @@ public class ModelObj extends ModelBase
 	{		
 		super.render(entity, time, distance, loop, lookY, lookX, scale);
 
+		setRotationAngles(time, distance, loop, lookY, lookX, scale, entity);
+		
 		GL11.glPushMatrix();
 		GL11.glRotatef(initRotFix, 1.0F, 0.0F, 0.0F);
 		GL11.glTranslatef(0.0F, offsetFixY, 0.0F);

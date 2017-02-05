@@ -133,12 +133,11 @@ public class AnimationSequence
 			if(!part.getName().equals(exceptionPartName))
 			{
                 TreeMap<Integer, AnimationPart> animations = partsByPartName.get(part.getName());
-				if (animations != null && animations.size() > 0)
+				if(animations != null && animations.size() > 0)
 				{
                     AnimationPart anim = findPartForTime(animations, MathHelper.floor_float(time));
                     if (anim == null)
                         anim = animations.lastEntry().getValue();
-
                     anim.animatePart(part, time - anim.getStartTime());
                 }
 			}
@@ -190,7 +189,7 @@ public class AnimationSequence
 		for(int i = 0; i < segmentList.tagCount(); i++)
 		{
 			AnimationPart animation = new AnimationPart(segmentList.getCompoundTagAt(i));
-			animations.add(animation);
+			addAnimation(animation);
 		}
 		animationName = compound.getString("Name");
 		actionPoint = compound.getFloat("ActionPoint");

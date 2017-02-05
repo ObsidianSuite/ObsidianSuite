@@ -1,16 +1,19 @@
 package obsidianAPI.render;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
+import obsidianAPI.animation.AnimationSequence;
+import obsidianAPI.registry.AnimationRegistry;
+import obsidianAnimator.Util;
 
 public class ModelAnimated extends ModelObj
 {
 
+	private long animStartTime = System.nanoTime();
+	
 	public ModelAnimated(String entityName, ResourceLocation modelLocation, ResourceLocation textureLocation) throws IOException
 	{			
 		super(entityName, Minecraft.getMinecraft().getResourceManager().getResource(modelLocation).getInputStream(), textureLocation);
@@ -20,6 +23,16 @@ public class ModelAnimated extends ModelObj
 	public void setRotationAngles(float f, float f1, float f2, float f3, float f4, float f5, Entity entity) 
 	{				
 		super.setRotationAngles(f, f1, f2, f3, f4, f5, entity);
+		
+		AnimationSequence seq = AnimationRegistry.getAnimation("player", "WalkF");
+		
+		
+		float time = Util.getAnimationFrameTime(animStartTime, 0, seq.getFPS(), 1.0F);
+		
+		if(time > seq.getTotalTime())
+			animStartTime = System.nanoTime();
+		
+		seq.animateAll(time, this);		
 	}
 
 }

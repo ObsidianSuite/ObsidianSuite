@@ -44,6 +44,12 @@ class AnimationMap
 		}
 	}
 	
+	AnimationSequence getAnimation(String binding)
+	{
+		//TODO error handling here if animation is null.
+		return map.get(binding);
+	}
+	
 	private AnimationSequence loadAnimation(ResourceLocation resource) throws IOException
 	{
         IResource res = Minecraft.getMinecraft().getResourceManager().getResource(resource);
