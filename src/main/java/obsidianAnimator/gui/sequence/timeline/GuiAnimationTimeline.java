@@ -146,7 +146,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 	public void loadKeyframes()
 	{	
 		keyframes.clear();
-		for(AnimationPart animpart : currentAnimation.getAnimations())
+		for(AnimationPart animpart : currentAnimation.getAnimationList())
 		{
 			Part mr = Util.getPartFromName(animpart.getPartName(), entityModel.parts);
 
@@ -419,7 +419,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 	private void updateAnimationFPS(int fps)
 	{
 		AnimationSequence sequence = new AnimationSequence(entityName, currentAnimation.getName());
-		sequence.setAnimations(currentAnimation.getAnimations());
+		sequence.setAnimations(currentAnimation.getAnimationList());
 		sequence.setFPS(fps);
 		updateAnimation(sequence);
 	}
