@@ -1,34 +1,36 @@
 package obsidianAPI.animation;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.google.common.collect.Maps;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.util.MathHelper;
 import obsidianAPI.render.ModelObj;
 import obsidianAPI.render.part.Part;
+
+import java.util.*;
 
 /**
  * An actual animation. Comprised of animation parts - sections for each part of the model.
  *
  */
-public class AnimationSequence 
+public class AnimationSequence
 {
 
 	private String animationName;
-	List<AnimationPart> animations = new ArrayList<AnimationPart>();
+	private List<AnimationPart> animations = new ArrayList<AnimationPart>();
+	private final Map<String, TreeMap<Integer,AnimationPart>> partsByPartName = Maps.newHashMap();
 	private float actionPoint = 0.0F;
 	private int fps;
 	private String entityName;
 
-	public AnimationSequence(String entityName, String animationName) 
+	public AnimationSequence(String entityName, String animationName)
 	{
 		this.entityName = entityName;
 		this.animationName = animationName;
 		this.fps = 25;
 	}
-	
-	public AnimationSequence(NBTTagCompound compound) 
+
+	public AnimationSequence(NBTTagCompound compound)
 	{
 		this.loadData(compound);
 	}
@@ -37,25 +39,54 @@ public class AnimationSequence
 	{
 		return entityName;
 	}
-	
-	public String getName() 
+
+	public String getName()
 	{
 		return animationName;
 	}
-	
+
 	public void setAnimations(List<AnimationPart> animations)
 	{
 		this.animations = animations;
+
+		partsByPartName.clear();
+		for (AnimationPart part : animations)
+		{
+			addAnimationToMap(part);
+		}
 	}
-	
-	public List<AnimationPart> getAnimations() 
+
+	private void addAnimationToMap(AnimationPart part)
+	{
+        TreeMap<Integer, AnimationPart> parts = partsByPartName.get(part.getPartName());
+        if (parts == null)
+        {
+            parts = new TreeMap<>();
+            partsByPartName.put(part.getPartName(), parts);
+        }
+
+        parts.put(part.getStartTime(), part);
+    }
+
+	public List<AnimationPart> getAnimations()
 	{
 		return animations;
 	}
 
-	public void addAnimation(AnimationPart par0Animation)
+	public Collection<AnimationPart> getAnimations(String partName)
 	{
-		animations.add(par0Animation);
+        TreeMap<Integer, AnimationPart> parts = partsByPartName.get(partName);
+		if (parts == null)
+		{
+			return Collections.emptyList();
+		}
+		return parts.values();
+	}
+
+	public void addAnimation(AnimationPart part)
+	{
+		animations.add(part);
+		addAnimationToMap(part);
 	}
 
 	public void setActionPoint(float time)
@@ -67,71 +98,67 @@ public class AnimationSequence
 	{
 		return actionPoint;
 	}
-	
+
 	public int getFPS()
 	{
 		return fps;
 	}
-	
+
 	public void setFPS(int fps)
 	{
 		this.fps = fps;
 	}
-	
+
 	/**
 	 * Return true if the given partname has two or more animation parts associated with it.
 	 */
 	public boolean multiPartSequence(String partName)
 	{
-		boolean one = false;
-		for(AnimationPart s : this.animations)
-		{
-			if(s.getPartName().equals(partName))
-			{
-				//If one is true, another animation part having this part name implies two or more.
-				if(one)
-					return true;
-				else
-					one = true;
-			}
-		}
-		return false;
+	    return getAnimations(partName).size() >= 2;
 	}
 
-	public void animateAll(float time, ModelObj entityModel) 
+	public void animateAll(float time, ModelObj entityModel)
 	{
 		animateAll(time, entityModel, "");
 	}
-	
+
 	/**
 	 * Sets all the parts of a model to their rotation at a given time.
 	 * The part with name = exceptionPartName will not be rotated.
 	 */
-	public void animateAll(float time, ModelObj entityModel, String exceptionPartName) 
+	public void animateAll(float time, ModelObj entityModel, String exceptionPartName)
 	{
-		//TODO this could be more efficient, currently O(num_anim_parts*num_body_parts)
 		for(Part part : entityModel.parts)
 		{
 			if(!part.getName().equals(exceptionPartName))
 			{
-				AnimationPart lastAnimation = getLastAnimation(part.getName());
-				if(lastAnimation != null && time > lastAnimation.getEndTime())
-					lastAnimation.animatePart(part, lastAnimation.getEndTime() - lastAnimation.getStartTime());
-				else
+                TreeMap<Integer, AnimationPart> animations = partsByPartName.get(part.getName());
+				if (animations != null && animations.size() > 0)
 				{
-					for(AnimationPart s : this.animations)
-					{
-						if(s.getPartName().equals(part.getName()) && time >= s.getStartTime() && time <= s.getEndTime())
-							s.animatePart(part, time - s.getStartTime());
-					}
-				}
+                    AnimationPart anim = findPartForTime(animations, MathHelper.floor_float(time));
+                    if (anim == null)
+                        anim = animations.lastEntry().getValue();
+
+                    anim.animatePart(part, time - anim.getStartTime());
+                }
 			}
 		}
 	}
 
-	public float getTotalTime() 
+	private AnimationPart findPartForTime(TreeMap<Integer,AnimationPart> parts, int time)
 	{
-		float max = 0.0F;
+        Map.Entry<Integer, AnimationPart> entry = parts.floorEntry(time);
+        if (entry != null)
+        {
+            return entry.getValue();
+        }
+
+        return null;
+	}
+
+	public int getTotalTime()
+	{
+		int max = 0;
 		for(AnimationPart animation : animations)
 		{
 			if(animation.getEndTime() > max)
@@ -140,29 +167,9 @@ public class AnimationSequence
 			}
 		}
 		return max;
-	}	
-
-	/**
-	 * Returns the time of the last frame for a given part.
-	 */
-	private AnimationPart getLastAnimation(String partName)
-	{
-		AnimationPart lastAnimation = null;
-		for(AnimationPart s : this.animations)
-		{
-			if(s.getPartName().equals(partName))
-				if(lastAnimation != null)
-				{
-					if(s.getEndTime() > lastAnimation.getEndTime())
-						lastAnimation = s;
-				}
-				else
-					lastAnimation = s;
-		}
-		return lastAnimation;
 	}
 
-	public NBTTagCompound getSaveData() 
+	public NBTTagCompound getSaveData()
 	{
 		NBTTagCompound sequenceData = new NBTTagCompound();
 		NBTTagList animationList = new NBTTagList();
@@ -176,7 +183,7 @@ public class AnimationSequence
 		return sequenceData;
 	}
 
-	public void loadData(NBTTagCompound compound) 
+	public void loadData(NBTTagCompound compound)
 	{
 		entityName = compound.getString("EntityName");
 		NBTTagList segmentList = compound.getTagList("Animations", 10);
@@ -184,10 +191,9 @@ public class AnimationSequence
 		{
 			AnimationPart animation = new AnimationPart(segmentList.getCompoundTagAt(i));
 			animations.add(animation);
-		}		
+		}
 		animationName = compound.getString("Name");
 		actionPoint = compound.getFloat("ActionPoint");
 		fps = compound.hasKey("FPS") ? compound.getInteger("FPS") : 25;
 	}
-
 }

@@ -17,8 +17,8 @@ import obsidianAnimator.render.MathHelper;
  */
 public class AnimationPart 
 {
-	private float startTime;
-	private float endTime;
+	private int startTime;
+	private int endTime;
 	private float[] startPosition;
 	private float[] endPosition;
 	private float[] movement = new float[3];
@@ -31,7 +31,7 @@ public class AnimationPart
 		loadData(compound);
 	}
 
-	public AnimationPart(float startTime, float endTime, float[] startPos, float[] endPos, Part part)
+	public AnimationPart(int startTime, int endTime, float[] startPos, float[] endPos, Part part)
 	{
 		this.startTime = startTime;
 		this.endTime = endTime;
@@ -114,12 +114,12 @@ public class AnimationPart
 		return endPosition;
 	}
 
-	public float getStartTime()
+	public int getStartTime()
 	{
 		return startTime;
 	}
 
-	public float getEndTime()
+	public int getEndTime()
 	{
 		return endTime;
 	}
@@ -161,8 +161,8 @@ public class AnimationPart
 		animationData.setFloat("XEnd", Float.parseFloat(df.format(this.endPosition[0])));
 		animationData.setFloat("YEnd", Float.parseFloat(df.format(this.endPosition[1])));
 		animationData.setFloat("ZEnd", Float.parseFloat(df.format(this.endPosition[2])));
-		animationData.setFloat("StartTime", Float.parseFloat(df.format(this.startTime)));
-		animationData.setFloat("FinishTime", Float.parseFloat(df.format(this.endTime)));
+		animationData.setFloat("StartTime", this.startTime);
+		animationData.setFloat("FinishTime", this.endTime);
 		animationData.setString("Part", partName);
 		return animationData;
 	}
@@ -177,8 +177,8 @@ public class AnimationPart
 		this.endPosition[0] = compound.getFloat("XEnd");
 		this.endPosition[1] = compound.getFloat("YEnd");
 		this.endPosition[2] = compound.getFloat("ZEnd");
-		this.startTime = compound.getFloat("StartTime");
-		this.endTime = compound.getFloat("FinishTime");
+		this.startTime = compound.getInteger("StartTime");
+		this.endTime = compound.getInteger("FinishTime");
 		this.partName = compound.getString("Part");
 	}
 
