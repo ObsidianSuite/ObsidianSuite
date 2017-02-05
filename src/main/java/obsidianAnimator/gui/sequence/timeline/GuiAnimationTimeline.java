@@ -328,9 +328,9 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 		return null;
 	}
 
-	private float getLastKeyFrameTime() 
+	private int getLastKeyFrameTime()
 	{
-		float lastFrameTime = 0;
+		int lastFrameTime = 0;
 		for(Part part : parts)
 		{
 			if(keyframes.get(part) != null)
@@ -375,7 +375,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 				{
 					//Used for parts that only have one keyframe and where that keyframe is at the beginning 
 					//The part will maintain that rotation throughout the whole animation.
-					sequence.addAnimation(new AnimationPart(0.0F, getLastKeyFrameTime(), kf.values, kf.values, part));
+					sequence.addAnimation(new AnimationPart(0, getLastKeyFrameTime(), kf.values, kf.values, part));
 				}
 			}
 		}
