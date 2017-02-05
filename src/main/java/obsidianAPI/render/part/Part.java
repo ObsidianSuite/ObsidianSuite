@@ -9,8 +9,8 @@ public class Part
 {
 	protected float valueX, valueY, valueZ;
 	protected float[] originalValues;
-	private String name;
-	public ModelObj modelObj;
+	private final String name;
+	public final ModelObj modelObj;
 
 	public Part(ModelObj mObj, String name) 
 	{
@@ -84,4 +84,23 @@ public class Part
 		setValues(originalValues);
 	}
 
+	@Override
+	public boolean equals(Object o)
+	{
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+
+		Part part = (Part) o;
+
+		if (!name.equals(part.name)) return false;
+		return modelObj.equals(part.modelObj);
+	}
+
+	@Override
+	public int hashCode()
+	{
+		int result = name.hashCode();
+		result = 31 * result + modelObj.hashCode();
+		return result;
+	}
 }

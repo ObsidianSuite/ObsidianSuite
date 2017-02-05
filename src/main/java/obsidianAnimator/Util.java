@@ -25,14 +25,6 @@ public class Util
         tessellator.addVertexWithUV(x + 0, y + 0, zLevel, 0, 0);
         tessellator.draw();
 	}
-	
-	public static String getDisplayName(String partName, ArrayList<Part> parts) 
-	{
-		Part p = getPartFromName(partName, parts);
-		if(p != null)
-			return p.getDisplayName();
-		return partName;
-	}
 
 	public static Part getPartFromName(String name, ArrayList<Part> parts) 
 	{

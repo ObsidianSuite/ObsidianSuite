@@ -4,9 +4,7 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,14 +14,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Nullable;
+
 import org.lwjgl.opengl.GL11;
 
 import com.google.common.collect.Maps;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelRenderer;
-import net.minecraft.client.resources.IResource;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
@@ -32,7 +30,6 @@ import net.minecraftforge.client.model.ModelFormatException;
 import net.minecraftforge.client.model.obj.GroupObject;
 import net.minecraftforge.client.model.obj.WavefrontObject;
 import obsidianAPI.animation.AnimationParenting;
-import obsidianAPI.animation.AnimationSequence;
 import obsidianAPI.animation.PartGroups;
 import obsidianAPI.render.part.Part;
 import obsidianAPI.render.part.PartEntityPos;
@@ -46,7 +43,6 @@ public class ModelObj extends ModelBase
 	public final String entityName;
 	public WavefrontObject model;
 	public ArrayList<Part> parts;
-	public AnimationParenting parenting;
 	public PartGroups partGroups;
 	private Map<PartObj, float[]> defaults;
 
@@ -59,7 +55,6 @@ public class ModelObj extends ModelBase
 	{			
 		this.entityName = entityName;
 		defaults = Maps.newHashMap();
-		parenting = new AnimationParenting();
 		txtRL = textureLocation;
 		load(modelInputStream);
 		init();
@@ -150,7 +145,7 @@ public class ModelObj extends ModelBase
 	private void loadModel(String modelData) throws ModelFormatException, UnsupportedEncodingException
 	{
 		model = new WavefrontObject("Test file", new ByteArrayInputStream(modelData.getBytes("UTF-8")));
-		parts = createPartObjList(this, model.groupObjects);
+		parts = createPartObjList(model.groupObjects);
 		parts.add(new PartEntityPos(this));
 		if(entityName.equals("player"))
 		{
@@ -207,7 +202,7 @@ public class ModelObj extends ModelBase
 	
 	private void loadSetup(NBTTagCompound nbt)
 	{		
-		parenting.loadData(nbt.getCompoundTag("Parenting"), this);
+		AnimationParenting.loadData(nbt.getCompoundTag("Parenting"), this);
 		partGroups.loadData(nbt.getCompoundTag("Groups"), this);
 	}
 
@@ -256,9 +251,16 @@ public class ModelObj extends ModelBase
 	//						Parenting
 	//----------------------------------------------------------------
 
-	public void setParent(PartObj child, PartObj parent)
+	public void setParent(PartObj child, @Nullable PartObj parent)
 	{
-		parenting.addParenting(parent, child);
+		if (child.hasParent())
+			child.getParent().removeChild(child);
+
+		child.setParent(parent);
+		if (parent != null)
+		{
+			parent.addChild(child);
+		}
 	}
 
 	//----------------------------------------------------------------
@@ -295,7 +297,7 @@ public class ModelObj extends ModelBase
 			if(p instanceof PartObj)
 			{
 				PartObj part = (PartObj) p;
-				if(!parenting.hasParent(part))
+				if(!part.hasParent())
 					part.render();
 			}
 			//TODO entity movement via PartEntityPos
@@ -328,18 +330,23 @@ public class ModelObj extends ModelBase
 		return arr;
 	}
 
-	public ArrayList<Part> createPartObjList(ModelObj model, ArrayList<GroupObject> groupObjects)
+	public ArrayList<Part> createPartObjList(ArrayList<GroupObject> groupObjects)
 	{
 		ArrayList<Part> parts = new ArrayList<Part>();
 		for(GroupObject gObj : groupObjects)
-			parts.add(new PartObj(model, gObj));
+			parts.add(createPart(gObj));
 		return parts;
+	}
+
+	protected PartObj createPart(GroupObject group)
+	{
+		return new PartObj(this, group);
 	}
 	
 	public NBTTagCompound createNBTTag()
 	{
 		NBTTagCompound nbt = new NBTTagCompound();
-		nbt.setTag("Parenting", parenting.getSaveData());
+		nbt.setTag("Parenting", AnimationParenting.getSaveData(this));
 		nbt.setTag("Groups", partGroups.getSaveData());
 		return nbt;
 	}

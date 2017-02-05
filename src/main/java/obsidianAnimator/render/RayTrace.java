@@ -56,9 +56,9 @@ public class RayTrace
 //		entityModel.clearHighlights();
 //		PartObj p = entityModel.testRay(new RayTrace(v,w));
 //		if(p != null)
-//			additionalHighlightPartName = p.getName();
+//			hoveredPart = p.getName();
 //		else
-//			additionalHighlightPartName = null;
+//			hoveredPart = null;
 	}
 
 	
