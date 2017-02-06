@@ -7,6 +7,7 @@ import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.common.MinecraftForge;
+import obsidianAPI.ObsidianEventHandler;
 
 @Mod(modid = "ObsidianAnimations")
 public class ObsidianAnimations
@@ -31,7 +32,7 @@ public class ObsidianAnimations
 		proxy.init();
 		proxy.registerAnimations();
 
-		ObsidianAnimationsEventHandler eventHandler = new ObsidianAnimationsEventHandler();
+		ObsidianEventHandler eventHandler = new ObsidianEventHandler();
 		MinecraftForge.EVENT_BUS.register(eventHandler);
 
 		if(FMLCommonHandler.instance().getEffectiveSide().isClient())
