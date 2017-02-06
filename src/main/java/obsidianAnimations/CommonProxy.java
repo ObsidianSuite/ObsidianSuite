@@ -19,6 +19,7 @@ public class CommonProxy
 
 	public void registerAnimations()
 	{
+		AnimationRegistry.init();
 		AnimationRegistry.registerEntity("player");
 		AnimationRegistry.registerAnimation("player", "WalkF", new ResourceLocation("mod_obsidian_animations:animations/player/WalkF.oba"));
 	}
