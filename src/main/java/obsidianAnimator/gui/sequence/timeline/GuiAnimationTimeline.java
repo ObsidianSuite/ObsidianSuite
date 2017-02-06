@@ -360,7 +360,8 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 	private void updateAnimationParts()
 	{
 		//Create new animation object if new version
-		AnimationSequence sequence = new AnimationSequence(entityName, currentAnimation.getName());
+		AnimationSequence sequence = currentAnimation.copy();
+		sequence.clearAnimations();
 		//Generate animation from keyframes.
 		for(Part part : keyframes.keySet())
 		{
@@ -418,8 +419,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 
 	private void updateAnimationFPS(int fps)
 	{
-		AnimationSequence sequence = new AnimationSequence(entityName, currentAnimation.getName());
-		sequence.setAnimations(currentAnimation.getAnimations());
+		AnimationSequence sequence = currentAnimation.copy();
 		sequence.setFPS(fps);
 		updateAnimation(sequence);
 	}
@@ -587,6 +587,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 
 			mainPanel = new JPanel();
 			controlPanel = new ControlPanel(GuiAnimationTimeline.this);
+			final ActionPointsPanel actionsPanel = new ActionPointsPanel(GuiAnimationTimeline.this);
 
 			JPanel timelinePanel = new JPanel();
 			final JTextField timeTextField = new JTextField("0");
@@ -605,6 +606,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 					{
 						lines[i].repaint();
 					}
+					actionsPanel.updateText();
 				}
 			});
 			timeSlider.addMouseListener(new BlankMouseListener()
@@ -681,8 +683,20 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 			scrollPane.setPreferredSize(new Dimension(700,400));
 			scrollPane.setWheelScrollingEnabled(false);
 
+			JPanel rightPanel = new JPanel();
+			rightPanel.setLayout(new GridBagLayout());
+
+			c = new GridBagConstraints();
+			c.gridx = 0;
+			c.gridy = 0;
+			rightPanel.add(scrollPane,c);
+			c.gridx = 0;
+			c.gridy = 1;
+			c.fill = GridBagConstraints.HORIZONTAL;
+			rightPanel.add(actionsPanel, c);
+
 			mainPanel.add(controlPanel);
-			mainPanel.add(scrollPane);
+			mainPanel.add(rightPanel);
 
 			setContentPane(mainPanel);
 			pack();
