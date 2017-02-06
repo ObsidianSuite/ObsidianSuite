@@ -12,6 +12,7 @@ public class CommonProxy
 {	
 	public void init() 
 	{	
+		ModEntities.registerEntities();
 		registerRendering();
 	}
 
@@ -19,7 +20,8 @@ public class CommonProxy
 
 	public void registerAnimations()
 	{
-		AnimationRegistry.registerEntity("player");
+		AnimationRegistry.init();
+		AnimationRegistry.registerEntity(EntityDummyPlayer.class, "player");
 		AnimationRegistry.registerAnimation("player", "WalkF", new ResourceLocation("mod_obsidian_animations:animations/player/WalkF.oba"));
 	}
 

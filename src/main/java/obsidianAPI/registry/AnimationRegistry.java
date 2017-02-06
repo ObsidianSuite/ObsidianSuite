@@ -1,25 +1,48 @@
 package obsidianAPI.registry;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import cpw.mods.fml.common.FMLCommonHandler;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.common.MinecraftForge;
+import obsidianAPI.ObsidianEventHandler;
 import obsidianAPI.animation.AnimationSequence;
 import obsidianAPI.exceptions.UnregisteredEntityException;
 
 public class AnimationRegistry 
 {
-	
+		
 	//Map between entity type and the corresponding map of animations.
 	private static Map<String, AnimationMap> entityMap = new HashMap<String, AnimationMap>();
 	
-	/**
-	 * Add an entity type to the AnimationRegistry. 
-	 * This allows animations to be registered for this entity type.
-	 */
-	public static void registerEntity(String entityType)
+	private static Map<Class, String> registeredClasses = new HashMap<Class, String>();
+	
+	public static void init()
+	{
+		ObsidianEventHandler eventHandler = new ObsidianEventHandler();
+		MinecraftForge.EVENT_BUS.register(eventHandler);
+
+		if(FMLCommonHandler.instance().getEffectiveSide().isClient())
+			FMLCommonHandler.instance().bus().register(eventHandler);
+	}
+	
+	public static void registerEntity(Class entityClass, String entityType)
 	{
 		entityMap.put(entityType, new AnimationMap());
+		registeredClasses.put(entityClass, entityType);
+	}
+	
+	public static boolean isRegisteredClass(Class entityClass)
+	{
+		return registeredClasses.containsKey(entityClass);
+	}
+	
+	public static String getEntityName(Class entityClass)
+	{
+		return AnimationRegistry.registeredClasses.get(entityClass);
 	}
 	
 	/**
