@@ -19,12 +19,6 @@ public class ObsidianAnimations
 	@SidedProxy(serverSide = "obsidianAnimations.CommonProxy", clientSide = "obsidianAnimations.ClientProxy")
 	public static CommonProxy proxy;
 
-	@EventHandler
-	public void preInit(FMLPreInitializationEvent event)
-	{
-		ModEntities.registerEntities();
-	}
-
 	@Mod.EventHandler
 	public void init(FMLInitializationEvent event)
 	{		
