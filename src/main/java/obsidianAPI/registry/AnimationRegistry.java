@@ -18,7 +18,7 @@ public class AnimationRegistry
 	//Map between entity type and the corresponding map of animations.
 	private static Map<String, AnimationMap> entityMap = new HashMap<String, AnimationMap>();
 	
-	private static List<Class> registeredClasses = new ArrayList<Class>();
+	private static Map<Class, String> registeredClasses = new HashMap<Class, String>();
 	
 	public static void init()
 	{
@@ -32,12 +32,17 @@ public class AnimationRegistry
 	public static void registerEntity(Class entityClass, String entityType)
 	{
 		entityMap.put(entityType, new AnimationMap());
-		registeredClasses.add(entityClass);
+		registeredClasses.put(entityClass, entityType);
 	}
 	
 	public static boolean isRegisteredClass(Class entityClass)
 	{
-		return registeredClasses.contains(entityClass);
+		return registeredClasses.containsKey(entityClass);
+	}
+	
+	public static String getEntityName(Class entityClass)
+	{
+		return AnimationRegistry.registeredClasses.get(entityClass);
 	}
 	
 	/**

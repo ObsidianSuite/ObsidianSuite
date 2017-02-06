@@ -9,14 +9,16 @@ import obsidianAPI.registry.AnimationRegistry;
 
 public class EntityAnimationProperties implements IExtendedEntityProperties
 {
-	
+
+	private String entityName;
 	private AnimationSequence activeAnimation;
 	private long animationStartTime;
 	
 	@Override
 	public void init(Entity entity, World world) 
 	{
-		
+		entityName = AnimationRegistry.getEntityName(entity.getClass());
+		setActiveAnimation("WalkF");
 	}
 	
 	@Override
@@ -30,15 +32,20 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
 		
 	}
 	
-	public AnimationSequence getActiveAnimation()
+	public void setActiveAnimation(String binding)
 	{
-		//return activeAnimation;
-		return AnimationRegistry.getAnimation("player", "WalkF");
+		activeAnimation = AnimationRegistry.getAnimation(entityName, binding);
+		animationStartTime = System.nanoTime();
 	}
 	
-	public long getCurrentFrame()
+	public AnimationSequence getActiveAnimation()
 	{
-		return animationStartTime;
+		return activeAnimation;
+	}
+	
+	public long getAnimationStartTime()
+	{
+		return System.nanoTime();
 	}
 
 
