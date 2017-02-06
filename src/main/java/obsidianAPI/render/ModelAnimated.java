@@ -5,6 +5,7 @@ import java.io.IOException;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
+import obsidianAPI.EntityAnimationProperties;
 import obsidianAPI.animation.AnimationSequence;
 import obsidianAPI.registry.AnimationRegistry;
 import obsidianAnimator.Util;
@@ -24,15 +25,17 @@ public class ModelAnimated extends ModelObj
 	{				
 		super.setRotationAngles(f, f1, f2, f3, f4, f5, entity);
 		
-		AnimationSequence seq = AnimationRegistry.getAnimation("player", "WalkF");
-		
-		
-		float time = Util.getAnimationFrameTime(animStartTime, 0, seq.getFPS(), 1.0F);
-		
-		if(time > seq.getTotalTime())
-			animStartTime = System.nanoTime();
-		
-		seq.animateAll(time, this);		
+		EntityAnimationProperties animationProperties = (EntityAnimationProperties) entity.getExtendedProperties("Animation");
+		if(animationProperties != null)
+		{
+			AnimationSequence seq = animationProperties.getActiveAnimation();
+						
+			float time = Util.getAnimationFrameTime(animStartTime, 0, seq.getFPS(), 1.0F);
+			
+			if(time > seq.getTotalTime())
+				animStartTime = System.nanoTime();
+			
+			seq.animateAll(time, this);	
+		}
 	}
-
 }
