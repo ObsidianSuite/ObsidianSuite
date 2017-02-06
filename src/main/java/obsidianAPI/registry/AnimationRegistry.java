@@ -1,6 +1,8 @@
 package obsidianAPI.registry;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import cpw.mods.fml.common.FMLCommonHandler;
@@ -12,9 +14,11 @@ import obsidianAPI.exceptions.UnregisteredEntityException;
 
 public class AnimationRegistry 
 {
-	
+		
 	//Map between entity type and the corresponding map of animations.
 	private static Map<String, AnimationMap> entityMap = new HashMap<String, AnimationMap>();
+	
+	private static List<Class> registeredClasses = new ArrayList<Class>();
 	
 	public static void init()
 	{
@@ -25,13 +29,15 @@ public class AnimationRegistry
 			FMLCommonHandler.instance().bus().register(eventHandler);
 	}
 	
-	/**
-	 * Add an entity type to the AnimationRegistry. 
-	 * This allows animations to be registered for this entity type.
-	 */
-	public static void registerEntity(String entityType)
+	public static void registerEntity(Class entityClass, String entityType)
 	{
 		entityMap.put(entityType, new AnimationMap());
+		registeredClasses.add(entityClass);
+	}
+	
+	public static boolean isRegisteredClass(Class entityClass)
+	{
+		return registeredClasses.contains(entityClass);
 	}
 	
 	/**
