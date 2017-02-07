@@ -25,18 +25,26 @@ public class ModelAnimated extends ModelObj
 	{				
 		super.setRotationAngles(f, f1, f2, f3, f4, f5, entity);
 
-		EntityAnimationProperties animProps = (EntityAnimationProperties) entity.getExtendedProperties("Animation");
-		if(animProps != null)
+		if(isMoving(entity))
 		{
-			AnimationSequence seq = animProps.getActiveAnimation();			
-			//float time = Util.getAnimationFrameTime(animProps.getAnimationStartTime(), 0, seq.getFPS(), 1.0F);
-			float time = Util.getAnimationFrameTime(animStartTime, 0, seq.getFPS(), 1.0F);
+			EntityAnimationProperties animProps = (EntityAnimationProperties) entity.getExtendedProperties("Animation");
+			if(animProps != null)
+			{
+				AnimationSequence seq = animProps.getActiveAnimation();			
+				//float time = Util.getAnimationFrameTime(animProps.getAnimationStartTime(), 0, seq.getFPS(), 1.0F);
+				float time = Util.getAnimationFrameTime(animStartTime, 0, seq.getFPS(), 1.0F);
 
-			if(time > seq.getTotalTime())
-				animStartTime = System.nanoTime();
+				if(time > seq.getTotalTime())
+					animStartTime = System.nanoTime();
 
 
-			seq.animateAll(time, this);	
+				seq.animateAll(time, this);	
+			}
 		}
+	}
+
+	private boolean isMoving(Entity parEntity) 
+	{
+		return parEntity.getDistance(parEntity.prevPosX, parEntity.prevPosY, parEntity.prevPosZ) != 0;
 	}
 }
