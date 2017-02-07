@@ -25,19 +25,19 @@ public class EventHandler
 	@SubscribeEvent
 	public void onGuiOpen(GuiOpenEvent event)
 	{
-		try 
-		{
-			if(event.gui instanceof GuiMainMenu && !updateChecked)
-			{
-				ServerConfig.init();
-				new Updater().checkForUpdate(ObsidianAnimator.version);
-				updateChecked = true;
-			}
-		} 
-		catch (IOException e) 
-		{
-			e.printStackTrace();
-		}
+//		try 
+//		{
+//			if(event.gui instanceof GuiMainMenu && !updateChecked)
+//			{
+//				ServerConfig.init();
+//				new Updater().checkForUpdate(ObsidianAnimator.version);
+//				updateChecked = true;
+//			}
+//		} 
+//		catch (IOException e) 
+//		{
+//			e.printStackTrace();
+//		}
 	}
 
 	@SideOnly(Side.CLIENT)
