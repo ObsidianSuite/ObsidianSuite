@@ -1,13 +1,17 @@
 package obsidianAPI.render;
 
 import java.io.IOException;
+import java.util.TreeMap;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
+import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
 import obsidianAPI.EntityAnimationProperties;
+import obsidianAPI.animation.AnimationPart;
 import obsidianAPI.animation.AnimationSequence;
 import obsidianAPI.registry.AnimationRegistry;
+import obsidianAPI.render.part.Part;
 import obsidianAnimator.Util;
 
 public class ModelAnimated extends ModelObj
@@ -41,10 +45,18 @@ public class ModelAnimated extends ModelObj
 				seq.animateAll(time, this);	
 			}
 		}
+		else
+			animateToDefault();
 	}
 
 	private boolean isMoving(Entity parEntity) 
 	{
 		return parEntity.getDistance(parEntity.prevPosX, parEntity.prevPosY, parEntity.prevPosZ) != 0;
+	}
+	
+	private void animateToDefault()
+	{
+		for(Part part : parts)
+			part.setValues(part.getOriginalValues());
 	}
 }
