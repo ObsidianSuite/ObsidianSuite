@@ -25,9 +25,9 @@ public class ModelAnimated extends ModelObj
 	}
 
 	@Override
-	public void setRotationAngles(float f, float f1, float f2, float f3, float f4, float f5, Entity entity) 
+	public void setRotationAngles(float swingTime, float swingMax, float f2, float lookX, float lookY, float f5, Entity entity) 
 	{				
-		super.setRotationAngles(f, f1, f2, f3, f4, f5, entity);
+		super.setRotationAngles(swingTime, swingMax, f2, lookX, lookY, f5, entity);
 
 		if(isMoving(entity))
 		{
@@ -47,6 +47,19 @@ public class ModelAnimated extends ModelObj
 		}
 		else
 			animateToDefault();
+		
+		
+		//System.out.println(lookX);
+		
+		for(Part p : parts)
+		{
+			if(p.getDisplayName().equals("head"))
+			{
+				p.setValue((float) (-lookX/180F*Math.PI), 1);
+				p.setValue((float) (lookY/180F*Math.PI), 0);
+				break;
+			}
+		}
 	}
 
 	private boolean isMoving(Entity parEntity) 
