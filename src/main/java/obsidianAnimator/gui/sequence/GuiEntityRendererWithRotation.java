@@ -96,7 +96,8 @@ public class GuiEntityRendererWithRotation extends GuiEntityRenderer
 			}
 			else if(part instanceof PartRotation)
 			{
-				partObj = (PartObj) Util.getPartFromName("cube.008", entityModel.parts);
+				//FIXME PartRotation part name hardcoded.
+				partObj = entityModel.getPartObjFromName("cube.008");
 				partObj.postRenderAll();
 				GL11.glTranslatef(0,-0.17F,0);
 				((PartRotation) part).rotate();

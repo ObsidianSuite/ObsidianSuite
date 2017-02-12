@@ -276,7 +276,7 @@ public class ModelObj extends ModelBase
 		ArrayList<Part> newPartList = new ArrayList<Part>();
 		for(String partName : order.split(","))
 		{
-			newPartList.add(Util.getPartFromName(partName, parts));
+			newPartList.add(getPartFromName(partName));
 		}
 		for(Part part : parts)
 		{
@@ -390,6 +390,34 @@ public class ModelObj extends ModelBase
 		nbt.setTag("Parenting", AnimationParenting.getSaveData(this));
 		nbt.setTag("Groups", partGroups.getSaveData());
 		return nbt;
+	}
+	
+	public Part getPartFromName(String name) 
+	{
+		for(Part part : parts)
+		{
+			if(part.getName().equals(name) || part.getDisplayName().equals(name))
+			{
+				return part;
+			}
+		}
+		throw new RuntimeException("No part found for '" + name + "'");
+	}
+	
+	public PartObj getPartObjFromName(String name) 
+	{
+		for(Part p : parts)
+		{
+			if(p instanceof PartObj)
+			{
+				PartObj part = (PartObj) p;
+				if(part.getName().equals(name) || part.getDisplayName().equals(name))
+				{
+					return part;
+				}
+			}
+		}
+		throw new RuntimeException("No part obj found for " + name + ".");
 	}
 
 }

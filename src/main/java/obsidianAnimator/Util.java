@@ -11,48 +11,9 @@ import obsidianAPI.render.part.PartObj;
 
 public class Util 
 {
-	
-	/**
-	 * Used for rendering custom Gui sizes, args: posX, posY, width, height, zLevel
-	 **/
-	public static void drawCustomGui(double x, double y, double width, double height, double zLevel)
-	{
-		Tessellator tessellator = Tessellator.instance;
-        tessellator.startDrawingQuads();
-        tessellator.addVertexWithUV(x + 0, y + height, zLevel, 0,1);
-        tessellator.addVertexWithUV(x + width, y + height, zLevel, 1, 1);
-        tessellator.addVertexWithUV(x + width, y + 0, zLevel, 1,0);
-        tessellator.addVertexWithUV(x + 0, y + 0, zLevel, 0, 0);
-        tessellator.draw();
-	}
 
-	public static Part getPartFromName(String name, ArrayList<Part> parts) 
-	{
-		for(Part part : parts)
-		{
-			if(part.getName().equals(name))
-			{
-				return part;
-			}
-		}
-		throw new RuntimeException("No part found for '" + name + "'");
-	}
+
 	
-	public static PartObj getPartObjFromName(String name, ArrayList<Part> parts) 
-	{
-		for(Part p : parts)
-		{
-			if(p instanceof PartObj)
-			{
-				PartObj part = (PartObj) p;
-				if(part.getName().equals(name) || part.getDisplayName().equals(name))
-				{
-					return part;
-				}
-			}
-		}
-		throw new RuntimeException("No part obj found for " + name + ".");
-	}
 	
 	/**
 	 * Calculate which frame an animation is on based on the time that it started at, which frame it started at, and its FPS.

@@ -80,7 +80,8 @@ public class GuiEntityRendererWithTranslation extends GuiEntityRendererWithRotat
 			}
 			else if(!(part instanceof PartEntityPos))
 			{	
-				PartObj partObj = (PartObj) Util.getPartFromName("cube.008", entityModel.parts);
+				//FIXME Hard coded part name
+				PartObj partObj = entityModel.getPartObjFromName("cube.008");
 				partObj.postRenderAll();
 				GL11.glTranslatef(0,-0.17F,0);
 			}

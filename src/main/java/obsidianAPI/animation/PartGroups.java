@@ -150,7 +150,7 @@ public class PartGroups
 		for (int i = 0; i < partList.tagCount(); i++)
 		{
 			NBTTagCompound partCompound = partList.getCompoundTagAt(i);
-			PartObj part = Util.getPartObjFromName(partCompound.getString("Name"), model.parts);
+			PartObj part = model.getPartObjFromName(partCompound.getString("Name"));
 			part.setDisplayName(partCompound.getString("DisplayName"));
 			String group = partCompound.getString("Group");
 			if(!groups.containsKey(group))

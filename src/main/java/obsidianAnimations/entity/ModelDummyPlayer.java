@@ -16,8 +16,8 @@ public class ModelDummyPlayer extends ModelAnimated
 	public ModelDummyPlayer()
 	{
 		super("dummy", modelRL, textureRL);
-		head = Util.getPartObjFromName("head", parts);
-		chestLw = Util.getPartObjFromName("chestLw", parts);
+		head = getPartObjFromName("head");
+		chestLw = getPartObjFromName("chestLw");
 	}
 	
 	@Override

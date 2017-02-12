@@ -108,12 +108,12 @@ public class GuiAnimationParenting extends GuiEntityRenderer
 
 	private PartObj getParent()
 	{
-		return Util.getPartObjFromName((String) parentingFrame.parentDropDown.getSelectedItem(), entityModel.parts);
+		return entityModel.getPartObjFromName((String) parentingFrame.parentDropDown.getSelectedItem());
 	}
 
 	private PartObj getChild()
 	{
-		return Util.getPartObjFromName((String) parentingFrame.childDropDown.getSelectedItem(), entityModel.parts);
+		return entityModel.getPartObjFromName((String) parentingFrame.childDropDown.getSelectedItem());
 	}
 
 	private class ParentingFrame extends JFrame

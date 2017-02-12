@@ -66,12 +66,12 @@ public class AnimationParenting
 		for (int i = 0; i < parentNBTList.tagCount(); i++)
 		{
 			NBTTagCompound parentCompound = parentNBTList.getCompoundTagAt(i);
-			PartObj parent = Util.getPartObjFromName(parentCompound.getString("Parent"), model.parts);
+			PartObj parent = model.getPartObjFromName(parentCompound.getString("Parent"));
 			int j = 0;
 			while(parentCompound.hasKey("Child" + j))
 			{
 				String name = parentCompound.getString("Child" + j);
-				PartObj child = Util.getPartObjFromName(name, model.parts);
+				PartObj child = model.getPartObjFromName(name);
 
                 model.setParent(child, parent);
                 j++;

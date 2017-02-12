@@ -69,16 +69,16 @@ public class RenderObj_Animator extends RenderLiving
 			GL11.glPushMatrix();
 			
 			//Post render for lower right arm.
-			PartObj armLwR = Util.getPartObjFromName("armLwR", modelObj.parts);
+			PartObj armLwR = modelObj.getPartObjFromName("armLwR");
 			armLwR.postRenderItem();
 			
 			//Prop rotation and translation
-			float[] propRotation = Util.getPartFromName("prop_rot", modelObj.parts).getValues();
-			float[] propTranslation = Util.getPartFromName("prop_trans", modelObj.parts).getValues();
+			float[] propRotation = modelObj.getPartFromName("prop_rot").getValues();
+			float[] propTranslation = modelObj.getPartFromName("prop_trans").getValues();
 			GL11.glTranslatef(propTranslation[0], propTranslation[1], propTranslation[2]);	
 			
 			GL11.glRotatef(180F, 1, 0, 0);
-			((PartRotation) Util.getPartFromName("prop_rot", modelObj.parts)).rotate();
+			((PartRotation) modelObj.getPartFromName("prop_rot")).rotate();
 			GL11.glRotatef(-180F, 1, 0, 0);
 			
 			EnumAction enumaction = null;

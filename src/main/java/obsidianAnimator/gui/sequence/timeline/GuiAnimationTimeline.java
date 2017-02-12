@@ -148,7 +148,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 		keyframes.clear();
 		for(AnimationPart animpart : currentAnimation.getAnimationList())
 		{
-			Part mr = Util.getPartFromName(animpart.getPartName(), entityModel.parts);
+			Part mr = entityModel.getPartFromName(animpart.getPartName());
 
 			String partName = animpart.getPartName();
 			List<Keyframe> partKfs = keyframes.get(mr);
