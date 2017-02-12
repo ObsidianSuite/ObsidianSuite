@@ -9,7 +9,7 @@ import obsidianAnimator.Util;
 public class ModelDummyPlayer extends ModelAnimated
 {
 
-	private PartObj head;
+	private PartObj head, chestLw;
 	private static final ResourceLocation modelRL = new ResourceLocation("mod_obsidian_animations:models/player/player.obm");
 	private static final ResourceLocation textureRL = new ResourceLocation("mod_obsidian_animations:models/player/player.png");
 	
@@ -17,14 +17,15 @@ public class ModelDummyPlayer extends ModelAnimated
 	{
 		super("dummy", modelRL, textureRL);
 		head = Util.getPartObjFromName("head", parts);
+		chestLw = Util.getPartObjFromName("chestLw", parts);
 	}
 	
 	@Override
 	public void setRotationAngles(float swingTime, float swingMax, float f2, float lookX, float lookY, float f5, Entity entity) 
 	{				
 		super.setRotationAngles(swingTime, swingMax, f2, lookX, lookY, f5, entity);
-		head.setValue((float) (-lookX/180F*Math.PI), 1);
 		head.setValue((float) (lookY/180F*Math.PI), 0);
+		chestLw.setValue((float) (-lookX/180F*Math.PI), 1);
 	}
 
 }
