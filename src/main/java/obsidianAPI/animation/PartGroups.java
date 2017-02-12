@@ -8,10 +8,10 @@ import java.util.Map.Entry;
 
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import obsidianAPI.Util;
 import obsidianAPI.render.ModelObj;
 import obsidianAPI.render.part.Part;
 import obsidianAPI.render.part.PartObj;
-import obsidianAnimator.Util;
 
 /**
  * Parts can be grouped together, eg upper and lower arm -> arm.
@@ -150,7 +150,7 @@ public class PartGroups
 		for (int i = 0; i < partList.tagCount(); i++)
 		{
 			NBTTagCompound partCompound = partList.getCompoundTagAt(i);
-			PartObj part = Util.getPartObjFromName(partCompound.getString("Name"), model.parts);
+			PartObj part = model.getPartObjFromName(partCompound.getString("Name"));
 			part.setDisplayName(partCompound.getString("DisplayName"));
 			String group = partCompound.getString("Group");
 			if(!groups.containsKey(group))

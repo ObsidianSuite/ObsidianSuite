@@ -5,10 +5,10 @@ import org.lwjgl.opengl.GL11;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.util.Vec3;
+import obsidianAPI.Util;
 import obsidianAPI.render.part.Part;
 import obsidianAPI.render.part.PartObj;
 import obsidianAPI.render.part.PartRotation;
-import obsidianAnimator.Util;
 import obsidianAnimator.gui.GuiEntityRenderer;
 import obsidianAnimator.render.MathHelper;
 import obsidianAnimator.render.RayTrace;
@@ -96,7 +96,8 @@ public class GuiEntityRendererWithRotation extends GuiEntityRenderer
 			}
 			else if(part instanceof PartRotation)
 			{
-				partObj = (PartObj) Util.getPartFromName("cube.008", entityModel.parts);
+				//FIXME PartRotation part name hardcoded.
+				partObj = entityModel.getPartObjFromName("cube.008");
 				partObj.postRenderAll();
 				GL11.glTranslatef(0,-0.17F,0);
 				((PartRotation) part).rotate();

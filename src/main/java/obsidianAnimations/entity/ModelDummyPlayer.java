@@ -2,9 +2,9 @@ package obsidianAnimations.entity;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
+import obsidianAPI.Util;
 import obsidianAPI.render.ModelAnimated;
 import obsidianAPI.render.part.PartObj;
-import obsidianAnimator.Util;
 
 public class ModelDummyPlayer extends ModelAnimated
 {
@@ -16,8 +16,8 @@ public class ModelDummyPlayer extends ModelAnimated
 	public ModelDummyPlayer()
 	{
 		super("dummy", modelRL, textureRL);
-		head = Util.getPartObjFromName("head", parts);
-		chestLw = Util.getPartObjFromName("chestLw", parts);
+		head = getPartObjFromName("head");
+		chestLw = getPartObjFromName("chestLw");
 	}
 	
 	@Override

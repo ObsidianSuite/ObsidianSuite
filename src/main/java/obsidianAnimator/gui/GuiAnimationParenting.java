@@ -1,10 +1,10 @@
 package obsidianAnimator.gui;
 
 import net.minecraft.client.Minecraft;
+import obsidianAPI.Util;
 import obsidianAPI.animation.AnimationParenting;
 import obsidianAPI.render.part.Part;
 import obsidianAPI.render.part.PartObj;
-import obsidianAnimator.Util;
 import obsidianAnimator.gui.frames.HomeFrame;
 import org.lwjgl.input.Mouse;
 
@@ -108,12 +108,12 @@ public class GuiAnimationParenting extends GuiEntityRenderer
 
 	private PartObj getParent()
 	{
-		return Util.getPartObjFromName((String) parentingFrame.parentDropDown.getSelectedItem(), entityModel.parts);
+		return entityModel.getPartObjFromName((String) parentingFrame.parentDropDown.getSelectedItem());
 	}
 
 	private PartObj getChild()
 	{
-		return Util.getPartObjFromName((String) parentingFrame.childDropDown.getSelectedItem(), entityModel.parts);
+		return entityModel.getPartObjFromName((String) parentingFrame.childDropDown.getSelectedItem());
 	}
 
 	private class ParentingFrame extends JFrame
