@@ -1,23 +1,17 @@
 package obsidianAnimations;
 
-import java.io.File;
-import java.util.List;
+import java.io.IOException;
 
-import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.client.registry.RenderingRegistry;
-import cpw.mods.fml.common.ObfuscationReflectionHelper;
-import net.minecraft.client.resources.FolderResourcePack;
-import net.minecraft.client.resources.IResourcePack;
-import obsidianAnimator.data.ModelHandler;
-import obsidianAnimator.render.AnimationResourcePack;
-import obsidianAnimator.render.entity.EntityObj;
+import obsidianAnimations.entity.EntityDummyPlayer;
+import obsidianAnimations.entity.RenderDummyPlayer;
 
 public class ClientProxy extends CommonProxy
 {	
 	
 	public void registerRendering()
 	{
-
+		RenderingRegistry.registerEntityRenderingHandler(EntityDummyPlayer.class, new RenderDummyPlayer());
 	}
 }
 

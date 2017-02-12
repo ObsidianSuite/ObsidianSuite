@@ -25,23 +25,23 @@ public class EventHandler
 
 	boolean updateChecked = false;
 
-	@SubscribeEvent
-	public void onGuiOpen(GuiOpenEvent event)
-	{
-		try 
-		{
-			if(event.gui instanceof GuiMainMenu && !updateChecked)
-			{
-				ServerConfig.init();
-				new Updater().checkForUpdate(ObsidianAnimator.version);
-				updateChecked = true;
-			}
-		} 
-		catch (IOException e) 
-		{
-			e.printStackTrace();
-		}
-	}
+//	@SubscribeEvent
+//	public void onGuiOpen(GuiOpenEvent event)
+//	{
+//		try 
+//		{
+//			if(event.gui instanceof GuiMainMenu && !updateChecked)
+//			{
+//				ServerConfig.init();
+//				new Updater().checkForUpdate(ObsidianAnimator.version);
+//				updateChecked = true;
+//			}
+//		} 
+//		catch (IOException e) 
+//		{
+//			e.printStackTrace();
+//		}
+//	}
 
 	@SideOnly(Side.CLIENT)
 	@SubscribeEvent

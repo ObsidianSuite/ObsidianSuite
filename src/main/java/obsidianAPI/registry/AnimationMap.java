@@ -1,4 +1,4 @@
-package obsidianAPI;
+package obsidianAPI.registry;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -42,6 +42,12 @@ class AnimationMap
 			System.out.println("Unable to load animation:");
 			e.printStackTrace();
 		}
+	}
+	
+	AnimationSequence getAnimation(String binding)
+	{
+		//TODO error handling here if animation is null.
+		return map.get(binding);
 	}
 	
 	private AnimationSequence loadAnimation(ResourceLocation resource) throws IOException

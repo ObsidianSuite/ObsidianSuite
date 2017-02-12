@@ -16,14 +16,14 @@ import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.util.ResourceLocation;
 import obsidianAnimator.file.FileHandler;
 import obsidianAnimator.render.entity.ModelObj_Animator;
-import obsidianAnimator.render.entity.RenderObj;
+import obsidianAnimator.render.entity.RenderObj_Animator;
 
 public class ModelHandler 
 {
 
 	private static Map<String, ModelObj_Animator> models = new HashMap<String, ModelObj_Animator>();
 
-	public static RenderObj modelRenderer = new RenderObj();
+	public static RenderObj_Animator modelRenderer = new RenderObj_Animator();
 
 	public static String importModel(File modelFile, File textureFile)
 	{
@@ -47,7 +47,7 @@ public class ModelHandler
 		models.put(model.entityName, model);
 		return model;
 	}
-	
+
 	private static ResourceLocation generateTextureResourceLocation(String entityName)
 	{
 		return new ResourceLocation(String.format("animation:models/%s.png", entityName));
@@ -57,7 +57,7 @@ public class ModelHandler
 	{
 		modelRenderer.setModel(models.get(entityName));
 	}
-	
+
 	public static boolean isModelImported(String entityName)
 	{
 		return models.containsKey(entityName);
@@ -90,12 +90,12 @@ public class ModelHandler
 		for(String s : models.keySet())
 			makeModelFile(s);
 	}
-	
+
 	private static void makeModelFile(String entityName)
 	{
 		File f = new File(Persistence.modelFolder, entityName + "." + FileHandler.modelExtension);
 		String textAfterNBT = getTextAfterNBT(f);
-		
+
 		try 
 		{
 			CompressedStreamTools.write(ModelHandler.getModel(entityName).createNBTTag(), f);
@@ -109,7 +109,7 @@ public class ModelHandler
 	private static String getTextAfterNBT(File f)
 	{
 		String text = "\n";
-		
+
 		try 
 		{
 			BufferedReader reader = new BufferedReader(new FileReader(f));
@@ -120,7 +120,7 @@ public class ModelHandler
 			{
 				if(currentLine.contains("# Model #"))
 					nbtFinished = true;
-				
+
 				if(nbtFinished)
 					text += currentLine + "\n";
 			}
@@ -128,7 +128,7 @@ public class ModelHandler
 		} 
 		catch (FileNotFoundException e) {e.printStackTrace();} 
 		catch (IOException e) {e.printStackTrace();}
-		
+
 		return text;
 	}
 

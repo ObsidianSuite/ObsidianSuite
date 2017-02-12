@@ -1,6 +1,27 @@
 package obsidianAPI.render;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Nullable;
+
+import org.lwjgl.opengl.GL11;
+
 import com.google.common.collect.Maps;
+
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.entity.Entity;
@@ -17,13 +38,6 @@ import obsidianAPI.render.part.PartEntityPos;
 import obsidianAPI.render.part.PartObj;
 import obsidianAPI.render.part.PartRotation;
 import obsidianAnimator.Util;
-import org.lwjgl.opengl.GL11;
-
-import javax.annotation.Nullable;
-import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 public class ModelObj extends ModelBase
 {
@@ -38,14 +52,26 @@ public class ModelObj extends ModelBase
 	private static final float offsetFixY = -1.5F;
 
 	private final ResourceLocation txtRL;
-
-	public ModelObj(String entityName, File modelFile, ResourceLocation texture)
+	
+	public ModelObj(String entityName, ResourceLocation modelLocation, ResourceLocation textureLocation)
+	{
+		this(entityName, null, modelLocation, textureLocation);
+	}
+	
+	public ModelObj(String entityName, File modelFile, ResourceLocation textureLocation)
+	{			
+		this(entityName, modelFile, null, textureLocation);
+	}
+	
+	private ModelObj(String entityName, File modelFile, ResourceLocation modelLocation, ResourceLocation textureLocation)
 	{			
 		this.entityName = entityName;
 		defaults = Maps.newHashMap();
-		txtRL = texture;
-
-		loadFromFile(modelFile);
+		txtRL = textureLocation;
+		if(modelFile != null)
+			load(modelFile);
+		else
+			load(modelLocation);
 		init();
 	}
 
@@ -74,12 +100,36 @@ public class ModelObj extends ModelBase
 	{
 		return defaults.get(part).clone();
 	}
-
-	private void loadFromFile(File file) 
+	
+	private void load(ResourceLocation modelLocation)
 	{
 		try 
 		{
-			BufferedReader reader = new BufferedReader(new FileReader(file));
+			load(Minecraft.getMinecraft().getResourceManager().getResource(modelLocation).getInputStream());
+		} 
+		catch (IOException e) 
+		{
+			e.printStackTrace();
+		}  
+	}
+	
+	private void load(File modelFile)
+	{
+		try 
+		{
+			load(new FileInputStream(modelFile));
+		} 
+		catch (IOException e) 
+		{
+			e.printStackTrace();
+		}  
+	}
+
+	private void load(InputStream stream) 
+	{
+		try 
+		{
+			BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
 			
 			String nbtData = "";
 			String modelData = "";
@@ -277,6 +327,8 @@ public class ModelObj extends ModelBase
 	{		
 		super.render(entity, time, distance, loop, lookY, lookX, scale);
 
+		setRotationAngles(time, distance, loop, lookY, lookX, scale, entity);
+		
 		GL11.glPushMatrix();
 		GL11.glRotatef(initRotFix, 1.0F, 0.0F, 0.0F);
 		GL11.glTranslatef(0.0F, offsetFixY, 0.0F);
@@ -289,8 +341,9 @@ public class ModelObj extends ModelBase
 				if(!part.hasParent())
 					part.render();
 			}
-			else if(p instanceof PartEntityPos)
-				((PartEntityPos) p).move(entity);
+			//TODO entity movement via PartEntityPos
+//			else if(p instanceof PartEntityPos)
+//				((PartEntityPos) p).move(entity);
 		}
 
 		GL11.glPopMatrix();

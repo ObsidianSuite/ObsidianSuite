@@ -21,7 +21,6 @@ public class AnimationSequence
 {
 
 	private String animationName;
-	private List<AnimationPart> animations = new ArrayList<AnimationPart>();
 	private final Map<String, TreeMap<Integer,AnimationPart>> partsByPartName = Maps.newHashMap();
 	private final Map<Integer, Set<String>> actionPoints = Maps.newHashMap();
 	private int fps;
@@ -51,13 +50,9 @@ public class AnimationSequence
 
 	public void setAnimations(List<AnimationPart> animations)
 	{
-		this.animations = animations;
-
 		partsByPartName.clear();
 		for (AnimationPart part : animations)
-		{
 			addAnimationToMap(part);
-		}
 	}
 
 	private void addAnimationToMap(AnimationPart part)
@@ -72,9 +67,12 @@ public class AnimationSequence
         parts.put(part.getStartTime(), part);
     }
 
-	public List<AnimationPart> getAnimations()
+	public List<AnimationPart> getAnimationList()
 	{
-		return animations;
+		List<AnimationPart> animationList = new ArrayList<AnimationPart>();
+		for(String partName : partsByPartName.keySet())
+			animationList.addAll(getAnimations(partName));
+		return animationList;
 	}
 
 	public Collection<AnimationPart> getAnimations(String partName)
@@ -89,7 +87,6 @@ public class AnimationSequence
 
 	public void addAnimation(AnimationPart part)
 	{
-		animations.add(part);
 		addAnimationToMap(part);
 	}
 
@@ -168,12 +165,11 @@ public class AnimationSequence
 			if(!part.getName().equals(exceptionPartName))
 			{
                 TreeMap<Integer, AnimationPart> animations = partsByPartName.get(part.getName());
-				if (animations != null && animations.size() > 0)
+				if(animations != null && animations.size() > 0)
 				{
                     AnimationPart anim = findPartForTime(animations, MathHelper.floor_float(time));
                     if (anim == null)
                         anim = animations.lastEntry().getValue();
-
                     anim.animatePart(part, time - anim.getStartTime());
                 }
 			}
@@ -191,10 +187,11 @@ public class AnimationSequence
         return null;
 	}
 
+	//TODO AnimatinSequence - would it be better to store this rather than calculate it every time?
 	public int getTotalTime()
 	{
 		int max = 0;
-		for(AnimationPart animation : animations)
+		for(AnimationPart animation : getAnimationList())
 		{
 			if(animation.getEndTime() > max)
 			{
@@ -215,7 +212,7 @@ public class AnimationSequence
 	{
 		NBTTagCompound sequenceData = new NBTTagCompound();
 		NBTTagList animationList = new NBTTagList();
-		for(AnimationPart animation : animations)
+		for(AnimationPart animation : getAnimationList())
 			animationList.appendTag(animation.getSaveData());
 		sequenceData.setTag("Animations", animationList);
 		sequenceData.setString("EntityName", entityName);
@@ -253,7 +250,7 @@ public class AnimationSequence
 		for(int i = 0; i < segmentList.tagCount(); i++)
 		{
 			AnimationPart animation = new AnimationPart(segmentList.getCompoundTagAt(i));
-			animations.add(animation);
+			addAnimation(animation);
 		}
 		animationName = compound.getString("Name");
 		fps = compound.hasKey("FPS") ? compound.getInteger("FPS") : 25;

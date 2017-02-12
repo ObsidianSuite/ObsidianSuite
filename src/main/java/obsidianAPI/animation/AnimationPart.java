@@ -31,16 +31,20 @@ public class AnimationPart
 		loadData(compound);
 	}
 
-	public AnimationPart(int startTime, int endTime, float[] startPos, float[] endPos, Part part)
+	public AnimationPart(int startTime, int endTime, float[] startPosition, float[] endPosition, Part part)
 	{
 		this.startTime = startTime;
 		this.endTime = endTime;
-		this.startPosition = startPos;
-		this.endPosition = endPos;
+		this.startPosition = startPosition;
+		this.endPosition = endPosition;
 		this.partName = part.getName();
-
-		this.startQuart = MathHelper.eulerToQuarternion(startPos[0]/180F*Math.PI, startPos[1]/180F*Math.PI, startPos[2]/180F*Math.PI);
-		this.endQuart = MathHelper.eulerToQuarternion(endPos[0]/180F*Math.PI, endPos[1]/180F*Math.PI, endPos[2]/180F*Math.PI);
+		init();
+	}
+	
+	private void init()
+	{
+		this.startQuart = MathHelper.eulerToQuarternion(startPosition[0]/180F*Math.PI, startPosition[1]/180F*Math.PI, startPosition[2]/180F*Math.PI);
+		this.endQuart = MathHelper.eulerToQuarternion(endPosition[0]/180F*Math.PI, endPosition[1]/180F*Math.PI, endPosition[2]/180F*Math.PI);
 
 		for(int i = 0; i < 3; i++)
 		{
@@ -49,18 +53,19 @@ public class AnimationPart
 			//it is at time zero.
 			if(dT == 0)
 				dT = 1;
-			float dif = endPos[i] - startPos[i];
+			float dif = endPosition[i] - startPosition[i];
 			//Keep rotation within range.
-			if(part instanceof PartObj)
-			{
-				if(Math.abs(dif) > Math.PI)
-				{
-					if(dif < 0)
-						dif += 2*Math.PI;
-					else
-						dif -= 2*Math.PI;
-				}
-			}
+			//TODO Find a way to re-implement this without needed the part instance. 
+//			if(part instanceof PartObj)
+//			{
+//				if(Math.abs(dif) > Math.PI)
+//				{
+//					if(dif < 0)
+//						dif += 2*Math.PI;
+//					else
+//						dif -= 2*Math.PI;
+//				}
+//			}
 			this.movement[i] = dif/dT;
 		}
 	}
@@ -99,7 +104,6 @@ public class AnimationPart
 			else if(values[i] > Math.PI)
 				values[i] -= 2*Math.PI;	
 		}
-
 
 		part.setValues(values);
 	}
@@ -180,6 +184,7 @@ public class AnimationPart
 		this.startTime = compound.getInteger("StartTime");
 		this.endTime = compound.getInteger("FinishTime");
 		this.partName = compound.getString("Part");
+		init();
 	}
 
 
