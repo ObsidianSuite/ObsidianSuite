@@ -21,9 +21,9 @@ public class ModelObj_Animator extends ModelObj
 	public static final ResourceLocation pinkResLoc = new ResourceLocation("mod_obsidian_animator:defaultModelTextures/pink.png");
 	public static final ResourceLocation whiteResLoc = new ResourceLocation("mod_obsidian_animator:defaultModelTextures/white.png");
 
-	public ModelObj_Animator(String entityName, File modelFile, ResourceLocation texture) throws FileNotFoundException
+	public ModelObj_Animator(String entityName, File modelFile, ResourceLocation texture)
 	{			
-		super(entityName, new FileInputStream(modelFile), texture);
+		super(entityName, modelFile, texture);
 		hightlightedParts = new ArrayList<PartObj>();
 	}
 

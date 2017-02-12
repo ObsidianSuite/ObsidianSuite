@@ -41,19 +41,11 @@ public class ModelHandler
 
 	private static ModelObj_Animator loadModel(File modelFile)
 	{
-		try 
-		{
-			String fileName = modelFile.getName();
-			String entityName = fileName.substring(0,fileName.indexOf("."));
-			ModelObj_Animator model = new ModelObj_Animator(entityName, modelFile, generateTextureResourceLocation(entityName));
-			models.put(model.entityName, model);
-			return model;
-		} 
-		catch (FileNotFoundException e) 
-		{
-			e.printStackTrace();
-		}
-		return null;
+		String fileName = modelFile.getName();
+		String entityName = fileName.substring(0,fileName.indexOf("."));
+		ModelObj_Animator model = new ModelObj_Animator(entityName, modelFile, generateTextureResourceLocation(entityName));
+		models.put(model.entityName, model);
+		return model;
 	}
 
 	private static ResourceLocation generateTextureResourceLocation(String entityName)

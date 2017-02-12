@@ -1,4 +1,4 @@
-package obsidianAnimations;
+package obsidianAnimations.entity;
 
 import java.io.IOException;
 

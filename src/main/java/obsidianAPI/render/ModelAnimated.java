@@ -18,10 +18,10 @@ public class ModelAnimated extends ModelObj
 {
 
 	long animStartTime = System.nanoTime();
-
-	public ModelAnimated(String entityName, ResourceLocation modelLocation, ResourceLocation textureLocation) throws IOException
+	
+	public ModelAnimated(String entityName, ResourceLocation modelLocation, ResourceLocation textureLocation)
 	{			
-		super(entityName, Minecraft.getMinecraft().getResourceManager().getResource(modelLocation).getInputStream(), textureLocation);
+		super(entityName, modelLocation, textureLocation);
 	}
 
 	@Override
@@ -51,15 +51,18 @@ public class ModelAnimated extends ModelObj
 		
 		//System.out.println(lookX);
 		
-		for(Part p : parts)
-		{
-			if(p.getDisplayName().equals("head"))
-			{
-				p.setValue((float) (-lookX/180F*Math.PI), 1);
-				p.setValue((float) (lookY/180F*Math.PI), 0);
-				break;
-			}
-		}
+//		for(Part p : parts)
+//		{
+//			if(p.getDisplayName().equals("head"))
+//			{
+//				p.setValue((float) (-lookX/180F*Math.PI), 1);
+//				p.setValue((float) (lookY/180F*Math.PI), 0);
+//			}
+//			else if(p.getDisplayName().equals("chestLw"))
+//			{
+//				p.setValue((float) (-lookX/180F*Math.PI), 1);
+//			}
+//		}
 	}
 
 	private boolean isMoving(Entity parEntity) 

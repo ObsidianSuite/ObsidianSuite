@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -20,6 +21,7 @@ import org.lwjgl.opengl.GL11;
 
 import com.google.common.collect.Maps;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.entity.Entity;
@@ -51,12 +53,25 @@ public class ModelObj extends ModelBase
 
 	private final ResourceLocation txtRL;
 	
-	public ModelObj(String entityName, InputStream modelInputStream, ResourceLocation textureLocation)
+	public ModelObj(String entityName, ResourceLocation modelLocation, ResourceLocation textureLocation)
+	{
+		this(entityName, null, modelLocation, textureLocation);
+	}
+	
+	public ModelObj(String entityName, File modelFile, ResourceLocation textureLocation)
+	{			
+		this(entityName, modelFile, null, textureLocation);
+	}
+	
+	private ModelObj(String entityName, File modelFile, ResourceLocation modelLocation, ResourceLocation textureLocation)
 	{			
 		this.entityName = entityName;
 		defaults = Maps.newHashMap();
 		txtRL = textureLocation;
-		load(modelInputStream);
+		if(modelFile != null)
+			load(modelFile);
+		else
+			load(modelLocation);
 		init();
 	}
 
@@ -84,6 +99,30 @@ public class ModelObj extends ModelBase
 	public float[] getDefaults(PartObj part)
 	{
 		return defaults.get(part).clone();
+	}
+	
+	private void load(ResourceLocation modelLocation)
+	{
+		try 
+		{
+			load(Minecraft.getMinecraft().getResourceManager().getResource(modelLocation).getInputStream());
+		} 
+		catch (IOException e) 
+		{
+			e.printStackTrace();
+		}  
+	}
+	
+	private void load(File modelFile)
+	{
+		try 
+		{
+			load(new FileInputStream(modelFile));
+		} 
+		catch (IOException e) 
+		{
+			e.printStackTrace();
+		}  
 	}
 
 	private void load(InputStream stream) 

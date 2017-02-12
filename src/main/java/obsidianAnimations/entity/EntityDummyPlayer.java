@@ -1,4 +1,4 @@
-package obsidianAnimations;
+package obsidianAnimations.entity;
 
 import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.SharedMonsterAttributes;
