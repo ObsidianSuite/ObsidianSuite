@@ -10,7 +10,6 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,9 +26,9 @@ import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
-import obsidianAnimator.animation.PartGroups;
-import obsidianAnimator.render.objRendering.ModelObj;
-import obsidianAnimator.render.objRendering.parts.PartObj;
+import obsidianAPI.animation.PartGroups;
+import obsidianAPI.render.part.PartObj;
+import obsidianAnimator.gui.sequence.timeline.BlankMouseListener;
 
 public class GuiPartSetup extends GuiEntityRenderer
 {
@@ -321,25 +320,13 @@ public class GuiPartSetup extends GuiEntityRenderer
 				add(dp, c);
 				
 				//Mouse listener to highlight part when panel entered.
-				addMouseListener(new MouseListener()
+				addMouseListener(new BlankMouseListener()
 				{
-					@Override
-					public void mouseClicked(MouseEvent arg0) {}
-
 					@Override
 					public void mouseEntered(MouseEvent e) 
 					{
-						currentPartName = part.getName();
+						selectedPart = part;
 					}
-
-					@Override
-					public void mouseExited(MouseEvent e) {}
-
-					@Override
-					public void mousePressed(MouseEvent e) {}
-
-					@Override
-					public void mouseReleased(MouseEvent e) {}
 				});
 			}
 
@@ -377,19 +364,13 @@ public class GuiPartSetup extends GuiEntityRenderer
 			private DragPanel(final PartPanel partPanel)
 			{
 				setPreferredSize(new Dimension(30, 24));
-				addMouseListener(new MouseListener()
+				addMouseListener(new BlankMouseListener()
 				{
-					@Override
-					public void mouseClicked(MouseEvent arg0) {}
-
 					@Override
 					public void mouseEntered(MouseEvent arg0) 
 					{
-						currentPartName = partPanel.part.getName();
+						selectedPart = partPanel.part;
 					}
-
-					@Override
-					public void mouseExited(MouseEvent arg0) {}
 
 					@Override
 					public void mousePressed(MouseEvent arg0) 

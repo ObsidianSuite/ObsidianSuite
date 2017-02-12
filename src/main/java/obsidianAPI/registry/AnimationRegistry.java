@@ -1,0 +1,68 @@
+package obsidianAPI.registry;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import cpw.mods.fml.common.FMLCommonHandler;
+import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.common.MinecraftForge;
+import obsidianAPI.ObsidianEventHandler;
+import obsidianAPI.animation.AnimationSequence;
+import obsidianAPI.exceptions.UnregisteredEntityException;
+
+public class AnimationRegistry 
+{
+		
+	//Map between entity type and the corresponding map of animations.
+	private static Map<String, AnimationMap> entityMap = new HashMap<String, AnimationMap>();
+	
+	private static Map<Class, String> registeredClasses = new HashMap<Class, String>();
+	
+	public static void init()
+	{
+		ObsidianEventHandler eventHandler = new ObsidianEventHandler();
+		MinecraftForge.EVENT_BUS.register(eventHandler);
+
+		if(FMLCommonHandler.instance().getEffectiveSide().isClient())
+			FMLCommonHandler.instance().bus().register(eventHandler);
+	}
+	
+	public static void registerEntity(Class entityClass, String entityType)
+	{
+		entityMap.put(entityType, new AnimationMap());
+		registeredClasses.put(entityClass, entityType);
+	}
+	
+	public static boolean isRegisteredClass(Class entityClass)
+	{
+		return registeredClasses.containsKey(entityClass);
+	}
+	
+	public static String getEntityName(Class entityClass)
+	{
+		return AnimationRegistry.registeredClasses.get(entityClass);
+	}
+	
+	/**
+	 * Add an animation for a given entity type.
+	 * The binding parameter is the string used
+	 *  to access the animation.
+	 * Entity must be already registered.
+	 */
+	public static void registerAnimation(String entityType, String binding, ResourceLocation resource)
+	{
+		if(!entityMap.containsKey(entityType))
+			throw new UnregisteredEntityException(entityType);
+		entityMap.get(entityType).registerAnimation(binding, resource);
+	}
+	
+	public static AnimationSequence getAnimation(String entityType, String binding)
+	{
+		if(!entityMap.containsKey(entityType))
+			throw new UnregisteredEntityException(entityType);
+		return entityMap.get(entityType).getAnimation(binding);
+	}
+
+}

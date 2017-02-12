@@ -9,7 +9,6 @@ import org.lwjgl.util.vector.Quaternion;
 
 import net.minecraft.util.Vec3;
 import net.minecraftforge.client.model.obj.Face;
-import obsidianAnimator.render.objRendering.RayTrace;
 
 public class MathHelper 
 {

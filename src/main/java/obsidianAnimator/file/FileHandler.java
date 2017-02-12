@@ -11,7 +11,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
-import obsidianAnimator.animation.AnimationSequence;
+import obsidianAPI.animation.AnimationSequence;
 
 public class FileHandler 
 {

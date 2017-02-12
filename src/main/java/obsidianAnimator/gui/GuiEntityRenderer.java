@@ -1,7 +1,9 @@
 package obsidianAnimator.gui;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
@@ -16,23 +18,22 @@ import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.entity.EntityLivingBase;
+import obsidianAPI.render.part.Part;
+import obsidianAPI.render.part.PartObj;
 import obsidianAnimator.ObsidianAnimator;
-import obsidianAnimator.Util;
 import obsidianAnimator.data.ModelHandler;
-import obsidianAnimator.render.objRendering.EntityObj;
-import obsidianAnimator.render.objRendering.ModelObj;
-import obsidianAnimator.render.objRendering.parts.Part;
-import obsidianAnimator.render.objRendering.parts.PartObj;
+import obsidianAnimator.render.entity.EntityObj;
+import obsidianAnimator.render.entity.ModelObj_Animator;
 
 public class GuiEntityRenderer extends GuiBlack
 {
 
 	public String entityName;
 	public EntityLivingBase entityToRender;
-	public ModelObj entityModel;
-	protected List<String> parts = new ArrayList<String>();
-	public String currentPartName;
-	protected String additionalHighlightPartName;
+	public ModelObj_Animator entityModel;
+	protected List<Part> parts = new ArrayList<Part>();
+	public Part selectedPart;
+	protected Part hoveredPart;
 
 	public boolean boolBase;
 	public boolean boolGrid;
@@ -46,7 +47,7 @@ public class GuiEntityRenderer extends GuiBlack
 
 	private RenderBlocks renderBlocks = new RenderBlocks();
 
-	private List<View> views;
+	private final Map<Integer,View> views = new HashMap<Integer, View>();
 
 	public int gridMinX = -1, gridMaxX = 1, gridMinZ = -1, gridMaxZ = 1;
 	
@@ -62,11 +63,11 @@ public class GuiEntityRenderer extends GuiBlack
 		//Setup parts list.
 		for(Part part : entityModel.parts)
 		{
-			parts.add(part.getName());
+			parts.add(part);
 			part.setToOriginalValues();
 		}
 
-		currentPartName = parts.get(0);
+		selectedPart = parts.get(0);
 		setupViews();
 		
 		ModelHandler.updateRenderer(entityName);
@@ -119,14 +120,18 @@ public class GuiEntityRenderer extends GuiBlack
 	 */
 	private void setupViews()
 	{
-		views = new ArrayList<View>();
-		views.add(new View("Default", -314, 26, 5));
-		views.add(new View("Front", 0, 0, 7));
-		views.add(new View("Left", 90, 0, 4));
-		views.add(new View("Right", -90, 0, 6));
-		views.add(new View("Back", 180, 0, 1));
-		views.add(new View("Top", 180, 90, 8));
-		views.add(new View("Bottom ", 0, -90, 2));
+		addView("Default", -314, 26, 5);
+		addView("Front", 0, 0, 7);
+		addView("Left", 90, 0, 4);
+		addView("Right", -90, 0, 6);
+		addView("Back", 180, 0, 1);
+		addView("Top", 180, 90, 8);
+		addView("Bottom ", 0, -90, 2);
+	}
+
+	private void addView(String name, float horizontalRotation, float verticalRotation, int numpadKey)
+	{
+		views.put(numpadKey, new View(name, horizontalRotation, verticalRotation, numpadKey));
 	}
 
 	public void drawScreen(int par1, int par2, float par3)
@@ -148,18 +153,16 @@ public class GuiEntityRenderer extends GuiBlack
 
 		entityModel.clearHighlights();
 
-		if(currentPartName != null && !currentPartName.equals(""))
+		if(selectedPart != null)
 		{
-			Part currentPart = Util.getPartFromName(currentPartName, entityModel.parts);
-			if(currentPart instanceof PartObj)
-				entityModel.hightlightPart((PartObj) currentPart, true);
+			if(selectedPart instanceof PartObj)
+				entityModel.hightlightPart((PartObj) selectedPart, true);
 		}
 
-		if(additionalHighlightPartName != null && !additionalHighlightPartName.equals(""))
+		if(hoveredPart != null)
 		{
-			Part additionalPart = Util.getPartFromName(additionalHighlightPartName, entityModel.parts);
-			if(additionalPart instanceof PartObj)
-				entityModel.hightlightPart((PartObj) additionalPart, false);
+			if(hoveredPart instanceof PartObj)
+				entityModel.hightlightPart((PartObj) hoveredPart, false);
 		}
 	}
 
@@ -171,10 +174,10 @@ public class GuiEntityRenderer extends GuiBlack
 	protected void mouseClicked(int x, int y, int i) 
 	{
 		super.mouseClicked(x, y, i);
-		if(i == 0 && additionalHighlightPartName != null && !additionalHighlightPartName.equals(""))
-			updatePart(additionalHighlightPartName);
+		if(i == 0 && hoveredPart != null)
+			updatePart(hoveredPart);
 		else if(i == 0)
-			updatePart("");
+			updatePart(null);
 	}
 
 	@Override
@@ -241,9 +244,9 @@ public class GuiEntityRenderer extends GuiBlack
 	 * 		     	   Part Manipulation					*
 	 * ---------------------------------------------------- */
 
-	protected void updatePart(String newPartName)
+	protected void updatePart(Part newPartName)
 	{
-		currentPartName = newPartName;
+		selectedPart = newPartName;
 	}
 
 
@@ -253,11 +256,7 @@ public class GuiEntityRenderer extends GuiBlack
 
 	public void processRay()
 	{
-		PartObj raySelection = entityModel.testRay();
-		if(raySelection != null)
-			additionalHighlightPartName = raySelection.getName();
-		else
-			additionalHighlightPartName = "";
+		hoveredPart = entityModel.testRay();
 	}
 
 	/* ---------------------------------------------------- *
@@ -380,18 +379,16 @@ public class GuiEntityRenderer extends GuiBlack
 	public void changeView(int numpadKey)
 	{
 		boolean viewFound = false;
-		for(View v : views)
+		if (views.containsKey(numpadKey))
 		{
-			if(v.numpadKey == numpadKey)
-			{
-				horizontalRotation = v.horizontalRotation;
-				verticalRotation = v.verticalRotation;
-				viewFound = true;
-				break;
-			}
+			View v = views.get(numpadKey);
+			horizontalRotation = v.horizontalRotation;
+			verticalRotation = v.verticalRotation;
 		}
-		if(!viewFound)
+		else
+		{
 			System.err.println("Could not change to view, numpadkey: " + numpadKey);
+		}
 	}
 
 	private class View

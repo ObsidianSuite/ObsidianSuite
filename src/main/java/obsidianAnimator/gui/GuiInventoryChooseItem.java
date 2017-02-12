@@ -8,7 +8,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import obsidianAnimator.gui.sequence.timeline.GuiAnimationTimeline;
-import obsidianAnimator.render.objRendering.EntityObj;
+import obsidianAnimator.render.entity.EntityObj;
 
 @SideOnly(Side.CLIENT)
 public class GuiInventoryChooseItem extends GuiInventory

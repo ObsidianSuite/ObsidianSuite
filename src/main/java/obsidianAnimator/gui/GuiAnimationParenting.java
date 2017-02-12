@@ -1,31 +1,18 @@
 package obsidianAnimator.gui;
 
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.plaf.basic.BasicComboBoxRenderer;
-
-import org.lwjgl.input.Mouse;
-
 import net.minecraft.client.Minecraft;
+import obsidianAPI.animation.AnimationParenting;
+import obsidianAPI.render.part.Part;
+import obsidianAPI.render.part.PartObj;
 import obsidianAnimator.Util;
 import obsidianAnimator.gui.frames.HomeFrame;
-import obsidianAnimator.render.objRendering.bend.Bend;
-import obsidianAnimator.render.objRendering.parts.Part;
-import obsidianAnimator.render.objRendering.parts.PartObj;
+import org.lwjgl.input.Mouse;
 
+import javax.swing.*;
+import javax.swing.plaf.basic.BasicComboBoxRenderer;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 public class GuiAnimationParenting extends GuiEntityRenderer 
 {
@@ -55,20 +42,38 @@ public class GuiAnimationParenting extends GuiEntityRenderer
 		super.handleMouseInput();
 	}
 
-	private void attemptParent()
+	@Override
+	protected void updatePart(Part newPartName)
 	{
-		PartObj parent = getParent();
-		PartObj child = getChild();
+		if (selectedPart != null && newPartName != null && selectedPart instanceof PartObj && newPartName instanceof PartObj)
+		{
+			PartObj parent = (PartObj) this.selectedPart;
+			PartObj child = (PartObj) newPartName;
+			attemptParent(parent, child);
+		}
+		else
+		{
+			super.updatePart(newPartName);
+		}
+	}
+
+	private void attemptParent(PartObj parent, PartObj child)
+	{
 		if(parent.getName().equals(child.getName()))
+		{
 			JOptionPane.showMessageDialog(parentingFrame, "Cannot parent a part to itself.", "Parenting issue", JOptionPane.ERROR_MESSAGE);
-		else if(entityModel.parenting.hasParent(child))
+		} else if (!AnimationParenting.areUnrelated(child, parent) || !AnimationParenting.areUnrelated(parent, child))
+		{
+			JOptionPane.showMessageDialog(parentingFrame, "Parts are already related.", "Parenting issue", JOptionPane.ERROR_MESSAGE);
+		}
+		else if(child.getParent() != null)
 		{
 			Object[] options = {"OK", "Remove bend"};
 			int n = JOptionPane.showOptionDialog(parentingFrame, child.getDisplayName() + " already has a parent.", "Parenting issue",
 						JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE,null,options,options[0]);
 			if(n == 1)
 			{
-				entityModel.parenting.unParent(child);
+				entityModel.setParent(child, null);
 				relationFrame.updateLabels();
 			}
 		}
@@ -77,20 +82,16 @@ public class GuiAnimationParenting extends GuiEntityRenderer
 			int n = JOptionPane.showConfirmDialog(parentingFrame, "Parent " + child.getDisplayName() + " to " + parent.getDisplayName() + "?", "Parenting", 
 					JOptionPane.YES_NO_CANCEL_OPTION);
 			if(n == 0)
-			{
-				if(Bend.canCreateBend(child, parent) && JOptionPane.showConfirmDialog(parentingFrame, "Parent with bend?", "Parenting", JOptionPane.YES_NO_OPTION) == 0)
-					parent(parent, child, true);
-				else
-					parent(parent, child, false);
-			}
+				parent(parent, child);
 		}
 	}
 
-	private void parent(PartObj parent, PartObj child, boolean bend) 
+	private void parent(PartObj parent, PartObj child) 
 	{
 		try
 		{
-			entityModel.setParent(child, parent, bend);
+
+			entityModel.setParent(child, parent);
 			relationFrame.updateLabels();
 		}
 		catch(Exception e)
@@ -117,8 +118,8 @@ public class GuiAnimationParenting extends GuiEntityRenderer
 
 	private class ParentingFrame extends JFrame
 	{
-		JComboBox<String> parentDropDown;
-		JComboBox<String> childDropDown;
+		JComboBox<Part> parentDropDown;
+		JComboBox<Part> childDropDown;
 
 		private ParentingFrame()
 		{
@@ -128,15 +129,14 @@ public class GuiAnimationParenting extends GuiEntityRenderer
 			mainPanel.setLayout(new GridBagLayout());
 			GridBagConstraints c = new GridBagConstraints();
 
-			parentDropDown = new JComboBox<String>();
-			childDropDown = new JComboBox<String>();
-			for(String s : parts)
+			parentDropDown = new JComboBox<Part>();
+			childDropDown = new JComboBox<Part>();
+			for(Part p : parts)
 			{
-				Part p = Util.getPartFromName(s, entityModel.parts);
 				if(p instanceof PartObj)
 				{
-					parentDropDown.addItem(s);
-					childDropDown.addItem(s);
+					parentDropDown.addItem(p);
+					childDropDown.addItem(p);
 				}
 			}
 			parentDropDown.setRenderer(new PartComboBoxRenderer(true));
@@ -147,7 +147,7 @@ public class GuiAnimationParenting extends GuiEntityRenderer
 				@Override
 				public void actionPerformed(ActionEvent e) 
 				{
-					currentPartName = (String) ((JComboBox<String>) e.getSource()).getSelectedItem();
+					selectedPart = (Part) ((JComboBox<String>) e.getSource()).getSelectedItem();
 				}
 			});
 
@@ -156,7 +156,7 @@ public class GuiAnimationParenting extends GuiEntityRenderer
 				@Override
 				public void actionPerformed(ActionEvent e) 
 				{
-					additionalHighlightPartName = (String) ((JComboBox<String>) e.getSource()).getSelectedItem();
+					hoveredPart = (Part) ((JComboBox<String>) e.getSource()).getSelectedItem();
 				}
 			});
 
@@ -164,9 +164,9 @@ public class GuiAnimationParenting extends GuiEntityRenderer
 			relationButton.addActionListener(new ActionListener()
 			{
 				@Override
-				public void actionPerformed(ActionEvent e) 
+				public void actionPerformed(ActionEvent e)
 				{
-					attemptParent();
+					attemptParent(GuiAnimationParenting.this.getParent(), getChild());
 				}
 			});
 
@@ -176,7 +176,11 @@ public class GuiAnimationParenting extends GuiEntityRenderer
 				@Override
 				public void actionPerformed(ActionEvent e) 
 				{
-					entityModel.parenting.clear();
+					for (PartObj partObj : entityModel.getPartObjs())
+					{
+						entityModel.setParent(partObj, null);
+						partObj.getChildren().clear();
+					}
 					relationFrame.updateLabels();
 				}
 			});
@@ -268,22 +272,25 @@ public class GuiAnimationParenting extends GuiEntityRenderer
 			mainPanel.add(new JLabel("Children"),c);
 			
 			int h = 1;
-			for(PartObj parent : entityModel.parenting.getAllParents())
+			for(PartObj parent : entityModel.getPartObjs())
 			{
-				c.gridx = 0;
-				c.gridy = h;
-				mainPanel.add(new JLabel(parent.getDisplayName()),c);
-				c.gridx = 1;
-				String s = "";
-				for(PartObj child : entityModel.parenting.getChildren(parent))
+				if (!parent.getChildren().isEmpty())
 				{
-					s = s + child.getDisplayName() + ",";
+					c.gridx = 0;
+					c.gridy = h;
+					mainPanel.add(new JLabel(parent.getDisplayName()), c);
+					c.gridx = 1;
+					String s = "";
+					for (PartObj child : parent.getChildren())
+					{
+						s = s + child.getDisplayName() + ",";
+					}
+					if (s.length() > 1)
+						s = s.substring(0, s.length() - 1);
+
+					mainPanel.add(new JLabel(s), c);
+					h++;
 				}
-				if(s.length() > 1)
-					s = s.substring(0, s.length() - 1);
-				
-				mainPanel.add(new JLabel(s),c);
-				h++;
 			}
 			revalidate();
 			pack();
@@ -308,9 +315,9 @@ public class GuiAnimationParenting extends GuiEntityRenderer
 				if (index > -1) 
 				{
 					if(parentPart)
-						currentPartName = parts.get(index);
+						selectedPart = parts.get(index);
 					else
-						additionalHighlightPartName = parts.get(index);
+						hoveredPart = parts.get(index);
 				}
 			} 
 			else 
@@ -319,7 +326,7 @@ public class GuiAnimationParenting extends GuiEntityRenderer
 				setForeground(list.getForeground());
 			}
 			setFont(list.getFont());
-			setText((value == null) ? "" : Util.getDisplayName(value.toString(), entityModel.parts));
+			setText((value == null) ? "" : ((Part)value).getName());
 			return this;
 		}
 	}

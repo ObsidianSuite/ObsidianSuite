@@ -9,8 +9,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import obsidianAnimator.Util;
-import obsidianAnimator.render.objRendering.parts.Part;
+import obsidianAPI.render.part.Part;
 
 public class PartPanel extends JPanel
 {
@@ -51,9 +50,9 @@ public class PartPanel extends JPanel
 	{
 		String name = "No part selected";
 		String x="-",y="-",z="-";
-		if(timeline.currentPartName != null && !timeline.currentPartName.equals(""))
+		if(timeline.selectedPart != null)
 		{
-			Part part = Util.getPartFromName(timeline.currentPartName, timeline.entityModel.parts);
+			Part part = timeline.selectedPart;
 			name = part.getDisplayName();
 			x = df.format(part.getValue(0));
 			y = df.format(part.getValue(1));

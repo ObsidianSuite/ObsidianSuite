@@ -12,7 +12,7 @@ import javax.swing.JPanel;
 
 import net.minecraft.client.Minecraft;
 import obsidianAnimator.gui.GuiInventoryChooseItem;
-import obsidianAnimator.render.objRendering.EntityObj;
+import obsidianAnimator.render.entity.EntityObj;
 
 public class ItemPanel extends JPanel
 {

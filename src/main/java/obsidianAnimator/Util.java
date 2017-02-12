@@ -6,8 +6,8 @@ import java.util.List;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.entity.Entity;
-import obsidianAnimator.render.objRendering.parts.Part;
-import obsidianAnimator.render.objRendering.parts.PartObj;
+import obsidianAPI.render.part.Part;
+import obsidianAPI.render.part.PartObj;
 
 public class Util 
 {
@@ -24,14 +24,6 @@ public class Util
         tessellator.addVertexWithUV(x + width, y + 0, zLevel, 1,0);
         tessellator.addVertexWithUV(x + 0, y + 0, zLevel, 0, 0);
         tessellator.draw();
-	}
-	
-	public static String getDisplayName(String partName, ArrayList<Part> parts) 
-	{
-		Part p = getPartFromName(partName, parts);
-		if(p != null)
-			return p.getDisplayName();
-		return partName;
 	}
 
 	public static Part getPartFromName(String name, ArrayList<Part> parts) 
