@@ -8,11 +8,11 @@ import net.minecraft.entity.Entity;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
 import obsidianAPI.EntityAnimationProperties;
+import obsidianAPI.Util;
 import obsidianAPI.animation.AnimationPart;
 import obsidianAPI.animation.AnimationSequence;
 import obsidianAPI.registry.AnimationRegistry;
 import obsidianAPI.render.part.Part;
-import obsidianAnimator.Util;
 
 public abstract class ModelAnimated extends ModelObj
 {

@@ -72,7 +72,10 @@ public class Persistence
 		try 
 		{
 			if(!file.exists())
+			{
+				file.getParentFile().mkdirs();
 				file.createNewFile();
+			}
 			CompressedStreamTools.writeCompressed(nbt, new FileOutputStream(file));
 		} 
 		catch (FileNotFoundException e) {e.printStackTrace();}

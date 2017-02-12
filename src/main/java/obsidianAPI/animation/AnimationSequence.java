@@ -1,9 +1,13 @@
 package obsidianAPI.animation;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.NBTTagString;
 import net.minecraft.util.MathHelper;
+import net.minecraftforge.common.util.Constants;
 import obsidianAPI.render.ModelObj;
 import obsidianAPI.render.part.Part;
 
@@ -18,7 +22,7 @@ public class AnimationSequence
 
 	private String animationName;
 	private final Map<String, TreeMap<Integer,AnimationPart>> partsByPartName = Maps.newHashMap();
-	private float actionPoint = 0.0F;
+	private final Map<Integer, Set<String>> actionPoints = Maps.newHashMap();
 	private int fps;
 	private String entityName;
 
@@ -86,14 +90,45 @@ public class AnimationSequence
 		addAnimationToMap(part);
 	}
 
-	public void setActionPoint(float time)
+	public void clearAnimations()
 	{
-		this.actionPoint = time;
+		partsByPartName.clear();
 	}
 
-	public float getActionPoint()
+	public Collection<String> getActionPoints(int time)
 	{
-		return actionPoint;
+		Set<String> names = actionPoints.get(time);
+		if (names == null)
+		{
+			names = Collections.emptySet();
+		}
+		return ImmutableList.copyOf(names);
+	}
+
+	public void addActionPoint(int time, String name)
+	{
+		Set<String> names = actionPoints.get(time);
+		if (names == null)
+		{
+			names = Sets.newHashSet();
+			actionPoints.put(time,names);
+		}
+
+		names.add(name);
+	}
+
+	public void removeActionPoint(int time, String name)
+	{
+		Set<String> names = actionPoints.get(time);
+		if (names != null)
+		{
+			names.remove(name);
+
+			if (names.size() == 0)
+			{
+				actionPoints.remove(time);
+			}
+		}
 	}
 
 	public int getFPS()
@@ -166,6 +201,13 @@ public class AnimationSequence
 		return max;
 	}
 
+	public AnimationSequence copy()
+	{
+		AnimationSequence sequence = new AnimationSequence(entityName,animationName);
+		sequence.loadData(getSaveData());
+		return sequence;
+	}
+
 	public NBTTagCompound getSaveData()
 	{
 		NBTTagCompound sequenceData = new NBTTagCompound();
@@ -175,9 +217,30 @@ public class AnimationSequence
 		sequenceData.setTag("Animations", animationList);
 		sequenceData.setString("EntityName", entityName);
 		sequenceData.setString("Name", animationName);
-		sequenceData.setFloat("ActionPoint", actionPoint);
 		sequenceData.setInteger("FPS", fps);
+		sequenceData.setTag("Actions", getActionsSaveData());
 		return sequenceData;
+	}
+
+	private NBTTagList getActionsSaveData()
+	{
+		NBTTagList actionList = new NBTTagList();
+		for (Map.Entry<Integer, Set<String>> entry : actionPoints.entrySet())
+		{
+			int time = entry.getKey();
+			NBTTagList nameList = new NBTTagList();
+			for (String name : entry.getValue())
+			{
+				nameList.appendTag(new NBTTagString(name));
+			}
+
+			NBTTagCompound timeCompound = new NBTTagCompound();
+			timeCompound.setInteger("Time", time);
+			timeCompound.setTag("Names", nameList);
+
+			actionList.appendTag(timeCompound);
+		}
+		return actionList;
 	}
 
 	public void loadData(NBTTagCompound compound)
@@ -190,7 +253,24 @@ public class AnimationSequence
 			addAnimation(animation);
 		}
 		animationName = compound.getString("Name");
-		actionPoint = compound.getFloat("ActionPoint");
 		fps = compound.hasKey("FPS") ? compound.getInteger("FPS") : 25;
+
+		loadActions(compound.getTagList("Actions", Constants.NBT.TAG_COMPOUND));
+	}
+
+	private void loadActions(NBTTagList actionsList)
+	{
+		for (int i = 0; i < actionsList.tagCount(); i++)
+		{
+			NBTTagCompound timeCompound = actionsList.getCompoundTagAt(i);
+			int time = timeCompound.getInteger("Time");
+			NBTTagList nameList = timeCompound.getTagList("Names", Constants.NBT.TAG_STRING);
+			for (int j = 0; j < nameList.tagCount(); j++)
+			{
+				String name = nameList.getStringTagAt(j);
+
+				addActionPoint(time, name);
+			}
+		}
 	}
 }
