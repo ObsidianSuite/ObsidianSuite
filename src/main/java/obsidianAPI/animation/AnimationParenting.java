@@ -2,9 +2,9 @@ package obsidianAPI.animation;
 
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import obsidianAPI.Util;
 import obsidianAPI.render.ModelObj;
 import obsidianAPI.render.part.PartObj;
-import obsidianAnimator.Util;
 
 import java.util.HashMap;
 import java.util.List;

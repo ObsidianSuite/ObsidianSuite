@@ -2,9 +2,9 @@ package obsidianAnimations.entity;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
+import obsidianAPI.Util;
 import obsidianAPI.render.ModelAnimated;
 import obsidianAPI.render.part.PartObj;
-import obsidianAnimator.Util;
 
 public class ModelDummyPlayer extends ModelAnimated
 {

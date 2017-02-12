@@ -6,7 +6,7 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.util.ResourceLocation;
-import obsidianAnimator.Util;
+import obsidianAPI.Util;
 
 public class GuiBlack extends GuiScreen
 {

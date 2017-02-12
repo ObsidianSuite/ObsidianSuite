@@ -1,10 +1,10 @@
 package obsidianAnimator.gui;
 
 import net.minecraft.client.Minecraft;
+import obsidianAPI.Util;
 import obsidianAPI.animation.AnimationParenting;
 import obsidianAPI.render.part.Part;
 import obsidianAPI.render.part.PartObj;
-import obsidianAnimator.Util;
 import obsidianAnimator.gui.frames.HomeFrame;
 import org.lwjgl.input.Mouse;
 
