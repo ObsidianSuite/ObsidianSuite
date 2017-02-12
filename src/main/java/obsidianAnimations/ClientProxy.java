@@ -11,14 +11,7 @@ public class ClientProxy extends CommonProxy
 	
 	public void registerRendering()
 	{
-        try 
-        {
-			RenderingRegistry.registerEntityRenderingHandler(EntityDummyPlayer.class, new RenderDummyPlayer());
-		} 
-        catch (IOException e) 
-        {
-			e.printStackTrace();
-		}
+		RenderingRegistry.registerEntityRenderingHandler(EntityDummyPlayer.class, new RenderDummyPlayer());
 	}
 }
 

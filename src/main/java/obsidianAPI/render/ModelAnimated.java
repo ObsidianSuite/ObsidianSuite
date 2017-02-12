@@ -14,7 +14,7 @@ import obsidianAPI.registry.AnimationRegistry;
 import obsidianAPI.render.part.Part;
 import obsidianAnimator.Util;
 
-public class ModelAnimated extends ModelObj
+public abstract class ModelAnimated extends ModelObj
 {
 
 	long animStartTime = System.nanoTime();
@@ -47,22 +47,6 @@ public class ModelAnimated extends ModelObj
 		}
 		else
 			animateToDefault();
-		
-		
-		//System.out.println(lookX);
-		
-//		for(Part p : parts)
-//		{
-//			if(p.getDisplayName().equals("head"))
-//			{
-//				p.setValue((float) (-lookX/180F*Math.PI), 1);
-//				p.setValue((float) (lookY/180F*Math.PI), 0);
-//			}
-//			else if(p.getDisplayName().equals("chestLw"))
-//			{
-//				p.setValue((float) (-lookX/180F*Math.PI), 1);
-//			}
-//		}
 	}
 
 	private boolean isMoving(Entity parEntity) 
