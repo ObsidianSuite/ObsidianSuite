@@ -37,12 +37,27 @@ public class AnimationRegistry
 	
 	public static boolean isRegisteredClass(Class entityClass)
 	{
-		return registeredClasses.containsKey(entityClass);
+		return getRegisteredSuperClass(entityClass) != null;
 	}
 	
+	private static Class getRegisteredSuperClass(Class entityClass)
+	{
+		boolean registered = false;
+		while(!registered && entityClass != null)
+		{
+			registered = registeredClasses.containsKey(entityClass);
+			if(!registered)
+				entityClass = entityClass.getSuperclass();
+		}
+		return entityClass;
+	}
+		
 	public static String getEntityName(Class entityClass)
 	{
-		return AnimationRegistry.registeredClasses.get(entityClass);
+		Class regClass = getRegisteredSuperClass(entityClass);
+		if(regClass == null)
+			throw new UnregisteredEntityException(entityClass.getName());
+		return AnimationRegistry.registeredClasses.get(regClass);
 	}
 	
 	/**

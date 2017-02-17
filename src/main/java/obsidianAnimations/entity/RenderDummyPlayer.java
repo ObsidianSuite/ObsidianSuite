@@ -10,7 +10,7 @@ public class RenderDummyPlayer extends RenderObj
 	
 	public RenderDummyPlayer()
 	{
-		super(new ModelDummyPlayer(), new ResourceLocation("mod_obsidian_animations:models/player/player.png"));
+		super(new ModelDummyPlayer(), new ResourceLocation("mod_obsidian_animations:models/player.png"));
 	}
 
 }

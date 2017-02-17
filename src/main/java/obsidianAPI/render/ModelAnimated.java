@@ -58,7 +58,7 @@ public abstract class ModelAnimated extends ModelObj
 		}
 	}
 
-	private boolean isMoving(Entity parEntity) 
+	protected boolean isMoving(Entity parEntity) 
 	{
 		return parEntity.getDistance(parEntity.prevPosX, parEntity.prevPosY, parEntity.prevPosZ) != 0;
 	}
