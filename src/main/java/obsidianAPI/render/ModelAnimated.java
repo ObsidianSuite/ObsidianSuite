@@ -1,17 +1,13 @@
 package obsidianAPI.render;
 
-import java.io.IOException;
-import java.util.TreeMap;
+import java.util.HashMap;
+import java.util.Map;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
-import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
 import obsidianAPI.EntityAnimationProperties;
 import obsidianAPI.Util;
-import obsidianAPI.animation.AnimationPart;
 import obsidianAPI.animation.AnimationSequence;
-import obsidianAPI.registry.AnimationRegistry;
 import obsidianAPI.render.part.Part;
 
 public abstract class ModelAnimated extends ModelObj
@@ -49,7 +45,7 @@ public abstract class ModelAnimated extends ModelObj
 				float time = Util.getAnimationFrameTime(animProps.getAnimationStartTime(), 0, seq.getFPS(), 1.0F);
 				animProps.updateFrameTime(time);
 
-				seq.animateAll(time, this);
+				animateToPartValues(seq.getPartValuesAtTime(this, time));
 			}
 			else
 			{
@@ -63,9 +59,21 @@ public abstract class ModelAnimated extends ModelObj
 		return parEntity.getDistance(parEntity.prevPosX, parEntity.prevPosY, parEntity.prevPosZ) != 0;
 	}
 	
+	private void animateToPartValues(Map<String, float[]> partValues)
+	{
+		//Set part rotations to state - lag
+		for(Part part : parts)
+			part.setValues(partValues.get(part.getName()));
+		
+		//Reduce lag
+		
+	}
+	
 	private void animateToDefault()
 	{
+		Map<String, float[]> defaultState = new HashMap<String, float[]>();
 		for(Part part : parts)
-			part.setValues(part.getOriginalValues());
+			defaultState.put(part.getName(), part.getOriginalValues());
+		animateToPartValues(defaultState);
 	}
 }

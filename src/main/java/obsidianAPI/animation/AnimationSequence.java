@@ -57,15 +57,15 @@ public class AnimationSequence
 
 	private void addAnimationToMap(AnimationPart part)
 	{
-        TreeMap<Integer, AnimationPart> parts = partsByPartName.get(part.getPartName());
-        if (parts == null)
-        {
-            parts = new TreeMap<>();
-            partsByPartName.put(part.getPartName(), parts);
-        }
+		TreeMap<Integer, AnimationPart> parts = partsByPartName.get(part.getPartName());
+		if (parts == null)
+		{
+			parts = new TreeMap<>();
+			partsByPartName.put(part.getPartName(), parts);
+		}
 
-        parts.put(part.getStartTime(), part);
-    }
+		parts.put(part.getStartTime(), part);
+	}
 
 	public List<AnimationPart> getAnimationList()
 	{
@@ -77,7 +77,7 @@ public class AnimationSequence
 
 	public Collection<AnimationPart> getAnimations(String partName)
 	{
-        TreeMap<Integer, AnimationPart> parts = partsByPartName.get(partName);
+		TreeMap<Integer, AnimationPart> parts = partsByPartName.get(partName);
 		if (parts == null)
 		{
 			return Collections.emptyList();
@@ -146,7 +146,7 @@ public class AnimationSequence
 	 */
 	public boolean multiPartSequence(String partName)
 	{
-	    return getAnimations(partName).size() >= 2;
+		return getAnimations(partName).size() >= 2;
 	}
 
 	public void animateAll(float time, ModelObj entityModel)
@@ -164,27 +164,46 @@ public class AnimationSequence
 		{
 			if(!part.getName().equals(exceptionPartName))
 			{
-                TreeMap<Integer, AnimationPart> animations = partsByPartName.get(part.getName());
+				TreeMap<Integer, AnimationPart> animations = partsByPartName.get(part.getName());
 				if(animations != null && animations.size() > 0)
 				{
-                    AnimationPart anim = findPartForTime(animations, MathHelper.floor_float(time));
-                    if (anim == null)
-                        anim = animations.lastEntry().getValue();
-                    anim.animatePart(part, time - anim.getStartTime());
-                }
+					AnimationPart anim = findPartForTime(animations, MathHelper.floor_float(time));
+					if (anim == null)
+						anim = animations.lastEntry().getValue();
+					anim.animatePart(part, time - anim.getStartTime());
+				}
 			}
 		}
 	}
 
+	public Map<String, float[]> getPartValuesAtTime(ModelObj entityModel, float time)
+	{
+		Map<String, float[]> partValues = new HashMap<String, float[]>();
+		for(Part part : entityModel.parts)
+		{
+			TreeMap<Integer, AnimationPart> animations = partsByPartName.get(part.getName());
+			if(animations != null && animations.size() > 0)
+			{
+				AnimationPart anim = findPartForTime(animations, MathHelper.floor_float(time));
+				if (anim == null)
+					anim = animations.lastEntry().getValue();
+				partValues.put(part.getName(), anim.getPartRotationAtTime(time - anim.getStartTime()));
+			}
+			else
+				partValues.put(part.getName(), part.getOriginalValues());
+		}
+		return partValues;
+	}
+
 	private AnimationPart findPartForTime(TreeMap<Integer,AnimationPart> parts, int time)
 	{
-        Map.Entry<Integer, AnimationPart> entry = parts.floorEntry(time);
-        if (entry != null)
-        {
-            return entry.getValue();
-        }
+		Map.Entry<Integer, AnimationPart> entry = parts.floorEntry(time);
+		if (entry != null)
+		{
+			return entry.getValue();
+		}
 
-        return null;
+		return null;
 	}
 
 	//TODO AnimatinSequence - would it be better to store this rather than calculate it every time?
