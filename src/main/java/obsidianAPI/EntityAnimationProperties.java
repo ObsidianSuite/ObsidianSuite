@@ -1,6 +1,11 @@
 package obsidianAPI;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+
 import com.google.common.collect.Lists;
+
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
@@ -9,9 +14,6 @@ import obsidianAPI.animation.ActionPointCallback;
 import obsidianAPI.animation.AnimationSequence;
 import obsidianAPI.registry.AnimationRegistry;
 
-import java.util.Collection;
-import java.util.List;
-
 public class EntityAnimationProperties implements IExtendedEntityProperties
 {
     private final List<ActionPointCallback> actionPointCallbacks = Lists.newLinkedList();
@@ -19,8 +21,9 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
     private String entityName;
     private AnimationSequence activeAnimation;
     private long animationStartTime;
+    private Map<String, float[]> partLagMap;
 
-    private int nextFrame = 0;
+	private int nextFrame = 0;
 
     @Override
     public void init(Entity entity, World world)
@@ -46,6 +49,17 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
 
     }
 
+    public Map<String, float[]> getPartLagMap() 
+    {
+		return partLagMap;
+	}
+
+	public void setPartLagMap(Map<String, float[]> partLagMap) 
+	{
+		this.partLagMap = partLagMap;
+	}
+
+    
     public void setActiveAnimation(String binding)
     {
         activeAnimation = AnimationRegistry.getAnimation(entityName, binding);

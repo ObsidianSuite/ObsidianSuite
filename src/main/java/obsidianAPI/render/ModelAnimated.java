@@ -45,7 +45,7 @@ public abstract class ModelAnimated extends ModelObj
 				float time = Util.getAnimationFrameTime(animProps.getAnimationStartTime(), 0, seq.getFPS(), 1.0F);
 				animProps.updateFrameTime(time);
 
-				animateToPartValues(seq.getPartValuesAtTime(this, time));
+				animateToPartValues(seq.getPartValuesAtTime(this, time), null);
 			}
 			else
 			{
@@ -59,11 +59,25 @@ public abstract class ModelAnimated extends ModelObj
 		return parEntity.getDistance(parEntity.prevPosX, parEntity.prevPosY, parEntity.prevPosZ) != 0;
 	}
 	
-	private void animateToPartValues(Map<String, float[]> partValues)
+	private void animateToPartValues(Map<String, float[]> partValues, Map<String, float[]> partLagMap)
 	{
 		//Set part rotations to state - lag
 		for(Part part : parts)
-			part.setValues(partValues.get(part.getName()));
+		{
+			//Get lag
+			float[] lag = new float[]{0,0,0};
+			if(partLagMap != null)
+				lag = partLagMap.get(part.getName());
+			
+			//Generate new part rotation
+			float[] targetRot = partValues.get(part.getName());
+			float[] newRot = new float[3];
+			for(int i = 0; i < 3; i++)
+				newRot[i] = targetRot[i] - lag[i];
+			
+			//Actually set part rotation
+			part.setValues(newRot);
+		}
 		
 		//Reduce lag
 		
@@ -74,6 +88,6 @@ public abstract class ModelAnimated extends ModelObj
 		Map<String, float[]> defaultState = new HashMap<String, float[]>();
 		for(Part part : parts)
 			defaultState.put(part.getName(), part.getOriginalValues());
-		animateToPartValues(defaultState);
+		animateToPartValues(defaultState, null);
 	}
 }
