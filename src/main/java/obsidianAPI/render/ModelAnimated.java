@@ -16,9 +16,6 @@ import obsidianAPI.render.part.Part;
 
 public abstract class ModelAnimated extends ModelObj
 {
-
-	long animStartTime = System.nanoTime();
-	
 	public ModelAnimated(String entityName, ResourceLocation modelLocation, ResourceLocation textureLocation)
 	{			
 		super(entityName, modelLocation, textureLocation);
@@ -29,24 +26,36 @@ public abstract class ModelAnimated extends ModelObj
 	{				
 		super.setRotationAngles(swingTime, swingMax, f2, lookX, lookY, f5, entity);
 
-		if(isMoving(entity))
+		EntityAnimationProperties animProps = (EntityAnimationProperties) entity.getExtendedProperties("Animation");
+		if (animProps == null)
 		{
-			EntityAnimationProperties animProps = (EntityAnimationProperties) entity.getExtendedProperties("Animation");
-			if(animProps != null)
-			{
-				AnimationSequence seq = animProps.getActiveAnimation();			
-				//float time = Util.getAnimationFrameTime(animProps.getAnimationStartTime(), 0, seq.getFPS(), 1.0F);
-				float time = Util.getAnimationFrameTime(animStartTime, 0, seq.getFPS(), 1.0F);
-
-				if(time > seq.getTotalTime())
-					animStartTime = System.nanoTime();
-
-
-				seq.animateAll(time, this);	
-			}
+			animateToDefault();
 		}
 		else
-			animateToDefault();
+		{
+			boolean isMoving = isMoving(entity);
+			if (isMoving && animProps.getActiveAnimation() == null)
+			{
+				animProps.setActiveAnimation("WalkF");
+			}
+			else if (!isMoving && animProps.getActiveAnimation() != null && animProps.getActiveAnimation().getName().equals("WalkF"))
+			{
+				animProps.clearAnimation();
+			}
+
+			AnimationSequence seq = animProps.getActiveAnimation();
+			if (seq != null)
+			{
+				float time = Util.getAnimationFrameTime(animProps.getAnimationStartTime(), 0, seq.getFPS(), 1.0F);
+				animProps.updateFrameTime(time);
+
+				seq.animateAll(time, this);
+			}
+			else
+			{
+				animateToDefault();
+			}
+		}
 	}
 
 	protected boolean isMoving(Entity parEntity) 

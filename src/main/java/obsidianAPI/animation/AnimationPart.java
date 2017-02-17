@@ -4,13 +4,13 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
 
+import obsidianAPI.Util;
 import org.lwjgl.util.vector.Quaternion;
 
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import obsidianAPI.render.part.Part;
 import obsidianAPI.render.part.PartObj;
-import obsidianAnimator.render.MathHelper;
 
 /**
  * A section of an animation for a specific part. 
@@ -43,8 +43,8 @@ public class AnimationPart
 	
 	private void init()
 	{
-		this.startQuart = MathHelper.eulerToQuarternion(startPosition[0]/180F*Math.PI, startPosition[1]/180F*Math.PI, startPosition[2]/180F*Math.PI);
-		this.endQuart = MathHelper.eulerToQuarternion(endPosition[0]/180F*Math.PI, endPosition[1]/180F*Math.PI, endPosition[2]/180F*Math.PI);
+		this.startQuart = Util.eulerToQuarternion(startPosition[0] / 180F * Math.PI, startPosition[1] / 180F * Math.PI, startPosition[2] / 180F * Math.PI);
+		this.endQuart = Util.eulerToQuarternion(endPosition[0] / 180F * Math.PI, endPosition[1] / 180F * Math.PI, endPosition[2] / 180F * Math.PI);
 
 		for(int i = 0; i < 3; i++)
 		{
@@ -82,8 +82,8 @@ public class AnimationPart
 
 			//	System.out.println(endQuart);
 
-			Quaternion interpolatedQ = MathHelper.slerp(startQuart, endQuart, t);
-			values = MathHelper.quarternionToEuler(interpolatedQ);
+			Quaternion interpolatedQ = Util.slerp(startQuart, endQuart, t);
+			values = Util.quarternionToEuler(interpolatedQ);
 			for(int i = 0; i < 3; i++)
 			{
 				//System.out.println(i + values[i]);
