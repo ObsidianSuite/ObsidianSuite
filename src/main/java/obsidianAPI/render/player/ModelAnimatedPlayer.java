@@ -9,8 +9,8 @@ public class ModelAnimatedPlayer extends ModelAnimated
 {
 
 	private PartObj head, chestLw;
-	private static final ResourceLocation modelRL = new ResourceLocation("mod_obsidian_animations:models/player/player.obm");
-	private static final ResourceLocation textureRL = new ResourceLocation("mod_obsidian_animations:models/player/player.png");
+	private static final ResourceLocation modelRL = new ResourceLocation("mod_obsidian_animations:models/biped.obm");
+	private static final ResourceLocation textureRL = new ResourceLocation("mod_obsidian_animations:models/player.png");
 	
 	public ModelAnimatedPlayer()
 	{

@@ -7,7 +7,7 @@ import net.minecraft.util.ResourceLocation;
 public class RenderPlayerAnimated extends RenderPlayer
 {
 	
-	private static final ResourceLocation texture = new ResourceLocation("mod_obsidian_animations:models/player/player.png");
+	private static final ResourceLocation texture = new ResourceLocation("mod_obsidian_animations:models/player.png");
 	
 	public RenderPlayerAnimated()
 	{

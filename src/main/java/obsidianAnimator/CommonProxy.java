@@ -9,7 +9,7 @@ public class CommonProxy
 {	
 	public void init() 
 	{	
-		EntityRegistry.registerGlobalEntityID(EntityObj.class, "Obj", EntityRegistry.findGlobalUniqueEntityId(), 0, 0);
+		EntityRegistry.registerGlobalEntityID(EntityObj.class, "Obj", EntityRegistry.findGlobalUniqueEntityId());
 		registerRendering();
 	}
 
