@@ -5,7 +5,6 @@ import java.util.Random;
 import cpw.mods.fml.common.registry.EntityRegistry;
 import net.minecraft.entity.EntityList;
 import obsidianAnimations.entity.EntityDummyPlayer;
-import obsidianAnimator.render.entity.EntityObj;
 
 public class ModEntities 
 {
