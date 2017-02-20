@@ -180,19 +180,22 @@ public class AnimationSequence
 	{
 		Map<String, float[]> partValues = new HashMap<String, float[]>();
 		for(Part part : entityModel.parts)
-		{
-			TreeMap<Integer, AnimationPart> animations = partsByPartName.get(part.getName());
-			if(animations != null && animations.size() > 0)
-			{
-				AnimationPart anim = findPartForTime(animations, MathHelper.floor_float(time));
-				if (anim == null)
-					anim = animations.lastEntry().getValue();
-				partValues.put(part.getName(), anim.getPartRotationAtTime(time - anim.getStartTime()));
-			}
-			else
-				partValues.put(part.getName(), part.getOriginalValues());
-		}
+			partValues.put(part.getName(), getPartValueAtTime(part, time));
 		return partValues;
+	}
+	
+	public float[] getPartValueAtTime(Part part, float time)
+	{
+		TreeMap<Integer, AnimationPart> animations = partsByPartName.get(part.getName());
+		if(animations != null && animations.size() > 0)
+		{
+			AnimationPart anim = findPartForTime(animations, MathHelper.floor_float(time));
+			if (anim == null)
+				anim = animations.lastEntry().getValue();
+			return anim.getPartRotationAtTime(time - anim.getStartTime());
+		}
+		else
+			return part.getOriginalValues();
 	}
 
 	private AnimationPart findPartForTime(TreeMap<Integer,AnimationPart> parts, int time)
