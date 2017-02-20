@@ -91,21 +91,22 @@ public class AnimationPart
 			}
 		}
 		else
-		{
-			values[0] = startPosition[0] + time*movement[0];
-			values[1] = startPosition[1] + time*movement[1];
-			values[2] = startPosition[2] + time*movement[2];
-		}
-
+			values = getPartRotationAtTime(time);
+		part.setValues(values);
+	}
+	
+	public float[] getPartRotationAtTime(float time)
+	{
+		float[] values = new float[3];
 		for(int i = 0; i < 3; i++)
 		{
+			values[i] = startPosition[i] + time*movement[i];
 			if(values[i] < -Math.PI)
 				values[i] += 2*Math.PI;
 			else if(values[i] > Math.PI)
 				values[i] -= 2*Math.PI;	
 		}
-
-		part.setValues(values);
+		return values;
 	}
 
 	public float[] getStartPosition() 
