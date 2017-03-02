@@ -106,7 +106,8 @@ public class PartObj_Animator extends PartObj
 	/**
 	 * Change the texture coordinates and texture if the part is highlighted.
 	 */
-	private void updateTextureCoordinates(boolean mainHighlight, boolean otherHighlight, boolean bindTexture)
+	@Override
+	public void updateTextureCoordinates(boolean mainHighlight, boolean otherHighlight, boolean bindTexture)
 	{		
 		boolean useHighlightCoords = true;
 		ResourceLocation texture;
