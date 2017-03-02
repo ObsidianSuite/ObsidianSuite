@@ -171,7 +171,7 @@ public class ModelObj extends ModelBase
 	
 	private void loadModel(String modelData) throws ModelFormatException, UnsupportedEncodingException
 	{
-		model = new WavefrontObject("Test file", new ByteArrayInputStream(modelData.getBytes("UTF-8")));
+		model = new WavefrontObject(this.entityName, new ByteArrayInputStream(modelData.getBytes("UTF-8")));
 		parts = createPartObjList(model.groupObjects);
 		parts.add(new PartEntityPos(this));
 		if(entityName.equals("player"))
