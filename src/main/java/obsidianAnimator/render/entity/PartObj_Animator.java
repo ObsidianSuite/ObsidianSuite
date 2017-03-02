@@ -1,36 +1,27 @@
 package obsidianAnimator.render.entity;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.lwjgl.opengl.GL11;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.obj.Face;
 import net.minecraftforge.client.model.obj.GroupObject;
 import net.minecraftforge.client.model.obj.TextureCoordinate;
-import obsidianAPI.animation.AnimationParenting;
-import obsidianAPI.render.ModelObj;
 import obsidianAPI.render.part.PartObj;
 import obsidianAnimator.render.MathHelper;
 import obsidianAnimator.render.RayTrace;
+import org.lwjgl.opengl.GL11;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * One partObj for each 'part' of the model.
- * 
  */
 public class PartObj_Animator extends PartObj
 {
-	private Map<Face, TextureCoordinate[]> defaultTextureCoords;
 
-	public PartObj_Animator(ModelObj_Animator modelObject, GroupObject groupObj) 
+	public PartObj_Animator(ModelObj_Animator modelObject, GroupObject groupObj)
 	{
 		super(modelObject, groupObj);
-		defaultTextureCoords = new HashMap<Face, TextureCoordinate[]>();
-		setDefaultTCsToCurrentTCs();
 	}
 
 	//----------------------------------------------------------------

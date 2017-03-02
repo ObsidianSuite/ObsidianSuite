@@ -60,7 +60,7 @@ public class AnimationSequence
         TreeMap<Integer, AnimationPart> parts = partsByPartName.get(part.getPartName());
         if (parts == null)
         {
-            parts = new TreeMap<>();
+            parts = new TreeMap<Integer, AnimationPart>();
             partsByPartName.put(part.getPartName(), parts);
         }
 
