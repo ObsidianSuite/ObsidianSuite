@@ -1,19 +1,23 @@
 package obsidianAPI.render.part;
 
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import net.minecraft.client.Minecraft;
+import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.client.model.obj.Face;
 import net.minecraftforge.client.model.obj.GroupObject;
-import obsidianAPI.animation.AnimationParenting;
+import net.minecraftforge.client.model.obj.TextureCoordinate;
 import obsidianAPI.render.ModelObj;
+import obsidianAPI.render.bend.Bend;
 import org.lwjgl.opengl.GL11;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
  * One partObj for each 'part' of the model.
- *
  */
 public class PartObj extends PartRotation
 {
@@ -21,14 +25,18 @@ public class PartObj extends PartRotation
 	public GroupObject groupObj;
 	private String displayName;
 
+	protected Map<Face, TextureCoordinate[]> defaultTextureCoords = Maps.newHashMap();
+
 	private PartObj parent;
 	private Set<PartObj> children = Sets.newHashSet();
+	private Bend bend = null;
 
 	public PartObj(ModelObj modelObject, GroupObject groupObj)
 	{
 		super(modelObject, (groupObj.name.contains("_") ? groupObj.name.substring(0, groupObj.name.indexOf("_")) : groupObj.name).toLowerCase());
 		this.groupObj = groupObj;
 		this.displayName = getName();
+		setDefaultTCsToCurrentTCs();
 	}
 
 	public void setParent(PartObj parent)
@@ -59,6 +67,26 @@ public class PartObj extends PartRotation
 	public Set<PartObj> getChildren()
 	{
 		return children;
+	}
+
+	public void setBend(Bend bend)
+	{
+		this.bend = bend;
+	}
+
+	public boolean hasBend()
+	{
+		return bend != null;
+	}
+
+	public void removeBend()
+	{
+		if (bend != null)
+		{
+			modelObj.removeBend(bend);
+			bend.remove();
+			bend = null;
+		}
 	}
 
 	//------------------------------------------
@@ -95,7 +123,54 @@ public class PartObj extends PartRotation
 	//         Rendering and Rotating
 	//------------------------------------------
 
-	public void updateTextureCoordinates(){}
+	/**
+	 * Stores the current texture coordinates in default texture coords.
+	 * This is required in case a bend is removed, then the texture coords can be restored.
+	 * XXX
+	 */
+	public void setDefaultTCsToCurrentTCs()
+	{
+		for (Face f : groupObj.faces)
+		{
+			if (f.textureCoordinates == null)
+			{
+				f.textureCoordinates = new TextureCoordinate[3];
+				for (int i = 0; i < 3; i++)
+				{
+					f.textureCoordinates[i] = new TextureCoordinate(0, 0);
+				}
+			}
+
+			TextureCoordinate[] coordsToStore = new TextureCoordinate[3];
+			for (int i = 0; i < 3; i++)
+			{
+				coordsToStore[i] = new TextureCoordinate(f.textureCoordinates[i].u, f.textureCoordinates[i].v);
+			}
+
+			defaultTextureCoords.put(f, coordsToStore);
+		}
+	}
+
+	public void updateTextureCoordinates()
+	{
+		updateTextureCoordinates(false, false, true);
+	}
+
+	/**
+	 * Change the texture coordinates and texture if the part is highlighted.
+	 */
+	public void updateTextureCoordinates(boolean mainHighlight, boolean otherHighlight, boolean bindTexture)
+	{
+		ResourceLocation texture = modelObj.getTexture();
+
+		if (bindTexture)
+			Minecraft.getMinecraft().getTextureManager().bindTexture(texture);
+
+		for (Face f : groupObj.faces)
+		{
+			f.textureCoordinates = defaultTextureCoords.get(f);
+		}
+	}
 
 	public void render()
 	{
@@ -178,5 +253,27 @@ public class PartObj extends PartRotation
 		GL11.glTranslatef(-rotationPoint[0], -rotationPoint[1], -rotationPoint[2]);
 		rotate();
 		GL11.glTranslatef(rotationPoint[0], rotationPoint[1], rotationPoint[2]);
+	}
+
+	public float[] createRotationMatrixFromAngles()
+	{
+		double sx = Math.sin(-valueX);
+		double sy = Math.sin(-valueY);
+		double sz = Math.sin(-valueZ);
+		double cx = Math.cos(-valueX);
+		double cy = Math.cos(-valueY);
+		double cz = Math.cos(-valueZ);
+
+		float m0 = (float) (cy * cz);
+		float m1 = (float) (sx * sy * cz - cx * sz);
+		float m2 = (float) (cx * sy * cz + sx * sz);
+		float m3 = (float) (cy * sz);
+		float m4 = (float) (sx * sy * sz + cx * cz);
+		float m5 = (float) (cx * sy * sz - sx * cz);
+		float m6 = (float) -sy;
+		float m7 = (float) (sx * cy);
+		float m8 = (float) (cx * cy);
+
+		return new float[] {m0, m1, m2, m3, m4, m5, m6, m7, m8};
 	}
 }
