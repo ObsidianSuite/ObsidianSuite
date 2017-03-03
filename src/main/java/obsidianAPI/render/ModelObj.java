@@ -36,8 +36,8 @@ public class ModelObj extends ModelBase
 	public PartGroups partGroups;
 	private Map<PartObj, float[]> defaults;
 
-	private static final float initRotFix = 180.0F;
-	private static final float offsetFixY = -1.5F;
+	public static final float initRotFix = 180.0F;
+	public static final float offsetFixY = -1.5F;
 
 	private final ResourceLocation txtRL;
 	

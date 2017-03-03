@@ -67,10 +67,13 @@ public class RenderObj_Animator extends RenderLiving
 		if (itemstack1 != null)
 		{
 			GL11.glPushMatrix();
+
+			GL11.glRotatef(ModelObj.initRotFix, 1.0F, 0.0F, 0.0F);
+			GL11.glTranslatef(0.0F, ModelObj.offsetFixY, 0.0F);
 			
 			//Post render for lower right arm.
 			PartObj armLwR = modelObj.getPartObjFromName("armLwR");
-			armLwR.postRenderItem();
+			armLwR.postRenderAll();
 			
 			//Prop rotation and translation
 			float[] propRotation = modelObj.getPartFromName("prop_rot").getValues();
@@ -89,44 +92,37 @@ public class RenderObj_Animator extends RenderLiving
 			if (is3D || itemstack1.getItem() instanceof ItemBlock && RenderBlocks.renderItemIn3d(Block.getBlockFromItem(itemstack1.getItem()).getRenderType()))
 			{
 				f2 = 0.5F;
-				GL11.glTranslatef(0.0F, 0.1875F, -0.3125F);
 				f2 *= 0.75F;
-				GL11.glRotatef(20.0F, 1.0F, 0.0F, 0.0F);
-				GL11.glRotatef(45.0F, 0.0F, 1.0F, 0.0F);
+				GL11.glTranslatef(0f, -0.3f, 0.3f);
+				GL11.glRotatef(45, 1f, 0f, 0f);
+				GL11.glRotatef(45, 0f, 1f, 0f);
 				GL11.glScalef(-f2, -f2, f2);
 			}
 			else if (itemstack1.getItem() == Items.bow)
 			{
 				f2 = 0.625F;
-				GL11.glTranslatef(0.0F, 0.125F, 0.3125F);
-				GL11.glRotatef(-20.0F, 0.0F, 1.0F, 0.0F);
+				GL11.glTranslatef(0.125f, -0.4f, -0.25f);
 				GL11.glScalef(f2, -f2, f2);
-				GL11.glRotatef(-100.0F, 1.0F, 0.0F, 0.0F);
+				GL11.glRotatef(90f, 1f, 0f, 0f);
 				GL11.glRotatef(45.0F, 0.0F, 1.0F, 0.0F);
 			}
 			else if (itemstack1.getItem().isFull3D())
 			{
 				f2 = 0.625F;
 
-				if (itemstack1.getItem().shouldRotateAroundWhenRendering())
-				{
-					GL11.glRotatef(180.0F, 0.0F, 0.0F, 1.0F);
-					GL11.glTranslatef(0.0F, -0.125F, 0.0F);
-				}
-
-				GL11.glTranslatef(0.07F, 0.15F, -0.14F);
-				GL11.glScalef(f2, -f2, f2);
-				GL11.glRotatef(-100.0F, 1.0F, 0.0F, 0.0F);
-				GL11.glRotatef(45.0F, 0.0F, 1.0F, 0.0F);
+				GL11.glTranslatef(0.03f, -0.15F, 0f);
+				GL11.glScalef(f2, f2, f2);
+				GL11.glRotatef(70.0F, 1.0F, 0.0F, 0.0F);
+				GL11.glRotatef(40.0F, 0.0F, 1.0F, 0.0F);
 			}
 			else
 			{
 				f2 = 0.375F;
-				GL11.glTranslatef(0.25F, 0.1875F, -0.1875F);
+				GL11.glTranslatef(0.1f, -0.3f, 0.07f);
 				GL11.glScalef(f2, f2, f2);
-				GL11.glRotatef(60.0F, 0.0F, 0.0F, 1.0F);
-				GL11.glRotatef(-90.0F, 1.0F, 0.0F, 0.0F);
-				GL11.glRotatef(20.0F, 0.0F, 0.0F, 1.0F);
+				GL11.glRotatef(-90f, 0, 0f, 1f);
+				GL11.glRotatef(110f, 1f, 0f, 0f);
+				GL11.glRotatef(45f, 0f, 1f, 0f);
 			}
 			
 			float f3;

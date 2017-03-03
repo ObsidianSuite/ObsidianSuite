@@ -187,20 +187,6 @@ public class PartObj extends PartRotation
 		Minecraft.getMinecraft().getTextureManager().bindTexture(modelObj.getTexture());
 	}
 
-	public void postRenderItem()
-	{
-		//Adjust initial position.
-		GL11.glRotatef(180F, 1, 0, 0);
-		GL11.glTranslatef(0, -1.6F, 0);
-
-		//Actually do the post rendering here.
-		postRenderAll();
-
-		//Re-adjust positon to align with hand in resting position.
-		GL11.glRotatef(180F, 1, 0, 0);
-		GL11.glTranslatef(-0.06F,0.05F,0.1F);
-	}
-
 	/**
 	 * Complete post render - parent post render, translation for this part, then rotation for this part.
 	 */
