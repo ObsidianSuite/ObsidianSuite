@@ -1,5 +1,9 @@
 package obsidianAnimator.render.entity;
 
+import net.minecraft.client.renderer.OpenGlHelper;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.util.Vec3;
+import obsidianAnimator.render.MathHelper;
 import org.lwjgl.opengl.GL11;
 
 import cpw.mods.fml.relauncher.Side;
@@ -76,14 +80,11 @@ public class RenderObj_Animator extends RenderLiving
 			armLwR.postRenderAll();
 			
 			//Prop rotation and translation
-			float[] propRotation = modelObj.getPartFromName("prop_rot").getValues();
+			PartRotation prop_rot = (PartRotation) modelObj.getPartFromName("prop_rot");
+
 			float[] propTranslation = modelObj.getPartFromName("prop_trans").getValues();
-			GL11.glTranslatef(propTranslation[0], propTranslation[1], propTranslation[2]);	
-			
-			GL11.glRotatef(180F, 1, 0, 0);
-			((PartRotation) modelObj.getPartFromName("prop_rot")).rotate();
-			GL11.glRotatef(-180F, 1, 0, 0);
-			
+			GL11.glTranslatef(propTranslation[0], propTranslation[1], propTranslation[2]);
+
 			EnumAction enumaction = null;
 
 			net.minecraftforge.client.IItemRenderer customRenderer = net.minecraftforge.client.MinecraftForgeClient.getItemRenderer(itemstack1, net.minecraftforge.client.IItemRenderer.ItemRenderType.EQUIPPED);
@@ -91,6 +92,13 @@ public class RenderObj_Animator extends RenderLiving
 
 			if (is3D || itemstack1.getItem() instanceof ItemBlock && RenderBlocks.renderItemIn3d(Block.getBlockFromItem(itemstack1.getItem()).getRenderType()))
 			{
+				GL11.glRotatef(180F, 1, 0, 0);
+				GL11.glTranslatef(0, 0.30F, -0.3f);
+				prop_rot.rotate();
+				//drawRotationAxis();
+				GL11.glTranslatef(-0, -0.30F, 0.3f);
+				GL11.glRotatef(-180F, 1, 0, 0);
+
 				f2 = 0.5F;
 				f2 *= 0.75F;
 				GL11.glTranslatef(0f, -0.3f, 0.3f);
@@ -100,6 +108,13 @@ public class RenderObj_Animator extends RenderLiving
 			}
 			else if (itemstack1.getItem() == Items.bow)
 			{
+				GL11.glRotatef(180F, 1, 0, 0);
+				GL11.glTranslatef(0.125f, 0.17F, 0.0f);
+				prop_rot.rotate();
+				//drawRotationAxis();
+				GL11.glTranslatef(-0.125f, -0.17F, 0.0f);
+				GL11.glRotatef(-180F, 1, 0, 0);
+
 				f2 = 0.625F;
 				GL11.glTranslatef(0.125f, -0.4f, -0.25f);
 				GL11.glScalef(f2, -f2, f2);
@@ -108,17 +123,31 @@ public class RenderObj_Animator extends RenderLiving
 			}
 			else if (itemstack1.getItem().isFull3D())
 			{
+				GL11.glRotatef(180F, 1, 0, 0);
+				GL11.glTranslatef(-0.00f, 0.17F, -0.04f);
+				prop_rot.rotate();
+				//drawRotationAxis();
+				GL11.glTranslatef(0.00f, -0.17F, 0.04f);
+				GL11.glRotatef(-180F, 1, 0, 0);
+
 				f2 = 0.625F;
 
-				GL11.glTranslatef(0.03f, -0.15F, 0f);
+				GL11.glTranslatef(0.03f, -0.10F, 0f);
 				GL11.glScalef(f2, f2, f2);
 				GL11.glRotatef(70.0F, 1.0F, 0.0F, 0.0F);
 				GL11.glRotatef(40.0F, 0.0F, 1.0F, 0.0F);
 			}
 			else
 			{
+				GL11.glRotatef(180F, 1, 0, 0);
+				GL11.glTranslatef(0, 0.30F, -0.3f);
+				prop_rot.rotate();
+				//drawRotationAxis();
+				GL11.glTranslatef(-0, -0.30F, 0.3f);
+				GL11.glRotatef(-180F, 1, 0, 0);
+
 				f2 = 0.375F;
-				GL11.glTranslatef(0.1f, -0.3f, 0.07f);
+				GL11.glTranslatef(0.2f, -0.3f, 0.07f);
 				GL11.glScalef(f2, f2, f2);
 				GL11.glRotatef(-90f, 0, 0f, 1f);
 				GL11.glRotatef(110f, 1f, 0f, 0f);
@@ -153,5 +182,58 @@ public class RenderObj_Animator extends RenderLiving
 
 			GL11.glPopMatrix();
 		}
+	}
+
+	private void drawRotationAxis()
+	{
+		int colour = 0xFFFFFF;
+		Vec3 u = null;
+		Vec3 v = null;
+		for(int i = 0; i < 3; i++)
+		{
+			switch(i)
+			{
+				case 0:
+					colour = 0xFF0000;
+					u = Vec3.createVectorHelper(-MathHelper.rotationWheelRadius, 0.0F, 0.0F);
+					v = Vec3.createVectorHelper(MathHelper.rotationWheelRadius, 0.0F, 0.0F);
+					break;
+				case 1:
+					colour = 0x00FF00;
+					u = Vec3.createVectorHelper(0.0F, -MathHelper.rotationWheelRadius, 0.0F);
+					v = Vec3.createVectorHelper(0.0F, MathHelper.rotationWheelRadius, 0.0F);
+					break;
+				case 2:
+					colour = 0x0000FF;
+					u = Vec3.createVectorHelper(0.0F, 0.0F, -MathHelper.rotationWheelRadius);
+					v = Vec3.createVectorHelper(0.0F, 0.0F, MathHelper.rotationWheelRadius);
+					break;
+			}
+				drawLine(u, v, colour, 4.0F, 1F);
+		}
+	}
+
+	private void drawLine(Vec3 p1, Vec3 p2, int color, float width, float alpha)
+	{
+		GL11.glPushMatrix();
+		GL11.glEnable(GL11.GL_BLEND);
+		OpenGlHelper.glBlendFunc(770, 771, 1, 0);
+		GL11.glColor4f(1.0F, 1.0F, 1.0F, alpha);
+		GL11.glLineWidth(width);
+		GL11.glDisable(GL11.GL_TEXTURE_2D);
+
+		Tessellator tessellator = Tessellator.instance;
+
+		tessellator.startDrawing(1);
+		tessellator.setColorRGBA_I(color, (int) (alpha*255));
+		tessellator.addVertex(p1.xCoord,p1.yCoord,p1.zCoord);
+		tessellator.addVertex(p2.xCoord,p2.yCoord,p2.zCoord);
+		tessellator.draw();
+
+		GL11.glDepthMask(true);
+		GL11.glEnable(GL11.GL_DEPTH_TEST);
+		GL11.glEnable(GL11.GL_TEXTURE_2D);
+		GL11.glDisable(GL11.GL_BLEND);
+		GL11.glPopMatrix();
 	}
 }
