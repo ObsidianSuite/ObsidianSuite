@@ -1,15 +1,11 @@
 package obsidianAnimator.render.entity;
 
-import net.minecraft.client.renderer.OpenGlHelper;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.util.Vec3;
-import obsidianAnimator.render.MathHelper;
-import org.lwjgl.opengl.GL11;
-
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.block.Block;
+import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.RenderBlocks;
+import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.entity.RenderLiving;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -18,10 +14,13 @@ import net.minecraft.item.EnumAction;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
-import obsidianAPI.Util;
+import net.minecraft.util.Vec3;
 import obsidianAPI.render.ModelObj;
+import obsidianAPI.render.part.PartEntityPos;
 import obsidianAPI.render.part.PartObj;
 import obsidianAPI.render.part.PartRotation;
+import obsidianAnimator.render.MathHelper;
+import org.lwjgl.opengl.GL11;
 
 @SideOnly(Side.CLIENT)
 public class RenderObj_Animator extends RenderLiving
@@ -44,7 +43,15 @@ public class RenderObj_Animator extends RenderLiving
 		modelObj = model;
 		mainModel = model;
 	}
-	
+
+	@Override
+	public void doRender(Entity p_76986_1_, double p_76986_2_, double p_76986_4_, double p_76986_6_, float p_76986_8_, float p_76986_9_)
+	{
+		PartEntityPos pos = (PartEntityPos) modelObj.getPartFromName("entitypos");
+		float[] values = pos.getValues();
+        super.doRender(p_76986_1_, p_76986_2_ + values[0], p_76986_4_ + values[1], p_76986_6_ + values[2], p_76986_8_, p_76986_9_);
+    }
+
 	@Override
 	protected void renderEquippedItems(EntityLivingBase entity, float f)
 	{
