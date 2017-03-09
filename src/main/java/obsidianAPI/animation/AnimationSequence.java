@@ -170,7 +170,8 @@ public class AnimationSequence
                     AnimationPart anim = findPartForTime(animations, MathHelper.floor_float(time));
                     if (anim == null)
                         anim = animations.lastEntry().getValue();
-                    anim.animatePart(part, time - anim.getStartTime());
+                    float frameTime = Math.min(time - anim.getStartTime(), anim.getEndTime() - anim.getStartTime());
+                    anim.animatePart(part, frameTime);
                 }
 			}
 		}
