@@ -49,9 +49,9 @@ public class EntityAutoMove
 	public void moveEntity(float time, Entity entity)
 	{
 		float[] moveAmounts = calculateMoveAmounts(time);
-		entity.posX += moveAmounts[0];
-		entity.posY += moveAmounts[1];
-		entity.posZ += moveAmounts[2];
+		entity.posX = moveAmounts[0];
+		entity.posY = moveAmounts[1];
+		entity.posZ = moveAmounts[2];
 	}
 
 	public void matrixTranslate(float time)
