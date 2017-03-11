@@ -54,12 +54,6 @@ public class EntityAutoMove
 		entity.posZ = moveAmounts[2];
 	}
 
-	public void matrixTranslate(float time)
-	{
-		float[] moveAmounts = calculateMoveAmounts(time);
-		GL11.glTranslatef(moveAmounts[0], moveAmounts[1], moveAmounts[2]);
-	}
-
 	private float[] calculateMoveAmounts(float time)
 	{
 		float f = (time/(float)fps)*speed;
