@@ -1,45 +1,5 @@
 package obsidianAnimator.gui.sequence.timeline;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionListener;
-import java.awt.event.MouseWheelEvent;
-import java.awt.event.MouseWheelListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.io.File;
-import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import javax.swing.AbstractAction;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JLayeredPane;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSlider;
-import javax.swing.JTextField;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
-import org.lwjgl.input.Keyboard;
-import org.lwjgl.opengl.Display;
-import org.lwjgl.opengl.GL11;
-
 import obsidianAPI.Util;
 import obsidianAPI.animation.AnimationPart;
 import obsidianAPI.animation.AnimationSequence;
@@ -50,6 +10,19 @@ import obsidianAnimator.gui.frames.HomeFrame;
 import obsidianAnimator.gui.sequence.EntityAutoMove;
 import obsidianAnimator.gui.sequence.ExternalFrame;
 import obsidianAnimator.gui.sequence.GuiEntityRendererWithTranslation;
+import org.lwjgl.input.Keyboard;
+import org.lwjgl.opengl.Display;
+import org.lwjgl.opengl.GL11;
+
+import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import java.awt.*;
+import java.awt.event.*;
+import java.io.File;
+import java.text.DecimalFormat;
+import java.util.*;
+import java.util.List;
 
 public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation implements ExternalFrame
 {
@@ -66,20 +39,22 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 
 	private Part exceptionPart = null;
 
-	boolean boolPlay;	
+	boolean boolPlay;
 	boolean boolLoop;
 	boolean boolMovementActive;
-	
+
 	//Nano time at which the animation started playing (play button pressed).
 	long playStartTimeNano;
 	//Frame time at which the animation started playing (play button pressed).
 	float playStartTimeFrame;
 
 	EntityAutoMove entityMovement;
-	
+
 	private File animationFile;
 
 	private KeyMappings keyMappings;
+
+	private float[] copiedValues = null;
 
 	public GuiAnimationTimeline(File animationFile, AnimationSequence animation)
 	{
@@ -89,7 +64,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 		this.animationFile = animationFile;
 		boolPlay = false;
 		boolMovementActive = false;
-		
+
 		loadKeyframes();
 		loadFrames();
 
@@ -126,6 +101,9 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
         keyMappings.addCtrlKey(KeyEvent.VK_Y, Keyboard.KEY_Y,"redoReleased", new RedoAction());
         keyMappings.addKey(KeyEvent.VK_ESCAPE,Keyboard.KEY_ESCAPE, "escPressed", new EscAction());
 		keyMappings.addKey(KeyEvent.VK_DELETE, Keyboard.KEY_DELETE, "escPressed", new DeleteAction());
+		keyMappings.addCtrlKey(KeyEvent.VK_R, Keyboard.KEY_R,"rPressed", new ResetAction());
+		keyMappings.addCtrlKey(KeyEvent.VK_C, Keyboard.KEY_C, "cPressed", new CopyAction());
+		keyMappings.addCtrlKey(KeyEvent.VK_V, Keyboard.KEY_V, "vPressed", new PasteAction());
 
         int[] numpadKey = new int[] {
         		Keyboard.KEY_NUMPAD0, Keyboard.KEY_NUMPAD1, Keyboard.KEY_NUMPAD2, Keyboard.KEY_NUMPAD3,
@@ -141,10 +119,10 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
     }
 
 	/**
-	 * Creates keyframes from the animation sequence. 
+	 * Creates keyframes from the animation sequence.
 	 */
 	public void loadKeyframes()
-	{	
+	{
 		keyframes.clear();
 		for(AnimationPart animpart : currentAnimation.getAnimationList())
 		{
@@ -153,7 +131,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 			String partName = animpart.getPartName();
 			List<Keyframe> partKfs = keyframes.get(mr);
 			if(keyframes.get(mr) == null)
-				partKfs = new ArrayList<Keyframe>();			
+				partKfs = new ArrayList<Keyframe>();
 
 			float[] defaults = mr.getOriginalValues();
 			//If the movement starts at time zero, and the part isn't in its original position, add a keyframe at time zero.
@@ -192,7 +170,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 	}
 
 	public void drawScreen(int par1, int par2, float par3)
-	{				
+	{
 		if(boolPlay)
 		{
 			time = Util.getAnimationFrameTime(playStartTimeNano, playStartTimeFrame, currentAnimation.getFPS(), timeMultiplier);
@@ -374,7 +352,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 				}
 				else if(doesPartOnlyHaveOneKeyframe(part))
 				{
-					//Used for parts that only have one keyframe and where that keyframe is at the beginning 
+					//Used for parts that only have one keyframe and where that keyframe is at the beginning
 					//The part will maintain that rotation throughout the whole animation.
 					sequence.addAnimation(new AnimationPart(0, getLastKeyFrameTime(), kf.values, kf.values, part));
 				}
@@ -457,7 +435,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 		super.updatePart(newPartName);
 		exceptionPart = newPartName;
 		timelineFrame.refresh();
-	}	
+	}
 
 	/* ---------------------------------------------------- *
 	 * 				  		 Undo/redo						*
@@ -523,7 +501,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 		exceptionPart = selectedPart;
 	}
 
-	@Override	
+	@Override
 	protected void onControllerRelease()
 	{
 		super.onControllerRelease();
@@ -532,7 +510,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 	}
 
 	@Override
-	public void updateExternalFrameFromDisplay() 
+	public void updateExternalFrameFromDisplay()
 	{
 		timelineFrame.setAlwaysOnTop(Display.isActive());
 	}
@@ -596,7 +574,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 			timeSlider.addChangeListener(new ChangeListener()
 			{
 				@Override
-				public void stateChanged(ChangeEvent e) 
+				public void stateChanged(ChangeEvent e)
 				{
 					timeTextField.setText(df.format(timeSlider.getValue()));
 					time = timeSlider.getValue();
@@ -610,7 +588,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 			timeSlider.addMouseListener(new BlankMouseListener()
 			{
 				@Override
-				public void mousePressed(MouseEvent arg0) 
+				public void mousePressed(MouseEvent arg0)
 				{
 					exceptionPart = null;
 				}
@@ -618,11 +596,11 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 			timeTextField.addKeyListener(new KeyAdapter()
 			{
 				@Override
-				public void keyReleased(KeyEvent ke) 
+				public void keyReleased(KeyEvent ke)
 				{
 					String typed = timeTextField.getText();
 					timeSlider.setValue(0);
-					if(!typed.matches("\\d+(\\.\\d*)?")) 
+					if(!typed.matches("\\d+(\\.\\d*)?"))
 					{
 						return;
 					}
@@ -635,7 +613,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 			addMouseWheelListener(new MouseWheelListener()
 			{
 				@Override
-				public void mouseWheelMoved(MouseWheelEvent e) 
+				public void mouseWheelMoved(MouseWheelEvent e)
 				{
 					updateTimelineLength((int) (e.getPreciseWheelRotation()*5));
 				}
@@ -776,7 +754,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 		}
 
 		private class KeyframeLine extends JPanel
-		{		
+		{
 			Keyframe closestKeyframe;
 			Part part;
 			boolean mouseWithin;
@@ -791,7 +769,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 				this.addMouseListener(new BlankMouseListener()
 				{
 					@Override
-					public void mouseClicked(MouseEvent e) 
+					public void mouseClicked(MouseEvent e)
 					{
 						Keyframe kf = getExistingKeyframe();
 						if(kf != null && e.isControlDown())
@@ -807,32 +785,32 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 
 
 					@Override
-					public void mouseEntered(MouseEvent e) 
+					public void mouseEntered(MouseEvent e)
 					{
 						mouseWithin = true;
 						hoveredPart = part;
 					}
 
 					@Override
-					public void mouseExited(MouseEvent e) 
+					public void mouseExited(MouseEvent e)
 					{
-						mouseWithin = false; 
+						mouseWithin = false;
 						repaint();
 						hoveredPart = null;
 					}
 
 					@Override
-					public void mouseReleased(MouseEvent e) 
+					public void mouseReleased(MouseEvent e)
 					{
 						if(keyframeTimeChanged)
 							updateAnimationParts();
 						keyframeTimeChanged = false;
-					}		
+					}
 				});
 				this.addMouseMotionListener(new MouseMotionListener()
 				{
 					@Override
-					public void mouseDragged(MouseEvent e) 
+					public void mouseDragged(MouseEvent e)
 					{
 						if(closestKeyframe != null)
 						{
@@ -862,7 +840,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 						int x = 200 + KeyframeLine.this.getX() + e.getX();
 						int y = KeyframeLine.this.getY() + e.getY();
 						updateCopyLabel(x, y, xToKeyframeTime(e.getX()), e.isControlDown());
-					}			
+					}
 				});
 			}
 
@@ -933,7 +911,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 	private class SpaceAction extends AbstractAction
 	{
 		@Override
-		public void actionPerformed(ActionEvent arg0) 
+		public void actionPerformed(ActionEvent arg0)
 		{
 			addKeyframe();
 		}
@@ -942,7 +920,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 	private class WAction extends AbstractAction
 	{
 		@Override
-		public void actionPerformed(ActionEvent arg0) 
+		public void actionPerformed(ActionEvent arg0)
 		{
 			for(int i = 0; i < parts.size(); i++)
 			{
@@ -954,33 +932,33 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 						updatePart(parts.get(parts.size() - 1));
 					break;
 				}
-			}			
+			}
 		}
 	}
 
 	private class SAction extends AbstractAction
 	{
 		@Override
-		public void actionPerformed(ActionEvent arg0) 
+		public void actionPerformed(ActionEvent arg0)
 		{
 			for(int i = 0; i < parts.size(); i++)
 			{
 				if(parts.get(i).equals(selectedPart))
-				{					
+				{
 					if(i < parts.size() - 1)
 						updatePart(parts.get(i+1));
 					else
 						updatePart(parts.get(0));
 					break;
 				}
-			}		
+			}
 		}
 	}
 
 	private class AAction extends AbstractAction
 	{
 		@Override
-		public void actionPerformed(ActionEvent arg0) 
+		public void actionPerformed(ActionEvent arg0)
 		{
 			exceptionPart = null;
 			time = time > 0 ? time - 1 : time;
@@ -992,7 +970,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 	private class DAction extends AbstractAction
 	{
 		@Override
-		public void actionPerformed(ActionEvent arg0) 
+		public void actionPerformed(ActionEvent arg0)
 		{
 			exceptionPart = null;
 			time = time < timelineFrame.timelineLength ? time + 1 : time;
@@ -1003,36 +981,103 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 	private class UndoAction extends AbstractAction
 	{
 		@Override
-		public void actionPerformed(ActionEvent arg0) 
+		public void actionPerformed(ActionEvent arg0)
 		{
-			undo();		
+			undo();
 		}
 	}
 
 	private class RedoAction extends AbstractAction
 	{
 		@Override
-		public void actionPerformed(ActionEvent arg0) 
+		public void actionPerformed(ActionEvent arg0)
 		{
-			redo();		
+			redo();
 		}
 	}
 
 	private class DeleteAction extends AbstractAction
 	{
 		@Override
-		public void actionPerformed(ActionEvent arg0) 
+		public void actionPerformed(ActionEvent arg0)
 		{
-			deleteKeyframe();		
+			deleteKeyframe();
 		}
 	}
 
 	private class EscAction extends AbstractAction
 	{
 		@Override
-		public void actionPerformed(ActionEvent arg0) 
+		public void actionPerformed(ActionEvent arg0)
 		{
-			close();		
+			close();
+		}
+	}
+
+	private class ResetAction extends AbstractAction
+	{
+		@Override
+		public void actionPerformed(ActionEvent e)
+		{
+			if (selectedPart != null)
+			{
+				Keyframe toReset = getKeyframe(selectedPart, (int) time);
+				if (toReset != null)
+				{
+					for (int i = 0; i < 3; i++)
+					{
+						toReset.values[i] = selectedPart.getOriginalValues()[i];
+					}
+					updateAnimationParts();
+				}
+			}
+		}
+	}
+
+	private class CopyAction extends AbstractAction
+	{
+        @Override
+        public void actionPerformed(ActionEvent e)
+        {
+            if (selectedPart != null)
+            {
+                Keyframe frame = getKeyframe(selectedPart, (int) time);
+                if (frame != null)
+                {
+                    copiedValues = new float[] {
+                            frame.values[0],
+                            frame.values[1],
+                            frame.values[2]
+                    };
+                } else
+                {
+                    copiedValues = new float[] {
+                            selectedPart.getValue(0),
+                            selectedPart.getValue(1),
+                            selectedPart.getValue(2)
+                    };
+                }
+            }
+        }
+    }
+
+	private class PasteAction extends AbstractAction
+	{
+		@Override
+		public void actionPerformed(ActionEvent e)
+		{
+			if (selectedPart != null && copiedValues != null)
+			{
+				Keyframe frame = getKeyframe(selectedPart, (int) time);
+				if (frame != null)
+				{
+					frame.values[0] = copiedValues[0];
+					frame.values[1] = copiedValues[1];
+					frame.values[2] = copiedValues[2];
+
+					updateAnimationParts();
+				}
+			}
 		}
 	}
 
