@@ -57,15 +57,15 @@ public class AnimationSequence
 
 	private void addAnimationToMap(AnimationPart part)
 	{
-        TreeMap<Integer, AnimationPart> parts = partsByPartName.get(part.getPartName());
-        if (parts == null)
-        {
-            parts = new TreeMap<Integer, AnimationPart>();
-            partsByPartName.put(part.getPartName(), parts);
-        }
+		TreeMap<Integer, AnimationPart> parts = partsByPartName.get(part.getPartName());
+		if (parts == null)
+		{
+			parts = new TreeMap<Integer, AnimationPart>();
+			partsByPartName.put(part.getPartName(), parts);
+		}
 
-        parts.put(part.getStartTime(), part);
-    }
+		parts.put(part.getStartTime(), part);
+	}
 
 	public List<AnimationPart> getAnimationList()
 	{
@@ -77,7 +77,7 @@ public class AnimationSequence
 
 	public Collection<AnimationPart> getAnimations(String partName)
 	{
-        TreeMap<Integer, AnimationPart> parts = partsByPartName.get(partName);
+		TreeMap<Integer, AnimationPart> parts = partsByPartName.get(partName);
 		if (parts == null)
 		{
 			return Collections.emptyList();
@@ -146,7 +146,7 @@ public class AnimationSequence
 	 */
 	public boolean multiPartSequence(String partName)
 	{
-	    return getAnimations(partName).size() >= 2;
+		return getAnimations(partName).size() >= 2;
 	}
 
 	public void animateAll(float time, ModelObj entityModel)
@@ -158,34 +158,60 @@ public class AnimationSequence
 	 * Sets all the parts of a model to their rotation at a given time.
 	 * The part with name = exceptionPartName will not be rotated.
 	 */
+	/**
+	 * Sets all the parts of a model to their rotation at a given time.
+	 * The part with name = exceptionPartName will not be rotated.
+	 */
 	public void animateAll(float time, ModelObj entityModel, String exceptionPartName)
 	{
 		for(Part part : entityModel.parts)
 		{
 			if(!part.getName().equals(exceptionPartName))
 			{
-                TreeMap<Integer, AnimationPart> animations = partsByPartName.get(part.getName());
+				TreeMap<Integer, AnimationPart> animations = partsByPartName.get(part.getName());
 				if(animations != null && animations.size() > 0)
 				{
-                    AnimationPart anim = findPartForTime(animations, MathHelper.floor_float(time));
-                    if (anim == null)
-                        anim = animations.lastEntry().getValue();
-                    float frameTime = Math.min(time - anim.getStartTime(), anim.getEndTime() - anim.getStartTime());
-                    anim.animatePart(part, frameTime);
-                }
+					AnimationPart anim = findPartForTime(animations, MathHelper.floor_float(time));
+					if (anim == null)
+						anim = animations.lastEntry().getValue();
+					float frameTime = Math.min(time - anim.getStartTime(), anim.getEndTime() - anim.getStartTime());
+					anim.animatePart(part, frameTime);
+				}
 			}
 		}
 	}
 
+	public Map<String, float[]> getPartValuesAtTime(ModelObj entityModel, float time)
+	{
+		Map<String, float[]> partValues = new HashMap<String, float[]>();
+		for(Part part : entityModel.parts)
+			partValues.put(part.getName(), getPartValueAtTime(part, time));
+		return partValues;
+	}
+
+	public float[] getPartValueAtTime(Part part, float time)
+	{
+		TreeMap<Integer, AnimationPart> animations = partsByPartName.get(part.getName());
+		if(animations != null && animations.size() > 0)
+		{
+			AnimationPart anim = findPartForTime(animations, MathHelper.floor_float(time));
+			if (anim == null)
+				anim = animations.lastEntry().getValue();
+			return anim.getPartRotationAtTime(time - anim.getStartTime());
+		}
+		else
+			return part.getOriginalValues();
+	}
+
 	private AnimationPart findPartForTime(TreeMap<Integer,AnimationPart> parts, int time)
 	{
-        Map.Entry<Integer, AnimationPart> entry = parts.floorEntry(time);
-        if (entry != null)
-        {
-            return entry.getValue();
-        }
+		Map.Entry<Integer, AnimationPart> entry = parts.floorEntry(time);
+		if (entry != null)
+		{
+			return entry.getValue();
+		}
 
-        return null;
+		return null;
 	}
 
 	//TODO AnimatinSequence - would it be better to store this rather than calculate it every time?
