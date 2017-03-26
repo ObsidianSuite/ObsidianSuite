@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import obsidianAPI.render.part.PartEntityPos;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
@@ -268,6 +269,12 @@ public class GuiEntityRenderer extends GuiBlack
 	 */
 	private void renderEntityIntoGui(int xPos, int yPos, float scale, float rotX, float rotY, EntityLivingBase par5EntityLivingBase)
 	{
+		PartEntityPos pos = (PartEntityPos) entityModel.getPartFromName("entitypos");
+		float[] values = pos.getValues();
+		par5EntityLivingBase.posX += values[0];
+		par5EntityLivingBase.posY += values[1];
+		par5EntityLivingBase.posZ += values[2];
+
 		GL11.glEnable(GL11.GL_COLOR_MATERIAL);
 		GL11.glPushMatrix();
 		GL11.glTranslatef(xPos, yPos, 200.0F);
@@ -300,6 +307,10 @@ public class GuiEntityRenderer extends GuiBlack
 		GL11.glTranslated(par5EntityLivingBase.posX, par5EntityLivingBase.posY, par5EntityLivingBase.posZ);
 		processRay();
 		GL11.glPopMatrix();
+
+		par5EntityLivingBase.posX -= values[0];
+		par5EntityLivingBase.posY -= values[1];
+		par5EntityLivingBase.posZ -= values[2];
 	}
 
 	private void renderBase(int xPos, int yPos, float scale, float rotX, float rotY)

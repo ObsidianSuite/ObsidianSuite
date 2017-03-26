@@ -40,10 +40,10 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 
+import obsidianAPI.Util;
 import obsidianAPI.animation.AnimationPart;
 import obsidianAPI.animation.AnimationSequence;
 import obsidianAPI.render.part.Part;
-import obsidianAnimator.Util;
 import obsidianAnimator.file.FileHandler;
 import obsidianAnimator.gui.GuiBlack;
 import obsidianAnimator.gui.frames.HomeFrame;
@@ -148,7 +148,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 		keyframes.clear();
 		for(AnimationPart animpart : currentAnimation.getAnimationList())
 		{
-			Part mr = Util.getPartFromName(animpart.getPartName(), entityModel.parts);
+			Part mr = entityModel.getPartFromName(animpart.getPartName());
 
 			String partName = animpart.getPartName();
 			List<Keyframe> partKfs = keyframes.get(mr);
@@ -499,8 +499,6 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 	public void processRay()
 	{
 		GL11.glPushMatrix();
-		if(entityMovement != null && boolMovementActive)
-			entityMovement.matrixTranslate(time);
 		super.processRay();
 		GL11.glPopMatrix();
 	}

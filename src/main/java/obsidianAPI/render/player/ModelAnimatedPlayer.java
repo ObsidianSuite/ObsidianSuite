@@ -1,21 +1,20 @@
-package obsidianAnimations.entity;
+package obsidianAPI.render.player;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
-import obsidianAPI.Util;
 import obsidianAPI.render.ModelAnimated;
 import obsidianAPI.render.part.PartObj;
 
-public class ModelDummyPlayer extends ModelAnimated
+public class ModelAnimatedPlayer extends ModelAnimated
 {
 
 	private PartObj head, chestLw;
 	private static final ResourceLocation modelRL = new ResourceLocation("mod_obsidian_animations:models/biped.obm");
 	private static final ResourceLocation textureRL = new ResourceLocation("mod_obsidian_animations:models/player.png");
 	
-	public ModelDummyPlayer()
+	public ModelAnimatedPlayer()
 	{
-		super("dummy", modelRL, textureRL);
+		super("player", modelRL, textureRL);
 		head = getPartObjFromName("head");
 		chestLw = getPartObjFromName("chestLw");
 	}
@@ -29,3 +28,4 @@ public class ModelDummyPlayer extends ModelAnimated
 	}
 
 }
+
