@@ -1,8 +1,8 @@
 package obsidianAnimator.gui;
 
 import net.minecraft.client.Minecraft;
-import obsidianAPI.Util;
 import obsidianAPI.animation.AnimationParenting;
+import obsidianAPI.render.bend.Bend;
 import obsidianAPI.render.part.Part;
 import obsidianAPI.render.part.PartObj;
 import obsidianAnimator.gui.frames.HomeFrame;
@@ -73,25 +73,33 @@ public class GuiAnimationParenting extends GuiEntityRenderer
 						JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE,null,options,options[0]);
 			if(n == 1)
 			{
-				entityModel.setParent(child, null);
+				entityModel.setParent(child, null, false);
 				relationFrame.updateLabels();
 			}
 		}
 		else
 		{
-			int n = JOptionPane.showConfirmDialog(parentingFrame, "Parent " + child.getDisplayName() + " to " + parent.getDisplayName() + "?", "Parenting", 
-					JOptionPane.YES_NO_CANCEL_OPTION);
-			if(n == 0)
-				parent(parent, child);
+			int n = JOptionPane.showConfirmDialog(parentingFrame, "Parent " + child.getDisplayName() + " to " + parent.getDisplayName() + "?", "Parenting",
+												  JOptionPane.YES_NO_CANCEL_OPTION);
+			if (n == 0)
+			{
+				if (Bend.canCreateBend(child, parent) && JOptionPane.showConfirmDialog(parentingFrame, "Parent with bend?", "Parenting", JOptionPane.YES_NO_OPTION) == 0)
+				{
+					parent(parent, child, true);
+				} else
+				{
+					parent(parent, child, false);
+				}
+			}
 		}
 	}
 
-	private void parent(PartObj parent, PartObj child) 
+	private void parent(PartObj parent, PartObj child, boolean bend)
 	{
 		try
 		{
 
-			entityModel.setParent(child, parent);
+			entityModel.setParent(child, parent, bend);
 			relationFrame.updateLabels();
 		}
 		catch(Exception e)
@@ -178,7 +186,7 @@ public class GuiAnimationParenting extends GuiEntityRenderer
 				{
 					for (PartObj partObj : entityModel.getPartObjs())
 					{
-						entityModel.setParent(partObj, null);
+						entityModel.setParent(partObj, null, false);
 						partObj.getChildren().clear();
 					}
 					relationFrame.updateLabels();

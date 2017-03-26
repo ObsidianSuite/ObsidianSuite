@@ -499,8 +499,6 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 	public void processRay()
 	{
 		GL11.glPushMatrix();
-		if(entityMovement != null && boolMovementActive)
-			entityMovement.matrixTranslate(time);
 		super.processRay();
 		GL11.glPopMatrix();
 	}

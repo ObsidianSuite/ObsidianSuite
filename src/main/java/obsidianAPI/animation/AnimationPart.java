@@ -92,6 +92,18 @@ public class AnimationPart
 		}
 		else
 			values = getPartRotationAtTime(time);
+
+		if (!partName.equals("entitypos"))
+		{
+			for (int i = 0; i < 3; i++)
+			{
+				if (values[i] < -Math.PI)
+					values[i] += 2 * Math.PI;
+				else if (values[i] > Math.PI)
+					values[i] -= 2 * Math.PI;
+			}
+		}
+		
 		part.setValues(values);
 	}
 	

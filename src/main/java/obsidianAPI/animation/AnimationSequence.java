@@ -60,7 +60,7 @@ public class AnimationSequence
 		TreeMap<Integer, AnimationPart> parts = partsByPartName.get(part.getPartName());
 		if (parts == null)
 		{
-			parts = new TreeMap<>();
+			parts = new TreeMap<Integer, AnimationPart>();
 			partsByPartName.put(part.getPartName(), parts);
 		}
 
@@ -158,6 +158,10 @@ public class AnimationSequence
 	 * Sets all the parts of a model to their rotation at a given time.
 	 * The part with name = exceptionPartName will not be rotated.
 	 */
+	/**
+	 * Sets all the parts of a model to their rotation at a given time.
+	 * The part with name = exceptionPartName will not be rotated.
+	 */
 	public void animateAll(float time, ModelObj entityModel, String exceptionPartName)
 	{
 		for(Part part : entityModel.parts)
@@ -170,7 +174,8 @@ public class AnimationSequence
 					AnimationPart anim = findPartForTime(animations, MathHelper.floor_float(time));
 					if (anim == null)
 						anim = animations.lastEntry().getValue();
-					anim.animatePart(part, time - anim.getStartTime());
+					float frameTime = Math.min(time - anim.getStartTime(), anim.getEndTime() - anim.getStartTime());
+					anim.animatePart(part, frameTime);
 				}
 			}
 		}
@@ -183,7 +188,7 @@ public class AnimationSequence
 			partValues.put(part.getName(), getPartValueAtTime(part, time));
 		return partValues;
 	}
-	
+
 	public float[] getPartValueAtTime(Part part, float time)
 	{
 		TreeMap<Integer, AnimationPart> animations = partsByPartName.get(part.getName());

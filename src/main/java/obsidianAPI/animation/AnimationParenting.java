@@ -2,13 +2,9 @@ package obsidianAPI.animation;
 
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import obsidianAPI.Util;
 import obsidianAPI.render.ModelObj;
 import obsidianAPI.render.part.PartObj;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 public class AnimationParenting
@@ -46,7 +42,12 @@ public class AnimationParenting
 				int i = 0;
 				for (PartObj child : children)
 				{
-					parentCompound.setString("Child"+i,child.getName());
+					String name = child.getName();
+					if (child.hasBend())
+					{
+						name += "*";
+					}
+					parentCompound.setString("Child" + i, name);
 					i++;
 				}
 
@@ -68,13 +69,19 @@ public class AnimationParenting
 			NBTTagCompound parentCompound = parentNBTList.getCompoundTagAt(i);
 			PartObj parent = model.getPartObjFromName(parentCompound.getString("Parent"));
 			int j = 0;
-			while(parentCompound.hasKey("Child" + j))
+			while (parentCompound.hasKey("Child" + j))
 			{
 				String name = parentCompound.getString("Child" + j);
+				boolean hasBend = false;
+				if (name.endsWith("*"))
+				{
+					name = name.substring(0, name.length() - 1);
+					hasBend = true;
+				}
 				PartObj child = model.getPartObjFromName(name);
 
-                model.setParent(child, parent);
-                j++;
+				model.setParent(child, parent, hasBend);
+				j++;
 			}
 		}
 	}
