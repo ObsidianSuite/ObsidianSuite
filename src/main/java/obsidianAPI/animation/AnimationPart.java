@@ -97,12 +97,15 @@ public class AnimationPart
 			values[2] = startPosition[2] + time*movement[2];
 		}
 
-		for(int i = 0; i < 3; i++)
+		if (!partName.equals("entitypos"))
 		{
-			if(values[i] < -Math.PI)
-				values[i] += 2*Math.PI;
-			else if(values[i] > Math.PI)
-				values[i] -= 2*Math.PI;	
+			for (int i = 0; i < 3; i++)
+			{
+				if (values[i] < -Math.PI)
+					values[i] += 2 * Math.PI;
+				else if (values[i] > Math.PI)
+					values[i] -= 2 * Math.PI;
+			}
 		}
 
 		part.setValues(values);
