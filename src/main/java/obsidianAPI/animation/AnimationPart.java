@@ -1,16 +1,16 @@
 package obsidianAPI.animation;
 
+import net.minecraft.nbt.NBTBase;
+import net.minecraft.nbt.NBTTagCompound;
+import obsidianAPI.Quaternion;
+import obsidianAPI.Util;
+import obsidianAPI.render.part.Part;
+import obsidianAPI.render.part.PartObj;
+import obsidianAPI.render.part.PartRotation;
+
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
-
-import obsidianAPI.Util;
-import org.lwjgl.util.vector.Quaternion;
-
-import net.minecraft.nbt.NBTBase;
-import net.minecraft.nbt.NBTTagCompound;
-import obsidianAPI.render.part.Part;
-import obsidianAPI.render.part.PartObj;
 
 /**
  * A section of an animation for a specific part. 
@@ -43,8 +43,8 @@ public class AnimationPart
 	
 	private void init()
 	{
-		this.startQuart = Util.eulerToQuarternion(startPosition[0] / 180F * Math.PI, startPosition[1] / 180F * Math.PI, startPosition[2] / 180F * Math.PI);
-		this.endQuart = Util.eulerToQuarternion(endPosition[0] / 180F * Math.PI, endPosition[1] / 180F * Math.PI, endPosition[2] / 180F * Math.PI);
+		this.startQuart = Quaternion.fromEuler(startPosition[0], startPosition[1], startPosition[2]);
+		this.endQuart = Quaternion.fromEuler(endPosition[0], endPosition[1], endPosition[2]);
 
 		for(int i = 0; i < 3; i++)
 		{
@@ -54,41 +54,19 @@ public class AnimationPart
 			if(dT == 0)
 				dT = 1;
 			float dif = endPosition[i] - startPosition[i];
-			//Keep rotation within range.
-			//TODO Find a way to re-implement this without needed the part instance. 
-//			if(part instanceof PartObj)
-//			{
-//				if(Math.abs(dif) > Math.PI)
-//				{
-//					if(dif < 0)
-//						dif += 2*Math.PI;
-//					else
-//						dif -= 2*Math.PI;
-//				}
-//			}
 			this.movement[i] = dif/dT;
 		}
 	}
 
 	public void animatePart(Part part, float time) 
-	{		
-		boolean useQuarternions = false;
-
+	{
 		float[] values = new float[3];
-		if(useQuarternions && part instanceof PartObj)		
+		if(part instanceof PartRotation)
 		{
-			PartObj partObj = (PartObj) part;
 			float t = time/(endTime - startTime);
 
-			//	System.out.println(endQuart);
-
-			Quaternion interpolatedQ = Util.slerp(startQuart, endQuart, t);
-			values = Util.quarternionToEuler(interpolatedQ);
-			for(int i = 0; i < 3; i++)
-			{
-				//System.out.println(i + values[i]);
-				values[i] = (float) (values[i]/Math.PI*180F);
-			}
+			Quaternion interpolatedQ = Quaternion.slerp(startQuart,endQuart,t);
+			values = interpolatedQ.toEuler();
 		}
 		else
 			values = getPartRotationAtTime(time);
