@@ -17,16 +17,19 @@ buildscript {
 
 apply plugin: 'forge'
 
-version = "1.7.10-0.1.1"
+version = "0.1"
 group= "com.yourname.modid" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "ObsidianAnimator"
 
 minecraft {
-    version = "1.7.10-10.13.2.1291"
+    version = "1.7.10-10.13.4.1614-1.7.10"
     runDir = "eclipse"
 }
 
 dependencies {
+
+   compile project(':API')
+
     // you may put jars on which you depend on in ./libs
     // or you may define them like so..
     //compile "some.group:artifact:version:classifier"
@@ -38,7 +41,8 @@ dependencies {
 
     // for more info...
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
-    // http://www.gradle.org/docs/current/userguide/dependency_management.html	
+    // http://www.gradle.org/docs/current/userguide/dependency_management.html
+
 }
 
 processResources
@@ -59,23 +63,4 @@ processResources
     from(sourceSets.main.resources.srcDirs) {
         exclude 'mcmod.info'
     }
-}
-
-//Add "embedded" configuration
-configurations 
-{
-    embed
-    compile.extendsFrom(embed)
-}
-// Add dependencies
-dependencies
-{
-    // This dependency and its transitive deps will be embedded
-    //embed files('libs/jsch-0.1.53.jar')
-}
-
-//Add dependencies to the JAR
-jar 
-{
-    from configurations.embed.collect { it.isDirectory() ? it : zipTree(it) }
 }
