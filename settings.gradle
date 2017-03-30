@@ -1,0 +1,8 @@
+include ':API'
+project(':API').projectDir = new File(settingsDir, 'API')
+
+include ':Animator'
+project(':Animator').projectDir = new File(settingsDir, 'Animator')
+
+include ':Mod'
+project(':Mod').projectDir = new File(settingsDir, 'Mod')

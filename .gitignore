@@ -1,2 +1,34 @@
-.metadata
+/lib
+/logs
+/src_backup
+/repo
+/libs
 
+# eclipse
+/bin
+*.launch
+.settings
+.metadata
+.classpath
+.project
+
+# idea
+/out
+*.ipr
+*.iws
+*.iml
+.idea
+
+# gradle
+/build
+.gradle
+
+# other
+/eclipse
+/run
+/__pycache__
+/maven
+
+# server
+.cache-main
+.cache-tests
