@@ -1,0 +1,33 @@
+/lib
+/logs
+/src_backup
+/mods
+/config
+
+# eclipse
+/bin
+*.launch
+.settings
+.metadata
+.classpath
+.project
+
+# idea
+/out
+*.ipr
+*.iws
+*.iml
+.idea
+
+# gradle
+/build
+.gradle
+
+# other
+/eclipse
+/run
+/__pycache__
+
+# server
+.cache-main
+.cache-tests
