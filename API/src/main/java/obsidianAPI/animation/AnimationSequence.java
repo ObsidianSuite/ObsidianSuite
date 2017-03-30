@@ -197,7 +197,7 @@ public class AnimationSequence
 			AnimationPart anim = findPartForTime(animations, MathHelper.floor_float(time));
 			if (anim == null)
 				anim = animations.lastEntry().getValue();
-			return anim.getPartRotationAtTime(time - anim.getStartTime());
+			return anim.getPartRotationAtTime(part, time - anim.getStartTime());
 		}
 		else
 			return part.getOriginalValues();
