@@ -15,54 +15,42 @@ buildscript {
     }
 }
 
-apply plugin: 'forge'
 
-version = "0.1"
-group= "com.yourname.modid" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = "ObsidianAnimator"
+allprojects {
+    apply plugin: 'java'
+    apply plugin: 'maven'
+}
 
-minecraft {
-    version = "1.7.10-10.13.4.1614-1.7.10"
-    runDir = "run"
+subprojects {
+	apply plugin: 'forge'
 }
 
 dependencies {
-
    compile project(':API')
    compile project(':Animator')
    compile project(':Mod')
-
-    // you may put jars on which you depend on in ./libs
-    // or you may define them like so..
-    //compile "some.group:artifact:version:classifier"
-    //compile "some.group:artifact:version"
-      
-    // real examples
-    //compile 'com.mod-buildcraft:buildcraft:6.0.8:dev'  // adds buildcraft to the dev env
-    //compile 'com.googlecode.efficient-java-matrix-library:ejml:0.24' // adds ejml to the dev env
-
-    // for more info...
-    // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
-    // http://www.gradle.org/docs/current/userguide/dependency_management.html
-
 }
 
-processResources
-{
-    // this will ensure that this task is redone when the versions change.
-    inputs.property "version", project.version
-    inputs.property "mcversion", project.minecraft.version
+task eclipse(overwrite: true) {
+	outputs.file "$projectDir/eclipse"
 
-    // replace stuff in mcmod.info, nothing else
-    from(sourceSets.main.resources.srcDirs) {
-        include 'mcmod.info'
-                
-        // replace version and mcversion
-        expand 'version':project.version, 'mcversion':project.minecraft.version
-    }
-        
-    // copy everything else, thats not the mcmod.info
-    from(sourceSets.main.resources.srcDirs) {
-        exclude 'mcmod.info'
-    }
+	def zipFile = file('tmp.zip')
+	def url = new URL('http://download1478.mediafire.com/ssz1x9dhtvrg/do9kqx8btp0yp29/ObsidianSuiteEclipseFolder.zip')
+	
+	doFirst {
+		if (!zipFile.exists()) {
+			url.withInputStream{ i -> zipFile.withOutputStream{ it << i }}
+		}
+		
+		copy {
+			from zipTree(zipFile) into projectDir
+		}
+		
+		mkdir "Animator/run"
+		mkdir "Mod/run"
+	}
+	
+	doLast {
+		delete zipFile
+	}
 }
