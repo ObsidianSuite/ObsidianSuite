@@ -80,9 +80,13 @@ public class RenderObj_Animator extends RenderLiving
 			
 			//Prop rotation and translation
 			PartRotation prop_rot = (PartRotation) modelObj.getPartFromName("prop_rot");
-
+			
+			//Need to swap sign so rotation is the correct way.
+			prop_rot.setValue(-prop_rot.getValue(1), 1);
+			prop_rot.setValue(-prop_rot.getValue(2), 2);
+			
 			float[] propTranslation = modelObj.getPartFromName("prop_trans").getValues();
-			GL11.glTranslatef(propTranslation[0], propTranslation[1], propTranslation[2]);
+			GL11.glTranslatef(-propTranslation[0], -propTranslation[1], -propTranslation[2]);
 
 			EnumAction enumaction = null;
 
@@ -152,6 +156,11 @@ public class RenderObj_Animator extends RenderLiving
 				GL11.glRotatef(110f, 1f, 0f, 0f);
 				GL11.glRotatef(45f, 0f, 1f, 0f);
 			}
+			
+			//Need to swap back to original value.
+			prop_rot.setValue(-prop_rot.getValue(1), 1);
+			prop_rot.setValue(-prop_rot.getValue(2), 2);
+
 			
 			float f3;
 			int k;
