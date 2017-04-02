@@ -177,8 +177,10 @@ public class RenderObj_Animator extends RenderLiving
 				f2 = 0.5F;
 				f2 *= 0.75F;
 				GL11.glTranslatef(0f, -0.3f, 0.3f);
-				GL11.glRotatef(45, 1f, 0f, 0f);
+				GL11.glRotatef(45, 1, 0, 0);
 				GL11.glRotatef(45, 0f, 1f, 0f);
+				GL11.glRotatef(180, 1f, 0f, 0f);
+				GL11.glRotatef(-90, 0f, 1f, 0f);
 				GL11.glScalef(-f2, -f2, f2);
 			}
 			else if (itemstack.getItem() == Items.bow)
