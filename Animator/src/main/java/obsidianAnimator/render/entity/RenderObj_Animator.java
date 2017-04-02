@@ -128,7 +128,7 @@ public class RenderObj_Animator extends RenderLiving
 			else
 			{
 				GL11.glRotatef(180F, 1, 0, 0);
-				GL11.glTranslatef(0, 0.30F, -0.3f);
+				GL11.glTranslatef(0, 0.30F, -0.2f);
 			}
 		}
 	}
@@ -211,11 +211,13 @@ public class RenderObj_Animator extends RenderLiving
 				GL11.glRotatef(-180F, 1, 0, 0);
 
 				f2 = 0.375F;
-				GL11.glTranslatef(0.2f, -0.3f, 0.07f);
 				GL11.glScalef(f2, f2, f2);
-				GL11.glRotatef(-90f, 0, 0f, 1f);
-				GL11.glRotatef(110f, 1f, 0f, 0f);
-				GL11.glRotatef(45f, 0f, 1f, 0f);
+				
+				GL11.glTranslatef(-0.6f,-0.8f,0.7f);
+				GL11.glRotatef(88, 1, 0, 0);
+				GL11.glRotatef(130, 0, 1, 0);
+				GL11.glRotatef(26, 1, 0, 1);
+
 			}
 		}
 	}
