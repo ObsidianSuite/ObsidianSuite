@@ -68,7 +68,8 @@ public class AnimationPart
 		float[] values = new float[3];
 		if(part instanceof PartRotation)
 		{
-			float t = time/(endTime - startTime);
+			int dt = endTime - startTime;
+			float t = dt == 0 ? 1 : time / dt;
 
 			Quaternion interpolatedQ = Quaternion.slerp(startQuart,endQuart,t);
 			values = interpolatedQ.toEuler();
