@@ -90,10 +90,10 @@ public class RenderObj_Animator extends RenderLiving
 			GL11.glPopMatrix();
 		}
 	}
-
+	
 	/**
 	 * Transform an existing GL11 matrix to the held item location.
-	 * Takes prop rotation and translation into account.
+	 * Takes prop translation into account.
 	 */
 	public void transformToItemCentre(ItemStack itemstack)
 	{				
@@ -101,14 +101,9 @@ public class RenderObj_Animator extends RenderLiving
 		PartObj armLwR = modelObj.getPartObjFromName("armLwR");
 		armLwR.postRenderAll();
 
-		//Prop rotation. Need to swap signs so rotation is the correct way.
-		PartRotation prop_rot = (PartRotation) modelObj.getPartFromName("prop_rot");
-		prop_rot.setValue(-prop_rot.getValue(1), 1);
-		prop_rot.setValue(-prop_rot.getValue(2), 2);
-
 		//Prop translation
 		float[] propTranslation = modelObj.getPartFromName("prop_trans").getValues();
-		GL11.glTranslatef(-propTranslation[0], -propTranslation[1], -propTranslation[2]);
+		GL11.glTranslatef(-propTranslation[0], propTranslation[1], propTranslation[2]);
 
 		if (itemstack != null)
 		{
@@ -119,27 +114,40 @@ public class RenderObj_Animator extends RenderLiving
 			{
 				GL11.glRotatef(180F, 1, 0, 0);
 				GL11.glTranslatef(0, 0.30F, -0.3f);
-				prop_rot.rotate();
 			}
 			else if (itemstack.getItem() == Items.bow)
 			{
 				GL11.glRotatef(180F, 1, 0, 0);
 				GL11.glTranslatef(0.125f, 0.17F, 0.0f);
-				prop_rot.rotate();
 			}
 			else if (itemstack.getItem().isFull3D())
 			{
 				GL11.glRotatef(180F, 1, 0, 0);
 				GL11.glTranslatef(-0.00f, 0.22F, -0.04f);
-				prop_rot.rotate();
 			}
 			else
 			{
 				GL11.glRotatef(180F, 1, 0, 0);
 				GL11.glTranslatef(0, 0.30F, -0.3f);
-				prop_rot.rotate();
 			}
 		}
+	}
+
+	/**
+	 * Transform an existing GL11 matrix to the held item location.
+	 * Takes prop rotation and translation into account.
+	 */
+	public void transformToItemCentreAndRotate(ItemStack itemstack)
+	{				
+
+		//Prop rotation. Need to swap signs so rotation is the correct way.
+		PartRotation prop_rot = (PartRotation) modelObj.getPartFromName("prop_rot");
+		//System.out.println(prop_rot.getValue(0));
+		prop_rot.setValue(-prop_rot.getValue(1), 1);
+		prop_rot.setValue(-prop_rot.getValue(2), 2);
+
+		transformToItemCentre(itemstack);
+		prop_rot.rotate();
 
 		//Need to swap back to original value.
 		prop_rot.setValue(-prop_rot.getValue(1), 1);
@@ -154,7 +162,7 @@ public class RenderObj_Animator extends RenderLiving
 	{
 		float f2;
 
-		transformToItemCentre(itemstack);
+		transformToItemCentreAndRotate(itemstack);
 
 		if (itemstack != null)
 		{

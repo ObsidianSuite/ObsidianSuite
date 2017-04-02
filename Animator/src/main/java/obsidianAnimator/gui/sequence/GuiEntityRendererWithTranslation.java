@@ -4,12 +4,14 @@ import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.Vec3;
 import obsidianAPI.Util;
 import obsidianAPI.render.part.Part;
 import obsidianAPI.render.part.PartEntityPos;
 import obsidianAPI.render.part.PartObj;
 import obsidianAPI.render.part.PartRotation;
+import obsidianAnimator.data.ModelHandler;
 import obsidianAnimator.render.MathHelper;
 import obsidianAnimator.render.RayTrace;
 
@@ -78,12 +80,10 @@ public class GuiEntityRendererWithTranslation extends GuiEntityRendererWithRotat
 				super.processRay();
 				return;
 			}
-			else if(!(part instanceof PartEntityPos))
+			else if(!(part instanceof PartEntityPos)) //TODO should we have specific parts for prop rotation and translation? Eg PartPropRot
 			{	
-				//FIXME Hard coded part name
-				PartObj partObj = entityModel.getPartObjFromName("cube.008");
-				partObj.postRenderAll();
-				GL11.glTranslatef(0,-0.17F,0);
+				ItemStack itemstack = entityToRender.getHeldItem();
+				ModelHandler.modelRenderer.transformToItemCentre(itemstack);
 			}
 
 
@@ -191,11 +191,16 @@ public class GuiEntityRendererWithTranslation extends GuiEntityRendererWithRotat
 			double d = translationDelta - prevTranslationDelta;
 			if(!Double.isNaN(d))
 			{
-				Part part = selectedPart;
-				if(part instanceof PartEntityPos)
-					d *= -1;
-				updatePartValue(-d, translationAxisPlane);
-				prevTranslationDelta = translationDelta;
+				if(selectedPart instanceof PartEntityPos)
+				{
+					updatePartValue(d, translationAxisPlane);
+					prevTranslationDelta = translationDelta;
+				}
+				else
+				{
+					updatePartValue(-d, translationAxisPlane);
+					prevTranslationDelta = translationDelta - d;
+				}
 			}
 		}
 	}

@@ -99,7 +99,7 @@ public class GuiEntityRendererWithRotation extends GuiEntityRenderer
 			else if(part instanceof PartRotation) //Prop rotation
 			{
 				ItemStack itemstack = entityToRender.getHeldItem();
-				ModelHandler.modelRenderer.transformToItemCentre(itemstack);
+				ModelHandler.modelRenderer.transformToItemCentreAndRotate(itemstack);
 			}
 			else
 			{
