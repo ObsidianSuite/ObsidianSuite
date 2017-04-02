@@ -4,11 +4,13 @@ import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.Vec3;
 import obsidianAPI.Util;
 import obsidianAPI.render.part.Part;
 import obsidianAPI.render.part.PartObj;
 import obsidianAPI.render.part.PartRotation;
+import obsidianAnimator.data.ModelHandler;
 import obsidianAnimator.gui.GuiEntityRenderer;
 import obsidianAnimator.render.MathHelper;
 import obsidianAnimator.render.RayTrace;
@@ -94,13 +96,10 @@ public class GuiEntityRendererWithRotation extends GuiEntityRenderer
 				partObj = (PartObj) part;
 				partObj.postRenderAll();
 			}
-			else if(part instanceof PartRotation)
+			else if(part instanceof PartRotation) //Prop rotation
 			{
-				//FIXME PartRotation part name hardcoded.
-				partObj = entityModel.getPartObjFromName("cube.008");
-				partObj.postRenderAll();
-				GL11.glTranslatef(0,-0.17F,0);
-				((PartRotation) part).rotate();
+				ItemStack itemstack = entityToRender.getHeldItem();
+				ModelHandler.modelRenderer.transformToItemCentreAndRotate(itemstack);
 			}
 			else
 			{
@@ -186,10 +185,16 @@ public class GuiEntityRendererWithRotation extends GuiEntityRenderer
 		if(selectedPart != null)
 		{
 			Part part = selectedPart;
-			if(part instanceof PartRotation)
+			if(part instanceof PartObj)
 			{
 				GL11.glRotated(-part.getValue(2)/Math.PI*180F, 0, 0, 1);
 				GL11.glRotated(-part.getValue(1)/Math.PI*180F, 0, 1, 0);
+				GL11.glRotated(-part.getValue(0)/Math.PI*180F, 1, 0, 0);
+			}
+			else if(part instanceof PartRotation) //Prop rotation has two negatives
+			{
+				GL11.glRotated(part.getValue(2)/Math.PI*180F, 0, 0, 1);
+				GL11.glRotated(part.getValue(1)/Math.PI*180F, 0, 1, 0);
 				GL11.glRotated(-part.getValue(0)/Math.PI*180F, 1, 0, 0);
 			}
 		}
