@@ -103,7 +103,7 @@ public class RenderObj_Animator extends RenderLiving
 
 		//Prop translation
 		float[] propTranslation = modelObj.getPartFromName("prop_trans").getValues();
-		GL11.glTranslatef(-propTranslation[0], propTranslation[1], propTranslation[2]);
+		GL11.glTranslatef(propTranslation[0], propTranslation[1], propTranslation[2]);
 
 		if (itemstack != null)
 		{
@@ -111,25 +111,13 @@ public class RenderObj_Animator extends RenderLiving
 			boolean is3D = (customRenderer != null && customRenderer.shouldUseRenderHelper(ItemRenderType.EQUIPPED, itemstack, ItemRendererHelper.BLOCK_3D));
 
 			if (is3D || itemstack.getItem() instanceof ItemBlock && RenderBlocks.renderItemIn3d(Block.getBlockFromItem(itemstack.getItem()).getRenderType()))
-			{
-				GL11.glRotatef(180F, 1, 0, 0);
-				GL11.glTranslatef(0, 0.30F, -0.3f);
-			}
+				GL11.glTranslatef(0, -0.30F, 0.3f);
 			else if (itemstack.getItem() == Items.bow)
-			{
-				GL11.glRotatef(180F, 1, 0, 0);
-				GL11.glTranslatef(0.125f, 0.17F, 0.0f);
-			}
+				GL11.glTranslatef(-0.125f, -0.17F, 0.0f);
 			else if (itemstack.getItem().isFull3D())
-			{
-				GL11.glRotatef(180F, 1, 0, 0);
-				GL11.glTranslatef(-0.00f, 0.22F, -0.04f);
-			}
+				GL11.glTranslatef(0.00f, -0.22F, 0.04f);
 			else
-			{
-				GL11.glRotatef(180F, 1, 0, 0);
-				GL11.glTranslatef(0, 0.30F, -0.2f);
-			}
+				GL11.glTranslatef(0, -0.30F, 0.2f);
 		}
 	}
 
@@ -171,8 +159,7 @@ public class RenderObj_Animator extends RenderLiving
 
 			if (is3D || itemstack.getItem() instanceof ItemBlock && RenderBlocks.renderItemIn3d(Block.getBlockFromItem(itemstack.getItem()).getRenderType()))
 			{
-				GL11.glTranslatef(-0, -0.30F, 0.3f);
-				GL11.glRotatef(-180F, 1, 0, 0);
+				GL11.glTranslatef(0, 0.30F, -0.3f);
 
 				f2 = 0.5F;
 				f2 *= 0.75F;
@@ -185,8 +172,7 @@ public class RenderObj_Animator extends RenderLiving
 			}
 			else if (itemstack.getItem() == Items.bow)
 			{
-				GL11.glTranslatef(-0.125f, -0.17F, 0.0f);
-				GL11.glRotatef(-180F, 1, 0, 0);
+				GL11.glTranslatef(0.125f, 0.17F, 0f);
 
 				f2 = 0.625F;
 				GL11.glTranslatef(0.125f, -0.4f, -0.25f);
@@ -196,8 +182,7 @@ public class RenderObj_Animator extends RenderLiving
 			}
 			else if (itemstack.getItem().isFull3D())
 			{
-				GL11.glTranslatef(0.00f, -0.22F, 0.04f);
-				GL11.glRotatef(-180F, 1, 0, 0);
+				GL11.glTranslatef(0, 0.22F, -0.04f);
 
 				f2 = 0.625F;
 				GL11.glTranslatef(0.03f, -0.15F, 0f);
@@ -207,8 +192,7 @@ public class RenderObj_Animator extends RenderLiving
 			}
 			else
 			{
-				GL11.glTranslatef(-0, -0.30F, 0.3f);
-				GL11.glRotatef(-180F, 1, 0, 0);
+				GL11.glTranslatef(0, 0.3F, -0.3f);
 
 				f2 = 0.375F;
 				GL11.glScalef(f2, f2, f2);

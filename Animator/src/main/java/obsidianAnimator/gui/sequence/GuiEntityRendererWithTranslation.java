@@ -191,16 +191,11 @@ public class GuiEntityRendererWithTranslation extends GuiEntityRendererWithRotat
 			double d = translationDelta - prevTranslationDelta;
 			if(!Double.isNaN(d))
 			{
+				updatePartValue(d, translationAxisPlane);
 				if(selectedPart instanceof PartEntityPos)
-				{
-					updatePartValue(d, translationAxisPlane);
 					prevTranslationDelta = translationDelta;
-				}
 				else
-				{
-					updatePartValue(-d, translationAxisPlane);
 					prevTranslationDelta = translationDelta - d;
-				}
 			}
 		}
 	}
