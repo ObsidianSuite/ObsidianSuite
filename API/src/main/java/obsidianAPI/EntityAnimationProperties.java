@@ -1,11 +1,7 @@
 package obsidianAPI;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-
 import com.google.common.collect.Lists;
-
+import com.google.common.collect.Maps;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
@@ -13,6 +9,12 @@ import net.minecraftforge.common.IExtendedEntityProperties;
 import obsidianAPI.animation.ActionPointCallback;
 import obsidianAPI.animation.AnimationSequence;
 import obsidianAPI.registry.AnimationRegistry;
+import obsidianAPI.render.ModelObj;
+import obsidianAPI.render.part.Part;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 public class EntityAnimationProperties implements IExtendedEntityProperties
 {
@@ -21,7 +23,8 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
     private String entityName;
     private AnimationSequence activeAnimation;
     private long animationStartTime;
-    private Map<String, float[]> partLagMap;
+    private final Map<String, float[]> prevValues = Maps.newHashMap();
+    private boolean loop;
 
 	private int nextFrame = 0;
 
@@ -49,27 +52,59 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
 
     }
 
-    public Map<String, float[]> getPartLagMap() 
+	public Map<String, float[]> getPrevValues()
     {
-		return partLagMap;
+		return prevValues;
 	}
 
-	public void setPartLagMap(Map<String, float[]> partLagMap) 
-	{
-		this.partLagMap = partLagMap;
-	}
-
-    
-    public void setActiveAnimation(String binding)
+    public void setActiveAnimation(ModelObj model, String binding, boolean loop)
     {
+        if (activeAnimation != null)
+        {
+            setPrevValuesFromActiveAnimation(model);
+        }
+        else
+        {
+            setPrevValuesToOriginal(model);
+        }
+
+        this.loop = loop;
         activeAnimation = AnimationRegistry.getAnimation(entityName, binding);
         animationStartTime = System.nanoTime();
         nextFrame = 0;
     }
 
-    public void clearAnimation()
+    public void clearAnimation(ModelObj model)
     {
-        activeAnimation = null;
+        if (activeAnimation != null)
+        {
+            setPrevValuesFromActiveAnimation(model);
+
+            activeAnimation = null;
+            animationStartTime = System.nanoTime();
+        }
+    }
+
+    private void setPrevValuesToOriginal(ModelObj model)
+    {
+        prevValues.clear();
+
+        for (Part part : model.parts)
+        {
+            prevValues.put(part.getName(), part.getOriginalValues());
+        }
+    }
+
+    private void setPrevValuesFromActiveAnimation(ModelObj model)
+    {
+        prevValues.clear();
+
+        float time = Util.getAnimationFrameTime(getAnimationStartTime(), 0, activeAnimation.getFPS(), 1.0F);
+
+        for (Part part : model.parts)
+        {
+            prevValues.put(part.getName(), activeAnimation.getPartValueAtTime(part, time));
+        }
     }
 
     public AnimationSequence getActiveAnimation()
@@ -82,7 +117,7 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
         return animationStartTime;
     }
 
-    public void updateFrameTime(float time)
+    public void updateFrameTime(ModelObj model, float time)
     {
         if (activeAnimation != null)
         {
@@ -94,7 +129,14 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
 
             if (time > activeAnimation.getTotalTime())
             {
-                clearAnimation();
+                if (loop)
+                {
+                    setActiveAnimation(model, activeAnimation.getName(), true);
+                }
+                else
+                {
+                    clearAnimation(model);
+                }
             }
         }
     }
