@@ -15,8 +15,20 @@ buildscript {
     }
 }
 
+apply plugin: 'forge'
+
+minecraft {
+    version = "1.7.10-10.13.4.1614-1.7.10"
+    runDir = "run"
+}
 
 allprojects {
+
+	sourceCompatibility = targetCompatibility = "1.8"
+	compileJava {
+		sourceCompatibility = targetCompatibility = "1.8"
+	}
+
     apply plugin: 'java'
     apply plugin: 'maven'
 }
