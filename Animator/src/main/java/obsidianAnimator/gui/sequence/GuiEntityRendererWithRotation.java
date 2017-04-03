@@ -1,5 +1,9 @@
 package obsidianAnimator.gui.sequence;
 
+import java.nio.ByteBuffer;
+import java.nio.DoubleBuffer;
+
+import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.renderer.OpenGlHelper;
@@ -22,7 +26,7 @@ public class GuiEntityRendererWithRotation extends GuiEntityRenderer
 	private boolean rotationWheelMouseOver = false;
 	//True if mouse was clicked while hovering over the rotation wheel and is still down.
 	private boolean rotationWheelDrag = false;
-	//The current plane seleciton of the rotation wheel (0-x,1-y,2-z)
+	//The current plane selection of the rotation wheel (0-x,1-y,2-z)
 	private Integer rotationWheelPlane;
 
 	//Vector for current rotation of wheel while dragging.
@@ -30,6 +34,9 @@ public class GuiEntityRendererWithRotation extends GuiEntityRenderer
 	//Vector for rotation of wheel when first clicked on.
 	private Vec3 initialRotationGuidePoint;
 	private double prevRotationWheelDelta = 0.0F;
+	
+	//Used for storing the values of the part before rotation 
+	private float[] preRotationPartValues = new float[3];
 
 	public GuiEntityRendererWithRotation(String entityName)
 	{
@@ -58,9 +65,15 @@ public class GuiEntityRendererWithRotation extends GuiEntityRenderer
 	{
 		//If mouse over and lmb clicked, begin drag.
 		if(rotationWheelMouseOver && button == 0)
+		{
 			rotationWheelDrag = true;
+			storePreRotationPartValues();
+		}
 		else
+		{
+			rotationWheelDrag = false;
 			super.mouseClicked(x, y, button);
+		}
 	}
 
 	@Override
@@ -87,47 +100,18 @@ public class GuiEntityRendererWithRotation extends GuiEntityRenderer
 	{
 		if(selectedPart != null)
 		{
-			GL11.glPushMatrix();
-
-			Part part = selectedPart;
-			PartObj partObj;
-			if(part instanceof PartObj)
-			{
-				partObj = (PartObj) part;
-				partObj.postRenderAll();
-			}
-			else if(part instanceof PartRotation) //Prop rotation
-			{
-				ItemStack itemstack = entityToRender.getHeldItem();
-				ModelHandler.modelRenderer.transformToItemCentreAndRotate(itemstack);
-			}
-			else
-			{
-				GL11.glPopMatrix();
-				super.processRay();
-				return;
-			}
-
-			drawRotationWheel();
-
-			rotationWheelMouseOver = false;
 			if(!rotationWheelDrag)
 			{
 				updateWheelMouseOver();
-				//If it isn't being moused over, hand over ray processing to GuiEntityRenderer, which will test for hovering over parts.
 				if(!rotationWheelMouseOver)
-				{
-					GL11.glPopMatrix();
 					super.processRay();
-					return;
-				}
-				//If it is being hovered over, ensure there is no part highlighted for selection.
-				else
-					hoveredPart = null;
 			}
 			else
-				onControllerDrag();
+				processRotation();
 
+			GL11.glPushMatrix();
+			applyRotationTransform();
+			drawRotationWheel();
 			GL11.glPopMatrix();
 		}
 		else
@@ -139,16 +123,41 @@ public class GuiEntityRendererWithRotation extends GuiEntityRenderer
 	 */
 	private void updateWheelMouseOver()
 	{
+		GL11.glPushMatrix();
+
+		applyRotationTransform();
+
 		Integer dim = testRotationRay();
 		if(dim != null)
 		{
 			rotationWheelMouseOver = true;
 			rotationWheelPlane = dim;
-			rotationGuidePoint = getMouseVectorInPlane(rotationWheelPlane);
-			initialRotationGuidePoint = rotationGuidePoint;
+			hoveredPart = null;
 		}
 		else
+		{
+			rotationWheelMouseOver = false;
 			rotationWheelPlane = null;
+		}
+
+		GL11.glPopMatrix();
+	}
+
+	private void processRotation()
+	{		
+		GL11.glPushMatrix();
+
+		//Rotation calculation must be done relative to the state before dragging begins.
+		//Makes sure that the new rotation input doesn't come into effect. 
+		applyPreRotationTransform();
+
+		rotationGuidePoint = getMouseVectorInPlane(rotationWheelPlane);
+		if(initialRotationGuidePoint == null)
+			initialRotationGuidePoint = rotationGuidePoint;
+
+		onControllerDrag();
+
+		GL11.glPopMatrix();
 	}
 
 	/**
@@ -181,23 +190,6 @@ public class GuiEntityRendererWithRotation extends GuiEntityRenderer
 
 	public Vec3 getMouseVectorInPlane(int dim)
 	{
-		GL11.glPushMatrix();
-		if(selectedPart != null)
-		{
-			Part part = selectedPart;
-			if(part instanceof PartObj)
-			{
-				GL11.glRotated(-part.getValue(2)/Math.PI*180F, 0, 0, 1);
-				GL11.glRotated(-part.getValue(1)/Math.PI*180F, 0, 1, 0);
-				GL11.glRotated(-part.getValue(0)/Math.PI*180F, 1, 0, 0);
-			}
-			else if(part instanceof PartRotation) //Prop rotation has two negatives
-			{
-				GL11.glRotated(part.getValue(2)/Math.PI*180F, 0, 0, 1);
-				GL11.glRotated(part.getValue(1)/Math.PI*180F, 0, 1, 0);
-				GL11.glRotated(-part.getValue(0)/Math.PI*180F, 1, 0, 0);
-			}
-		}
 		Vec3 n = null;
 		Vec3 p = Vec3.createVectorHelper(0,0,0);
 		switch(dim)
@@ -207,7 +199,6 @@ public class GuiEntityRendererWithRotation extends GuiEntityRenderer
 		case 2: n = Vec3.createVectorHelper(0, 0, 1); break; 
 		}
 		Vec3 v = MathHelper.getRayPlaneIntersection(RayTrace.getRayTrace(), p, n);
-		GL11.glPopMatrix();
 		return v;
 	}
 
@@ -238,10 +229,49 @@ public class GuiEntityRendererWithRotation extends GuiEntityRenderer
 		processWheelRotation();
 	}
 
-	protected void onControllerRelease(){}
+	protected void onControllerRelease()
+	{
+		initialRotationGuidePoint = null;
+	}
 
 	/* ---------------------------------------------------- *
-	 * 						Render							*
+	 * 					Transformations				     	*
+	 * ---------------------------------------------------- */	
+
+	private void storePreRotationPartValues()
+	{
+		if(selectedPart != null)
+			preRotationPartValues = selectedPart.getValues();
+	}
+	
+	private void applyPreRotationTransform()
+	{
+		if(selectedPart != null)
+		{
+			float[] currentValues = selectedPart.getValues();
+			selectedPart.setValues(preRotationPartValues);
+			applyRotationTransform();
+			selectedPart.setValues(currentValues);
+		}
+	}
+	
+	private void applyRotationTransform()
+	{
+		PartObj partObj = null;
+		if(selectedPart instanceof PartObj)
+		{
+			partObj = (PartObj) selectedPart;
+			partObj.postRenderAll();
+		}
+		else if(selectedPart instanceof PartRotation) //Prop rotation
+		{
+			ItemStack itemstack = entityToRender.getHeldItem();
+			ModelHandler.modelRenderer.transformToItemCentreAndRotate(itemstack);
+		}
+	}
+
+	/* ---------------------------------------------------- *
+	 * 						Drawing							*
 	 * ---------------------------------------------------- */	
 
 	private void drawRotationWheel()
