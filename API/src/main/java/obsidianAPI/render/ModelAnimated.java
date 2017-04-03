@@ -1,14 +1,14 @@
 package obsidianAPI.render;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
 import obsidianAPI.EntityAnimationProperties;
 import obsidianAPI.Util;
 import obsidianAPI.animation.AnimationSequence;
 import obsidianAPI.render.part.Part;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public abstract class ModelAnimated extends ModelObj
 {
@@ -33,17 +33,7 @@ public abstract class ModelAnimated extends ModelObj
 		}
 		else
 		{
-			boolean isMoving = isMoving(entity);
-			if (isMoving && animProps.getActiveAnimation() == null)
-			{
-				animProps.setActiveAnimation("WalkF");
-				animProps.setPartLagMap(generatePartLagMap(animProps.getActiveAnimation().getPartValuesAtTime(this, 0)));
-			}
-			else if (!isMoving && animProps.getActiveAnimation() != null && animProps.getActiveAnimation().getName().equals("WalkF"))
-			{
-				animProps.clearAnimation();
-				animProps.setPartLagMap(generatePartLagMap(getDefaultPartValues()));
-			}
+			updateMoveAnimation(entity,animProps);
 
 			AnimationSequence seq = animProps.getActiveAnimation();
 			if (seq != null)
@@ -57,6 +47,20 @@ public abstract class ModelAnimated extends ModelObj
 			{
 				animateToDefault(animProps.getPartLagMap());
 			}
+		}
+	}
+
+	protected void updateMoveAnimation(Entity entity, EntityAnimationProperties animProps)
+	{
+		boolean isMoving = isMoving(entity);
+		if (isMoving && animProps.getActiveAnimation() == null)
+		{
+			animProps.setActiveAnimation("WalkF");
+			animProps.setPartLagMap(generatePartLagMap(animProps.getActiveAnimation().getPartValuesAtTime(this, 0)));
+		} else if (!isMoving && animProps.getActiveAnimation() != null && animProps.getActiveAnimation().getName().equals("WalkF"))
+		{
+			animProps.clearAnimation();
+			animProps.setPartLagMap(generatePartLagMap(getDefaultPartValues()));
 		}
 	}
 
