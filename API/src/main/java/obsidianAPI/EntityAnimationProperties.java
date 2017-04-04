@@ -95,11 +95,6 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
         }
     }
 
-    public float getMultiplier()
-    {
-        return multiplier;
-    }
-
     public void setMultiplier(float multiplier)
     {
         this.multiplier = multiplier;
@@ -119,12 +114,17 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
     {
         prevValues.clear();
 
-        float time = Util.getAnimationFrameTime(getAnimationStartTime(), 0, activeAnimation.getFPS(), getMultiplier());
+        float time = getAnimationFrameTime();
 
         for (Part part : model.parts)
         {
             prevValues.put(part.getName(), activeAnimation.getPartValueAtTime(part, time));
         }
+    }
+
+    public float getAnimationFrameTime()
+    {
+        return Util.getAnimationFrameTime(getAnimationStartTime(), 0, activeAnimation.getFPS(), multiplier);
     }
 
     public AnimationSequence getActiveAnimation()

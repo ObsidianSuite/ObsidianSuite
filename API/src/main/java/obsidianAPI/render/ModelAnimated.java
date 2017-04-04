@@ -37,7 +37,7 @@ public abstract class ModelAnimated extends ModelObj
 			AnimationSequence seq = animProps.getActiveAnimation();
 			if (seq != null)
 			{
-				float time = Util.getAnimationFrameTime(animProps.getAnimationStartTime(), 0, seq.getFPS(), animProps.getMultiplier());
+				float time = animProps.getAnimationFrameTime();
 				animProps.updateFrameTime(this,time);
 
 				animateToPartValues(animProps, seq.getPartValuesAtTime(this, time));
