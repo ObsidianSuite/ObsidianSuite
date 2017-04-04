@@ -8,6 +8,7 @@ import obsidianAPI.Util;
 import obsidianAPI.animation.AnimationSequence;
 import obsidianAPI.render.part.Part;
 
+import javax.annotation.Nonnull;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,7 +29,7 @@ public abstract class ModelAnimated extends ModelObj
 		EntityAnimationProperties animProps = (EntityAnimationProperties) entity.getExtendedProperties("Animation");
 		if (animProps == null)
 		{
-			animateToDefault(null);
+			parts.forEach(Part::setToOriginalValues);
 		}
 		else
 		{
@@ -66,13 +67,13 @@ public abstract class ModelAnimated extends ModelObj
 		return parEntity.getDistance(parEntity.prevPosX, parEntity.prevPosY, parEntity.prevPosZ) > 0.15D;
 	}
 
-	private void animateToPartValues(EntityAnimationProperties animProps, Map<String, float[]> partValues)
+	private void animateToPartValues(@Nonnull EntityAnimationProperties animProps, Map<String, float[]> partValues)
 	{
-		Map<String, float[]> prevValues = animProps == null ? getDefaultPartValues() : animProps.getPrevValues();
+		Map<String, float[]> prevValues = animProps.getPrevValues();
 		if (prevValues == null)
 			prevValues = getDefaultPartValues();
 
-		double dt = animProps == null ? Double.POSITIVE_INFINITY : (System.nanoTime() - animProps.getAnimationStartTime()) / 1000000000.0;
+		double dt = (System.nanoTime() - animProps.getAnimationStartTime()) / 1000000000.0;
 
 		float t = (float) Math.min(dt / ANIM_MERGE_DURATION, 1f);
 		for (Part part : parts)
