@@ -25,6 +25,7 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
     private long animationStartTime;
     private final Map<String, float[]> prevValues = Maps.newHashMap();
     private boolean loop;
+    private float multiplier = 1f;
 
 	private int nextFrame = 0;
 
@@ -69,6 +70,7 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
         }
 
         this.loop = loop;
+        multiplier = 1f;
         activeAnimation = AnimationRegistry.getAnimation(entityName, binding);
         animationStartTime = System.nanoTime();
         nextFrame = 0;
@@ -80,9 +82,20 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
         {
             setPrevValuesFromActiveAnimation(model);
 
+            multiplier = 1f;
             activeAnimation = null;
             animationStartTime = System.nanoTime();
         }
+    }
+
+    public float getMultiplier()
+    {
+        return multiplier;
+    }
+
+    public void setMultiplier(float multiplier)
+    {
+        this.multiplier = multiplier;
     }
 
     private void setPrevValuesToOriginal(ModelObj model)
@@ -99,7 +112,7 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
     {
         prevValues.clear();
 
-        float time = Util.getAnimationFrameTime(getAnimationStartTime(), 0, activeAnimation.getFPS(), 1.0F);
+        float time = Util.getAnimationFrameTime(getAnimationStartTime(), 0, activeAnimation.getFPS(), getMultiplier());
 
         for (Part part : model.parts)
         {
