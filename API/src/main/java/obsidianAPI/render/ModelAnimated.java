@@ -37,10 +37,10 @@ public abstract class ModelAnimated extends ModelObj
 			}
 
 			animProps.updateFrameTime();
-			float time = animProps.getAnimationFrameTime();
-			animProps.updateAnimation(this, time);
 
+			float time = animProps.getAnimationFrameTime();
 			animateToPartValues(animProps, seq.getPartValuesAtTime(this, time));
+			animProps.updateAnimation(this, time);
 		}
 	}
 
