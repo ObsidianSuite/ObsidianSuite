@@ -10,6 +10,7 @@ import obsidianAPI.Util;
 import obsidianAPI.render.part.Part;
 import obsidianAPI.render.part.PartEntityPos;
 import obsidianAPI.render.part.PartObj;
+import obsidianAPI.render.part.PartPropScale;
 import obsidianAPI.render.part.PartPropTranslation;
 import obsidianAPI.render.part.PartRotation;
 import obsidianAnimator.data.ModelHandler;
@@ -80,7 +81,7 @@ public class GuiEntityRendererWithTranslation extends GuiEntityRendererWithRotat
 				super.processRay();
 				return;
 			}
-			else if(selectedPart instanceof PartPropTranslation)
+			else if(selectedPart instanceof PartPropTranslation || selectedPart instanceof PartPropScale)
 			{	
 				ItemStack itemstack = entityToRender.getHeldItem();
 				ModelHandler.modelRenderer.transformToItemCentre(itemstack);
@@ -192,7 +193,7 @@ public class GuiEntityRendererWithTranslation extends GuiEntityRendererWithRotat
 			if(!Double.isNaN(d))
 			{
 				updatePartValue(d, translationAxisPlane);
-				if(selectedPart instanceof PartEntityPos)
+				if(selectedPart instanceof PartEntityPos || selectedPart instanceof PartPropScale)
 					prevTranslationDelta = translationDelta;
 				else
 					prevTranslationDelta = translationDelta - d;

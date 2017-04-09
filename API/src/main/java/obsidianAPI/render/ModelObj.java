@@ -38,6 +38,7 @@ import obsidianAPI.render.part.Part;
 import obsidianAPI.render.part.PartEntityPos;
 import obsidianAPI.render.part.PartObj;
 import obsidianAPI.render.part.PartPropRotation;
+import obsidianAPI.render.part.PartPropScale;
 import obsidianAPI.render.part.PartPropTranslation;
 
 public class ModelObj extends ModelBase
@@ -192,6 +193,7 @@ public class ModelObj extends ModelBase
 		{
 			parts.add(new PartPropRotation(this));
 			parts.add(new PartPropTranslation(this));
+			parts.add(new PartPropScale(this));
 		}
 		partGroups = new PartGroups(this);
 	}

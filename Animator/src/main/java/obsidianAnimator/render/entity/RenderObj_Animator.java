@@ -19,6 +19,7 @@ import net.minecraftforge.client.IItemRenderer.ItemRendererHelper;
 import net.minecraftforge.client.MinecraftForgeClient;
 import obsidianAPI.render.ModelObj;
 import obsidianAPI.render.part.PartObj;
+import obsidianAPI.render.part.PartPropScale;
 import obsidianAPI.render.part.PartRotation;
 
 @SideOnly(Side.CLIENT)
@@ -152,6 +153,9 @@ public class RenderObj_Animator extends RenderLiving
 
 		transformToItemCentreAndRotate(itemstack);
 
+		PartPropScale prop_scale = (PartPropScale) modelObj.getPartFromName("prop_scale");
+		float[] scaleVals = prop_scale.getValues();
+		
 		if (itemstack != null)
 		{
 			IItemRenderer customRenderer = MinecraftForgeClient.getItemRenderer(itemstack, ItemRenderType.EQUIPPED);
@@ -159,52 +163,68 @@ public class RenderObj_Animator extends RenderLiving
 
 			if (is3D || itemstack.getItem() instanceof ItemBlock && RenderBlocks.renderItemIn3d(Block.getBlockFromItem(itemstack.getItem()).getRenderType()))
 			{
-				GL11.glTranslatef(0, 0.30F, -0.3f);
-
 				f2 = 0.5F;
 				f2 *= 0.75F;
+				
+				GL11.glTranslatef(0, 0.30F, -0.3f);
 				GL11.glTranslatef(0f, -0.3f, 0.3f);
+				
+				//Prop scale
+				GL11.glScalef(1.0f + scaleVals[0], 1.0f  + scaleVals[1], 1.0f + scaleVals[2]);
+				
 				GL11.glRotatef(45, 1, 0, 0);
 				GL11.glRotatef(45, 0f, 1f, 0f);
 				GL11.glRotatef(180, 1f, 0f, 0f);
 				GL11.glRotatef(-90, 0f, 1f, 0f);
 				GL11.glScalef(-f2, -f2, f2);
+
 			}
 			else if (itemstack.getItem() == Items.bow)
 			{
-				GL11.glTranslatef(0.125f, 0.17F, 0f);
-
 				f2 = 0.625F;
+
+				//TODO postRenderItem: bow - adjust all this
+				GL11.glTranslatef(0.125f, 0.17F, 0f);
 				GL11.glTranslatef(0.125f, -0.4f, -0.25f);
 				GL11.glScalef(f2, -f2, f2);
+				
+				//Prop scale
+				GL11.glScalef(1.0f + scaleVals[0], 1.0f  + scaleVals[1], 1.0f + scaleVals[2]);
+				
 				GL11.glRotatef(90f, 1f, 0f, 0f);
 				GL11.glRotatef(45.0F, 0.0F, 1.0F, 0.0F);
 			}
 			else if (itemstack.getItem().isFull3D())
 			{
-				GL11.glTranslatef(0, 0.22F, -0.04f);
-
 				f2 = 0.625F;
-				GL11.glTranslatef(0.03f, -0.15F, 0f);
+
+				GL11.glTranslatef(0, 0.22F, -0.04f);
+				GL11.glTranslatef(0f, -0.15F, 0f);
+				
+				//Prop scale
+				GL11.glScalef(1.0f + scaleVals[0], 1.0f  + scaleVals[1], 1.0f + scaleVals[2]);
+
+				GL11.glTranslatef(0.03f, 0f, 0f);
 				GL11.glScalef(f2, f2, f2);
 				GL11.glRotatef(70.0F, 1.0F, 0.0F, 0.0F);
 				GL11.glRotatef(40.0F, 0.0F, 1.0F, 0.0F);
 			}
 			else
 			{
-				GL11.glTranslatef(0, 0.3F, -0.3f);
-
 				f2 = 0.375F;
-				GL11.glScalef(f2, f2, f2);
 				
-				GL11.glTranslatef(-0.6f,-0.8f,0.7f);
+				//Prop scale
+				GL11.glScalef(1.0f + scaleVals[0], 1.0f  + scaleVals[1], 1.0f + scaleVals[2]);
+
+				GL11.glTranslatef(-0.2f,0.02f,-0.1f);
+				GL11.glScalef(f2, f2, f2);				
 				GL11.glRotatef(88, 1, 0, 0);
 				GL11.glRotatef(130, 0, 1, 0);
 				GL11.glRotatef(26, 1, 0, 1);
-
 			}
 		}
+				
+		
 	}
-
 
 }
