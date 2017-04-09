@@ -1,6 +1,26 @@
 package obsidianAPI.render;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Nullable;
+
+import org.lwjgl.opengl.GL11;
+
 import com.google.common.collect.Maps;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelRenderer;
@@ -17,14 +37,9 @@ import obsidianAPI.render.bend.Bend;
 import obsidianAPI.render.part.Part;
 import obsidianAPI.render.part.PartEntityPos;
 import obsidianAPI.render.part.PartObj;
-import obsidianAPI.render.part.PartRotation;
-import org.lwjgl.opengl.GL11;
-
-import javax.annotation.Nullable;
-import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import obsidianAPI.render.part.PartPropRotation;
+import obsidianAPI.render.part.PartPropScale;
+import obsidianAPI.render.part.PartPropTranslation;
 
 public class ModelObj extends ModelBase
 {
@@ -176,8 +191,9 @@ public class ModelObj extends ModelBase
 		parts.add(new PartEntityPos(this));
 		if(entityName.equals("player"))
 		{
-			parts.add(new PartRotation(this, "prop_rot"));
-			parts.add(new Part(this, "prop_trans"));
+			parts.add(new PartPropRotation(this));
+			parts.add(new PartPropTranslation(this));
+			parts.add(new PartPropScale(this));
 		}
 		partGroups = new PartGroups(this);
 	}

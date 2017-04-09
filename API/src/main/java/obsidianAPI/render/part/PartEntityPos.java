@@ -1,6 +1,5 @@
 package obsidianAPI.render.part;
 
-import net.minecraft.entity.Entity;
 import obsidianAPI.render.ModelObj;
 
 /**
@@ -12,13 +11,6 @@ public class PartEntityPos extends Part
 	public PartEntityPos(ModelObj mObj) 
 	{
 		super(mObj, "entitypos");
-	}
-
-	public void move(Entity entity) 
-	{
-		entity.posX = valueX;
-		entity.posY = valueY;
-		entity.posZ = valueZ;
 	}
 
 }

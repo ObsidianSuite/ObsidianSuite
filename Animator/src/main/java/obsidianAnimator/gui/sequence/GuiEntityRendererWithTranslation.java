@@ -10,6 +10,8 @@ import obsidianAPI.Util;
 import obsidianAPI.render.part.Part;
 import obsidianAPI.render.part.PartEntityPos;
 import obsidianAPI.render.part.PartObj;
+import obsidianAPI.render.part.PartPropScale;
+import obsidianAPI.render.part.PartPropTranslation;
 import obsidianAPI.render.part.PartRotation;
 import obsidianAnimator.data.ModelHandler;
 import obsidianAnimator.render.MathHelper;
@@ -73,14 +75,13 @@ public class GuiEntityRendererWithTranslation extends GuiEntityRendererWithRotat
 		{
 			GL11.glPushMatrix();
 
-			Part part = selectedPart;
-			if(part instanceof PartObj || part instanceof PartRotation)
+			if(selectedPart instanceof PartRotation)
 			{
 				GL11.glPopMatrix();
 				super.processRay();
 				return;
 			}
-			else if(!(part instanceof PartEntityPos)) //TODO should we have specific parts for prop rotation and translation? Eg PartPropRot
+			else if(selectedPart instanceof PartPropTranslation || selectedPart instanceof PartPropScale)
 			{	
 				ItemStack itemstack = entityToRender.getHeldItem();
 				ModelHandler.modelRenderer.transformToItemCentre(itemstack);
@@ -192,7 +193,7 @@ public class GuiEntityRendererWithTranslation extends GuiEntityRendererWithRotat
 			if(!Double.isNaN(d))
 			{
 				updatePartValue(d, translationAxisPlane);
-				if(selectedPart instanceof PartEntityPos)
+				if(selectedPart instanceof PartEntityPos || selectedPart instanceof PartPropScale)
 					prevTranslationDelta = translationDelta;
 				else
 					prevTranslationDelta = translationDelta - d;

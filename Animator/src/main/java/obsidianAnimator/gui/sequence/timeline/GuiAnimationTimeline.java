@@ -382,15 +382,8 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 		}
 		if(previousKf == null)
 		{
-			if(part.getName().equals("entitypos"))
-			{
-				previousKf = new Keyframe(0, part, new float[]{0.0F, 0.0F, 0.0F});
-			}
-			else
-			{
-				float[] defaults = part.getOriginalValues();
-				previousKf = new Keyframe(0, part, new float[]{0.0F, 0.0F, 0.0F});
-			}
+			float[] defaults = part.getOriginalValues();
+			previousKf = new Keyframe(0, part, defaults);
 		}
 		return previousKf;
 	}
