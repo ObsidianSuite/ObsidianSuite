@@ -3,18 +3,13 @@ package obsidianAPI.render;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
 import obsidianAPI.EntityAnimationProperties;
-import obsidianAPI.Quaternion;
-import obsidianAPI.Util;
 import obsidianAPI.animation.AnimationSequence;
 import obsidianAPI.render.part.Part;
 
-import java.util.HashMap;
 import java.util.Map;
 
 public abstract class ModelAnimated extends ModelObj
 {
-	public static final float ANIM_MERGE_DURATION = 0.125f;
-
 	public ModelAnimated(String entityName, ResourceLocation modelLocation, ResourceLocation textureLocation)
 	{
 		super(entityName, modelLocation, textureLocation);
@@ -28,37 +23,42 @@ public abstract class ModelAnimated extends ModelObj
 		EntityAnimationProperties animProps = (EntityAnimationProperties) entity.getExtendedProperties("Animation");
 		if (animProps == null)
 		{
-			animateToDefault(null);
+			parts.forEach(Part::setToOriginalValues);
 		}
 		else
 		{
-			updateMoveAnimation(entity,animProps);
+			updateMoveAnimation(entity, animProps);
 
 			AnimationSequence seq = animProps.getActiveAnimation();
-			if (seq != null)
+			if (seq == null)
 			{
-				float time = Util.getAnimationFrameTime(animProps.getAnimationStartTime(), 0, seq.getFPS(), 1.0F);
-				animProps.updateFrameTime(this,time);
+				animProps.setActiveAnimation(this,"Idle",true);
+				seq = animProps.getActiveAnimation();
+			}
 
-				animateToPartValues(animProps, seq.getPartValuesAtTime(this, time));
-			}
-			else
-			{
-				animateToDefault(animProps);
-			}
+			animProps.updateFrameTime();
+
+			float time = animProps.getAnimationFrameTime();
+			animateToPartValues(animProps, seq.getPartValuesAtTime(this, time));
+			animProps.updateAnimation(this, time);
 		}
 	}
 
 	protected void updateMoveAnimation(Entity entity, EntityAnimationProperties animProps)
 	{
 		boolean isMoving = isMoving(entity);
-		if (isMoving && animProps.getActiveAnimation() == null)
+		if (isMoving && isIdle(animProps))
 		{
 			animProps.setActiveAnimation(this,"WalkF", true);
-		} else if (!isMoving && animProps.getActiveAnimation() != null && animProps.getActiveAnimation().getName().equals("WalkF"))
+		} else if (!isMoving && !isIdle(animProps) && animProps.getActiveAnimation().getName().equals("WalkF"))
 		{
 			animProps.clearAnimation(this);
 		}
+	}
+
+	protected boolean isIdle(EntityAnimationProperties animProps)
+	{
+		return animProps.getActiveAnimation() == null || animProps.getActiveAnimation().getName().equals("Idle");
 	}
 
 	protected boolean isMoving(Entity parEntity)
@@ -68,41 +68,6 @@ public abstract class ModelAnimated extends ModelObj
 
 	private void animateToPartValues(EntityAnimationProperties animProps, Map<String, float[]> partValues)
 	{
-		Map<String, float[]> prevValues = animProps == null ? getDefaultPartValues() : animProps.getPrevValues();
-		if (prevValues == null)
-			prevValues = getDefaultPartValues();
-
-		double dt = animProps == null ? Double.POSITIVE_INFINITY : (System.nanoTime() - animProps.getAnimationStartTime()) / 1000000000.0;
-
-		float t = (float) Math.min(dt / ANIM_MERGE_DURATION, 1f);
-		for (Part part : parts)
-		{
-			float[] prevVals = prevValues.get(part.getName());
-			float[] targetVals = partValues.get(part.getName());
-
-			if (t >= 1f || !prevValues.containsKey(part.getName()))
-			{
-				part.setValues(partValues.get(part.getName()));
-			} else
-			{
-				Quaternion prevQuart = Quaternion.fromEuler(prevVals[0], prevVals[1], prevVals[2]);
-				Quaternion targetQuart = Quaternion.fromEuler(targetVals[0], targetVals[1], targetVals[2]);
-				Quaternion interpolatedQ = Quaternion.slerp(prevQuart, targetQuart, t);
-				part.setValues(interpolatedQ.toEuler());
-			}
-		}
-	}
-
-	private void animateToDefault(EntityAnimationProperties animProps)
-	{
-		animateToPartValues(animProps, getDefaultPartValues());
-	}
-
-	private Map<String, float[]> getDefaultPartValues()
-	{
-		Map<String, float[]> defaultState = new HashMap<String, float[]>();
-		for(Part part : parts)
-			defaultState.put(part.getName(), part.getOriginalValues());
-		return defaultState;
+		parts.forEach(p -> p.setValues(partValues.get(p.getName())));
 	}
 }

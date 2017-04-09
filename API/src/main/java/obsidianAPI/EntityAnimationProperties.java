@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 import net.minecraftforge.common.IExtendedEntityProperties;
 import obsidianAPI.animation.ActionPointCallback;
@@ -23,10 +24,19 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
     private String entityName;
     private AnimationSequence activeAnimation;
     private long animationStartTime;
-    private final Map<String, float[]> prevValues = Maps.newHashMap();
     private boolean loop;
+    private float multiplier = 1f;
+
+    private long now;
 
 	private int nextFrame = 0;
+
+	private float prevEntityPosX;
+	private float prevEntityPosZ;
+
+	private Runnable onFinished;
+
+	private float frameTime = 0f;
 
     @Override
     public void init(Entity entity, World world)
@@ -52,59 +62,108 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
 
     }
 
-	public Map<String, float[]> getPrevValues()
+    public void updateFrameTime()
     {
-		return prevValues;
-	}
+        now = System.nanoTime();
+
+        if (activeAnimation == null)
+            frameTime = 0f;
+        else
+            frameTime = Util.getAnimationFrameTime(now, animationStartTime, 0, activeAnimation.getFPS(), multiplier);
+    }
 
     public void setActiveAnimation(ModelObj model, String binding, boolean loop)
     {
+        setActiveAnimation(model, binding, loop, 0.25f);
+    }
+
+    public void setActiveAnimation(ModelObj model, String binding, boolean loopAnim, float transitionTime)
+    {
+        Map<String, float[]> currentValues;
         if (activeAnimation != null)
         {
-            setPrevValuesFromActiveAnimation(model);
+            currentValues = getCurrentValues(model);
+        } else
+        {
+            currentValues = getOriginalValues(model);
+        }
+
+        multiplier = 1f;
+        animationStartTime = now;
+        nextFrame = 0;
+        onFinished = null;
+
+        prevEntityPosX = 0f;
+        prevEntityPosZ = 0f;
+        if (transitionTime > 0.001f)
+        {
+            loop = false;
+            AnimationSequence next = AnimationRegistry.getAnimation(entityName, binding);
+
+            activeAnimation = Util.createTransition(model,next.getName(), currentValues, next.getPartValuesAtTime(model,0f),transitionTime);
+            onFinished = () ->
+            {
+                animationStartTime = now;
+                nextFrame = 0;
+                onFinished = null;
+                loop = loopAnim;
+                activeAnimation = next;
+            };
         }
         else
         {
-            setPrevValuesToOriginal(model);
+            this.loop = loopAnim;
+            activeAnimation = AnimationRegistry.getAnimation(entityName, binding);
         }
+    }
 
-        this.loop = loop;
-        activeAnimation = AnimationRegistry.getAnimation(entityName, binding);
-        animationStartTime = System.nanoTime();
-        nextFrame = 0;
+    public void clearAnimation(ModelObj model, float transitionTime)
+    {
+        if (activeAnimation == null || !activeAnimation.getName().equals("Idle"))
+        {
+            setActiveAnimation(model, "Idle", true,transitionTime);
+        }
     }
 
     public void clearAnimation(ModelObj model)
     {
-        if (activeAnimation != null)
-        {
-            setPrevValuesFromActiveAnimation(model);
-
-            activeAnimation = null;
-            animationStartTime = System.nanoTime();
-        }
+        clearAnimation(model,0.25f);
     }
 
-    private void setPrevValuesToOriginal(ModelObj model)
+    public void setMultiplier(float multiplier)
     {
-        prevValues.clear();
+        this.multiplier = multiplier;
+    }
+
+    private Map<String, float[]> getOriginalValues(ModelObj model)
+    {
+        Map<String, float[]> values = Maps.newHashMap();
 
         for (Part part : model.parts)
         {
-            prevValues.put(part.getName(), part.getOriginalValues());
+            values.put(part.getName(), part.getOriginalValues());
         }
+
+        return values;
     }
 
-    private void setPrevValuesFromActiveAnimation(ModelObj model)
+    private Map<String, float[]> getCurrentValues(ModelObj model)
     {
-        prevValues.clear();
+        Map<String, float[]> values = Maps.newHashMap();
 
-        float time = Util.getAnimationFrameTime(getAnimationStartTime(), 0, activeAnimation.getFPS(), 1.0F);
+        float time = getAnimationFrameTime();
 
         for (Part part : model.parts)
         {
-            prevValues.put(part.getName(), activeAnimation.getPartValueAtTime(part, time));
+            values.put(part.getName(), activeAnimation.getPartValueAtTime(part, time));
         }
+
+        return values;
+    }
+
+    public float getAnimationFrameTime()
+    {
+        return frameTime;
     }
 
     public AnimationSequence getActiveAnimation()
@@ -112,15 +171,27 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
         return activeAnimation;
     }
 
-    public long getAnimationStartTime()
-    {
-        return animationStartTime;
-    }
-
-    public void updateFrameTime(ModelObj model, float time)
+    public void updateAnimation(ModelObj model, float time)
     {
         if (activeAnimation != null)
         {
+            Part part = model.getPartFromName("entitypos");
+            if (part != null)
+            {
+                float entityPosX = part.getValue(0);
+                float entityPosZ = part.getValue(2);
+
+                float strafe = entityPosX - prevEntityPosX;
+                float forward = entityPosZ - prevEntityPosZ;
+
+                float f4 = MathHelper.sin(entity.rotationYaw * (float)Math.PI / 180.0F);
+                float f5 = MathHelper.cos(entity.rotationYaw * (float)Math.PI / 180.0F);
+                entity.setPosition(entity.posX + (double)(strafe * f5 - forward * f4), entity.posY,entity.posZ + (double)(forward * f5 + strafe * f4));
+
+                prevEntityPosX = entityPosX;
+                prevEntityPosZ = entityPosZ;
+            }
+
             while (time > nextFrame)
             {
                 fireActions(nextFrame);
@@ -131,7 +202,10 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
             {
                 if (loop)
                 {
-                    setActiveAnimation(model, activeAnimation.getName(), true);
+                    setActiveAnimation(model, activeAnimation.getName(), true, 0f);
+                } else if (onFinished != null)
+                {
+                    onFinished.run();
                 }
                 else
                 {
