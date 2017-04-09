@@ -74,14 +74,13 @@ public class GuiEntityRendererWithTranslation extends GuiEntityRendererWithRotat
 		{
 			GL11.glPushMatrix();
 
-			Part part = selectedPart;
-			if(part instanceof PartObj || part instanceof PartRotation)
+			if(selectedPart instanceof PartRotation)
 			{
 				GL11.glPopMatrix();
 				super.processRay();
 				return;
 			}
-			else if(part instanceof PartPropTranslation) //TODO should we have specific parts for prop rotation and translation? Eg PartPropRot
+			else if(selectedPart instanceof PartPropTranslation)
 			{	
 				ItemStack itemstack = entityToRender.getHeldItem();
 				ModelHandler.modelRenderer.transformToItemCentre(itemstack);

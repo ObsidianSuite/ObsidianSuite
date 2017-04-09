@@ -98,8 +98,8 @@ public class GuiEntityRendererWithRotation extends GuiEntityRenderer
 	@Override
 	public void processRay()
 	{
-		if(selectedPart != null)
-		{
+		if(selectedPart != null && selectedPart instanceof PartRotation)
+		{		
 			if(!rotationWheelDrag)
 			{
 				updateWheelMouseOver();
