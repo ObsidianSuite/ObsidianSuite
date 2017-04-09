@@ -295,7 +295,7 @@ public class GuiPartSetup extends GuiEntityRenderer
 				c.gridx = 0;
 				c.gridy = 0;
 				c.weightx = 1;
-				add(new JLabel(part.getName()),c);
+				add(new JLabel(part.getDisplayName()),c);
 
 				c.gridx = 1;
 				c.weightx = 0;

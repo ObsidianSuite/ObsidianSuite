@@ -10,6 +10,7 @@ import obsidianAPI.Util;
 import obsidianAPI.render.part.Part;
 import obsidianAPI.render.part.PartEntityPos;
 import obsidianAPI.render.part.PartObj;
+import obsidianAPI.render.part.PartPropTranslation;
 import obsidianAPI.render.part.PartRotation;
 import obsidianAnimator.data.ModelHandler;
 import obsidianAnimator.render.MathHelper;
@@ -80,7 +81,7 @@ public class GuiEntityRendererWithTranslation extends GuiEntityRendererWithRotat
 				super.processRay();
 				return;
 			}
-			else if(!(part instanceof PartEntityPos)) //TODO should we have specific parts for prop rotation and translation? Eg PartPropRot
+			else if(part instanceof PartPropTranslation) //TODO should we have specific parts for prop rotation and translation? Eg PartPropRot
 			{	
 				ItemStack itemstack = entityToRender.getHeldItem();
 				ModelHandler.modelRenderer.transformToItemCentre(itemstack);
