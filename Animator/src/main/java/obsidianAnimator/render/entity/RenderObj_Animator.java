@@ -198,11 +198,11 @@ public class RenderObj_Animator extends RenderLiving
 			{
 				f2 = 0.625F;
 
-				GL11.glTranslatef(0, 0.22F, -0.04f);
-				GL11.glTranslatef(0f, -0.15F, 0f);
-				
 				//Prop scale
 				GL11.glScalef(1.0f + scaleVals[0], 1.0f  + scaleVals[1], 1.0f + scaleVals[2]);
+				
+				GL11.glTranslatef(0, 0.22F, -0.04f);
+				GL11.glTranslatef(0f, -0.15F, 0f);
 
 				GL11.glTranslatef(0.03f, 0f, 0f);
 				GL11.glScalef(f2, f2, f2);
