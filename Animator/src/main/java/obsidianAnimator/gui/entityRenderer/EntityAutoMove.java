@@ -1,6 +1,4 @@
-package obsidianAnimator.gui.sequence;
-
-import org.lwjgl.opengl.GL11;
+package obsidianAnimator.gui.entityRenderer;
 
 import net.minecraft.entity.Entity;
 

@@ -1,9 +1,9 @@
-package obsidianAnimator.gui.sequence.timeline;
+package obsidianAnimator.gui.timeline.swing.component;
 
 import javax.swing.*;
 import java.awt.*;
 
-class CopyLabel extends JComponent
+public class CopyLabel extends JComponent
 {
     public int x;
     public int y;

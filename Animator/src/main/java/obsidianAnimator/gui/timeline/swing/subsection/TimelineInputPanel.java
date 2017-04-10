@@ -1,4 +1,4 @@
-package obsidianAnimator.gui.sequence.timeline;
+package obsidianAnimator.gui.timeline.swing.subsection;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -9,28 +9,24 @@ import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
-public class ControlPanel extends JPanel
+public class TimelineInputPanel extends JPanel
 {
-
-	private final GuiAnimationTimeline timeline;
 	
 	JButton playPauseButton;
-	AnimationPanel animationPanel;
-	PartPanel partPanel;
-	MovementPanel movementPanel;
-	RenderPanel renderPanel;
-	ItemPanel itemPanel;
+	public TimelineAnimationPanel animationPanel;
+	private TimelinePartPanel partPanel;
+	private TimelineMovementPanel movementPanel;
+	private TimelineRenderPanel renderPanel;
+	private TimelineItemPanel itemPanel;
 
 
-	public ControlPanel(GuiAnimationTimeline gui)
-	{				
-		timeline = gui;
-		
-		animationPanel = new AnimationPanel(timeline);
-		partPanel = new PartPanel(timeline);
-		movementPanel = new MovementPanel(timeline);
-		renderPanel = new RenderPanel(timeline);
-		itemPanel = new ItemPanel(timeline);
+	public TimelineInputPanel(TimelineInputController controller)
+	{						
+		animationPanel = controller.getAnimationPanel();
+		partPanel = controller.getPartPanel();
+		movementPanel = controller.getMovementPanel();
+		renderPanel = controller.getRenderPanel();
+		itemPanel = controller.getItemPanel();
 		
 		playPauseButton = new JButton("Play");
 		playPauseButton.addActionListener(new ActionListener()
@@ -38,16 +34,16 @@ public class ControlPanel extends JPanel
 			@Override
 			public void actionPerformed(ActionEvent e) 
 			{
-				if(timeline.time >= timeline.currentAnimation.getTotalTime())
-					timeline.time = 0;
-				timeline.boolPlay = !timeline.boolPlay; 		
-				if(timeline.boolPlay)
+				if(controller.getTime() >= controller.getCurrentAnimation().getTotalTime())
+					controller.setTime(0);
+				controller.setPlaying(!controller.isPlaying());	
+				if(controller.isPlaying())
 				{
-					timeline.playStartTimeNano = System.nanoTime();
-					timeline.playStartTimeFrame = timeline.time;
+					controller.setPlayStartTimeNano(System.nanoTime());
+					controller.setPlayStartTimeFrame(controller.getTime());
 				}
 
-				updatePlayPauseButton();
+				controller.updatePlayPauseButton();
 			}
 		});
 
@@ -57,7 +53,7 @@ public class ControlPanel extends JPanel
 			@Override
 			public void actionPerformed(ActionEvent e) 
 			{
-				timeline.close();
+				controller.close();
 			}
 		});
 
@@ -83,10 +79,5 @@ public class ControlPanel extends JPanel
 		c.insets = new Insets(2,5,10,5);
 		add(backButton,c);
 	}
-
-	protected void updatePlayPauseButton()
-	{
-		playPauseButton.setText(timeline.boolPlay ? "Pause" : "Play");
-	}
-		
+	
 }

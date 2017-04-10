@@ -1,4 +1,4 @@
-package obsidianAnimator.gui.sequence.timeline;
+package obsidianAnimator.gui;
 
 import com.google.common.collect.Maps;
 import net.minecraft.client.gui.GuiScreen;
@@ -8,12 +8,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.util.Map;
 
-public class KeyMappings
+public class KeyMapping
 {
     private final JFrame frame;
     private final Map<Integer, KeyAction> actionByMinecraftKey = Maps.newHashMap();
 
-    public KeyMappings(JFrame frame) {this.frame = frame;}
+    public KeyMapping(JFrame frame) {this.frame = frame;}
 
     public void addKey(int frameKey, int minecraftKey, String actionMapKey, Action action)
     {
@@ -43,6 +43,7 @@ public class KeyMappings
     {
         KeyAction action = actionByMinecraftKey.get(key);
 
+        //TODO GuiScreen.isCtrlKeyDown() only work if the MC screen is in focus, not the swing frame.
         if (action != null && (!action.ctrl || GuiScreen.isCtrlKeyDown()))
         {
             action.action.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_FIRST, ""));

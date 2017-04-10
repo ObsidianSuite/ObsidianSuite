@@ -1,4 +1,4 @@
-package obsidianAnimator.gui.sequence.timeline;
+package obsidianAnimator.gui.timeline.swing.subsection;
 
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -10,25 +10,23 @@ import java.awt.event.ActionListener;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-public class AnimationPanel extends JPanel
+public class TimelineAnimationPanel extends JPanel
 {
 	
-	private final GuiAnimationTimeline timeline;
-	JLabel lengthFrameLabel, lengthSecondsLabel, fpsLabel;
+	public JLabel lengthFrameLabel;
+	public JLabel lengthSecondsLabel;
+	public JLabel fpsLabel;
 
-	public AnimationPanel(GuiAnimationTimeline gui)
-	{
-		timeline = gui;
-		
+	public TimelineAnimationPanel(TimelineAnimationController controller)
+	{		
 		lengthFrameLabel = new JLabel();
 		lengthSecondsLabel = new JLabel();
-		fpsLabel = new JLabel(timeline.currentAnimation.getFPS() + " FPS");
+		fpsLabel = new JLabel(controller.getFPS() + " FPS");
 
 		JButton fpsButton = new JButton("Set FPS");
 		fpsButton.addActionListener(new ActionListener()
@@ -36,7 +34,7 @@ public class AnimationPanel extends JPanel
 			@Override
 			public void actionPerformed(ActionEvent e) 
 			{
-				getUserFPS();
+				controller.getUserFPS();
 			}
 		});
 
@@ -51,7 +49,7 @@ public class AnimationPanel extends JPanel
 			public void stateChanged(ChangeEvent e)
 			{
 				valueLabel.setText(slider.getValue() + "%");
-				timeline.timeMultiplier = slider.getValue()/100F;
+				controller.setTimeMultiplier(slider.getValue()/100F);
 			}
 		});
 		slider.setPreferredSize(new Dimension(100,20));
@@ -72,7 +70,7 @@ public class AnimationPanel extends JPanel
 		c.gridx = 0;
 		c.gridy = 0;
 		c.weightx = 1;
-		c.anchor = c.CENTER;
+		c.anchor = GridBagConstraints.CENTER;
 		c.insets = new Insets(2,2,2,2);
 		c.gridwidth = 1;
 		add(lengthFrameLabel, c);
@@ -101,47 +99,4 @@ public class AnimationPanel extends JPanel
 		setBorder(BorderFactory.createTitledBorder("Animation"));
 	}
 	
-	/**
-	 * Ask the user for an FPS value, and set the aniamtion's FPS value to it 
-	 * if an appropriate value is supplied.
-	 */
-	private void getUserFPS()
-	{
-		Integer fps = null;			
-		while(true)
-		{
-			String input = JOptionPane.showInputDialog(timeline.timelineFrame, "Set FPS (20-60)");
-			if(input == null)
-				break;
-			fps = getFPSFromString(input);
-			if(fps != null)
-			{
-				timeline.onFPSChange(fps);
-				break;
-			}
-			else
-				JOptionPane.showMessageDialog(timeline.timelineFrame, "Invalid input");
-		}
-	}
-
-	/**
-	 * Get an FPS value from a string.
-	 * The FPS value must be between 20 and 60 (inclusive)
-	 * @param input - String to parse.
-	 * @return FPS value or null if string is invalid.
-	 */
-	private Integer getFPSFromString(String input)
-	{
-		Integer fps = null;
-
-		try
-		{
-			fps = Integer.parseInt(input);
-			if(fps < 20 || fps > 60)
-				fps = null;
-		}
-		catch(NumberFormatException e){}
-
-		return fps;
-	}
 }

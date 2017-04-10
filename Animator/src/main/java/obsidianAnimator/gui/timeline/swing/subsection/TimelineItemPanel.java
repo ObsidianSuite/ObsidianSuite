@@ -1,4 +1,4 @@
-package obsidianAnimator.gui.sequence.timeline;
+package obsidianAnimator.gui.timeline.swing.subsection;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -12,17 +12,14 @@ import javax.swing.JPanel;
 
 import net.minecraft.client.Minecraft;
 import obsidianAnimator.gui.GuiInventoryChooseItem;
+import obsidianAnimator.gui.timeline.GuiAnimationTimeline;
 import obsidianAnimator.render.entity.EntityObj;
 
-public class ItemPanel extends JPanel
+public class TimelineItemPanel extends JPanel
 {
-
-	private final GuiAnimationTimeline timeline;
 	
-	public ItemPanel(GuiAnimationTimeline gui)
-	{
-		timeline = gui;
-		
+	public TimelineItemPanel(TimelineItemController controller)
+	{		
 		setLayout(new GridBagLayout());
 
 		GridBagConstraints c = new GridBagConstraints();
@@ -38,7 +35,7 @@ public class ItemPanel extends JPanel
 			@Override
 			public void actionPerformed(ActionEvent e) 
 			{
-				Minecraft.getMinecraft().displayGuiScreen(new GuiInventoryChooseItem(timeline, (EntityObj) timeline.entityToRender));
+				Minecraft.getMinecraft().displayGuiScreen(new GuiInventoryChooseItem(controller, controller.getEntityToRender()));
 			}
 		});
 		add(itemButton, c);

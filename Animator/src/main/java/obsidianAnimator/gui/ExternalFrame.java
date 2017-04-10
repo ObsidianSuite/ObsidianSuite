@@ -1,4 +1,4 @@
-package obsidianAnimator.gui.sequence;
+package obsidianAnimator.gui;
 
 public interface ExternalFrame 
 {

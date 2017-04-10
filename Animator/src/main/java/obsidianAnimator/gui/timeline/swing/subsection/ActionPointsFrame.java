@@ -1,4 +1,4 @@
-package obsidianAnimator.gui.sequence.timeline;
+package obsidianAnimator.gui.timeline.swing.subsection;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
@@ -17,8 +17,8 @@ public class ActionPointsFrame extends JFrame
     {
         super("Action Points");
 
-        final int time = (int) panel.timeline.time;
-        final AnimationSequence animation = panel.timeline.currentAnimation;
+        final int time = (int) panel.controller.getTime();
+        final AnimationSequence animation = panel.controller.currentAnimation;
 
         final JTextField actionField = new JTextField();
 

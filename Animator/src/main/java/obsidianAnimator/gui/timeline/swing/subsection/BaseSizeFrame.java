@@ -1,4 +1,4 @@
-package obsidianAnimator.gui.sequence.timeline;
+package obsidianAnimator.gui.timeline.swing.subsection;
 
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -23,15 +23,16 @@ public class BaseSizeFrame extends JFrame
 
 	private JButton setSizeButton;
 	
-	public BaseSizeFrame(final RenderPanel renderPanel)
+	//TODO create controller for this class so it doesn't need TimelineRenderController.
+	public BaseSizeFrame(final TimelineRenderPanel renderPanel, TimelineRenderController controller)
 	{
 		super("Base Size");
 		
 		valuePanels = new ValuePanel[]{
-				new ValuePanel("Min X:", -1, false, renderPanel.timeline.gridMinX), 
-				new ValuePanel("Max X:", 1, true, renderPanel.timeline.gridMaxX), 
-				new ValuePanel("Min Z:", -1, false, renderPanel.timeline.gridMinZ), 
-				new ValuePanel("Max Z:", 1, true, renderPanel.timeline.gridMaxZ)};
+				new ValuePanel("Min X:", -1, false, controller.getTimelineGui().gridMinX), 
+				new ValuePanel("Max X:", 1, true, controller.getTimelineGui().gridMaxX), 
+				new ValuePanel("Min Z:", -1, false, controller.getTimelineGui().gridMinZ), 
+				new ValuePanel("Max Z:", 1, true, controller.getTimelineGui().gridMaxZ)};
 		
 		JPanel mainPanel = new JPanel();
 
@@ -42,10 +43,10 @@ public class BaseSizeFrame extends JFrame
 			@Override
 			public void actionPerformed(ActionEvent e) 
 			{
-				renderPanel.timeline.gridMinX = valuePanels[0].getValue();
-				renderPanel.timeline.gridMaxX = valuePanels[1].getValue();
-				renderPanel.timeline.gridMinZ = valuePanels[2].getValue();
-				renderPanel.timeline.gridMaxZ = valuePanels[3].getValue();
+				controller.getTimelineGui().gridMinX = valuePanels[0].getValue();
+				controller.getTimelineGui().gridMaxX = valuePanels[1].getValue();
+				controller.getTimelineGui().gridMinZ = valuePanels[2].getValue();
+				controller.getTimelineGui().gridMaxZ = valuePanels[3].getValue();
 				dispose();
 			}
 		});
@@ -79,7 +80,7 @@ public class BaseSizeFrame extends JFrame
 
 		c.gridx = 0;
 		c.gridy = 2;
-		c.fill = c.BOTH;
+		c.fill = GridBagConstraints.BOTH;
 		c.insets = new Insets(5,5,5,5);
 		mainPanel.add(setSizeButton, c);
 		c.gridx = 1;

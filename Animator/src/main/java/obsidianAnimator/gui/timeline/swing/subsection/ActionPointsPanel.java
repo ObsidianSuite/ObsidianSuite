@@ -1,23 +1,32 @@
-package obsidianAnimator.gui.sequence.timeline;
+package obsidianAnimator.gui.timeline.swing.subsection;
 
-import com.google.common.base.Joiner;
-import obsidianAPI.animation.AnimationSequence;
-
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.util.Collection;
 
+import javax.swing.AbstractAction;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+
+import com.google.common.base.Joiner;
+
+import obsidianAPI.animation.AnimationSequence;
+import obsidianAnimator.gui.timeline.TimelineController;
+
 public class ActionPointsPanel extends JPanel
 {
-    final GuiAnimationTimeline timeline;
+    final TimelineController controller;
     final JLabel label;
 
     private ActionPointsFrame actionPointsFrame;
 
-    public ActionPointsPanel(GuiAnimationTimeline timeline)
+    public ActionPointsPanel(TimelineController controller)
     {
-        this.timeline = timeline;
+        this.controller = controller;
 
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 
@@ -43,10 +52,10 @@ public class ActionPointsPanel extends JPanel
         updateText();
     }
 
-    void updateText()
+    public void updateText()
     {
-        final int time = (int) timeline.time;
-        final AnimationSequence anim = timeline.currentAnimation;
+        final int time = (int) controller.getTime();
+        final AnimationSequence anim = controller.currentAnimation;
 
         Collection<String> points = anim.getActionPoints(time);
         label.setText(Joiner.on(',').join(points));

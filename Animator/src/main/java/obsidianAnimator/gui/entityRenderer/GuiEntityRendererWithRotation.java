@@ -1,4 +1,4 @@
-package obsidianAnimator.gui.sequence;
+package obsidianAnimator.gui.entityRenderer;
 
 import java.nio.ByteBuffer;
 import java.nio.DoubleBuffer;
@@ -15,7 +15,6 @@ import obsidianAPI.render.part.Part;
 import obsidianAPI.render.part.PartObj;
 import obsidianAPI.render.part.PartRotation;
 import obsidianAnimator.data.ModelHandler;
-import obsidianAnimator.gui.GuiEntityRenderer;
 import obsidianAnimator.render.MathHelper;
 import obsidianAnimator.render.RayTrace;
 

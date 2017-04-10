@@ -1,4 +1,4 @@
-package obsidianAnimator.gui.sequence.timeline;
+package obsidianAnimator.gui.timeline;
 
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;

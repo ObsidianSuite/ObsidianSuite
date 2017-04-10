@@ -16,7 +16,8 @@ import obsidianAnimator.file.FileChooser;
 import obsidianAnimator.file.FileHandler;
 import obsidianAnimator.file.FileNotChosenException;
 import obsidianAnimator.gui.GuiBlack;
-import obsidianAnimator.gui.sequence.timeline.GuiAnimationTimeline;
+import obsidianAnimator.gui.timeline.GuiAnimationTimeline;
+import obsidianAnimator.gui.timeline.TimelineController;
 
 public class HomeFrame extends BaseFrame
 {
@@ -111,7 +112,7 @@ public class HomeFrame extends BaseFrame
 			if(ModelHandler.isModelImported(sequence.getEntityName()))
 			{
 				frame.dispose();
-				Minecraft.getMinecraft().displayGuiScreen(new GuiAnimationTimeline(animationFile, sequence));
+				new TimelineController(animationFile, sequence).display();
 			}
 			else
 				JOptionPane.showMessageDialog(frame, "You must import the " + sequence.getEntityName() + " model first.");

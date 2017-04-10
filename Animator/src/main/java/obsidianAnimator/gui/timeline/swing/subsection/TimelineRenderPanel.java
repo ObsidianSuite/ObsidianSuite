@@ -1,4 +1,4 @@
-package obsidianAnimator.gui.sequence.timeline;
+package obsidianAnimator.gui.timeline.swing.subsection;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -12,49 +12,47 @@ import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-public class RenderPanel extends JPanel
+public class TimelineRenderPanel extends JPanel
 {
 	
-	public final GuiAnimationTimeline timeline;
 	private JCheckBox loopCB, baseCB, gridCB; 
 	private BaseSizeFrame baseSizeFrame;
 	
-	public RenderPanel(GuiAnimationTimeline gui)
+	public TimelineRenderPanel(TimelineRenderController controller)
 	{
-		timeline = gui;
 		
 		setLayout(new GridBagLayout());
 		
 		loopCB = new JCheckBox();
-		loopCB.setSelected(timeline.boolLoop);
+		loopCB.setSelected(controller.isLooping());
 		loopCB.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent actionEvent) 
 			{
 				AbstractButton abstractButton = (AbstractButton) actionEvent.getSource();
-				timeline.boolLoop = abstractButton.getModel().isSelected();
+				controller.setLooping(abstractButton.getModel().isSelected());
 			}
 		});
 		
 		baseCB = new JCheckBox();
-		baseCB.setSelected(timeline.boolBase);
+		baseCB.setSelected(controller.isBaseVisible());
 		baseCB.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent actionEvent) 
 			{
 				AbstractButton abstractButton = (AbstractButton) actionEvent.getSource();
-				timeline.boolBase = abstractButton.getModel().isSelected();
+				controller.setBaseVisible(abstractButton.getModel().isSelected());
 			}
 		});
 		
 		gridCB = new JCheckBox();
-		gridCB.setSelected(timeline.boolGrid);
+		gridCB.setSelected(controller.isGridVisible());
 		gridCB.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent actionEvent) 
 			{
 				AbstractButton abstractButton = (AbstractButton) actionEvent.getSource();
-				timeline.boolGrid = abstractButton.getModel().isSelected();
+				controller.setGridVisible(abstractButton.getModel().isSelected());
 			}
 		});
 		
@@ -66,7 +64,7 @@ public class RenderPanel extends JPanel
 			{
 				if(baseSizeFrame != null)
 					baseSizeFrame.dispose();
-				baseSizeFrame = new BaseSizeFrame(RenderPanel.this);
+				baseSizeFrame = new BaseSizeFrame(TimelineRenderPanel.this, controller);
 			}
 		});
 		

@@ -1,4 +1,4 @@
-package obsidianAnimator.gui;
+package obsidianAnimator.gui.entityRenderer;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,6 +23,7 @@ import obsidianAPI.render.part.Part;
 import obsidianAPI.render.part.PartObj;
 import obsidianAnimator.ObsidianAnimator;
 import obsidianAnimator.data.ModelHandler;
+import obsidianAnimator.gui.GuiBlack;
 import obsidianAnimator.render.entity.EntityObj;
 import obsidianAnimator.render.entity.ModelObj_Animator;
 
@@ -32,9 +33,9 @@ public class GuiEntityRenderer extends GuiBlack
 	public String entityName;
 	public EntityLivingBase entityToRender;
 	public ModelObj_Animator entityModel;
-	protected List<Part> parts = new ArrayList<Part>();
+	public List<Part> parts = new ArrayList<Part>();
 	public Part selectedPart;
-	protected Part hoveredPart;
+	public Part hoveredPart;
 
 	public boolean boolBase;
 	public boolean boolGrid;

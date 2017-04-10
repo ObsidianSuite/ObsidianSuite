@@ -1,13 +1,13 @@
-package obsidianAnimator.gui.sequence.timeline;
+package obsidianAnimator.gui.timeline;
 
 import obsidianAPI.render.part.Part;
 
-class Keyframe
+public class Keyframe
 {
-    final Part part;
-    int frameTime;
+    public final Part part;
+    public int frameTime;
     //Rotation for parts and position for entityPosition
-    final float[] values;
+    public float[] values;
     //Is current keyframe, or is a selected keyframe (multiple selected).
     boolean isCurrent;
     boolean isSelected;

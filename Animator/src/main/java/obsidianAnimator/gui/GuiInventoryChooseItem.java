@@ -4,36 +4,29 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiInventory;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import obsidianAnimator.gui.sequence.timeline.GuiAnimationTimeline;
+import obsidianAnimator.gui.timeline.swing.subsection.TimelineItemController;
 import obsidianAnimator.render.entity.EntityObj;
 
 @SideOnly(Side.CLIENT)
 public class GuiInventoryChooseItem extends GuiInventory
 {
     
-	private EntityPlayer player;
-	private String entityName;
-	private GuiAnimationTimeline parentGui;
+	private TimelineItemController controller;
 	private EntityObj entity;
 
-    public GuiInventoryChooseItem(GuiAnimationTimeline parentGui, EntityObj entity)
+    public GuiInventoryChooseItem(TimelineItemController controller, EntityObj entity)
     {
         super(Minecraft.getMinecraft().thePlayer);
         this.allowUserInput = true;
-        this.parentGui = parentGui;
+        this.controller = controller;
         this.entity = entity;
     }
 
     public void setItemStack(ItemStack itemStack)
     {
     	this.entity.setCurrentItem(itemStack); 
-    	//TODO animation item
-//    	AnimationData.setAnimationItem(parentGui.currentAnimation.getName(), Item.getIdFromItem(itemStack.getItem()));
-    	this.mc.displayGuiScreen(this.parentGui);
-    	this.parentGui.loadFrames();
+    	controller.display();
     }
     
     /**
@@ -41,7 +34,7 @@ public class GuiInventoryChooseItem extends GuiInventory
      */
     public void updateScreen()
     {
-           this.mc.displayGuiScreen(new GuiContainerChooseItem(this.mc.thePlayer, this));
+    	this.mc.displayGuiScreen(new GuiContainerChooseItem(this.mc.thePlayer, this));
     }
 
     /**
