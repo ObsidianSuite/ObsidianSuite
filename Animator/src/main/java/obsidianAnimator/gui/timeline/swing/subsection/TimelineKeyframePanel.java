@@ -37,16 +37,21 @@ public class TimelineKeyframePanel extends JPanel
 	private DecimalFormat df = new DecimalFormat("#.##");
 	
 	protected CopyLabel copyLabel;
+	
+	private final int numParts;
+	private static final int MAX_PARTS = 15;
 
 	public TimelineKeyframePanel(TimelineKeyframeController controller)
 	{
 		this.controller = controller;
+		this.numParts = controller.getTimelineGui().parts.size();
 		
-		final KeyframeLine[] lines = new KeyframeLine[controller.getTimelineGui().parts.size()];
-		for(int i = 0; i < controller.getTimelineGui().parts.size(); i++)
+		final KeyframeLine[] lines = new KeyframeLine[numParts];
+		for(int i = 0; i < numParts; i++)
 		{
 			lines[i] = new KeyframeLine(controller.getTimelineGui().parts.get(i));
 		}
+		
 		
 		final JTextField timeTextField = new JTextField("0");
 		timeSlider = new JSlider(0, TimelineKeyframeController.TIMELINE_LENGTH, 0);
@@ -64,7 +69,7 @@ public class TimelineKeyframePanel extends JPanel
 			{
 				timeTextField.setText(df.format(timeSlider.getValue()));
 				controller.setTime(timeSlider.getValue());
-				for(int i = 0; i < controller.getTimelineGui().parts.size(); i++)
+				for(int i = 0; i < numParts; i++)
 				{
 					lines[i].repaint();
 				}
@@ -97,7 +102,7 @@ public class TimelineKeyframePanel extends JPanel
 		});
 		
 	    JScrollBar hbar = new JScrollBar(JScrollBar.HORIZONTAL, 0, 50, 0, TimelineKeyframeController.TIMELINE_LENGTH);
-	    JScrollBar vbar = new JScrollBar(JScrollBar.VERTICAL, 0, 15, 0, controller.getTimelineGui().parts.size());
+	    JScrollBar vbar = new JScrollBar(JScrollBar.VERTICAL, 0, MAX_PARTS, 0, numParts);
 
 		
 		setLayout(new GridBagLayout());
@@ -114,8 +119,8 @@ public class TimelineKeyframePanel extends JPanel
 		c.weighty = 1;
 		add(timeSlider, c);
 
-		partLabels = new JLabel[controller.getTimelineGui().parts.size()];
-		for(int i = 0; i < controller.getTimelineGui().parts.size(); i++)
+		partLabels = new JLabel[numParts];
+		for(int i = 0; i < numParts; i++)
 		{
 			c.gridx = 0;
 			c.gridy = i+1;
@@ -137,14 +142,18 @@ public class TimelineKeyframePanel extends JPanel
 		}
 		
 		c.gridx = 1;
-		c.gridy = controller.getTimelineGui().parts.size() + 2;
+		c.gridy = numParts + 2;
 		c.insets = new Insets(5, 5, 5, 5);
 		add(hbar, c);
 		
-		c.gridx = 2;
-		c.gridy = 1;
-		c.gridheight = controller.getTimelineGui().parts.size();
-		add(vbar, c);
+		if(numParts > MAX_PARTS)
+		{
+			c.gridx = 2;
+			c.gridy = 1;
+			c.gridheight = numParts;
+			add(vbar, c);
+		}
+
 	}
 
 	public void refresthLineColours()

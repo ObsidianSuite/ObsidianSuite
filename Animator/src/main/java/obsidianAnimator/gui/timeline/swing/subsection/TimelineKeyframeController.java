@@ -25,6 +25,7 @@ public class TimelineKeyframeController extends TimelineControllerSub
 
 	public static final int TIMELINE_LENGTH = 500;	
 	
+	
 	public TimelineKeyframeController(TimelineController controller)
 	{
 		super(controller);
