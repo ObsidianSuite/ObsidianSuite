@@ -120,7 +120,7 @@ public class TimelineKeyMappings
 		public void actionPerformed(ActionEvent arg0) 
 		{
 			controller.setExceptionPart(null);
-			controller.setTime(controller.getTime() < TimelineKeyframeController.TIMELINE_LENGTH ? controller.getTime() + 1 : controller.getTime());
+			controller.setTime(controller.getTime() < controller.keyframeController.panel.getTimelineLength() ? controller.getTime() + 1 : controller.getTime());
 			controller.keyframeController.panel.timeSlider.setValue((int) controller.getTime());
 		}
 	}

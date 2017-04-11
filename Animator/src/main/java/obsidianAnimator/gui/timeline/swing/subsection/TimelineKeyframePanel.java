@@ -6,13 +6,19 @@ import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.AdjustmentEvent;
+import java.awt.event.AdjustmentListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 import java.text.DecimalFormat;
+import java.util.Dictionary;
+import java.util.Hashtable;
 import java.util.List;
 
+import javax.swing.BoundedRangeModel;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
@@ -32,35 +38,42 @@ public class TimelineKeyframePanel extends JPanel
 	private TimelineKeyframeController controller;
 	
 	public JSlider timeSlider;
-	
+	private final KeyframeLine[] lines;
 	private JLabel[] partLabels;
 	private DecimalFormat df = new DecimalFormat("#.##");
 	
 	protected CopyLabel copyLabel;
 	
 	private final int numParts;
+	private int timelineLength;	
+	private int timelineOffset = 0;
 	private static final int MAX_PARTS = 15;
+	private static final int MAX_FRAMES = 50;
 
 	public TimelineKeyframePanel(TimelineKeyframeController controller)
 	{
 		this.controller = controller;
 		this.numParts = controller.getTimelineGui().parts.size();
 		
-		final KeyframeLine[] lines = new KeyframeLine[numParts];
+		if(controller.getCurrentAnimation().getTotalTime() > 50)
+			timelineLength = controller.getCurrentAnimation().getTotalTime() + 10;
+		else
+			timelineLength = 60;
+		
+		lines = new KeyframeLine[numParts];
 		for(int i = 0; i < numParts; i++)
 		{
 			lines[i] = new KeyframeLine(controller.getTimelineGui().parts.get(i));
 		}
 		
-		
 		final JTextField timeTextField = new JTextField("0");
-		timeSlider = new JSlider(0, TimelineKeyframeController.TIMELINE_LENGTH, 0);
+		timeSlider = new JSlider(0, MAX_FRAMES, 0);
 		timeSlider.setPaintLabels(true);
 		timeSlider.setPaintTicks(true);
-		int majorIncrements = (int) (TimelineKeyframeController.TIMELINE_LENGTH/10F);
-		timeSlider.setMajorTickSpacing((int) (majorIncrements/5F));
-		timeSlider.setMinorTickSpacing(majorIncrements);
-		timeSlider.setLabelTable(timeSlider.createStandardLabels(majorIncrements));
+		//timeSlider.setMajorTickSpacing((int) (MAX_FRAMES/10F));
+		timeSlider.setMinorTickSpacing(1);
+		timeSlider.setSnapToTicks(true);
+		timeSlider.setLabelTable(createLabelTabel());
 		
 		timeSlider.addChangeListener(new ChangeListener()
 		{
@@ -101,8 +114,23 @@ public class TimelineKeyframePanel extends JPanel
 			}
 		});
 		
-	    JScrollBar hbar = new JScrollBar(JScrollBar.HORIZONTAL, 0, 50, 0, TimelineKeyframeController.TIMELINE_LENGTH);
+	    JScrollBar hbar = new JScrollBar(JScrollBar.HORIZONTAL, 0, MAX_FRAMES, 0, timelineLength);
 	    JScrollBar vbar = new JScrollBar(JScrollBar.VERTICAL, 0, MAX_PARTS, 0, numParts);
+	    hbar.addAdjustmentListener(new AdjustmentListener() {
+			@Override
+			public void adjustmentValueChanged(AdjustmentEvent e) {				
+				timelineOffset = e.getValue();
+				timeSlider.setMinimum(timelineOffset);
+				timeSlider.setMaximum(MAX_FRAMES + timelineOffset);
+				timeSlider.setLabelTable(createLabelTabel());
+				
+				if(MAX_FRAMES + timelineOffset == timelineLength)
+				{
+					timelineLength++;
+					hbar.setMaximum(timelineLength);
+				}
+			}
+		});
 
 		
 		setLayout(new GridBagLayout());
@@ -178,6 +206,29 @@ public class TimelineKeyframePanel extends JPanel
 		copyLabel.repaint();
 	}
 	
+	private Dictionary<Integer, JLabel> createLabelTabel()
+	{
+		Dictionary<Integer, JLabel> dictionary = new Hashtable<Integer, JLabel>();
+		for(int i = 0; i < Math.ceil(timelineLength/10F); i++)
+			dictionary.put(i*10, new JLabel(Integer.toString(i*10)));
+		return dictionary;
+	}
+	
+	private int timeToX(int time)
+	{
+		return (int)((time-timelineOffset)/(float)(MAX_FRAMES+1)*(lines[0].getWidth()));
+	}
+
+	private int xToTime(int x)
+	{
+		return timelineOffset + (int) (x*(MAX_FRAMES+1)/(float)(lines[0].getWidth()));
+	}
+	
+	public float getTimelineLength() 
+	{
+		return timelineLength;
+	}
+	
 	private class KeyframeLine extends JPanel
 	{		
 		Keyframe closestKeyframe;
@@ -198,7 +249,7 @@ public class TimelineKeyframePanel extends JPanel
 				{
 					Keyframe kf = controller.getExistingKeyframe();
 					if(kf != null && e.isControlDown())
-						controller.copyKeyframe(kf, part, xToKeyframeTime(e.getX()));
+						controller.copyKeyframe(kf, part, xToTime(e.getX()));
 					else if(closestKeyframe != null)
 					{
 						controller.setTime(closestKeyframe.frameTime);
@@ -240,11 +291,11 @@ public class TimelineKeyframePanel extends JPanel
 					if(closestKeyframe != null)
 					{
 						int prevFrameTime = closestKeyframe.frameTime;
-						int kfx = keyframeTimeToX(prevFrameTime);
+						int kfx = timeToX(prevFrameTime);
 						int dx = Math.abs(kfx - e.getX());
 						if(dx < 15)
 						{
-							int t = xToKeyframeTime(e.getX());
+							int t = xToTime(e.getX());
 							if(t >= 0 && t <= 300)
 							{
 								closestKeyframe.frameTime = t;
@@ -264,19 +315,9 @@ public class TimelineKeyframePanel extends JPanel
 					repaint();
 					int x = 200 + KeyframeLine.this.getX() + e.getX();
 					int y = KeyframeLine.this.getY() + e.getY();
-					updateCopyLabel(x, y, xToKeyframeTime(e.getX()), e.isControlDown());
+					updateCopyLabel(x, y, xToTime(e.getX()), e.isControlDown());
 				}			
 			});
-		}
-
-		private int keyframeTimeToX(int keyframeTime)
-		{
-			return (int)(keyframeTime/(float)TimelineKeyframeController.TIMELINE_LENGTH*(getWidth() - 10));
-		}
-
-		private int xToKeyframeTime(int x)
-		{
-			return (int) (x*TimelineKeyframeController.TIMELINE_LENGTH/(float)(getWidth() - 10));
 		}
 
 		public void updateClosestKeyframe(int mouseX)
@@ -288,7 +329,7 @@ public class TimelineKeyframePanel extends JPanel
 			{
 				for(Keyframe kf : partKeyframes)
 				{
-					int kfx = (int)(kf.frameTime/TimelineKeyframeController.TIMELINE_LENGTH*(getWidth() - 10));
+					int kfx = timeToX(kf.frameTime);
 					int dx = Math.abs(kfx - mouseX);
 					if(closestDistance == null || dx < closestDistance)
 					{
@@ -307,7 +348,7 @@ public class TimelineKeyframePanel extends JPanel
 			g.drawLine(0, 3, 0, getHeight() - 3);
 			g.drawLine(0, getHeight()/2, getWidth() - 10, getHeight()/2);
 			
-			int sliderX = (int)(controller.getTime()/(float)TimelineKeyframeController.TIMELINE_LENGTH*(getWidth() - 10));
+			int sliderX = timeToX((int) controller.getTime());
 			g.drawLine(sliderX, 0, sliderX, getHeight());
 
 			//Draw controller.keyframes for this line.
@@ -322,7 +363,8 @@ public class TimelineKeyframePanel extends JPanel
 						g.setColor(Color.green);
 					else
 						g.setColor(Color.red);
-					g.drawLine((int)(kf.frameTime/(float)TimelineKeyframeController.TIMELINE_LENGTH*(getWidth() - 10)), 4, (int)(kf.frameTime/(float)TimelineKeyframeController.TIMELINE_LENGTH*(getWidth() - 10)), getHeight() - 4);
+					int kfx = timeToX(kf.frameTime);
+					g.drawLine(kfx, 4, kfx, getHeight() - 4);
 				}
 			}
 		}

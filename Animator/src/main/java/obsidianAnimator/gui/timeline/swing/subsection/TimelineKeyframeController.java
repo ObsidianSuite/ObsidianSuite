@@ -21,14 +21,11 @@ public class TimelineKeyframeController extends TimelineControllerSub
 	
 	private Map<Part, List<Keyframe>> keyframes = new HashMap<Part, List<Keyframe>>();
 	
-	public final TimelineKeyframePanel panel;
-
-	public static final int TIMELINE_LENGTH = 500;	
-	
+	public final TimelineKeyframePanel panel;	
 	
 	public TimelineKeyframeController(TimelineController controller)
 	{
-		super(controller);
+		super(controller);		
 		this.panel = new TimelineKeyframePanel(this);
 	}
 	
