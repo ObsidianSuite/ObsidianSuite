@@ -8,6 +8,7 @@ import javax.swing.AbstractAction;
 import org.lwjgl.input.Keyboard;
 
 import obsidianAnimator.gui.KeyMapping;
+import obsidianAnimator.gui.timeline.swing.subsection.TimelineKeyframeController;
 
 public class TimelineKeyMappings 
 {
@@ -119,7 +120,7 @@ public class TimelineKeyMappings
 		public void actionPerformed(ActionEvent arg0) 
 		{
 			controller.setExceptionPart(null);
-			controller.setTime(controller.getTime() < controller.keyframeController.getTimelineLength() ? controller.getTime() + 1 : controller.getTime());
+			controller.setTime(controller.getTime() < TimelineKeyframeController.TIMELINE_LENGTH ? controller.getTime() + 1 : controller.getTime());
 			controller.keyframeController.panel.timeSlider.setValue((int) controller.getTime());
 		}
 	}

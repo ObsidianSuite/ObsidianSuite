@@ -10,13 +10,12 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
-import java.awt.event.MouseWheelEvent;
-import java.awt.event.MouseWheelListener;
 import java.text.DecimalFormat;
 import java.util.List;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollBar;
 import javax.swing.JSlider;
 import javax.swing.JTextField;
 import javax.swing.event.ChangeEvent;
@@ -50,9 +49,14 @@ public class TimelineKeyframePanel extends JPanel
 		}
 		
 		final JTextField timeTextField = new JTextField("0");
-		timeSlider = new JSlider(0, TimelineKeyframeController.TIMELINE_MAX, 0);
+		timeSlider = new JSlider(0, TimelineKeyframeController.TIMELINE_LENGTH, 0);
 		timeSlider.setPaintLabels(true);
 		timeSlider.setPaintTicks(true);
+		int majorIncrements = (int) (TimelineKeyframeController.TIMELINE_LENGTH/10F);
+		timeSlider.setMajorTickSpacing((int) (majorIncrements/5F));
+		timeSlider.setMinorTickSpacing(majorIncrements);
+		timeSlider.setLabelTable(timeSlider.createStandardLabels(majorIncrements));
+		
 		timeSlider.addChangeListener(new ChangeListener()
 		{
 			@Override
@@ -91,15 +95,10 @@ public class TimelineKeyframePanel extends JPanel
 				controller.setTime((float) value);
 			}
 		});
+		
+	    JScrollBar hbar = new JScrollBar(JScrollBar.HORIZONTAL, 0, 50, 0, TimelineKeyframeController.TIMELINE_LENGTH);
+	    JScrollBar vbar = new JScrollBar(JScrollBar.VERTICAL, 0, 15, 0, controller.getTimelineGui().parts.size());
 
-		addMouseWheelListener(new MouseWheelListener()
-		{
-			@Override
-			public void mouseWheelMoved(MouseWheelEvent e) 
-			{
-				controller.updateTimelineLength((int) (e.getPreciseWheelRotation()*5));
-			}
-		});
 		
 		setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
@@ -136,6 +135,16 @@ public class TimelineKeyframePanel extends JPanel
 			c.fill = GridBagConstraints.BOTH;
 			add(lines[i], c);
 		}
+		
+		c.gridx = 1;
+		c.gridy = controller.getTimelineGui().parts.size() + 2;
+		c.insets = new Insets(5, 5, 5, 5);
+		add(hbar, c);
+		
+		c.gridx = 2;
+		c.gridy = 1;
+		c.gridheight = controller.getTimelineGui().parts.size();
+		add(vbar, c);
 	}
 
 	public void refresthLineColours()
@@ -253,12 +262,12 @@ public class TimelineKeyframePanel extends JPanel
 
 		private int keyframeTimeToX(int keyframeTime)
 		{
-			return (int)(keyframeTime/(float)controller.getTimelineLength()*(getWidth() - 10));
+			return (int)(keyframeTime/(float)TimelineKeyframeController.TIMELINE_LENGTH*(getWidth() - 10));
 		}
 
 		private int xToKeyframeTime(int x)
 		{
-			return (int) (x*controller.getTimelineLength()/(float)(getWidth() - 10));
+			return (int) (x*TimelineKeyframeController.TIMELINE_LENGTH/(float)(getWidth() - 10));
 		}
 
 		public void updateClosestKeyframe(int mouseX)
@@ -270,7 +279,7 @@ public class TimelineKeyframePanel extends JPanel
 			{
 				for(Keyframe kf : partKeyframes)
 				{
-					int kfx = (int)(kf.frameTime/(float)controller.getTimelineLength()*(getWidth() - 10));
+					int kfx = (int)(kf.frameTime/TimelineKeyframeController.TIMELINE_LENGTH*(getWidth() - 10));
 					int dx = Math.abs(kfx - mouseX);
 					if(closestDistance == null || dx < closestDistance)
 					{
@@ -288,7 +297,9 @@ public class TimelineKeyframePanel extends JPanel
 			super.paint(g);
 			g.drawLine(0, 3, 0, getHeight() - 3);
 			g.drawLine(0, getHeight()/2, getWidth() - 10, getHeight()/2);
-			g.drawLine((int)(controller.getTime()/(float)controller.getTimelineLength()*(getWidth() - 10)), 0, (int)(controller.getTime()/(float)controller.getTimelineLength()*(getWidth() - 10)), getHeight());
+			
+			int sliderX = (int)(controller.getTime()/(float)TimelineKeyframeController.TIMELINE_LENGTH*(getWidth() - 10));
+			g.drawLine(sliderX, 0, sliderX, getHeight());
 
 			//Draw controller.keyframes for this line.
 			List<Keyframe> partKeyframes = controller.getPartKeyframes(part);
@@ -302,7 +313,7 @@ public class TimelineKeyframePanel extends JPanel
 						g.setColor(Color.green);
 					else
 						g.setColor(Color.red);
-					g.drawLine((int)(kf.frameTime/(float)controller.getTimelineLength()*(getWidth() - 10)), 4, (int)(kf.frameTime/(float)controller.getTimelineLength()*(getWidth() - 10)), getHeight() - 4);
+					g.drawLine((int)(kf.frameTime/(float)TimelineKeyframeController.TIMELINE_LENGTH*(getWidth() - 10)), 4, (int)(kf.frameTime/(float)TimelineKeyframeController.TIMELINE_LENGTH*(getWidth() - 10)), getHeight() - 4);
 				}
 			}
 		}

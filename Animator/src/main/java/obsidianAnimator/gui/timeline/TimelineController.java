@@ -73,7 +73,6 @@ public class TimelineController
 		this.keyMappings = new TimelineKeyMappings(this);		
 		
 		keyframeController.initCopyLabel();
-		keyframeController.updateTimelineLength(0);
 		updateAnimationParts();
 	}
 

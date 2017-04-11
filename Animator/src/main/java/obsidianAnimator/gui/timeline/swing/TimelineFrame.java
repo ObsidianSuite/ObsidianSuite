@@ -45,11 +45,11 @@ public class TimelineFrame extends JFrame
 		setAlwaysOnTop(true);
 		
 		if(Display.isVisible())
-			setLocation(Display.getX() + 50, Display.getY() + 500);
+			setLocation(Display.getX() + 10, Display.getY() + 440);
 		else
 		{
 			setLocationRelativeTo(null);
-			setLocation(50, 520);
+			setLocation(50, 420);
 		}
 
 		setResizable(false);
@@ -76,21 +76,13 @@ public class TimelineFrame extends JFrame
 		GridBagConstraints c = new GridBagConstraints();
 		c.gridx = 0;
 		c.gridy = 0;
-		rightPanel.add(createKeyframeScrollPane(),c);
+		rightPanel.add(controller.keyframeController.panel,c);
 		c.gridx = 0;
 		c.gridy = 1;
 		c.fill = GridBagConstraints.HORIZONTAL;
 		rightPanel.add(actionsPanel, c);
 		
 		return rightPanel;
-	}
-	
-	private JScrollPane createKeyframeScrollPane()
-	{
-		JScrollPane scrollPane = new JScrollPane(controller.keyframeController.panel);
-		scrollPane.setPreferredSize(new Dimension(700,400));
-		scrollPane.setWheelScrollingEnabled(false);
-		return scrollPane;
 	}
 
 	

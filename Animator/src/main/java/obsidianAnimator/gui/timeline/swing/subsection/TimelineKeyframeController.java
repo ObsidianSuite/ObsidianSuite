@@ -23,24 +23,12 @@ public class TimelineKeyframeController extends TimelineControllerSub
 	
 	public final TimelineKeyframePanel panel;
 
-	private int timelineLength = 100;
-	public static final int TIMELINE_MAX = 300;
-	public static final int TIMELINE_MIN = 50;
+	public static final int TIMELINE_LENGTH = 500;	
 	
 	public TimelineKeyframeController(TimelineController controller)
 	{
 		super(controller);
 		this.panel = new TimelineKeyframePanel(this);
-	}
-
-	public int getTimelineLength() 
-	{
-		return timelineLength;
-	}
-
-	public void setTimelineLength(int timelineLength)
-	{
-		this.timelineLength = timelineLength;
 	}
 	
 	public void initCopyLabel()
@@ -49,23 +37,6 @@ public class TimelineKeyframeController extends TimelineControllerSub
 		JLayeredPane layeredPane = mainController.timelineFrame.getRootPane().getLayeredPane();
 		layeredPane.add(panel.copyLabel, JLayeredPane.DRAG_LAYER);
 		panel.copyLabel.setBounds(0, 0, panel.getWidth(), panel.getHeight());
-	}
-	
-	public void updateTimelineLength(int delta)
-	{
-		int newLength = timelineLength + delta;
-		if(newLength < TIMELINE_MIN)
-			newLength = TIMELINE_MIN;
-		else if(newLength > TIMELINE_MAX)
-			newLength = TIMELINE_MAX;
-		timelineLength = newLength;
-
-		panel.timeSlider.setMaximum(timelineLength);
-		int majorIncrements = (int) (timelineLength/6F);
-		panel.timeSlider.setMajorTickSpacing((int) (majorIncrements/5F));
-		panel.timeSlider.setMinorTickSpacing(majorIncrements);
-		panel.timeSlider.setLabelTable(panel.timeSlider.createStandardLabels(majorIncrements));
-		panel.repaint();
 	}
 	
 	/**
