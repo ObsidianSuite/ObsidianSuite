@@ -6,6 +6,7 @@ import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Rectangle;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
 import java.awt.event.KeyAdapter;
@@ -17,15 +18,15 @@ import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
 
-import javax.swing.BoundedRangeModel;
-import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.JSlider;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.plaf.metal.MetalScrollBarUI;
 
 import obsidianAPI.render.part.Part;
 import obsidianAnimator.gui.timeline.BlankMouseListener;
@@ -36,15 +37,18 @@ public class TimelineKeyframePanel extends JPanel
 {
 
 	private TimelineKeyframeController controller;
-	
+
 	public JSlider timeSlider;
 	private final KeyframeLine[] lines;
 	private JLabel[] partLabels;
+	private JScrollBar vbar, hbar;
+	private final JTextField timeTextField;
 	private DecimalFormat df = new DecimalFormat("#.##");
-	
+
 	protected CopyLabel copyLabel;
-	
+
 	private final int numParts;
+	private int partsOffset = 0;
 	private int timelineLength;	
 	private int timelineOffset = 0;
 	private static final int MAX_PARTS = 15;
@@ -54,27 +58,26 @@ public class TimelineKeyframePanel extends JPanel
 	{
 		this.controller = controller;
 		this.numParts = controller.getTimelineGui().parts.size();
-		
+
 		if(controller.getCurrentAnimation().getTotalTime() > 50)
 			timelineLength = controller.getCurrentAnimation().getTotalTime() + 10;
 		else
 			timelineLength = 60;
-		
+
 		lines = new KeyframeLine[numParts];
 		for(int i = 0; i < numParts; i++)
 		{
 			lines[i] = new KeyframeLine(controller.getTimelineGui().parts.get(i));
 		}
-		
-		final JTextField timeTextField = new JTextField("0");
+
+		timeTextField = new JTextField("0");
 		timeSlider = new JSlider(0, MAX_FRAMES, 0);
 		timeSlider.setPaintLabels(true);
 		timeSlider.setPaintTicks(true);
-		//timeSlider.setMajorTickSpacing((int) (MAX_FRAMES/10F));
 		timeSlider.setMinorTickSpacing(1);
 		timeSlider.setSnapToTicks(true);
 		timeSlider.setLabelTable(createLabelTabel());
-		
+
 		timeSlider.addChangeListener(new ChangeListener()
 		{
 			@Override
@@ -113,17 +116,16 @@ public class TimelineKeyframePanel extends JPanel
 				controller.setTime((float) value);
 			}
 		});
-		
-	    JScrollBar hbar = new JScrollBar(JScrollBar.HORIZONTAL, 0, MAX_FRAMES, 0, timelineLength);
-	    JScrollBar vbar = new JScrollBar(JScrollBar.VERTICAL, 0, MAX_PARTS, 0, numParts);
-	    hbar.addAdjustmentListener(new AdjustmentListener() {
+
+		hbar = new RefreshScrollBar(JScrollBar.HORIZONTAL, 0, MAX_FRAMES, 0, timelineLength);
+		hbar.addAdjustmentListener(new AdjustmentListener() {
 			@Override
 			public void adjustmentValueChanged(AdjustmentEvent e) {				
 				timelineOffset = e.getValue();
 				timeSlider.setMinimum(timelineOffset);
 				timeSlider.setMaximum(MAX_FRAMES + timelineOffset);
 				timeSlider.setLabelTable(createLabelTabel());
-				
+
 				if(MAX_FRAMES + timelineOffset == timelineLength)
 				{
 					timelineLength++;
@@ -132,7 +134,26 @@ public class TimelineKeyframePanel extends JPanel
 			}
 		});
 
-		
+		vbar = new JScrollBar(JScrollBar.VERTICAL, 0, MAX_PARTS, 0, numParts);
+		vbar.addAdjustmentListener(new AdjustmentListener() {
+			@Override
+			public void adjustmentValueChanged(AdjustmentEvent e) {				
+				partsOffset = e.getValue();
+				removePartNamesAndLines();
+				addPartNamesAndLines();
+				revalidate();
+				repaint();
+			}
+		});
+
+		partLabels = new JLabel[numParts];
+		for(int i = 0; i < numParts; i++)
+		{
+			String name = controller.getTimelineGui().parts.get(i).getDisplayName();
+			partLabels[i] = new JLabel(name);
+			partLabels[i].setPreferredSize(new Dimension(70, partLabels[i].getPreferredSize().height));
+		}
+
 		setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
 		c.anchor = GridBagConstraints.WEST;
@@ -147,33 +168,13 @@ public class TimelineKeyframePanel extends JPanel
 		c.weighty = 1;
 		add(timeSlider, c);
 
-		partLabels = new JLabel[numParts];
-		for(int i = 0; i < numParts; i++)
-		{
-			c.gridx = 0;
-			c.gridy = i+1;
-			c.weightx = 0;
-			c.weighty = 0;
-			c.insets = new Insets(0, 0, 0, 0);
-			c.fill = GridBagConstraints.HORIZONTAL;
+		addPartNamesAndLines();
 
-			JLabel partLabel = new JLabel(controller.getTimelineGui().parts.get(i).getDisplayName());
-			partLabels[i] = partLabel;
-			add(partLabel, c);
-
-			c.gridx = 1;
-			c.weightx = 1;
-			c.weighty = 1;
-			c.insets = new Insets(0, 10, 0, 0);
-			c.fill = GridBagConstraints.BOTH;
-			add(lines[i], c);
-		}
-		
 		c.gridx = 1;
 		c.gridy = numParts + 2;
 		c.insets = new Insets(5, 5, 5, 5);
 		add(hbar, c);
-		
+
 		if(numParts > MAX_PARTS)
 		{
 			c.gridx = 2;
@@ -182,6 +183,41 @@ public class TimelineKeyframePanel extends JPanel
 			add(vbar, c);
 		}
 
+
+	}
+
+	private void addPartNamesAndLines()
+	{
+		GridBagConstraints c = new GridBagConstraints();
+		c.anchor = GridBagConstraints.WEST;
+
+		int n = numParts > MAX_PARTS ? MAX_PARTS : numParts;
+		for(int i = 0; i < n; i++)
+		{
+			c.gridx = 0;
+			c.gridy = i+1;
+			c.weightx = 0;
+			c.weighty = 0;
+			c.insets = new Insets(0, 0, 0, 0);
+			c.fill = GridBagConstraints.HORIZONTAL;
+			add(partLabels[i+partsOffset], c);
+
+			c.gridx = 1;
+			c.weightx = 1;
+			c.weighty = 1;
+			c.insets = new Insets(0, 10, 0, 0);
+			c.fill = GridBagConstraints.BOTH;
+			add(lines[i+partsOffset], c);
+		}
+	}
+
+	private void removePartNamesAndLines()
+	{
+		for(int i = 0; i < numParts; i++)
+		{
+			remove(partLabels[i]);
+			remove(lines[i]);
+		}
 	}
 
 	public void refresthLineColours()
@@ -196,7 +232,7 @@ public class TimelineKeyframePanel extends JPanel
 		revalidate();
 		repaint();
 	}
-	
+
 	public void updateCopyLabel(int x, int y, int time, boolean draw)
 	{
 		copyLabel.draw = draw;
@@ -205,7 +241,7 @@ public class TimelineKeyframePanel extends JPanel
 		copyLabel.y = y;
 		copyLabel.repaint();
 	}
-	
+
 	private Dictionary<Integer, JLabel> createLabelTabel()
 	{
 		Dictionary<Integer, JLabel> dictionary = new Hashtable<Integer, JLabel>();
@@ -213,7 +249,7 @@ public class TimelineKeyframePanel extends JPanel
 			dictionary.put(i*10, new JLabel(Integer.toString(i*10)));
 		return dictionary;
 	}
-	
+
 	private int timeToX(int time)
 	{
 		return (int)((time-timelineOffset)/(float)(MAX_FRAMES+1)*(lines[0].getWidth()));
@@ -223,12 +259,12 @@ public class TimelineKeyframePanel extends JPanel
 	{
 		return timelineOffset + (int) (x*(MAX_FRAMES+1)/(float)(lines[0].getWidth()));
 	}
-	
+
 	public float getTimelineLength() 
 	{
 		return timelineLength;
 	}
-	
+
 	private class KeyframeLine extends JPanel
 	{		
 		Keyframe closestKeyframe;
@@ -347,7 +383,7 @@ public class TimelineKeyframePanel extends JPanel
 			super.paint(g);
 			g.drawLine(0, 3, 0, getHeight() - 3);
 			g.drawLine(0, getHeight()/2, getWidth() - 10, getHeight()/2);
-			
+
 			int sliderX = timeToX((int) controller.getTime());
 			g.drawLine(sliderX, 0, sliderX, getHeight());
 
@@ -369,5 +405,28 @@ public class TimelineKeyframePanel extends JPanel
 			}
 		}
 	}
-	
+
+	private class RefreshScrollBar extends JScrollBar {
+		public RefreshScrollBar(int orientation, int value, int extent, int min, int max) {
+			super(orientation, value, extent, min, max);
+			setUI(new CustomUI());
+		}
+		class CustomUI extends MetalScrollBarUI {
+			@Override
+			protected void installListeners(){ 
+				{
+					super.installListeners();
+					if(scrollbar != null)
+					{
+						scrollbar.addAdjustmentListener(new AdjustmentListener(){
+							@Override
+							public void adjustmentValueChanged(AdjustmentEvent e) {
+								layoutHScrollbar(scrollbar);
+							}
+						});
+					}
+				}
+			}
+		}
+	}
 }
