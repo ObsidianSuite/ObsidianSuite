@@ -18,7 +18,8 @@ import obsidianAnimator.data.ModelHandler;
 import obsidianAnimator.file.FileChooser;
 import obsidianAnimator.file.FileHandler;
 import obsidianAnimator.file.FileNotChosenException;
-import obsidianAnimator.gui.GuiPartSetup;
+import obsidianAnimator.gui.entitySetup.EntitySetupController;
+import obsidianAnimator.gui.entitySetup.EntitySetupGui;
 
 public class ImportModelFrame extends BaseFrame
 {
@@ -101,7 +102,7 @@ public class ImportModelFrame extends BaseFrame
 	{
 		String entityName = ModelHandler.importModel(modelFile, textureFile);
 		frame.dispose();
-		Minecraft.getMinecraft().displayGuiScreen(new GuiPartSetup(entityName));
+		new EntitySetupController(entityName).display();
 	}
 
 	private void cancelPressed()

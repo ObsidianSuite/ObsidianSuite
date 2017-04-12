@@ -17,7 +17,7 @@ import javax.swing.JPanel;
 
 import obsidianAnimator.gui.entityRenderer.EntityAutoMove;
 import obsidianAnimator.gui.entityRenderer.EntityAutoMove.Direction;
-import obsidianAnimator.gui.timeline.GuiAnimationTimeline;
+import obsidianAnimator.gui.timeline.TimelineGui;
 
 public class TimelineMovementPanel extends JPanel
 {
