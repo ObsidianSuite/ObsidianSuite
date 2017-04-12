@@ -16,7 +16,7 @@ import obsidianAnimator.file.FileChooser;
 import obsidianAnimator.file.FileHandler;
 import obsidianAnimator.file.FileNotChosenException;
 import obsidianAnimator.gui.GuiBlack;
-import obsidianAnimator.gui.timeline.GuiAnimationTimeline;
+import obsidianAnimator.gui.timeline.TimelineGui;
 import obsidianAnimator.gui.timeline.TimelineController;
 
 public class HomeFrame extends BaseFrame

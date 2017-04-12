@@ -2,7 +2,7 @@ package obsidianAnimator.gui.timeline.swing;
 
 import obsidianAPI.animation.AnimationSequence;
 import obsidianAPI.render.part.Part;
-import obsidianAnimator.gui.timeline.GuiAnimationTimeline;
+import obsidianAnimator.gui.timeline.TimelineGui;
 import obsidianAnimator.gui.timeline.TimelineController;
 import obsidianAnimator.render.entity.EntityObj;
 
@@ -31,7 +31,7 @@ public abstract class TimelineControllerSub
 		return mainController.getSelectedPart();
 	}
 	
-	public GuiAnimationTimeline getTimelineGui()
+	public TimelineGui getTimelineGui()
 	{
 		return mainController.timelineGui;
 	}

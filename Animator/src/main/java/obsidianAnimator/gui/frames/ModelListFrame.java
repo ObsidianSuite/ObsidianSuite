@@ -12,16 +12,20 @@ import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 import net.minecraft.client.Minecraft;
 import obsidianAnimator.data.ModelHandler;
-import obsidianAnimator.gui.GuiPartSetup;
+import obsidianAnimator.gui.entitySetup.EntitySetupController;
+import obsidianAnimator.gui.entitySetup.EntitySetupGui;
 
 public class ModelListFrame extends BaseFrame
 {
 	
 	private JList list;
-
+	private JButton editButton;
+	
 	public ModelListFrame()
 	{
 		super("Model List");
@@ -33,11 +37,18 @@ public class ModelListFrame extends BaseFrame
 	{
 		list = new JList(ModelHandler.getModelList().toArray());
 		list.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+		list.addListSelectionListener(new ListSelectionListener(){
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+				editButton.setEnabled(((JList)e.getSource()).getSelectedValue() != null);
+			}
+		});
 
 		JScrollPane listScroller = new JScrollPane(list);
 		listScroller.setPreferredSize(new Dimension(280, 150));
 		
-		JButton editButton = new JButton("Edit");
+		editButton = new JButton("Edit model");
+		editButton.setEnabled(false);
 		editButton.addActionListener(new ActionListener()
 		{
 			@Override
@@ -81,11 +92,8 @@ public class ModelListFrame extends BaseFrame
 			String entityName = (String) list.getSelectedValue();
 			ModelHandler.updateRenderer(entityName);
 			frame.dispose();
-			Minecraft.getMinecraft().displayGuiScreen(new GuiPartSetup(entityName));
-		}
-		else
-			JOptionPane.showMessageDialog(frame, "Select a model first.");
-			
+			new EntitySetupController(entityName).display();
+		}	
 	}
 	
 	private void backPressed()

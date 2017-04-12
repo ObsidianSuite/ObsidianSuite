@@ -24,7 +24,7 @@ public class TimelineController
 {
 
 	//The Minecraft Gui for the timeline. Contains the entity.
-	public GuiAnimationTimeline timelineGui;
+	public TimelineGui timelineGui;
 
 	//The Swing frame for the timeline.
 	public TimelineFrame timelineFrame;
@@ -56,7 +56,7 @@ public class TimelineController
 		this.currentAnimation = animation;
 		this.animationFile = animationFile;
 
-		timelineGui = new GuiAnimationTimeline(this);
+		timelineGui = new TimelineGui(this);
 		
 		animationController = new TimelineAnimationController(this);
 		renderController = new TimelineRenderController(this);

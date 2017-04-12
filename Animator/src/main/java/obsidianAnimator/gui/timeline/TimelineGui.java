@@ -8,12 +8,12 @@ import obsidianAPI.render.part.Part;
 import obsidianAnimator.gui.ExternalFrame;
 import obsidianAnimator.gui.entityRenderer.GuiEntityRendererWithTranslation;
 
-public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation implements ExternalFrame
+public class TimelineGui extends GuiEntityRendererWithTranslation implements ExternalFrame
 {
 
 	public TimelineController controller;
 			
-	public GuiAnimationTimeline(TimelineController controller)
+	public TimelineGui(TimelineController controller)
 	{
 		super(controller.currentAnimation.getEntityName());
 		this.controller = controller;
