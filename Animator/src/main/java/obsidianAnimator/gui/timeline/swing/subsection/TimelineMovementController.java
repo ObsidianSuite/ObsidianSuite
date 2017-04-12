@@ -82,6 +82,12 @@ public class TimelineMovementController extends TimelineControllerSub
 	
 	public void setEntityMovement(EntityAutoMove entityMovement)
 	{
+		if(entityMovement == null)
+		{
+			getEntityToRender().posX = 0;
+			getEntityToRender().posY = 0;
+			getEntityToRender().posZ = 0;
+		}
 		this.entityMovement = entityMovement;
 	}
 	

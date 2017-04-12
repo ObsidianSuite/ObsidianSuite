@@ -93,10 +93,11 @@ public class TimelineController
 	
 	public void refresh()
 	{
+		inputController.updatePlayPauseButton();
 		partController.updatePartLabels();
 		keyframeController.panel.refresthLineColours();
 		movementController.updateEntityMovement();
-		timelineFrame.revalidate();
+		keyframeController.refreshSliderAndTextBox();
 		timelineFrame.repaint();	
 	}
 
@@ -163,11 +164,9 @@ public class TimelineController
 					setTime(currentAnimation.getTotalTime());
 				}
 			}
-			keyframeController.panel.timeSlider.setValue((int) getTime());
 		}
 		
-		inputController.updatePlayPauseButton();
-		timelineFrame.repaint();
+		refresh();
 
 		if(movementController.getEntityMovement() != null && movementController.isMovementActive())
 			movementController.getEntityMovement().moveEntity(getTime(), timelineGui.entityToRender);

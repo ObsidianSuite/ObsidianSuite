@@ -38,12 +38,11 @@ public class TimelineKeyframePanel extends JPanel
 
 	private TimelineKeyframeController controller;
 
-	public JSlider timeSlider;
+	protected JSlider timeSlider;
 	private final KeyframeLine[] lines;
 	private JLabel[] partLabels;
 	private JScrollBar vbar, hbar;
-	private final JTextField timeTextField;
-	private DecimalFormat df = new DecimalFormat("#.##");
+	protected final JTextField timeTextField;
 
 	protected CopyLabel copyLabel;
 
@@ -75,7 +74,6 @@ public class TimelineKeyframePanel extends JPanel
 		timeSlider.setPaintLabels(true);
 		timeSlider.setPaintTicks(true);
 		timeSlider.setMinorTickSpacing(1);
-		timeSlider.setSnapToTicks(true);
 		timeSlider.setLabelTable(createLabelTabel());
 
 		timeSlider.addChangeListener(new ChangeListener()
@@ -83,7 +81,6 @@ public class TimelineKeyframePanel extends JPanel
 			@Override
 			public void stateChanged(ChangeEvent e) 
 			{
-				timeTextField.setText(df.format(timeSlider.getValue()));
 				controller.setTime(timeSlider.getValue());
 				for(int i = 0; i < numParts; i++)
 				{
