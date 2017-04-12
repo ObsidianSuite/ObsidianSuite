@@ -109,7 +109,7 @@ public class TimelineKeyMappings
 		{
 			controller.setExceptionPart(null);
 			controller.setTime(controller.getTime() > 0 ? controller.getTime() - 1 : controller.getTime());
-			controller.keyframeController.panel.timeSlider.setValue((int) controller.getTime());
+			controller.keyframeController.refreshSliderAndTextBox();
 			controller.timelineFrame.repaint();
 		}
 	}
@@ -121,7 +121,8 @@ public class TimelineKeyMappings
 		{
 			controller.setExceptionPart(null);
 			controller.setTime(controller.getTime() < controller.keyframeController.panel.getTimelineLength() ? controller.getTime() + 1 : controller.getTime());
-			controller.keyframeController.panel.timeSlider.setValue((int) controller.getTime());
+			controller.keyframeController.refreshSliderAndTextBox();
+			controller.timelineFrame.repaint();
 		}
 	}
 

@@ -14,7 +14,7 @@ public class GuiInventoryChooseItem extends GuiInventory
     
 	private TimelineItemController controller;
 	private EntityObj entity;
-
+	
     public GuiInventoryChooseItem(TimelineItemController controller, EntityObj entity)
     {
         super(Minecraft.getMinecraft().thePlayer);
@@ -22,11 +22,14 @@ public class GuiInventoryChooseItem extends GuiInventory
         this.controller = controller;
         this.entity = entity;
     }
-
-    public void setItemStack(ItemStack itemStack)
+    
+    /**
+     * Adds the buttons (and other controls) to the screen in question.
+     */
+    public void initGui()
     {
-    	this.entity.setCurrentItem(itemStack); 
-    	controller.display();
+        this.buttonList.clear();
+        this.mc.displayGuiScreen(new GuiContainerChooseItem(this.mc.thePlayer, this));
     }
     
     /**
@@ -36,14 +39,12 @@ public class GuiInventoryChooseItem extends GuiInventory
     {
     	this.mc.displayGuiScreen(new GuiContainerChooseItem(this.mc.thePlayer, this));
     }
-
-    /**
-     * Adds the buttons (and other controls) to the screen in question.
-     */
-    public void initGui()
+    
+    public void setItemStack(ItemStack itemStack)
     {
-        this.buttonList.clear();
-        this.mc.displayGuiScreen(new GuiContainerChooseItem(this.mc.thePlayer, this));
+    	this.entity.setCurrentItem(itemStack); 
+    	controller.display();
     }
+	
 
 }

@@ -18,6 +18,8 @@ import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
 
+import javax.swing.BorderFactory;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
@@ -29,6 +31,7 @@ import javax.swing.event.ChangeListener;
 import javax.swing.plaf.metal.MetalScrollBarUI;
 
 import obsidianAPI.render.part.Part;
+import obsidianAPI.render.part.PartObj;
 import obsidianAnimator.gui.timeline.BlankMouseListener;
 import obsidianAnimator.gui.timeline.Keyframe;
 import obsidianAnimator.gui.timeline.swing.component.CopyLabel;
@@ -38,12 +41,11 @@ public class TimelineKeyframePanel extends JPanel
 
 	private TimelineKeyframeController controller;
 
-	public JSlider timeSlider;
+	protected JSlider timeSlider;
 	private final KeyframeLine[] lines;
 	private JLabel[] partLabels;
 	private JScrollBar vbar, hbar;
-	private final JTextField timeTextField;
-	private DecimalFormat df = new DecimalFormat("#.##");
+	protected final JTextField timeTextField;
 
 	protected CopyLabel copyLabel;
 
@@ -53,7 +55,7 @@ public class TimelineKeyframePanel extends JPanel
 	private int timelineOffset = 0;
 	private static final int MAX_PARTS = 15;
 	private static final int MAX_FRAMES = 50;
-
+	
 	public TimelineKeyframePanel(TimelineKeyframeController controller)
 	{
 		this.controller = controller;
@@ -75,7 +77,6 @@ public class TimelineKeyframePanel extends JPanel
 		timeSlider.setPaintLabels(true);
 		timeSlider.setPaintTicks(true);
 		timeSlider.setMinorTickSpacing(1);
-		timeSlider.setSnapToTicks(true);
 		timeSlider.setLabelTable(createLabelTabel());
 
 		timeSlider.addChangeListener(new ChangeListener()
@@ -83,7 +84,6 @@ public class TimelineKeyframePanel extends JPanel
 			@Override
 			public void stateChanged(ChangeEvent e) 
 			{
-				timeTextField.setText(df.format(timeSlider.getValue()));
 				controller.setTime(timeSlider.getValue());
 				for(int i = 0; i < numParts; i++)
 				{
@@ -149,9 +149,32 @@ public class TimelineKeyframePanel extends JPanel
 		partLabels = new JLabel[numParts];
 		for(int i = 0; i < numParts; i++)
 		{
-			String name = controller.getTimelineGui().parts.get(i).getDisplayName();
-			partLabels[i] = new JLabel(name);
-			partLabels[i].setPreferredSize(new Dimension(70, partLabels[i].getPreferredSize().height));
+			final Part part = controller.getTimelineGui().parts.get(i);
+			final JLabel partLabel = new JLabel(part.getDisplayName());
+			partLabel.setPreferredSize(new Dimension(70, partLabel.getPreferredSize().height));
+			partLabel.addMouseListener(new BlankMouseListener()
+			{
+				@Override
+				public void mouseEntered(MouseEvent arg0) 
+				{
+					controller.hoveredPart = part;
+				}
+
+				@Override
+				public void mousePressed(MouseEvent arg0) 
+				{
+					controller.getTimelineGui().selectedPart = part;
+					controller.hoveredPart = null;
+				}
+
+				@Override
+				public void mouseExited(MouseEvent e) 
+				{
+					controller.hoveredPart = null;
+				}
+			});
+			
+			partLabels[i] = partLabel;
 		}
 
 		setLayout(new GridBagLayout());
@@ -226,6 +249,8 @@ public class TimelineKeyframePanel extends JPanel
 		{
 			if(controller.getTimelineGui().selectedPart != null && partLabels[i].getText().equals(controller.getTimelineGui().selectedPart.getDisplayName()))
 				partLabels[i].setForeground(Color.red);
+			else if(controller.hoveredPart != null && partLabels[i].getText().equals(controller.hoveredPart.getDisplayName()))
+				partLabels[i].setForeground(Color.blue);
 			else
 				partLabels[i].setForeground(Color.black);
 		}

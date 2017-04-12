@@ -18,23 +18,38 @@ import obsidianAnimator.gui.timeline.swing.component.CopyLabel;
 
 public class TimelineKeyframeController extends TimelineControllerSub
 {
-	
+
 	private Map<Part, List<Keyframe>> keyframes = new HashMap<Part, List<Keyframe>>();
+
+	public final TimelineKeyframePanel panel;
 	
-	public final TimelineKeyframePanel panel;	
-	
+	protected Part hoveredPart;
+
 	public TimelineKeyframeController(TimelineController controller)
 	{
 		super(controller);		
 		this.panel = new TimelineKeyframePanel(this);
 	}
-	
+
 	public void initCopyLabel()
 	{
 		panel.copyLabel = new CopyLabel();
 		JLayeredPane layeredPane = mainController.timelineFrame.getRootPane().getLayeredPane();
 		layeredPane.add(panel.copyLabel, JLayeredPane.DRAG_LAYER);
 		panel.copyLabel.setBounds(0, 0, panel.getWidth(), panel.getHeight());
+	}
+
+	public void refreshSliderAndTextBox()
+	{
+		int time = (int) getTime();
+		if(!panel.timeTextField.hasFocus())
+			panel.timeTextField.setText(Integer.toString(time));
+		panel.timeSlider.setValue((int) getTime());
+	}
+
+	public Part getHoveredPart()
+	{
+		return hoveredPart;
 	}
 	
 	/**
@@ -75,7 +90,7 @@ public class TimelineKeyframeController extends TimelineControllerSub
 			keyframes.put(mr, partKfs);
 		}
 	}
-	
+
 	/**
 	 * Get a keyframe for a given part at a certain time.
 	 * Will return null if no keyframe exists.
@@ -93,7 +108,7 @@ public class TimelineKeyframeController extends TimelineControllerSub
 		}
 		return null;
 	}
-	
+
 	public void addKeyframe()
 	{
 		if(mainController.timelineGui.selectedPart != null)
@@ -103,7 +118,7 @@ public class TimelineKeyframeController extends TimelineControllerSub
 			addKeyframe(kf);
 		}
 	}
-	
+
 	public void addKeyframe(Keyframe kf)
 	{
 		List<Keyframe> partKeyframes = keyframes.get(kf.part);
@@ -122,7 +137,7 @@ public class TimelineKeyframeController extends TimelineControllerSub
 		panel.refresthLineColours();
 		mainController.updateAnimationParts();
 	}
-	
+
 	public void deleteKeyframe()
 	{
 		boolean removed = deleteKeyframe(mainController.timelineGui.selectedPart, (int) getTime());
@@ -137,7 +152,7 @@ public class TimelineKeyframeController extends TimelineControllerSub
 
 		mainController.refresh();
 	}
-	
+
 	public boolean deleteKeyframe(Part part, int time)
 	{
 		Keyframe toRemove = getKeyframe(part, time);
@@ -149,7 +164,7 @@ public class TimelineKeyframeController extends TimelineControllerSub
 
 		return false;
 	}
-	
+
 	public void copyKeyframe(Keyframe kf, Part part, int time)
 	{
 		String partName = kf.part.getName();
@@ -203,7 +218,7 @@ public class TimelineKeyframeController extends TimelineControllerSub
 		List<Keyframe> kfs = getPartKeyframes(part);
 		return (kfs != null && kfs.size() == 1);
 	}
-	
+
 	/**
 	 * Gets the keyframe that comes before this one, for the same part, or a default keyframe at time zero if none exists.
 	 */
@@ -229,12 +244,12 @@ public class TimelineKeyframeController extends TimelineControllerSub
 		}
 		return previousKf;
 	}
-	
+
 	public Set<Part> getPartsWithKeyframes()
 	{
 		return keyframes.keySet();
 	}
-	
+
 	public List<Keyframe> getPartKeyframes(Part part)
 	{
 		return keyframes.get(part);
