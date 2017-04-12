@@ -8,7 +8,6 @@ import javax.swing.AbstractAction;
 import org.lwjgl.input.Keyboard;
 
 import obsidianAnimator.gui.KeyMapping;
-import obsidianAnimator.gui.timeline.swing.subsection.TimelineKeyframeController;
 
 public class TimelineKeyMappings 
 {
@@ -176,9 +175,16 @@ public class TimelineKeyMappings
 					{
 						toReset.values[i] = controller.timelineGui.selectedPart.getOriginalValues()[i];
 					}
+					controller.setExceptionPart(null);
 					controller.updateAnimationParts();
 				}
+				else
+				{
+					controller.setExceptionPart(null);
+					controller.getSelectedPart().setToOriginalValues();
+				}
 			}
+			
 		}
 	}
 
@@ -221,6 +227,8 @@ public class TimelineKeyMappings
 				frame.values = controller.getCopiedValues();
 
 				controller.updateAnimationParts();
+				controller.setExceptionPart(null);
+				controller.refresh();
 
 				return true;
 			}

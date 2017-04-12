@@ -51,6 +51,7 @@ public class TimelineVersionController extends TimelineControllerSub
 			animationVersion --;
 			mainController.currentAnimation = animationVersions.get(animationVersion);
 			mainController.keyframeController.loadKeyframes();
+			mainController.setExceptionPart(null);
 			mainController.refresh();
 		}
 		else
@@ -64,6 +65,7 @@ public class TimelineVersionController extends TimelineControllerSub
 			animationVersion ++;
 			mainController.currentAnimation = animationVersions.get(animationVersion);
 			mainController.keyframeController.loadKeyframes();
+			mainController.setExceptionPart(null);
 			mainController.refresh();
 		}
 		else

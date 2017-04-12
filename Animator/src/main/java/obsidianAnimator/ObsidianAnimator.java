@@ -1,6 +1,8 @@
 package obsidianAnimator;
 
-import java.io.File;
+import javax.swing.InputMap;
+import javax.swing.KeyStroke;
+import javax.swing.UIManager;
 
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
@@ -45,5 +47,10 @@ public class ObsidianAnimator
         
         Minecraft.getMinecraft().gameSettings.showInventoryAchievementHint = false;
         Minecraft.getMinecraft().gameSettings.saveOptions();
+        
+        //Stop space from activating buttons, allowing it to be used for adding keyframes in the timeline.
+        InputMap im = (InputMap)UIManager.get("Button.focusInputMap");
+        im.put(KeyStroke.getKeyStroke("pressed SPACE"), "none");
+        im.put(KeyStroke.getKeyStroke("released SPACE"), "none");
 	}
 }
