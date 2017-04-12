@@ -40,6 +40,7 @@ public class GuiAnimationTimeline extends GuiEntityRendererWithTranslation imple
 		GL11.glPushMatrix();
 		super.processRay();
 		GL11.glPopMatrix();
+		controller.checkFramePartHighlighting();
 	}
 
 	@Override

@@ -1,6 +1,5 @@
 package obsidianAnimator.gui.timeline.swing.subsection;
 
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -22,7 +21,9 @@ public class TimelineKeyframeController extends TimelineControllerSub
 
 	private Map<Part, List<Keyframe>> keyframes = new HashMap<Part, List<Keyframe>>();
 
-	public final TimelineKeyframePanel panel;	
+	public final TimelineKeyframePanel panel;
+	
+	protected Part hoveredPart;
 
 	public TimelineKeyframeController(TimelineController controller)
 	{
@@ -46,6 +47,11 @@ public class TimelineKeyframeController extends TimelineControllerSub
 		panel.timeSlider.setValue((int) getTime());
 	}
 
+	public Part getHoveredPart()
+	{
+		return hoveredPart;
+	}
+	
 	/**
 	 * Creates keyframes from the animation sequence. 
 	 */

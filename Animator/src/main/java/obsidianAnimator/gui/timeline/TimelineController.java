@@ -208,5 +208,12 @@ public class TimelineController
 	{
 		this.copiedValues = copiedValues.clone();
 	}
+
+	public void checkFramePartHighlighting() 
+	{
+		Part frameHoveredPart = keyframeController.getHoveredPart();
+		if(frameHoveredPart != null)
+			timelineGui.hoveredPart = frameHoveredPart;
+	}
 	
 }
