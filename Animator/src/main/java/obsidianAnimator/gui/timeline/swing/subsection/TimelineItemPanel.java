@@ -12,8 +12,6 @@ import javax.swing.JPanel;
 
 import net.minecraft.client.Minecraft;
 import obsidianAnimator.gui.GuiInventoryChooseItem;
-import obsidianAnimator.gui.timeline.GuiAnimationTimeline;
-import obsidianAnimator.render.entity.EntityObj;
 
 public class TimelineItemPanel extends JPanel
 {
@@ -35,6 +33,7 @@ public class TimelineItemPanel extends JPanel
 			@Override
 			public void actionPerformed(ActionEvent e) 
 			{
+				controller.getTimelineFrame().setVisible(false);
 				Minecraft.getMinecraft().displayGuiScreen(new GuiInventoryChooseItem(controller, controller.getEntityToRender()));
 			}
 		});
@@ -47,9 +46,7 @@ public class TimelineItemPanel extends JPanel
 			@Override
 			public void actionPerformed(ActionEvent e) 
 			{
-				//TODO animation item
-//				AnimationData.setAnimationItem(timeline.currentAnimation.getName(), -1);
-//				((EntityObj) timeline.entityToRender).setCurrentItem(null); 
+		    	controller.getEntityToRender().setCurrentItem(null); 
 			}
 		});
 		add(emptyItemButton, c);
