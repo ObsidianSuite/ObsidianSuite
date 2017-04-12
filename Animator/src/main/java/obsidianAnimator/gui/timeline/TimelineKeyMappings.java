@@ -8,7 +8,6 @@ import javax.swing.AbstractAction;
 import org.lwjgl.input.Keyboard;
 
 import obsidianAnimator.gui.KeyMapping;
-import obsidianAnimator.gui.timeline.swing.subsection.TimelineKeyframeController;
 
 public class TimelineKeyMappings 
 {
