@@ -2,6 +2,7 @@ package obsidianAnimator.gui.entitySetup;
 
 import org.lwjgl.input.Keyboard;
 
+import obsidianAPI.render.part.PartObj;
 import obsidianAnimator.gui.entityRenderer.GuiEntityRenderer;
 
 public class EntitySetupGui extends GuiEntityRenderer
@@ -22,5 +23,13 @@ public class EntitySetupGui extends GuiEntityRenderer
 			controller.close();
 		else
 			super.keyTyped(par1, par2);
+	}
+
+	@Override
+	protected void mouseClicked(int x, int y, int i) 
+	{
+		super.mouseClicked(x, y, i);
+		if(i == 1 && hoveredPart != null)
+			controller.attemptParent((PartObj)selectedPart, (PartObj)hoveredPart);
 	}
 }

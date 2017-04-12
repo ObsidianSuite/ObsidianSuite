@@ -17,10 +17,9 @@ import org.lwjgl.opengl.Display;
 
 public class EntitySetupFrame extends JFrame
 {
-
-
 	
 	private EntitySetupController controller;
+	private EntitySetupParentingPanel parentingPanel;
 
 	public EntitySetupFrame(EntitySetupController controller)
 	{
@@ -53,12 +52,15 @@ public class EntitySetupFrame extends JFrame
 			@Override
 			public void actionPerformed(ActionEvent arg0) 
 			{
-				//mc.displayGuiScreen(new GuiAnimationParenting(entityName)); 
+				controller.close();
 			}
 		});
 		
+		parentingPanel = new EntitySetupParentingPanel(controller);
+		
 		JTabbedPane tabbedPane = new JTabbedPane();
 		tabbedPane.add("Part Setup", new EntitySetupPartPanel(controller));
+		tabbedPane.add("Parenting", parentingPanel);
 		
 		JPanel mainPanel = new JPanel();
 		mainPanel.setLayout(new GridBagLayout());
@@ -78,6 +80,11 @@ public class EntitySetupFrame extends JFrame
 		pack();
 		setResizable(false);
 		setAlwaysOnTop(true);
+	}
+
+	public void refreshParentingPanel() 
+	{
+		parentingPanel.refreshScrollPane();		
 	}
 
 	
