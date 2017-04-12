@@ -14,13 +14,16 @@ import net.minecraftforge.common.MinecraftForge;
 import obsidianAnimator.block.BlockBase;
 import obsidianAnimator.block.BlockGrid;
 
-@Mod(modid = "ObsidianAnimator")
+@Mod(modid = ObsidianAnimator.MODID, name = ObsidianAnimator.MODNAME, version = ObsidianAnimator.VERSION)
 public class ObsidianAnimator
 {
 	
+    public static final String MODID = "ObsidianAnimator";
+    public static final String MODNAME = "Obsidian Animator";
+    public static final String VERSION = "0.1.0";
+	
 	public static final String homePath = Minecraft.getMinecraft().mcDataDir.getAbsolutePath();
 	public static final String animationPath = homePath + "/animation";
-	public static final String version = "4.5";
 	
 	@Mod.Instance("ObsidianAnimator")
 	public static ObsidianAnimator instance;
