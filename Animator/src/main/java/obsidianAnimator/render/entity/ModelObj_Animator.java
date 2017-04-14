@@ -21,11 +21,22 @@ public class ModelObj_Animator extends ModelObj
 	public static final ResourceLocation pinkResLoc = new ResourceLocation("mod_obsidian_animator:defaultModelTextures/pink.png");
 	public static final ResourceLocation whiteResLoc = new ResourceLocation("mod_obsidian_animator:defaultModelTextures/white.png");
 
+	public ModelObj_Animator(String entityName, ResourceLocation model, ResourceLocation texture) 
+	{
+		this(entityName, null, model, texture);
+	}
+	
 	public ModelObj_Animator(String entityName, File modelFile, ResourceLocation texture)
 	{			
-		super(entityName, modelFile, texture);
-		hightlightedParts = new ArrayList<PartObj>();
+		this(entityName, modelFile, null, texture);
 	}
+	
+	private ModelObj_Animator(String entityName, File modelFile, ResourceLocation model, ResourceLocation texture)
+	{			
+		super(entityName, modelFile, model, texture);
+		hightlightedParts = new ArrayList<PartObj>();
+	} 
+
 
 	@Override
 	protected PartObj createPart(GroupObject group)

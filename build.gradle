@@ -23,14 +23,15 @@ minecraft {
 }
 
 allprojects {
-
-	sourceCompatibility = targetCompatibility = "1.8"
-	compileJava {
-		sourceCompatibility = targetCompatibility = "1.8"
-	}
-
     apply plugin: 'java'
     apply plugin: 'maven'
+	
+	sourceCompatibility = '1.8'
+	targetCompatibility = '1.8'
+	compileJava {
+			sourceCompatibility = '1.8'
+			targetCompatibility = '1.8'
+	}
 }
 
 subprojects {
@@ -65,4 +66,14 @@ task eclipse(overwrite: true) {
 	doLast {
 		delete zipFile
 	}
+}
+
+def animatorProjects = [project(':API'),project(':Animator')]
+animatorProjects.each { subproject -> evaluationDependsOn(subproject.path)}
+task buildAnimatorWithAPI( type: Jar, dependsOn: animatorProjects.tasks["build"] ) {
+    baseName = 'ObsidianAnimator_v0.1.1'
+    animatorProjects.each { subproject -> from subproject.configurations.archives.allArtifacts.files.collect {
+            zipTree(it)
+        }
+    }
 }

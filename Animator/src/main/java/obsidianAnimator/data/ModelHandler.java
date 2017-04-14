@@ -29,17 +29,17 @@ public class ModelHandler
 	{
 		copyFileToPersistentMemory(modelFile);
 		copyFileToPersistentMemory(textureFile);
-		ModelObj_Animator model = loadModel(modelFile);
+		ModelObj_Animator model = loadModelFromFile(modelFile);
 		updateRenderer(model.entityName);
 		return model.entityName;
 	}
 
 	public static void loadFileFromPersistence(File file)
 	{
-		loadModel(file);
+		loadModelFromFile(file);
 	}
 
-	private static ModelObj_Animator loadModel(File modelFile)
+	private static ModelObj_Animator loadModelFromFile(File modelFile)
 	{
 		String fileName = modelFile.getName();
 		String entityName = fileName.substring(0,fileName.indexOf("."));
@@ -48,9 +48,41 @@ public class ModelHandler
 		return model;
 	}
 
+	public static ModelObj_Animator loadModelFromResource(String entityName)
+	{
+		ResourceLocation modelResource = generateInternalModelResourceLocation(entityName);
+		ResourceLocation textureResource = generateInternalTextureResourceLocation(entityName);
+
+		ModelObj_Animator model = new ModelObj_Animator(entityName, modelResource, textureResource);
+		models.put(model.entityName, model);
+		return model;
+	}
+
+	/**
+	 * Generates a resource location for a png texture file that is in the external
+	 * animation folder.
+	 */
 	private static ResourceLocation generateTextureResourceLocation(String entityName)
 	{
 		return new ResourceLocation(String.format("animation:models/%s.png", entityName));
+	}
+
+	/**
+	 * Generates a resource location for an obm model file that is in the internal
+	 * assets folder, i.e. within in jar. 
+	 */
+	private static ResourceLocation generateInternalModelResourceLocation(String entityName)
+	{
+		return new ResourceLocation(String.format("mod_obsidian_animator:models/%s.obm", entityName));
+	}
+
+	/**
+	 * Generates a resource location for an png texture file that is in the internal
+	 * assets folder, i.e. within in jar. 
+	 */
+	private static ResourceLocation generateInternalTextureResourceLocation(String entityName)
+	{
+		return new ResourceLocation(String.format("mod_obsidian_animator:models/%s.png", entityName));
 	}
 
 	public static void updateRenderer(String entityName)
@@ -94,16 +126,22 @@ public class ModelHandler
 	private static void makeModelFile(String entityName)
 	{
 		File f = new File(Persistence.modelFolder, entityName + "." + FileHandler.modelExtension);
-		String textAfterNBT = getTextAfterNBT(f);
 
-		try 
+		//Models that don't have files will have been imported from internal resources,
+		//therefore don't need saving to a model file.
+		if(f.exists())
 		{
-			CompressedStreamTools.write(ModelHandler.getModel(entityName).createNBTTag(), f);
-			FileWriter fw = new FileWriter(f, true);
-			fw.write(textAfterNBT);
-			fw.close();
-		} 
-		catch (IOException e) {e.printStackTrace();}
+			String textAfterNBT = getTextAfterNBT(f);
+
+			try 
+			{
+				CompressedStreamTools.write(ModelHandler.getModel(entityName).createNBTTag(), f);
+				FileWriter fw = new FileWriter(f, true);
+				fw.write(textAfterNBT);
+				fw.close();
+			} 
+			catch (IOException e) {e.printStackTrace();}
+		}
 	}
 
 	private static String getTextAfterNBT(File f)
