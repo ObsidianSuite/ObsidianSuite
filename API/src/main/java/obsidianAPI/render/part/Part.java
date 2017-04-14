@@ -5,7 +5,7 @@ import obsidianAPI.render.ModelObj;
 /**
  * An abstract object for tracking information about a part (limb, position of model etc).
  */
-public class Part
+public abstract class Part
 {
 	protected float valueX, valueY, valueZ;
 	protected float[] originalValues;

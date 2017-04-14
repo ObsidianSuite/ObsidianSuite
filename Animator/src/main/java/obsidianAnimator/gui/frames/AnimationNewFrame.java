@@ -13,13 +13,13 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 
-import net.minecraft.client.Minecraft;
 import obsidianAPI.animation.AnimationSequence;
 import obsidianAnimator.data.ModelHandler;
 import obsidianAnimator.file.FileChooser;
 import obsidianAnimator.file.FileHandler;
 import obsidianAnimator.file.FileNotChosenException;
-import obsidianAnimator.gui.sequence.timeline.GuiAnimationTimeline;
+import obsidianAnimator.gui.timeline.TimelineGui;
+import obsidianAnimator.gui.timeline.TimelineController;
 
 public class AnimationNewFrame extends BaseFrame
 {
@@ -145,7 +145,7 @@ public class AnimationNewFrame extends BaseFrame
 			{
 				AnimationSequence sequence = new AnimationSequence(entityName, animationName);
 				frame.dispose();
-				Minecraft.getMinecraft().displayGuiScreen(new GuiAnimationTimeline(animationFile, sequence));
+				new TimelineController(animationFile, sequence).display();
 			}
 			else
 				JOptionPane.showMessageDialog(frame, "An animation with that name already exists.");

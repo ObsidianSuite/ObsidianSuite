@@ -107,7 +107,10 @@ public class Quaternion extends org.lwjgl.util.vector.Quaternion
         double dot = Quaternion.dot(q0, q1);
         if (dot < 0)
         {
-            q0 = q0.negate();
+            q0.x *= -1;
+            q0.y *= -1;
+            q0.z *= -1;
+            q0.w *= -1;
             dot = -dot;
         }
 
