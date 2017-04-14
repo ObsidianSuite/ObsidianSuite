@@ -20,7 +20,7 @@ public class ClientProxy extends CommonProxy
 		//Entities
         RenderingRegistry.registerEntityRenderingHandler(EntityObj.class, ModelHandler.modelRenderer);
         
-        //Register animator resource pack, where models and textures are stored.
+        //Register animator resource pack, where models and textures are stored, externally from the jar
         List<IResourcePack> resourcePackList = ObfuscationReflectionHelper.getPrivateValue(FMLClientHandler.class, FMLClientHandler.instance(), "resourcePackList");
         resourcePackList.add(new AnimationResourcePack());
 	}

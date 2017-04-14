@@ -6,9 +6,12 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.ResourceLocation;
 import obsidianAnimator.ObsidianAnimator;
 import obsidianAnimator.file.FileHandler;
 
@@ -54,6 +57,7 @@ public class Persistence
 
 	private static void loadModels()
 	{
+		//Load cached imported models
 		if(modelFolder.exists())
 		{
 			for(File f : modelFolder.listFiles(modelFileFilter))

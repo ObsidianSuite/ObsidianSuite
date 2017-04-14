@@ -66,7 +66,7 @@ public class ModelObj extends ModelBase
 		this(entityName, modelFile, null, textureLocation);
 	}
 	
-	private ModelObj(String entityName, File modelFile, ResourceLocation modelLocation, ResourceLocation textureLocation)
+	protected ModelObj(String entityName, File modelFile, ResourceLocation modelLocation, ResourceLocation textureLocation)
 	{			
 		this.entityName = entityName;
 		defaults = Maps.newHashMap();
