@@ -36,7 +36,7 @@ public class TimelineKeyframeController extends TimelineControllerSub
 		panel.copyLabel = new CopyLabel();
 		JLayeredPane layeredPane = mainController.timelineFrame.getRootPane().getLayeredPane();
 		layeredPane.add(panel.copyLabel, JLayeredPane.DRAG_LAYER);
-		panel.copyLabel.setBounds(0, 0, panel.getWidth(), panel.getHeight());
+		panel.copyLabel.setBounds(0, 0, mainController.timelineFrame.getWidth(), mainController.timelineFrame.getHeight());
 	}
 
 	public void refreshSliderAndTextBox()
