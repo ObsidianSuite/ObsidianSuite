@@ -15,6 +15,7 @@ public class CopyLabel extends JComponent
         super.paintComponent(g);
         if(draw)
         {
+        	System.out.println("Drawing");
             String s = String.valueOf(time);
             g.setColor(Color.red);
             g.drawString(s, x, y);
