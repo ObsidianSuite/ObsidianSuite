@@ -55,7 +55,7 @@ public class TimelineKeyframePanel extends JPanel
 	private int timelineOffset = 0;
 	private static final int MAX_PARTS = 15;
 	private static final int MAX_FRAMES = 50;
-	
+
 	public TimelineKeyframePanel(TimelineKeyframeController controller)
 	{
 		this.controller = controller;
@@ -173,7 +173,7 @@ public class TimelineKeyframePanel extends JPanel
 					controller.hoveredPart = null;
 				}
 			});
-			
+
 			partLabels[i] = partLabel;
 		}
 
@@ -354,18 +354,15 @@ public class TimelineKeyframePanel extends JPanel
 						int prevFrameTime = closestKeyframe.frameTime;
 						int kfx = timeToX(prevFrameTime);
 						int dx = Math.abs(kfx - e.getX());
-						if(dx < 15)
+						int t = xToTime(e.getX());
+						if(t >= 0 && t <= 300)
 						{
-							int t = xToTime(e.getX());
-							if(t >= 0 && t <= 300)
-							{
-								closestKeyframe.frameTime = t;
-								timeSlider.setValue(t);
-								repaint();
-							}
-							if(t != prevFrameTime)
-								keyframeTimeChanged = true;
+							closestKeyframe.frameTime = t;
+							timeSlider.setValue(t);
+							repaint();
 						}
+						if(t != prevFrameTime)
+							keyframeTimeChanged = true;
 					}
 				}
 

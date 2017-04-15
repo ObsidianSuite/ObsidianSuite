@@ -37,14 +37,15 @@ public class TimelineMovementPanel extends JPanel
 			@Override
 			public void actionPerformed(ActionEvent e) 
 			{
-				controller.updateEntityMovement();
 				if(directionBox.getSelectedItem().equals(Direction.None))
 				{
+					controller.setEntityMovement(null);
 					controller.setMovementActive(false);
 					activeCheckbox.setSelected(false);
 				}
 				else
 				{
+					controller.updateEntityMovement();
 					controller.setMovementActive(true);
 					activeCheckbox.setSelected(true);
 				}
