@@ -10,25 +10,24 @@ import java.io.File;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import net.minecraft.client.Minecraft;
+import obsidianAPI.exceptions.MissingImporterException;
+import obsidianAPI.file.ModelFileHandler;
 import obsidianAnimator.data.ModelHandler;
 import obsidianAnimator.file.FileChooser;
-import obsidianAnimator.file.FileHandler;
 import obsidianAnimator.file.FileNotChosenException;
 import obsidianAnimator.gui.entitySetup.EntitySetupController;
-import obsidianAnimator.gui.entitySetup.EntitySetupGui;
+import obsidianAnimator.render.entity.ModelObj_Animator;
 
 public class ImportModelFrame extends BaseFrame
 {
 
 	private File modelFile;
-	private File textureFile;
 	private JButton importButton;
 	private FileSelectionPanel modelSelectionPanel;
-	private FileSelectionPanel textureSelectionPanel;
 	
 	public ImportModelFrame() 
 	{
@@ -61,21 +60,16 @@ public class ImportModelFrame extends BaseFrame
 		
 		importButton.setPreferredSize(cancel.getPreferredSize());
 		
-		modelSelectionPanel = new FileSelectionPanel("Model File", FileHandler.modelFilter);
-		textureSelectionPanel = new FileSelectionPanel("Texture File", FileHandler.textureFilter);
+		modelSelectionPanel = new FileSelectionPanel("Model File", FileChooser.allModelFilter);
 		
 		GridBagConstraints c = new GridBagConstraints();
 		c.gridwidth = 2;
 
 		mainPanel.add(modelSelectionPanel,c);
 
-		c.gridy = 1;
-		mainPanel.add(textureSelectionPanel,c);
-
 		c.insets = new Insets(20,5,5,5);
-
 		c.fill = GridBagConstraints.BOTH;
-		c.gridy = 2;
+		c.gridy = 1;
 		c.gridwidth = 1;
 		c.weightx = 1;
 		mainPanel.add(importButton, c);
@@ -89,8 +83,7 @@ public class ImportModelFrame extends BaseFrame
 	private void refresh()
 	{
 		modelFile = modelSelectionPanel.targetFile;
-		textureFile = textureSelectionPanel.targetFile;
-		if(modelFile == null || textureFile == null)
+		if(modelFile == null)
 			importButton.setEnabled(false);
 		else
 			importButton.setEnabled(true);
@@ -100,9 +93,15 @@ public class ImportModelFrame extends BaseFrame
 	
 	private void importPressed()
 	{
-		String entityName = ModelHandler.importModel(modelFile, textureFile);
-		frame.dispose();
-		new EntitySetupController(entityName).display();
+		try {
+			ModelObj_Animator model = ModelFileHandler.instance.importModel(modelFile, ModelObj_Animator.class);
+			ModelHandler.addModel(model);
+			frame.dispose();
+			new EntitySetupController(model.entityName).display();
+		} catch (MissingImporterException e) {
+			JOptionPane.showMessageDialog(frame, "There is no importer for this file type.", "Import Error", JOptionPane.ERROR_MESSAGE);
+			e.printStackTrace();
+		} 
 	}
 
 	private void cancelPressed()
@@ -134,7 +133,6 @@ public class ImportModelFrame extends BaseFrame
 				@Override
 				public void actionPerformed(ActionEvent e) 
 				{
-
 					try 
 					{
 						targetFile = FileChooser.loadImportFile(frame, filter);

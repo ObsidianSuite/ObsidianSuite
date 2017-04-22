@@ -11,14 +11,14 @@ import java.util.Set;
 import com.google.common.collect.Sets;
 
 import net.minecraft.client.resources.FolderResourcePack;
-import obsidianAnimator.ObsidianAnimator;
+import obsidianAPI.file.FileHandler;
 
 public class AnimationResourcePack extends FolderResourcePack
 {
 
 	public AnimationResourcePack() 
 	{
-		super(new File(ObsidianAnimator.homePath));
+		super(new File(FileHandler.homePath + "/mods"));
 	}
 	
 	@Override

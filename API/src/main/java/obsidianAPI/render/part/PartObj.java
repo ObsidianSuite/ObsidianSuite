@@ -33,9 +33,10 @@ public class PartObj extends PartRotation
 
 	public PartObj(ModelObj modelObject, GroupObject groupObj)
 	{
-		super(modelObject, (groupObj.name.contains("_") ? groupObj.name.substring(0, groupObj.name.indexOf("_")) : groupObj.name).toLowerCase());
+		super(modelObject, groupObj.name);
 		this.groupObj = groupObj;
 		this.displayName = getName();
+		this.rotationPoint = new float[]{0,0,0};
 		setDefaultTCsToCurrentTCs();
 	}
 
@@ -134,8 +135,8 @@ public class PartObj extends PartRotation
 		{
 			if (f.textureCoordinates == null)
 			{
-				f.textureCoordinates = new TextureCoordinate[3];
-				for (int i = 0; i < 3; i++)
+				f.textureCoordinates = new TextureCoordinate[f.vertices.length];
+				for (int i = 0; i < f.vertices.length; i++)
 				{
 					f.textureCoordinates[i] = new TextureCoordinate(0, 0);
 				}

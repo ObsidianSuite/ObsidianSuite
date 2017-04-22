@@ -134,17 +134,20 @@ public class TimelineKeyframePanel extends JPanel
 			}
 		});
 
-		vbar = new JScrollBar(JScrollBar.VERTICAL, 0, MAX_PARTS, 0, numParts);
-		vbar.addAdjustmentListener(new AdjustmentListener() {
-			@Override
-			public void adjustmentValueChanged(AdjustmentEvent e) {				
-				partsOffset = e.getValue();
-				removePartNamesAndLines();
-				addPartNamesAndLines();
-				revalidate();
-				repaint();
-			}
-		});
+		if(numParts > MAX_PARTS)
+		{
+			vbar = new JScrollBar(JScrollBar.VERTICAL, 0, MAX_PARTS, 0, numParts);
+			vbar.addAdjustmentListener(new AdjustmentListener() {
+				@Override
+				public void adjustmentValueChanged(AdjustmentEvent e) {				
+					partsOffset = e.getValue();
+					removePartNamesAndLines();
+					addPartNamesAndLines();
+					revalidate();
+					repaint();
+				}
+			});
+		}
 
 		partLabels = new JLabel[numParts];
 		for(int i = 0; i < numParts; i++)

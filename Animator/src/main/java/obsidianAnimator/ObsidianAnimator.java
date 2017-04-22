@@ -22,9 +22,6 @@ public class ObsidianAnimator
     public static final String MODNAME = "Obsidian Animator";
     public static final String VERSION = "0.1.1";
 	
-	public static final String homePath = Minecraft.getMinecraft().mcDataDir.getAbsolutePath();
-	public static final String animationPath = homePath + "/animation";
-	
 	@Mod.Instance("ObsidianAnimator")
 	public static ObsidianAnimator instance;
 

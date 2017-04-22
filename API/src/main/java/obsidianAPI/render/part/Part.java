@@ -15,7 +15,7 @@ public abstract class Part
 	public Part(ModelObj mObj, String name) 
 	{
 		modelObj = mObj;
-		this.name = name.toLowerCase();
+		this.name = name;
 		valueX = 0.0F;
 		valueY = 0.0F;
 		valueZ = 0.0F;

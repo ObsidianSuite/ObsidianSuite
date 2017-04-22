@@ -39,7 +39,7 @@ public class EntitySetupPartPanel extends JPanel
 	
 	//CSV list of current groups.
 	private String currentGroups;
-	private JPanel partPanel, partMainPanel;
+	private JPanel partMainPanel;
 	//List of panels - one per part.
 	private List<PartPanel> partPanels;
 	
@@ -230,7 +230,7 @@ public class EntitySetupPartPanel extends JPanel
 		partPanels = newOrder;
 		removePartPanels();
 		addPartPanels();
-		partPanel.revalidate();
+		partMainPanel.revalidate();
 	}
 
 	/**
