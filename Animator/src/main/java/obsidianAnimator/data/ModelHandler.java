@@ -1,10 +1,21 @@
 package obsidianAnimator.data;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.io.IOUtils;
+
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.resources.IResource;
 import net.minecraft.util.ResourceLocation;
+import obsidianAPI.file.FileHandler;
+import obsidianAPI.file.importer.FileLoader;
 import obsidianAnimator.render.entity.ModelObj_Animator;
 import obsidianAnimator.render.entity.RenderObj_Animator;
 
@@ -21,15 +32,28 @@ public class ModelHandler
 		updateRenderer(model.entityName);
 	}
 
-	public static ModelObj_Animator loadModelFromResource(String entityName)
+	public static void loadModelFromResource(String entityName)
 	{
-		//		ResourceLocation modelResource = generateInternalModelResourceLocation(entityName);
-		//		ResourceLocation textureResource = generateInternalTextureResourceLocation(entityName);
-		//
-		//		ModelObj_Animator model = new ModelObj_Animator(entityName, modelResource, textureResource);
-		//		models.put(model.entityName, model);
-		//		return model;
-		return null;
+		System.out.println("LOADING " + entityName + " FROM RESLOC");
+		try {
+			ResourceLocation modelResource = generateInternalModelResourceLocation(entityName);
+			IResource res = Minecraft.getMinecraft().getResourceManager().getResource(modelResource);
+			
+			File tmpFile = new File(entityName + ".obm");
+			InputStream is = res.getInputStream();
+			OutputStream os = new FileOutputStream(tmpFile);
+			IOUtils.copy(is, os);
+			is.close();
+			os.close();
+			ModelObj_Animator model = FileLoader.fromFile(tmpFile, ModelObj_Animator.class);
+			tmpFile.delete();
+			addModel(model);
+			Minecraft.getMinecraft().refreshResources();
+		} catch (IOException e) {
+			System.out.println("Could not load " + entityName + " model from resource");
+			e.printStackTrace();
+		}
+
 	}
 
 	/**
@@ -39,15 +63,6 @@ public class ModelHandler
 	private static ResourceLocation generateInternalModelResourceLocation(String entityName)
 	{
 		return new ResourceLocation(String.format("mod_obsidian_animator:models/%s.obm", entityName));
-	}
-
-	/**
-	 * Generates a resource location for an png texture file that is in the internal
-	 * assets folder, i.e. within in jar. 
-	 */
-	private static ResourceLocation generateInternalTextureResourceLocation(String entityName)
-	{
-		return new ResourceLocation(String.format("mod_obsidian_animator:models/%s.png", entityName));
 	}
 
 	public static void updateRenderer(String entityName)

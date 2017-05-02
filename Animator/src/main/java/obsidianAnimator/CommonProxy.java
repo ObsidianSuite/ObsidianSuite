@@ -2,7 +2,6 @@ package obsidianAnimator;
 
 import cpw.mods.fml.common.registry.EntityRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
-import net.minecraft.util.ResourceLocation;
 import obsidianAnimator.data.ModelHandler;
 import obsidianAnimator.render.entity.EntityObj;
 

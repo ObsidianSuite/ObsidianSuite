@@ -19,6 +19,7 @@ public class AnimationResourcePack extends FolderResourcePack
 	public AnimationResourcePack() 
 	{
 		super(new File(FileHandler.homePath + "/mods"));
+		System.out.println("Created Animation Resource Pack");
 	}
 	
 	@Override
