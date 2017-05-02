@@ -38,8 +38,8 @@ public class GuiBlack extends GuiScreen
 	{
 		mc.theWorld.sendQuittingDisconnectingPacket();
         mc.loadWorld((WorldClient)null);
-		mc.displayGuiScreen(new GuiMainMenu());
-	}
+        mc.displayGuiScreen(new GuiAnimationMainMenu());
+    }
 	
 	private void drawCustomGui(double x, double y, double width, double height, double zLevel)
 	{
