@@ -24,6 +24,7 @@ public class FileHandler
 
 	public static final String homePath = Minecraft.getMinecraft().mcDataDir.getAbsolutePath().replaceFirst(".$","");;
 	public static final String animationPath = homePath + "mods/animation";
+	public static final File tabulaModelsDir = new File(homePath + "mods/tabula/saves");
 	public static final File modelFolder = new File(animationPath + "/models");
 	public static final File tmpFolder = new File(animationPath + "/tmp");
 
