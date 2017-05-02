@@ -1,11 +1,12 @@
 package obsidianAPI.animation;
 
+import java.util.Set;
+
+import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import obsidianAPI.render.ModelObj;
 import obsidianAPI.render.part.PartObj;
-
-import java.util.Set;
 
 public class AnimationParenting
 {

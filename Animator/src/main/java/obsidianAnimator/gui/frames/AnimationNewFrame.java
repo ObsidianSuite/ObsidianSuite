@@ -14,9 +14,9 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 
 import obsidianAPI.animation.AnimationSequence;
+import obsidianAPI.file.FileHandler;
 import obsidianAnimator.data.ModelHandler;
 import obsidianAnimator.file.FileChooser;
-import obsidianAnimator.file.FileHandler;
 import obsidianAnimator.file.FileNotChosenException;
 import obsidianAnimator.gui.timeline.TimelineGui;
 import obsidianAnimator.gui.timeline.TimelineController;

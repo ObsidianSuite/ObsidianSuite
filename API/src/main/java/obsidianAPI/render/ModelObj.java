@@ -1,16 +1,7 @@
 package obsidianAPI.render;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.DataInputStream;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -21,31 +12,32 @@ import org.lwjgl.opengl.GL11;
 
 import com.google.common.collect.Maps;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.client.model.ModelFormatException;
 import net.minecraftforge.client.model.obj.GroupObject;
 import net.minecraftforge.client.model.obj.WavefrontObject;
 import obsidianAPI.animation.AnimationParenting;
 import obsidianAPI.animation.PartGroups;
+import obsidianAPI.file.PartData;
+import obsidianAPI.file.importer.FileLoader;
 import obsidianAPI.render.bend.Bend;
 import obsidianAPI.render.part.Part;
 import obsidianAPI.render.part.PartEntityPos;
 import obsidianAPI.render.part.PartObj;
-import obsidianAPI.render.part.PartPropRotation;
-import obsidianAPI.render.part.PartPropScale;
-import obsidianAPI.render.part.PartPropTranslation;
+import obsidianAPI.render.part.prop.PartPropRotation;
+import obsidianAPI.render.part.prop.PartPropScale;
+import obsidianAPI.render.part.prop.PartPropTranslation;
 
 public class ModelObj extends ModelBase
 {
 
+	private final ResourceLocation texture;
+	public final WavefrontObject obj;
 	public final String entityName;
-	public WavefrontObject model;
 	public ArrayList<Part> parts;
 	protected ArrayList<Bend> bends = new ArrayList<Bend>();
 	public PartGroups partGroups;
@@ -53,34 +45,46 @@ public class ModelObj extends ModelBase
 
 	public static final float initRotFix = 180.0F;
 	public static final float offsetFixY = -1.5F;
-
-	private final ResourceLocation txtRL;
 	
-	public ModelObj(String entityName, ResourceLocation modelLocation, ResourceLocation textureLocation)
+	public ModelObj(String entityName, ResourceLocation objRes, ResourceLocation texture)
 	{
-		this(entityName, null, modelLocation, textureLocation);
+		this(entityName, FileLoader.readObj(objRes), texture);
 	}
 	
-	public ModelObj(String entityName, File modelFile, ResourceLocation textureLocation)
-	{			
-		this(entityName, modelFile, null, textureLocation);
-	}
-	
-	protected ModelObj(String entityName, File modelFile, ResourceLocation modelLocation, ResourceLocation textureLocation)
-	{			
+	public ModelObj(String entityName, WavefrontObject obj,  ResourceLocation texture)
+	{
 		this.entityName = entityName;
+		this.obj = obj;
+		this.texture = texture;
 		defaults = Maps.newHashMap();
-		txtRL = textureLocation;
-		if(modelFile != null)
-			load(modelFile);
-		else
-			load(modelLocation);
+		loadObj(obj);
 		init();
 	}
 
 	public ResourceLocation getTexture()
 	{
-		return txtRL;
+		return texture;
+	}
+	
+	public void loadSetup(InputStream stream)
+	{
+		try {
+			NBTTagCompound nbt = CompressedStreamTools.read(new DataInputStream(stream));
+			AnimationParenting.loadData(nbt.getCompoundTag("Parenting"), this);
+			partGroups.loadData(nbt.getCompoundTag("Groups"), this);
+			PartData.fromNBT(nbt.getCompoundTag("Setup"), this);
+		}
+		catch (Exception e) {System.err.println("Unable to load model nbt for " + entityName);}
+	}
+	
+	
+	public NBTTagCompound createNBTTag()
+	{
+		NBTTagCompound nbt = new NBTTagCompound();
+		nbt.setTag("Parenting", AnimationParenting.getSaveData(this));
+		nbt.setTag("Groups", partGroups.getSaveData());
+		nbt.setTag("Setup", PartData.toNBT(this));
+		return nbt;
 	}
 
 	public void init() 
@@ -104,89 +108,8 @@ public class ModelObj extends ModelBase
 		return defaults.get(part).clone();
 	}
 	
-	private void load(ResourceLocation modelLocation)
+	private void loadObj(WavefrontObject model)
 	{
-		try 
-		{
-			load(Minecraft.getMinecraft().getResourceManager().getResource(modelLocation).getInputStream());
-		} 
-		catch (IOException e) 
-		{
-			e.printStackTrace();
-		}  
-	}
-	
-	private void load(File modelFile)
-	{
-		try 
-		{
-			load(new FileInputStream(modelFile));
-		} 
-		catch (IOException e) 
-		{
-			e.printStackTrace();
-		}  
-	}
-
-	private void load(InputStream stream) 
-	{
-		try 
-		{
-			BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
-			
-			String nbtData = "";
-			String modelData = "";
-			String partData = "";
-
-			int targetString = 0;
-			String currentLine = "";
-			while((currentLine = reader.readLine()) != null)
-			{				
-				if(currentLine.contains("# Model #"))
-					targetString = 1;
-				else if(currentLine.contains("# Part #"))
-					targetString = 2;
-				else
-				{
-					switch(targetString)
-					{
-					case 0: nbtData += currentLine + "\n"; break;
-					case 1: modelData += currentLine + "\n"; break;
-					case 2: partData += currentLine + "\n"; break;
-					}
-				}
-			}
-			
-			loadModel(modelData);
-			loadAdditionalPartData(partData);
-			
-			//Only load setup if it exists - it won't if file is fresh from Blender.
-			if(!nbtData.equals(""))
-			{
-				//Write nbt data to temp file so it can be read by compressed stream tools.
-				File tmp = new File("tmp");
-				if(!tmp.exists())
-					tmp.createNewFile();
-				
-				FileWriter fw = new FileWriter(tmp);
-				BufferedWriter bw = new BufferedWriter(fw);
-				bw.write(nbtData);
-				bw.close();
-				fw.close();
-				
-				loadSetup(CompressedStreamTools.read(tmp));
-				
-				tmp.delete();				
-			}
-			reader.close();
-		} 
-		catch (FileNotFoundException e) {e.printStackTrace();} 
-		catch (IOException e) {e.printStackTrace();}
-	}
-	
-	private void loadModel(String modelData) throws ModelFormatException, UnsupportedEncodingException
-	{
-		model = new WavefrontObject(this.entityName, new ByteArrayInputStream(modelData.getBytes("UTF-8")));
 		parts = createPartObjList(model.groupObjects);
 		parts.add(new PartEntityPos(this));
 		if(entityName.equals("player"))
@@ -196,57 +119,6 @@ public class ModelObj extends ModelBase
 			parts.add(new PartPropScale(this));
 		}
 		partGroups = new PartGroups(this);
-	}
-	
-	private void loadAdditionalPartData(String partData)
-	{
-		PartObj currentPart = null;
-		int i = 0;
-		boolean readingRotation = true;
-
-		for(String currentLine : partData.split("\n"))
-		{
-			if(currentLine.equals("PART SETUP"))
-				readingRotation = false;
-
-			if(readingRotation)
-			{
-				switch(i)
-				{
-				case 0: 
-					for(Part p : parts)
-					{
-						if(p instanceof PartObj)
-						{
-							PartObj obj = (PartObj) p;
-							if(obj.getName().equals(currentLine))
-							{
-								currentPart = obj;
-								break;
-							}
-						}
-					}
-					i++;
-					break;
-				case 1:
-					currentPart.setRotationPoint(read3Floats(currentLine));
-					i++;
-					break;
-				case 2:
-					float[] rot = read3Floats(currentLine);
-					currentPart.setOriginalValues(rot);
-					currentPart.setValues(rot);
-					i = 0;
-					break;
-				}
-			}
-		}
-	}
-	
-	private void loadSetup(NBTTagCompound nbt)
-	{		
-		AnimationParenting.loadData(nbt.getCompoundTag("Parenting"), this);
-		partGroups.loadData(nbt.getCompoundTag("Groups"), this);
 	}
 
 	//----------------------------------------------------------------
@@ -369,6 +241,7 @@ public class ModelObj extends ModelBase
 		GL11.glRotatef(initRotFix, 1.0F, 0.0F, 0.0F);
 		GL11.glTranslatef(0.0F, offsetFixY, 0.0F);
 
+		
 		for(Part p : this.parts) 
 		{
 			if(p instanceof PartObj)
@@ -394,24 +267,6 @@ public class ModelObj extends ModelBase
 	//							Utils
 	//----------------------------------------------------------------
 
-	private static float[] read3Floats(String str)
-	{
-		float[] arr = new float[3];
-		for(int i = 0; i < 3; i++)
-		{
-			if(str.contains(","))
-			{
-				arr[i] = Float.parseFloat(str.substring(0, str.indexOf(",")));
-				str = str.substring(str.indexOf(",") + 2);
-			}
-			else
-			{
-				arr[i] = Float.parseFloat(str);
-			}
-		}
-		return arr;
-	}
-
 	public ArrayList<Part> createPartObjList(ArrayList<GroupObject> groupObjects)
 	{
 		ArrayList<Part> parts = new ArrayList<Part>();
@@ -423,14 +278,6 @@ public class ModelObj extends ModelBase
 	protected PartObj createPart(GroupObject group)
 	{
 		return new PartObj(this, group);
-	}
-	
-	public NBTTagCompound createNBTTag()
-	{
-		NBTTagCompound nbt = new NBTTagCompound();
-		nbt.setTag("Parenting", AnimationParenting.getSaveData(this));
-		nbt.setTag("Groups", partGroups.getSaveData());
-		return nbt;
 	}
 	
 	public Part getPartFromName(String name) 
@@ -453,12 +300,10 @@ public class ModelObj extends ModelBase
 			{
 				PartObj part = (PartObj) p;
 				if(part.getName().equals(name) || part.getDisplayName().equals(name))
-				{
 					return part;
-				}
 			}
 		}
-		throw new RuntimeException("No part obj found for " + name + ".");
+		throw new RuntimeException("No part obj found for " + name);
 	}
 
 }

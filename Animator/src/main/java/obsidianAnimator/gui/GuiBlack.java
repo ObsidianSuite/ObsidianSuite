@@ -2,11 +2,11 @@ package obsidianAnimator.gui;
 
 import org.lwjgl.opengl.GL11;
 
+import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.util.ResourceLocation;
-import obsidianAPI.Util;
 
 public class GuiBlack extends GuiScreen
 {
@@ -38,8 +38,8 @@ public class GuiBlack extends GuiScreen
 	{
 		mc.theWorld.sendQuittingDisconnectingPacket();
         mc.loadWorld((WorldClient)null);
-		mc.displayGuiScreen(new GuiAnimationMainMenu());
-	}
+        mc.displayGuiScreen(new GuiAnimationMainMenu());
+    }
 	
 	private void drawCustomGui(double x, double y, double width, double height, double zLevel)
 	{

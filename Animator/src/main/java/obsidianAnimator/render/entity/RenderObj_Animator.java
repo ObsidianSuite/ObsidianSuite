@@ -19,8 +19,8 @@ import net.minecraftforge.client.IItemRenderer.ItemRendererHelper;
 import net.minecraftforge.client.MinecraftForgeClient;
 import obsidianAPI.render.ModelObj;
 import obsidianAPI.render.part.PartObj;
-import obsidianAPI.render.part.PartPropScale;
 import obsidianAPI.render.part.PartRotation;
+import obsidianAPI.render.part.prop.PartPropScale;
 
 @SideOnly(Side.CLIENT)
 public class RenderObj_Animator extends RenderLiving
