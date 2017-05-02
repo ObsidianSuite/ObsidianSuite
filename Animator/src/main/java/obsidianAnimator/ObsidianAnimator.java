@@ -11,6 +11,7 @@ import cpw.mods.fml.common.event.FMLInitializationEvent;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.common.MinecraftForge;
+import obsidianAPI.file.FileHandler;
 import obsidianAnimator.block.BlockBase;
 import obsidianAnimator.block.BlockGrid;
 

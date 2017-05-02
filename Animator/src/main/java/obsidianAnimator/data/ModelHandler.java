@@ -14,7 +14,6 @@ import org.apache.commons.io.IOUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.IResource;
 import net.minecraft.util.ResourceLocation;
-import obsidianAPI.file.FileHandler;
 import obsidianAPI.file.importer.FileLoader;
 import obsidianAnimator.render.entity.ModelObj_Animator;
 import obsidianAnimator.render.entity.RenderObj_Animator;
@@ -34,7 +33,6 @@ public class ModelHandler
 
 	public static void loadModelFromResource(String entityName)
 	{
-		System.out.println("LOADING " + entityName + " FROM RESLOC");
 		try {
 			ResourceLocation modelResource = generateInternalModelResourceLocation(entityName);
 			IResource res = Minecraft.getMinecraft().getResourceManager().getResource(modelResource);

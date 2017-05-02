@@ -22,12 +22,19 @@ public class FileHandler
 	public static final String animationExtension = "oba";
 	public static final String textureExtension = "png";
 
-	public static final String homePath = Minecraft.getMinecraft().mcDataDir.getAbsolutePath().replaceFirst(".$","");;
+	public static final String homePath = generateHomePath();
 	public static final String animationPath = homePath + "mods/animation";
 	public static final File tabulaModelsDir = new File(homePath + "mods/tabula/saves");
 	public static final File modelFolder = new File(animationPath + "/models");
 	public static final File tmpFolder = new File(animationPath + "/tmp");
 
+	private static String generateHomePath() {
+		String mcDataDir = Minecraft.getMinecraft().mcDataDir.getAbsolutePath();
+		if(mcDataDir.endsWith("."))
+			mcDataDir = mcDataDir.substring(0, mcDataDir.length() - 1);
+		return mcDataDir;
+	}
+	
 	public static AnimationSequence getAnimationFromFile(File animationFile)
 	{
 		try 
