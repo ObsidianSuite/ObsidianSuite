@@ -72,10 +72,10 @@ public class ImportModelFrame extends BaseFrame {
 		tPane.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(ChangeEvent e) {
-				if(tPane.getSelectedIndex() == 1)
+				if(tPane.getSelectedIndex() == 0)
+					modelFile = modelSelectionPanel.targetFile;
+				else if(tPane.getSelectedIndex() == 1 && tabulaModelBox.getSelectedItem() != null)
 					modelFile = ((ComboBoxFileItem) tabulaModelBox.getSelectedItem()).file; 
-				else
-					modelFile = null;
 				refresh();	
 
 			}
@@ -114,8 +114,8 @@ public class ImportModelFrame extends BaseFrame {
 		JPanel tabulaPanel = new JPanel();
 
 		tabulaModelBox = new JComboBox<ComboBoxFileItem>(getComboBoxFileItems());
+		tabulaModelBox.setPrototypeDisplayValue(new ComboBoxFileItem(new File("ModelSomethingOrOther.obm")));
 		tabulaModelBox.addActionListener(new ActionListener() {
-
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				modelFile = ((ComboBoxFileItem) tabulaModelBox.getSelectedItem()).file; 
@@ -125,15 +125,16 @@ public class ImportModelFrame extends BaseFrame {
 
 		JLabel label = new JLabel("Tabula Model:");
 		label.setPreferredSize(new Dimension(150, 25));
-		
+
 		tabulaPanel.setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
+		c.weightx = 1;
 		c.insets = new Insets(5, 5, 5, 5);
 
-		tabulaPanel.add(label);
+		tabulaPanel.add(label, c);
 
 		c.gridx = 1;
-		tabulaPanel.add(tabulaModelBox);
+		tabulaPanel.add(tabulaModelBox, c);
 		return tabulaPanel;
 	}
 
@@ -154,14 +155,16 @@ public class ImportModelFrame extends BaseFrame {
 		frame.dispose();
 		new HomeFrame().display();
 	}
-	
+
 	private ComboBoxFileItem[] getComboBoxFileItems() {
-		File[] files = FileHandler.tabulaModelsDir.listFiles();
-		ComboBoxFileItem[] fileItems = new ComboBoxFileItem[files.length];
-		
-		for(int i = 0; i < files.length; i++) 
-			fileItems[i] = new ComboBoxFileItem(files[i]);
-		
+		ComboBoxFileItem[] fileItems = new ComboBoxFileItem[]{null};
+		if(FileHandler.tabulaModelsDir.exists()) {
+			File[] files = FileHandler.tabulaModelsDir.listFiles();
+			fileItems = new ComboBoxFileItem[files.length];
+
+			for(int i = 0; i < files.length; i++) 
+				fileItems[i] = new ComboBoxFileItem(files[i]);
+		}
 		return fileItems;
 	}
 
@@ -211,15 +214,15 @@ public class ImportModelFrame extends BaseFrame {
 		}
 
 	}
-	
+
 	private class ComboBoxFileItem {
-		
+
 		private File file;
-		
+
 		private ComboBoxFileItem(File file) {
 			this.file = file;
 		}
-		
+
 		@Override
 		public String toString() {
 			return file.getName().substring(0, file.getName().indexOf("."));
