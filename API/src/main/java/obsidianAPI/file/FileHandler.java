@@ -32,6 +32,8 @@ public class FileHandler
 		String mcDataDir = Minecraft.getMinecraft().mcDataDir.getAbsolutePath();
 		if(mcDataDir.endsWith("."))
 			mcDataDir = mcDataDir.substring(0, mcDataDir.length() - 1);
+		if(!mcDataDir.endsWith("/"))
+			mcDataDir += "/";
 		return mcDataDir;
 	}
 	
