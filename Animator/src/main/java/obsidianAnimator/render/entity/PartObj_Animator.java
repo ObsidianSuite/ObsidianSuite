@@ -87,11 +87,10 @@ public class PartObj_Animator extends PartObj
 				}
 			}   
 
-			TextureCoordinate[] coordsToStore = new TextureCoordinate[3];
-			for(int i = 0; i < 3; i++)
-			{
+			int size = f.textureCoordinates.length;
+			TextureCoordinate[] coordsToStore = new TextureCoordinate[size];
+			for(int i = 0; i < size; i++)
 				coordsToStore[i] = new TextureCoordinate(f.textureCoordinates[i].u, f.textureCoordinates[i].v);
-			}
 
 			defaultTextureCoords.put(f, coordsToStore);
 		}
@@ -111,10 +110,6 @@ public class PartObj_Animator extends PartObj
 	{		
 		boolean useHighlightCoords = true;
 		ResourceLocation texture;
-		TextureCoordinate[] highlightCoords = new TextureCoordinate[]{
-				new TextureCoordinate(0.0F, 0.0F), 
-				new TextureCoordinate(0.5F, 0.0F), 
-				new TextureCoordinate(0.0F, 0.5F)};
 		if(mainHighlight)
 			texture = ModelObj_Animator.pinkResLoc;
 		else if(otherHighlight)
@@ -131,7 +126,25 @@ public class PartObj_Animator extends PartObj
 		for(Face f : groupObj.faces)
 		{
 			if(useHighlightCoords)
+			{
+				TextureCoordinate[] highlightCoords;
+				if(f.vertices.length == 3)
+				{
+					highlightCoords = new TextureCoordinate[]{
+							new TextureCoordinate(0.0F, 0.0F), 
+							new TextureCoordinate(0.5F, 0.0F), 
+							new TextureCoordinate(0.0F, 0.5F)};
+				}
+				else
+				{
+					highlightCoords = new TextureCoordinate[]{
+							new TextureCoordinate(0.0F, 0.0F), 
+							new TextureCoordinate(0.5F, 0.0F), 
+							new TextureCoordinate(0.0F, 0.5F),
+							new TextureCoordinate(0.0F, 0.0F)};
+				}
 				f.textureCoordinates = highlightCoords;
+			}
 			else
 				f.textureCoordinates = defaultTextureCoords.get(f);
 		}

@@ -1,16 +1,16 @@
 package obsidianAnimator.render.entity;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.obj.GroupObject;
+import net.minecraftforge.client.model.obj.WavefrontObject;
 import obsidianAPI.render.ModelObj;
 import obsidianAPI.render.bend.Bend;
 import obsidianAPI.render.part.Part;
 import obsidianAPI.render.part.PartObj;
 import obsidianAnimator.render.Bend_Animator;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 public class ModelObj_Animator extends ModelObj
 {
@@ -20,20 +20,10 @@ public class ModelObj_Animator extends ModelObj
 
 	public static final ResourceLocation pinkResLoc = new ResourceLocation("mod_obsidian_animator:defaultModelTextures/pink.png");
 	public static final ResourceLocation whiteResLoc = new ResourceLocation("mod_obsidian_animator:defaultModelTextures/white.png");
-
-	public ModelObj_Animator(String entityName, ResourceLocation model, ResourceLocation texture) 
-	{
-		this(entityName, null, model, texture);
-	}
 	
-	public ModelObj_Animator(String entityName, File modelFile, ResourceLocation texture)
+	public ModelObj_Animator(String entityName, WavefrontObject objRes, ResourceLocation texture)
 	{			
-		this(entityName, modelFile, null, texture);
-	}
-	
-	private ModelObj_Animator(String entityName, File modelFile, ResourceLocation model, ResourceLocation texture)
-	{			
-		super(entityName, modelFile, model, texture);
+		super(entityName, objRes, texture);
 		hightlightedParts = new ArrayList<PartObj>();
 	} 
 

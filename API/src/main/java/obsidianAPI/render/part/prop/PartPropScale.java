@@ -1,6 +1,7 @@
-package obsidianAPI.render.part;
+package obsidianAPI.render.part.prop;
 
 import obsidianAPI.render.ModelObj;
+import obsidianAPI.render.part.Part;
 
 public class PartPropScale extends Part 
 {

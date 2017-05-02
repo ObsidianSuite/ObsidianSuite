@@ -6,38 +6,42 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.ResourceLocation;
-import obsidianAnimator.ObsidianAnimator;
-import obsidianAnimator.file.FileHandler;
+import obsidianAPI.exceptions.MissingImporterException;
+import obsidianAPI.file.FileHandler;
+import obsidianAPI.file.ModelFileHandler;
+import obsidianAPI.file.importer.FileLoader;
+import obsidianAnimator.file.FileChooser;
+import obsidianAnimator.render.entity.ModelObj_Animator;
 
 public class Persistence 
 {
 
-	private static final File saveFile = new File(ObsidianAnimator.animationPath, "save.data");
-	public static final File modelFolder = new File(ObsidianAnimator.animationPath + "/models");
-	
+	private static final File saveFile = new File(FileHandler.animationPath, "save.data");
+
 	private static FilenameFilter modelFileFilter = new FilenameFilter() 
 	{
-	    public boolean accept(File dir, String name) 
-	    {
-	        return name.toLowerCase().endsWith(".obm");
-	    }
+		public boolean accept(File dir, String name) 
+		{
+			return name.toLowerCase().endsWith("." + FileHandler.obsidianModelExtension);
+		}
 	};
 
 	public static void save()
 	{
-		ModelHandler.saveFiles();
-		
+		for(String entityName : ModelHandler.getModelList()) {
+			File f = new File(FileHandler.modelFolder, entityName + "." + FileHandler.obsidianModelExtension);
+			if(f.exists())
+				ModelFileHandler.saveModelDataToObsidianFile(ModelHandler.getModel(entityName), f);
+		}
+
 		NBTTagCompound nbt = new NBTTagCompound();
-		if(FileHandler.lastModelDirectory != null)
-			nbt.setString("lastModelDir", FileHandler.lastModelDirectory.getAbsolutePath());
-		if(FileHandler.lastAnimationDirectory != null)
-			nbt.setString("lastAnimationDir", FileHandler.lastAnimationDirectory.getAbsolutePath());
+		if(FileChooser.lastModelDirectory != null)
+			nbt.setString("lastModelDir", FileChooser.lastModelDirectory.getAbsolutePath());
+		if(FileChooser.lastAnimationDirectory != null)
+			nbt.setString("lastAnimationDir", FileChooser.lastAnimationDirectory.getAbsolutePath());
 		writeNBTToFile(nbt, saveFile);
 	}
 
@@ -49,24 +53,28 @@ public class Persistence
 		{
 			NBTTagCompound nbt = getNBTFromFile(saveFile);
 			if(nbt.hasKey("lastModelDir"))
-				FileHandler.lastModelDirectory = new File(nbt.getString("lastModelDir"));
+				FileChooser.lastModelDirectory = new File(nbt.getString("lastModelDir"));
 			if(nbt.hasKey("lastAnimationDir"))
-				FileHandler.lastAnimationDirectory = new File(nbt.getString("lastAnimationDir"));
+				FileChooser.lastAnimationDirectory = new File(nbt.getString("lastAnimationDir"));
 		}
 	}
 
+	/**
+	 * Load cached models
+	 */
 	private static void loadModels()
 	{
-		//Load cached imported models
-		if(modelFolder.exists())
+		if(FileHandler.modelFolder.exists())
 		{
-			for(File f : modelFolder.listFiles(modelFileFilter))
-				ModelHandler.loadFileFromPersistence(f);
+			for(File f : FileHandler.modelFolder.listFiles(modelFileFilter)) {
+				ModelObj_Animator model = FileLoader.fromFile(f, ModelObj_Animator.class);
+				ModelHandler.addModel(model);
+			}
 		}
 		else
-			modelFolder.mkdirs();
+			FileHandler.modelFolder.mkdirs();
 	}
-	
+
 
 	/**
 	 * Write an NBTTagCompound to a file.

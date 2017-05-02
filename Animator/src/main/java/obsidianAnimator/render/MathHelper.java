@@ -1,6 +1,5 @@
 package obsidianAnimator.render;
 
-import java.awt.Color;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
@@ -16,15 +15,8 @@ public class MathHelper
 	private static final float rotationWheelWidth = 0.1F;
 	public static final float rotationWheelRadius = 0.5F;
 
-	/**
-	 * Calculate intersection between ray and face.
-	 * @param p0 - Point on ray.
-	 * @param p1 - Another point on the ray.
-	 * @param f - Face to check against (3 vertices).
-	 * @return The distance from p0 to the face if an intersect exists, null otherwise.
-	 */
 	public static Double rayIntersectsFace(RayTrace ray, Face f)
-	{
+	{		
 		Vec3 v0 = Vec3.createVectorHelper(f.vertices[0].x, f.vertices[0].y, f.vertices[0].z);
 		Vec3 v1 = Vec3.createVectorHelper(f.vertices[1].x, f.vertices[1].y, f.vertices[1].z);
 		Vec3 v2 = Vec3.createVectorHelper(f.vertices[2].x, f.vertices[2].y, f.vertices[2].z);
@@ -32,18 +24,41 @@ public class MathHelper
 		Vec3 pI = getRayPlaneIntersection(ray,v0,n);
 		if(pI == null)
 			return null;
+		
+		if(pointWithinTriangle(pI, v0, v1, v2))
+			return ray.p0.distanceTo(pI);
+	
+		//Extra check if quad face
+		if(f.vertices.length == 4)
+		{
+			Vec3 v4 = Vec3.createVectorHelper(f.vertices[3].x, f.vertices[3].y, f.vertices[3].z);
+			
+			//Two extra checks cover all bases of vertex order
+			if(pointWithinTriangle(pI, v4, v1, v2))
+				return ray.p0.distanceTo(pI);
+			if(pointWithinTriangle(pI, v0, v4, v2))
+				return ray.p0.distanceTo(pI);
+		}
+		
+		return null;
+	}
+	
+	/**
+	 * Check if a point is within a triangle.
+	 * Point is assumed to on same plane as triangle.
+	 */
+	private static boolean pointWithinTriangle(Vec3 p, Vec3 v0, Vec3 v1, Vec3 v2)
+	{
 		Vec3 u = v0.subtract(v1);
 		Vec3 v = v0.subtract(v2);
-		Vec3 w = v0.subtract(pI);
+		Vec3 w = v0.subtract(p);
 		//System.out.println(u + " " + v + " " + w);
 		double dn = u.dotProduct(v)*u.dotProduct(v)-u.dotProduct(u)*v.dotProduct(v);
 		double s = (u.dotProduct(v)*w.dotProduct(v)-v.dotProduct(v)*w.dotProduct(u))/dn;
 		double t = (u.dotProduct(v)*w.dotProduct(u)-u.dotProduct(u)*w.dotProduct(v))/dn;
 		if(s>=0 && t>=0 && s+t<=1 && s != -0.0F && t != -0.0F)
-		{
-			return ray.p0.distanceTo(pI);
-		}
-		return null;
+			return true;
+		return false;
 	}
 
 	/**
