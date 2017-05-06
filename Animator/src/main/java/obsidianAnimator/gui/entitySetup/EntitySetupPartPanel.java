@@ -111,6 +111,8 @@ public class EntitySetupPartPanel extends JPanel
 		c.gridx = 0;
 		c.gridy = 5;
 		c.gridwidth = 5;
+		c.fill = GridBagConstraints.BOTH;
+		c.weighty = 1;
 		add(generateScrollPane(), c);
 	}
 	

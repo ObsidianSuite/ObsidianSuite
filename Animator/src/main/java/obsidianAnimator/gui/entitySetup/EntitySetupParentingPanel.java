@@ -1,6 +1,7 @@
 package obsidianAnimator.gui.entitySetup;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -81,7 +82,7 @@ public class EntitySetupParentingPanel extends JPanel
 		}
 		
 		scrollPane = new JScrollPane(parentingTreePanel);
-
+		scrollPane.setPreferredSize(new Dimension(300,700));
 		add(scrollPane, BorderLayout.CENTER);
 	}
 	
