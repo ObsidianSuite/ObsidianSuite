@@ -1,5 +1,6 @@
 package obsidianAnimator.gui.entitySetup;
 
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -56,10 +57,11 @@ public class EntitySetupFrame extends JFrame
 			}
 		});
 		
-		parentingPanel = new EntitySetupParentingPanel(controller);
+		EntitySetupPartPanel partPanel = new EntitySetupPartPanel(controller);
+		parentingPanel = new EntitySetupParentingPanel(controller);		
 		
 		JTabbedPane tabbedPane = new JTabbedPane();
-		tabbedPane.add("Part Setup", new EntitySetupPartPanel(controller));
+		tabbedPane.add("Part Setup", partPanel);
 		tabbedPane.add("Parenting", parentingPanel);
 		
 		JPanel mainPanel = new JPanel();
