@@ -1,6 +1,7 @@
 package obsidianAPI.file.importer;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.zip.ZipEntry;
@@ -21,7 +22,7 @@ public class ImporterTabula implements ModelImporter {
 	public static final ImporterTabula instance = new ImporterTabula();
 	private static final TblConverter tblConverter = new TblConverter();
 	private static final String TBL_TEXTURE_NAME = "texture.png";
-
+	
 	@Override
 	public ObsidianFile toObsidianFile(File file) {
 		try
@@ -36,9 +37,15 @@ public class ImporterTabula implements ModelImporter {
 			//Texture
 			ZipFile zipFile = new ZipFile(file);
 			ZipEntry textureEntry = zipFile.getEntry(TBL_TEXTURE_NAME);
-			byte[] textureBytes = IOUtils.toByteArray(zipFile.getInputStream(textureEntry));
+			byte[] textureBytes;
+			if(textureEntry != null) 
+				textureBytes = IOUtils.toByteArray(zipFile.getInputStream(textureEntry));
+			else {
+				File defaultTexture = new File(getClass().getClassLoader().getResource("model_textures/white.png").getPath());
+				textureBytes = IOUtils.toByteArray(new FileInputStream(defaultTexture));
+			}
 			zipFile.close();
-
+			
 			return new ObsidianFile(entityName, modelBytes, textureBytes);	
 		}
 		catch (Exception e1)
