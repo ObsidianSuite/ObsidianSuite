@@ -71,6 +71,19 @@ public class FileHandler
 		catch (IOException e) {e.printStackTrace();}
 	}
 
+	public static void copyFileToPersistentMemory(File file)
+	{			
+		modelFolder.mkdirs();
+		File copy = new File(modelFolder, file.getName());
+		try 
+		{
+			if(copy.exists())
+				copy.delete();
+			org.apache.commons.io.FileUtils.copyFile(file, copy);
+		} 
+		catch (IOException e) {e.printStackTrace();}
+	}
+	
 	public static void copyFileToPersistentMemory(String fileName, InputStream inputStream)
 	{			
 		modelFolder.mkdirs();

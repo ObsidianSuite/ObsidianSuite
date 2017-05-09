@@ -1,6 +1,7 @@
 package obsidianAPI.file;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,8 +31,10 @@ public class ModelFileHandler {
 		String extension = fileName.substring(fileName.indexOf(".") + 1, fileName.length());
 		
 		//If importing from obsidian file, just load
-		if(extension.equals("obm"))
+		if(extension.equals("obm")) {
+			FileHandler.copyFileToPersistentMemory(file);
 			return FileLoader.fromFile(file, clazz);
+		}
 
 		//If importing from other file type, import to obm file and
 		// then load from that file. 
