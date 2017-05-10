@@ -29,7 +29,13 @@ public class EntitySetupGui extends GuiEntityRenderer
 	protected void mouseClicked(int x, int y, int i) 
 	{
 		super.mouseClicked(x, y, i);
-		if(i == 1 && hoveredPart != null)
-			controller.attemptParent((PartObj)selectedPart, (PartObj)hoveredPart);
+		if(i == 1 && hoveredPart != null) {
+			PartObj selectedPartObj = (PartObj) selectedPart;
+			PartObj hoveredPartObj = (PartObj) hoveredPart;			
+			if(isShiftKeyDown())
+				controller.merge(selectedPartObj, hoveredPartObj);
+			else 
+				controller.attemptParent(selectedPartObj, hoveredPartObj);
+		}
 	}
 }

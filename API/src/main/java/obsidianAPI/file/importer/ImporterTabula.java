@@ -41,7 +41,7 @@ public class ImporterTabula implements ModelImporter {
 			if(textureEntry != null) 
 				textureBytes = IOUtils.toByteArray(zipFile.getInputStream(textureEntry));
 			else {
-				File defaultTexture = new File(getClass().getClassLoader().getResource("model_textures/white.png").getPath());
+				File defaultTexture = new File(getClass().getClassLoader().getResource("model_textures/grey.png").getPath());
 				textureBytes = IOUtils.toByteArray(new FileInputStream(defaultTexture));
 			}
 			zipFile.close();
