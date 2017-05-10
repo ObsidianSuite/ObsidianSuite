@@ -3,7 +3,10 @@ package obsidianAPI.file.importer;
 import java.io.File;
 import java.io.FileInputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -16,6 +19,7 @@ import ru.gloomyfolken.tcn2obj.TblConverter;
 import ru.gloomyfolken.tcn2obj.obj.ObjModel;
 import ru.gloomyfolken.tcn2obj.tbl.TabulaBox;
 import ru.gloomyfolken.tcn2obj.tbl.TabulaModel;
+import ru.gloomyfolken.tcn2obj.tbl.components.CubeInfo;
 
 public class ImporterTabula implements ModelImporter {
 
@@ -63,9 +67,20 @@ public class ImporterTabula implements ModelImporter {
 		
 		T model = FileLoader.fromFile(obsidianFile, clazz);
 		
-		//TODO model setup stuff here (initial rotation etc..)
 		TabulaModel tblModel = new TabulaModel(file);
 
+		//Parenting
+		for(TabulaBox box : tblModel.boxes) {
+			if(box.cube.children != null && box.cube.children.size() > 0) {
+				PartObj parent = model.getPartObjFromName(box.name);
+				for(CubeInfo cube : box.cube.children) {
+					PartObj child = model.getPartObjFromName(cube.name);
+					model.setParent(child, parent, false);
+				}
+			}
+		}
+		
+		//Rotation points
 		for(TabulaBox box : tblModel.boxes) {
 			PartObj part = model.getPartObjFromName(box.name);
 			
