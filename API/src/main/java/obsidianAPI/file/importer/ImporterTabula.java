@@ -83,17 +83,17 @@ public class ImporterTabula implements ModelImporter {
 		//Rotation points
 		for(TabulaBox box : tblModel.boxes) {
 			PartObj part = model.getPartObjFromName(box.name);
-			
+			float[] boxRotationPoint = getAbsoluteBoxRotationPoint(tblModel.boxes, box, model);
 			float[] rotationPoint = new float[3];
-			rotationPoint[0] = -box.rotationPointX/16F;
-			rotationPoint[1] = box.rotationPointY/16F - 1.5F;
-			rotationPoint[2] = box.rotationPointZ/16F;
+			rotationPoint[0] = -boxRotationPoint[0]/16F;
+			rotationPoint[1] = boxRotationPoint[1]/16F - 1.5F;
+			rotationPoint[2] = boxRotationPoint[2]/16F;
 			part.setRotationPoint(rotationPoint);
 		}
 		
+		
 		return model;
 	}
-
 	
 	private static byte[] createModelBytes(List<String> objLines) {
 		String s = "";
@@ -103,4 +103,38 @@ public class ImporterTabula implements ModelImporter {
 		return s.getBytes(StandardCharsets.UTF_8);
 	}
 
+	private static float[] getAbsoluteBoxRotationPoint(List<TabulaBox> boxes, TabulaBox box, ModelObj model) {
+		TabulaBox parent = getTabulaBoxParent(boxes, box, model);
+		if(parent == null)
+			return getBoxRotationPoint(box);
+
+		float[] absRotPoint = getBoxRotationPoint(box);
+		float[] parentAbsRotPoint = getAbsoluteBoxRotationPoint(boxes, parent, model);
+		for(int i = 0; i < 3; i++)
+			absRotPoint[i] += parentAbsRotPoint[i];
+	
+		return absRotPoint;
+	}
+	
+	private static TabulaBox getTabulaBox(List<TabulaBox> boxes, PartObj obj) {
+		for(TabulaBox box : boxes) {
+			if(box.name.equals(obj.getName()))
+				return box;
+		}
+		throw new RuntimeException("No box for name " + obj.getName());
+	}
+	
+	private static TabulaBox getTabulaBoxParent(List<TabulaBox> boxes, TabulaBox box, ModelObj model) {
+		PartObj child = model.getPartObjFromName(box.name);
+		PartObj parent = child.getParent();
+		if(parent != null)
+			return getTabulaBox(boxes, parent);
+		return null;
+	}
+	
+	private static float[] getBoxRotationPoint(TabulaBox box) {
+		return new float[]{box.rotationPointX, box.rotationPointY, box.rotationPointZ};
+	}
+
+	
 }
