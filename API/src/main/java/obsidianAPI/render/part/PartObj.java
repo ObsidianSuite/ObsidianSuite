@@ -1,7 +1,15 @@
 package obsidianAPI.render.part;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.lwjgl.opengl.GL11;
+
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.obj.Face;
@@ -9,12 +17,6 @@ import net.minecraftforge.client.model.obj.GroupObject;
 import net.minecraftforge.client.model.obj.TextureCoordinate;
 import obsidianAPI.render.ModelObj;
 import obsidianAPI.render.bend.Bend;
-import org.lwjgl.opengl.GL11;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * One partObj for each 'part' of the model.
@@ -29,6 +31,7 @@ public class PartObj extends PartRotation
 
 	private PartObj parent;
 	private Set<PartObj> children = Sets.newHashSet();
+	private List<PartObj> mergedParts = new ArrayList<PartObj>();
 	private Bend bend = null;
 
 	public PartObj(ModelObj modelObject, GroupObject groupObj)
@@ -88,6 +91,15 @@ public class PartObj extends PartRotation
 			bend.remove();
 			bend = null;
 		}
+	}
+	
+	public void addMergedPart(PartObj part) {
+		mergedParts.add(part);
+	}
+	
+
+	public List<PartObj> getMergedParts() {
+		return mergedParts;
 	}
 
 	//------------------------------------------
@@ -263,4 +275,5 @@ public class PartObj extends PartRotation
 
 		return new float[] {m0, m1, m2, m3, m4, m5, m6, m7, m8};
 	}
+
 }

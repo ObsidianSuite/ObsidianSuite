@@ -85,15 +85,4 @@ public class EntitySetupController
 		return partGroups;
 	}
 	
-	public void merge(PartObj part, PartObj partToMerge) {
-		part.groupObj.faces.addAll(partToMerge.groupObj.faces);
-		
-		for(PartObj childPart : partToMerge.getChildren()) 
-			merge(part, childPart);
-		
-		getEntityModel().setParent(partToMerge, null, false);
-		getEntityModel().parts.remove(partToMerge);
-		partToMerge.getChildren().clear();
-	}
-	
 }

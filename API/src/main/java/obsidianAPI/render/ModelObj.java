@@ -209,6 +209,19 @@ public class ModelObj extends ModelBase
 	{
 		bends.remove(bend);
 	}
+	
+	public void merge(PartObj part, PartObj partToMerge) {
+		part.groupObj.faces.addAll(partToMerge.groupObj.faces);
+		
+		for(PartObj childPart : partToMerge.getChildren()) 
+			merge(part, childPart);
+		
+		setParent(partToMerge, null, false);
+		parts.remove(partToMerge);
+		partToMerge.getChildren().clear();
+		
+		part.addMergedPart(partToMerge);
+	}
 
 	//----------------------------------------------------------------
 	//							Rotation

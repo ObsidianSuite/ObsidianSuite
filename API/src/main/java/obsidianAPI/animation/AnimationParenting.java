@@ -1,8 +1,8 @@
 package obsidianAPI.animation;
 
+import java.util.List;
 import java.util.Set;
 
-import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import obsidianAPI.render.ModelObj;
@@ -35,7 +35,8 @@ public class AnimationParenting
 		for (PartObj part : model.getPartObjs())
 		{
 			Set<PartObj> children = part.getChildren();
-			if (!children.isEmpty())
+			List<PartObj> mergeParts = part.getMergedParts();
+			if (!children.isEmpty() || !mergeParts.isEmpty())
 			{
 				NBTTagCompound parentCompound = new NBTTagCompound();
 				parentCompound.setString("Parent", part.getName());
@@ -50,6 +51,12 @@ public class AnimationParenting
 					}
 					parentCompound.setString("Child" + i, name);
 					i++;
+				}
+				
+				for(int j = 0; j < mergeParts.size(); j++)
+				{
+					PartObj mergedPart = mergeParts.get(j);
+					parentCompound.setString("Merged" + j, mergedPart.getName());
 				}
 
 				parentNBTList.appendTag(parentCompound);
@@ -82,6 +89,15 @@ public class AnimationParenting
 				PartObj child = model.getPartObjFromName(name);
 
 				model.setParent(child, parent, hasBend);
+				j++;
+			}
+			
+			j = 0;
+			while (parentCompound.hasKey("Merged" + j))
+			{
+				String name = parentCompound.getString("Merged" + j);
+				PartObj mergedPart = model.getPartObjFromName(name);
+				model.merge(parent, mergedPart);
 				j++;
 			}
 		}

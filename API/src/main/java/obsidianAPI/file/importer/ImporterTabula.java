@@ -3,10 +3,7 @@ package obsidianAPI.file.importer;
 import java.io.File;
 import java.io.FileInputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -91,6 +88,11 @@ public class ImporterTabula implements ModelImporter {
 			part.setRotationPoint(rotationPoint);
 		}
 		
+		//Merging
+		for(PartObj part : model.getPartObjs()) {
+			if(part.getName().endsWith("_m") && part.hasParent())
+				model.merge(part.getParent(), part);
+		}
 		
 		return model;
 	}
