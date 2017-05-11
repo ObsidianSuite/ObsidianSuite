@@ -3,9 +3,12 @@ package obsidianAPI.file.importer;
 import java.io.File;
 import java.io.FileInputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
+
+import javax.swing.JOptionPane;
 
 import org.apache.commons.io.IOUtils;
 
@@ -26,12 +29,19 @@ public class ImporterTabula implements ModelImporter {
 	
 	@Override
 	public ObsidianFile toObsidianFile(File file) {
+		String error = "Failed to import from Tabula file: " + file.getName();
 		try
 		{
 			String entityName = file.getName().substring(0, file.getName().indexOf("."));
 
 			//Model
 			TabulaModel tblModel = new TabulaModel(file);
+			String duplicatePartName;
+			if((duplicatePartName = containsDuplicateParts(tblModel)) != null) {
+				error += ". The model contains the duplicate part " + duplicatePartName;
+				throw new RuntimeException(error);
+			}
+			
 			ObjModel objModel = tblConverter.tcn2obj(tblModel, 0.0625f);			
 			byte[] modelBytes = createModelBytes(objModel.toStringList());
 			
@@ -51,7 +61,7 @@ public class ImporterTabula implements ModelImporter {
 		}
 		catch (Exception e1)
 		{
-			System.err.println("Failed to import from Tabula file: " + file.getName());
+			//JOptionPane.showMessageDialog(parentComponent, message, title, messageType);(null, error, "Import Error", JOptionPane., icon);
 			e1.printStackTrace();
 			return null;
 		}
@@ -136,6 +146,16 @@ public class ImporterTabula implements ModelImporter {
 	
 	private static float[] getBoxRotationPoint(TabulaBox box) {
 		return new float[]{box.rotationPointX, box.rotationPointY, box.rotationPointZ};
+	}
+	
+	private static String containsDuplicateParts(TabulaModel tblModel) {
+		List<String> names = new ArrayList<String>();
+		for(TabulaBox box : tblModel.boxes) {
+			if(names.contains(box.name))
+				return box.name;
+			names.add(box.name);
+		}
+		return null;
 	}
 
 	

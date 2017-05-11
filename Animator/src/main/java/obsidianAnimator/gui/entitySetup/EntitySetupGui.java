@@ -15,6 +15,14 @@ public class EntitySetupGui extends GuiEntityRenderer
 		super(entityName);		
 		this.controller = controller;
 	}
+	
+	@Override 
+	public void processRay()
+	{
+		if(controller.hoverCheckRequired())
+			super.processRay();
+	}
+
 
 	@Override
 	protected void keyTyped(char par1, int par2)

@@ -1,5 +1,9 @@
 package obsidianAnimator.gui.entitySetup;
 
+import java.awt.MouseInfo;
+import java.awt.Point;
+import java.awt.Rectangle;
+
 import javax.swing.JOptionPane;
 
 import net.minecraft.client.Minecraft;
@@ -13,25 +17,25 @@ import obsidianAnimator.render.entity.ModelObj_Animator;
 
 public class EntitySetupController 
 {
-	
+
 	private PartGroups partGroups;
 	private EntitySetupGui gui;
 	private EntitySetupFrame frame;
-	
+
 	public EntitySetupController(String entityName)
 	{
 		gui = new EntitySetupGui(entityName, this);
 		this.partGroups = gui.entityModel.partGroups;
-		
+
 		frame = new EntitySetupFrame(this);
 	}
-	
+
 	public void display()
 	{
 		Minecraft.getMinecraft().displayGuiScreen(gui);
 		frame.setVisible(true);
 	}
-	
+
 	public void attemptParent(PartObj parent, PartObj child)
 	{
 		if(parent.getName().equals(child.getName()))
@@ -62,27 +66,34 @@ public class EntitySetupController
 		getEntityModel().setParent(child, parent, false);
 		frame.refreshParentingPanel();
 	}
-	
+
 	public void close()
 	{
 		Minecraft.getMinecraft().displayGuiScreen(new GuiBlack());
 		frame.dispose();
 		new HomeFrame().display();
 	}
-	
+
 	public ModelObj_Animator getEntityModel()
 	{
 		return gui.entityModel;
 	}
-	
+
 	public void setSelectedPart(Part part)
 	{
 		gui.selectedPart = part;
 	}
-	
+
 	public PartGroups getPartGroups()
 	{
 		return partGroups;
 	}
-	
+
+	public boolean hoverCheckRequired() {
+		Point mousePos = MouseInfo.getPointerInfo().getLocation();
+		Rectangle bounds = frame.getBounds();
+		bounds.setLocation(frame.getLocationOnScreen());
+		return !bounds.contains(mousePos);
+	}
+
 }

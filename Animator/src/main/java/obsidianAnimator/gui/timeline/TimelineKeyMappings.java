@@ -68,14 +68,14 @@ public class TimelineKeyMappings
 		@Override
 		public void actionPerformed(ActionEvent arg0) 
 		{
-			for(int i = 0; i < controller.timelineGui.parts.size(); i++)
+			for(int i = 0; i < controller.timelineGui.entityModel.parts.size(); i++)
 			{
-				if(controller.timelineGui.parts.get(i).equals(controller.timelineGui.selectedPart))
+				if(controller.timelineGui.entityModel.parts.get(i).equals(controller.timelineGui.selectedPart))
 				{
 					if(i > 0)
-						controller.timelineGui.updatePart(controller.timelineGui.parts.get(i-1));
+						controller.timelineGui.updatePart(controller.timelineGui.entityModel.parts.get(i-1));
 					else
-						controller.timelineGui.updatePart(controller.timelineGui.parts.get(controller.timelineGui.parts.size() - 1));
+						controller.timelineGui.updatePart(controller.timelineGui.entityModel.parts.get(controller.timelineGui.entityModel.parts.size() - 1));
 					break;
 				}
 			}			
@@ -87,14 +87,14 @@ public class TimelineKeyMappings
 		@Override
 		public void actionPerformed(ActionEvent arg0) 
 		{
-			for(int i = 0; i < controller.timelineGui.parts.size(); i++)
+			for(int i = 0; i < controller.timelineGui.entityModel.parts.size(); i++)
 			{
-				if(controller.timelineGui.parts.get(i).equals(controller.timelineGui.selectedPart))
+				if(controller.timelineGui.entityModel.parts.get(i).equals(controller.timelineGui.selectedPart))
 				{					
-					if(i < controller.timelineGui.parts.size() - 1)
-						controller.timelineGui.updatePart(controller.timelineGui.parts.get(i+1));
+					if(i < controller.timelineGui.entityModel.parts.size() - 1)
+						controller.timelineGui.updatePart(controller.timelineGui.entityModel.parts.get(i+1));
 					else
-						controller.timelineGui.updatePart(controller.timelineGui.parts.get(0));
+						controller.timelineGui.updatePart(controller.timelineGui.entityModel.parts.get(0));
 					break;
 				}
 			}		

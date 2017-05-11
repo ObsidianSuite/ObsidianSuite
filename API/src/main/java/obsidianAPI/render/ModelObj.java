@@ -31,6 +31,7 @@ import obsidianAPI.render.part.PartObj;
 import obsidianAPI.render.part.prop.PartPropRotation;
 import obsidianAPI.render.part.prop.PartPropScale;
 import obsidianAPI.render.part.prop.PartPropTranslation;
+import scala.actors.threadpool.Arrays;
 
 public class ModelObj extends ModelBase
 {
@@ -211,16 +212,22 @@ public class ModelObj extends ModelBase
 	}
 	
 	public void merge(PartObj part, PartObj partToMerge) {
-		part.groupObj.faces.addAll(partToMerge.groupObj.faces);
-		
-		for(PartObj childPart : partToMerge.getChildren()) 
-			merge(part, childPart);
-		
-		setParent(partToMerge, null, false);
-		parts.remove(partToMerge);
-		partToMerge.getChildren().clear();
-		
-		part.addMergedPart(partToMerge);
+		List<PartObj> partsToMerge = new ArrayList<PartObj>();
+		partsToMerge.add(partToMerge);
+		merge(part, partsToMerge);
+	}
+	
+	public void merge(PartObj part, List<PartObj> partsToMerge) {
+		for(PartObj partToMerge : partsToMerge) {
+			part.groupObj.faces.addAll(partToMerge.groupObj.faces);
+			
+			merge(part, new ArrayList<PartObj>(partToMerge.getChildren()));
+			
+			setParent(partToMerge, null, false);
+			parts.remove(partToMerge);
+			partToMerge.getChildren().clear();
+			part.addMergedPart(partToMerge);
+		}
 	}
 
 	//----------------------------------------------------------------

@@ -209,7 +209,7 @@ public class TimelineKeyframeController extends TimelineControllerSub
 	public int getLastKeyFrameTime()
 	{
 		int lastFrameTime = 0;
-		for(Part part : mainController.timelineGui.parts)
+		for(Part part : mainController.timelineGui.entityModel.parts)
 		{
 			List<Keyframe> partKeyframes = getPartKeyframes(part);
 			if(partKeyframes != null)

@@ -59,7 +59,7 @@ public class TimelineKeyframePanel extends JPanel
 	public TimelineKeyframePanel(TimelineKeyframeController controller)
 	{
 		this.controller = controller;
-		this.numParts = controller.getTimelineGui().parts.size();
+		this.numParts = controller.getTimelineGui().entityModel.parts.size();
 
 		if(controller.getCurrentAnimation().getTotalTime() > 50)
 			timelineLength = controller.getCurrentAnimation().getTotalTime() + 10;
@@ -69,7 +69,7 @@ public class TimelineKeyframePanel extends JPanel
 		lines = new KeyframeLine[numParts];
 		for(int i = 0; i < numParts; i++)
 		{
-			lines[i] = new KeyframeLine(controller.getTimelineGui().parts.get(i));
+			lines[i] = new KeyframeLine(controller.getTimelineGui().entityModel.parts.get(i));
 		}
 
 		timeTextField = new JTextField("0");
@@ -152,7 +152,7 @@ public class TimelineKeyframePanel extends JPanel
 		partLabels = new JLabel[numParts];
 		for(int i = 0; i < numParts; i++)
 		{
-			final Part part = controller.getTimelineGui().parts.get(i);
+			final Part part = controller.getTimelineGui().entityModel.parts.get(i);
 			final JLabel partLabel = new JLabel(part.getDisplayName());
 			partLabel.setPreferredSize(new Dimension(70, partLabel.getPreferredSize().height));
 			partLabel.addMouseListener(new BlankMouseListener()
