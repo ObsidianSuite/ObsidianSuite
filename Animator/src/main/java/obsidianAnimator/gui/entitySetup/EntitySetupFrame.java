@@ -29,7 +29,7 @@ public class EntitySetupFrame extends JFrame
 		this.controller = controller;
 		
 		if(Display.isVisible())
-			setLocation(Display.getX() + 10, Display.getY() + 440);
+			setLocation(Display.getX() + 10, Display.getY() + 40);
 		else
 		{
 			setLocationRelativeTo(null);
