@@ -26,7 +26,7 @@ public class FileHandler
 	public static final String animationPath = homePath + "mods/animation";
 	public static final File tabulaModelsDir = new File(homePath + "mods/tabula/saves");
 	public static final File modelFolder = new File(animationPath + "/models");
-	public static final File tmpFolder = new File(animationPath + "/tmp");
+	public static final File binFolder = new File(animationPath + "/bin");
 
 	private static String generateHomePath() {
 		String mcDataDir = Minecraft.getMinecraft().mcDataDir.getAbsolutePath();
@@ -98,6 +98,18 @@ public class FileHandler
 		catch (IOException e) {e.printStackTrace();}
 	}
 
+	public static void copyFileToBin(String fileName, InputStream inputStream) {
+		binFolder.mkdirs();
+		File copy = new File(binFolder, fileName);
+		try 
+		{
+			if(copy.exists())
+				copy.delete();
+			FileOutputStream outputStream = new FileOutputStream(copy);
+			IOUtils.copy(inputStream, outputStream);
+		} 
+		catch (IOException e) {e.printStackTrace();}		
+	}
 
 	/**
 	 * Generates a resource location for a png texture file that is in the external
@@ -105,8 +117,10 @@ public class FileHandler
 	 */
 	public static ResourceLocation generateTextureResourceLocation(String entityName)
 	{
-		return new ResourceLocation(String.format("animation:models/%s.png", entityName));
+		return new ResourceLocation(String.format("animation:bin/%s.png", entityName));
 	}
+
+
 
 
 

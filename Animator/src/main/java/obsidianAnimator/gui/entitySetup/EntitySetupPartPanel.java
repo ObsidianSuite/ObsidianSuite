@@ -11,9 +11,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.BorderFactory;
@@ -26,8 +25,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-
-import org.lwjgl.opengl.Display;
 
 import obsidianAPI.render.part.PartObj;
 import obsidianAnimator.gui.timeline.BlankMouseListener;
@@ -144,8 +141,14 @@ public class EntitySetupPartPanel extends JPanel
 	 */
 	private void removePartPanels()
 	{
-		for(PartPanel p : partPanels)
+		Iterator<PartPanel> iter = partPanels.iterator();
+		while(iter.hasNext()) {
+			PartPanel p = iter.next();
 			partMainPanel.remove(p);
+			if(!controller.getEntityModel().getPartObjs().contains(p.part)) {
+				iter.remove();
+			}
+		}
 	}
 
 	private void showInsertPoint(PartPanel movingPanel, int mouseY)
@@ -230,6 +233,10 @@ public class EntitySetupPartPanel extends JPanel
 
 		//Update and redraw.
 		partPanels = newOrder;
+		refreshPartPanels();
+	}
+	
+	public void refreshPartPanels() {
 		removePartPanels();
 		addPartPanels();
 		partMainPanel.revalidate();

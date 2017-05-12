@@ -60,7 +60,19 @@ public class TimelineKeyframeController extends TimelineControllerSub
 		keyframes.clear();
 		for(AnimationPart animpart : getCurrentAnimation().getAnimationList())
 		{
-			Part mr = mainController.timelineGui.entityModel.getPartFromName(animpart.getPartName());
+			Part mr = null;
+			try {
+				mr = mainController.timelineGui.entityModel.getPartFromName(animpart.getPartName());
+			}
+			catch(Exception e) {
+				int res = JOptionPane.showConfirmDialog(null, "Error loading animation. Part " + animpart.getPartName() + " could not be found. If you continue, all animation data"
+						+ " for this part will be lost. Continue loading?", "Load Error", JOptionPane.OK_CANCEL_OPTION);
+				if(res == JOptionPane.CANCEL_OPTION) {
+					this.mainController.close();
+				}
+				else
+					continue;
+			}
 
 			String partName = animpart.getPartName();
 			List<Keyframe> partKfs = keyframes.get(mr);
@@ -197,7 +209,7 @@ public class TimelineKeyframeController extends TimelineControllerSub
 	public int getLastKeyFrameTime()
 	{
 		int lastFrameTime = 0;
-		for(Part part : mainController.timelineGui.parts)
+		for(Part part : mainController.timelineGui.entityModel.parts)
 		{
 			List<Keyframe> partKeyframes = getPartKeyframes(part);
 			if(partKeyframes != null)
