@@ -8,6 +8,10 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+
 import org.apache.commons.io.IOUtils;
 
 import obsidianAPI.file.ObsidianFile;
@@ -59,7 +63,10 @@ public class ImporterTabula implements ModelImporter {
 		}
 		catch (Exception e1)
 		{
-			//JOptionPane.showMessageDialog(parentComponent, message, title, messageType);(null, error, "Import Error", JOptionPane., icon);
+		    final JOptionPane pane = new JOptionPane(error);
+		    final JDialog d = pane.createDialog((JFrame)null, "Import Error");
+		    d.setAlwaysOnTop(true);
+		    d.setVisible(true);
 			e1.printStackTrace();
 			return null;
 		}

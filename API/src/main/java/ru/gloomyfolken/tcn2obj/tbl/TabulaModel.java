@@ -101,8 +101,9 @@ public class TabulaModel
     
     private void makeBox(CubeInfo cube)
     {
-        TabulaBox box = new TabulaBox(this, formatName(cube.name));
-        new TabulaBox(this, formatName(cube.name));
+    	cube.name = formatName(cube.name);
+        TabulaBox box = new TabulaBox(this, cube.name);
+        new TabulaBox(this, cube.name);
         box.mirror = cube.txMirror;
         box.cube = cube;
         box.model = model;
@@ -119,11 +120,12 @@ public class TabulaModel
             makeBox(child);
         }
     }
-    
-	private String formatName(String name) {
-		return name.replaceAll("[^a-zA-Z0-9_]", "");
-	}
 
+	private String formatName(String name) {
+		name = name.replaceAll("[^a-zA-Z0-9_]", "");
+		return name;
+	}
+    
     private void setOffsets(TabulaBox box, CubeInfo cube)
     {
         box.offsetX = (float) cube.offset[0];
