@@ -21,6 +21,7 @@ public class EntitySetupFrame extends JFrame
 	
 	private EntitySetupController controller;
 	private EntitySetupParentingPanel parentingPanel;
+	private EntitySetupPartPanel partPanel;
 
 	public EntitySetupFrame(EntitySetupController controller)
 	{
@@ -57,7 +58,7 @@ public class EntitySetupFrame extends JFrame
 			}
 		});
 		
-		EntitySetupPartPanel partPanel = new EntitySetupPartPanel(controller);
+		partPanel = new EntitySetupPartPanel(controller);
 		parentingPanel = new EntitySetupParentingPanel(controller);		
 		
 		JTabbedPane tabbedPane = new JTabbedPane();
@@ -84,9 +85,10 @@ public class EntitySetupFrame extends JFrame
 		setAlwaysOnTop(true);
 	}
 
-	public void refreshParentingPanel() 
+	public void refresh() 
 	{
 		parentingPanel.refreshScrollPane();		
+		partPanel.refreshPartPanels();
 	}
 
 	

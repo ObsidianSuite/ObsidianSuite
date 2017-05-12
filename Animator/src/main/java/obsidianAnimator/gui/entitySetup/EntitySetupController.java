@@ -54,7 +54,7 @@ public class EntitySetupController
 			if(n == 1)
 			{
 				getEntityModel().setParent(child, null, false);
-				frame.refreshParentingPanel();
+				refresh();
 			}
 		}
 		else
@@ -64,7 +64,11 @@ public class EntitySetupController
 	private void parent(PartObj parent, PartObj child)
 	{
 		getEntityModel().setParent(child, parent, false);
-		frame.refreshParentingPanel();
+		refresh();
+	}
+	
+	public void refresh() {
+		frame.refresh();
 	}
 
 	public void close()
@@ -92,7 +96,12 @@ public class EntitySetupController
 	public boolean hoverCheckRequired() {
 		Point mousePos = MouseInfo.getPointerInfo().getLocation();
 		Rectangle bounds = frame.getBounds();
-		bounds.setLocation(frame.getLocationOnScreen());
+		try {
+			bounds.setLocation(frame.getLocationOnScreen());
+		}
+		catch(Exception e) {
+			return false;
+		}
 		return !bounds.contains(mousePos);
 	}
 

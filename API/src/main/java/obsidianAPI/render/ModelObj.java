@@ -240,6 +240,8 @@ public class ModelObj extends ModelBase {
 	}
 
 	public void addMerge(PartObj part, PartObj partToMerge) {
+		if(partToMerge.getParent() != part)
+			setParent(partToMerge, part, false);
 		part.addMergedPart(partToMerge);
 	}
 	
