@@ -205,13 +205,23 @@ public class ModelObj extends ModelBase {
 				merge(child);
 		}
 		
-		//Merge any unmerged parts
-		List<PartObj> currentPartObjs = getPartObjs();
+		/** Merge any unmerged parts **/
+		//Caching part obj list
+		List<PartObj> currentPartObjs = getPartObjs(); 
+		//List of parts merged into parts that are going to be merge. 
+		//They need copying onto the parent.
+		List<PartObj> mergedPartsToCopy = new ArrayList<PartObj>(); //
 		for (PartObj mergedPart : part.getMergedParts()) {
+			//Part that is still in part list hasn't actually been merged yet
+			// so merge it here. 
 			if(currentPartObjs.contains(mergedPart)) {
 				merge(part, mergedPart);
+				mergedPartsToCopy.addAll(mergedPart.getMergedParts());
 			}
 		}
+		//Copy merged parts over to parent
+		for(PartObj mergedPart : mergedPartsToCopy)
+			part.addMergedPart(mergedPart);
 	}
 
 	/**

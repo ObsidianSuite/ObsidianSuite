@@ -92,7 +92,7 @@ public class FileLoader {
 	
 	private static ResourceLocation readTexture(String entityName, InputStream inputStream)
 	{
-		FileHandler.copyFileToPersistentMemory(entityName + ".png", inputStream);
+		FileHandler.copyFileToBin(entityName + ".png", inputStream);
 		return FileHandler.generateTextureResourceLocation(entityName);
 	}
 	
