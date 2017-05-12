@@ -15,6 +15,14 @@ public class EntitySetupGui extends GuiEntityRenderer
 		super(entityName);		
 		this.controller = controller;
 	}
+	
+	@Override 
+	public void processRay()
+	{
+		if(controller.hoverCheckRequired())
+			super.processRay();
+	}
+
 
 	@Override
 	protected void keyTyped(char par1, int par2)
@@ -29,7 +37,16 @@ public class EntitySetupGui extends GuiEntityRenderer
 	protected void mouseClicked(int x, int y, int i) 
 	{
 		super.mouseClicked(x, y, i);
-		if(i == 1 && hoveredPart != null)
-			controller.attemptParent((PartObj)selectedPart, (PartObj)hoveredPart);
+		if(i == 1 && hoveredPart != null) {
+			PartObj selectedPartObj = (PartObj) selectedPart;
+			PartObj hoveredPartObj = (PartObj) hoveredPart;			
+			if(isShiftKeyDown()) {
+				controller.getEntityModel().addMerge(selectedPartObj, hoveredPartObj);
+				controller.getEntityModel().runMerge();
+				controller.refresh();
+			}
+			else 
+				controller.attemptParent(selectedPartObj, hoveredPartObj);
+		}
 	}
 }

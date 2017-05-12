@@ -1,7 +1,15 @@
 package obsidianAPI.render.part;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.lwjgl.opengl.GL11;
+
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.obj.Face;
@@ -9,12 +17,6 @@ import net.minecraftforge.client.model.obj.GroupObject;
 import net.minecraftforge.client.model.obj.TextureCoordinate;
 import obsidianAPI.render.ModelObj;
 import obsidianAPI.render.bend.Bend;
-import org.lwjgl.opengl.GL11;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * One partObj for each 'part' of the model.
@@ -29,6 +31,8 @@ public class PartObj extends PartRotation
 
 	private PartObj parent;
 	private Set<PartObj> children = Sets.newHashSet();
+	private List<PartObj> mergedParts = new ArrayList<PartObj>();
+	private boolean merged = false;
 	private Bend bend = null;
 
 	public PartObj(ModelObj modelObject, GroupObject groupObj)
@@ -89,6 +93,24 @@ public class PartObj extends PartRotation
 			bend = null;
 		}
 	}
+	
+	public void addMergedPart(PartObj part) {
+		mergedParts.add(part);
+		part.setMerged(true);
+	}
+
+	public List<PartObj> getMergedParts() {
+		return mergedParts;
+	}
+	
+	public boolean isMerged() {
+		return merged;
+	}
+	
+	public void setMerged(boolean merged) {
+		this.merged = merged;
+	}
+	
 
 	//------------------------------------------
 	//              Basics
@@ -142,8 +164,8 @@ public class PartObj extends PartRotation
 				}
 			}
 
-			TextureCoordinate[] coordsToStore = new TextureCoordinate[3];
-			for (int i = 0; i < 3; i++)
+			TextureCoordinate[] coordsToStore = new TextureCoordinate[f.textureCoordinates.length];
+			for (int i = 0; i < f.textureCoordinates.length; i++)
 			{
 				coordsToStore[i] = new TextureCoordinate(f.textureCoordinates[i].u, f.textureCoordinates[i].v);
 			}
@@ -155,6 +177,19 @@ public class PartObj extends PartRotation
 	public void updateTextureCoordinates()
 	{
 		updateTextureCoordinates(false, false, true);
+	}
+	
+	public void addFacesFromPart(PartObj part) {
+		part.updateTextureCoordinates(false, false, false);
+		groupObj.faces.addAll(part.groupObj.faces);
+		for(Face f : part.groupObj.faces) {
+			TextureCoordinate[] coordsToStore = new TextureCoordinate[f.textureCoordinates.length];
+			for (int i = 0; i < f.textureCoordinates.length; i++)
+			{
+				coordsToStore[i] = new TextureCoordinate(f.textureCoordinates[i].u, f.textureCoordinates[i].v);
+			}
+			defaultTextureCoords.put(f, coordsToStore);
+		}
 	}
 
 	/**
@@ -263,4 +298,5 @@ public class PartObj extends PartRotation
 
 		return new float[] {m0, m1, m2, m3, m4, m5, m6, m7, m8};
 	}
+
 }

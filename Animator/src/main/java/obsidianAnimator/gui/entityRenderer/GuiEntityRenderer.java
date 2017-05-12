@@ -33,7 +33,6 @@ public class GuiEntityRenderer extends GuiBlack
 	public String entityName;
 	public EntityLivingBase entityToRender;
 	public ModelObj_Animator entityModel;
-	public List<Part> parts = new ArrayList<Part>();
 	public Part selectedPart;
 	public Part hoveredPart;
 
@@ -62,14 +61,7 @@ public class GuiEntityRenderer extends GuiBlack
 		this.entityModel = ModelHandler.getModel(entityName);
 		entityToRender = new EntityObj(Minecraft.getMinecraft().theWorld, entityName);
 
-		//Setup parts list.
-		for(Part part : entityModel.parts)
-		{
-			parts.add(part);
-			part.setToOriginalValues();
-		}
-
-		selectedPart = parts.get(0);
+		selectedPart = entityModel.parts.get(0);
 		setupViews();
 		
 		ModelHandler.updateRenderer(entityName);
