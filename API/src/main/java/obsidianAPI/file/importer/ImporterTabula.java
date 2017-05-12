@@ -99,12 +99,11 @@ public class ImporterTabula implements ModelImporter {
 		}
 		
 		//Merging
-//		for(PartObj part : model.getPartObjs()) {
-//			if(part.getName().endsWith("_m") && part.hasParent())
-//				
-//				//model.merge(part.getParent(), part);
-//		}
-		model.mergeAll();
+		for(PartObj part : model.getPartObjs()) {
+			if(part.getName().endsWith("_m") && part.hasParent())
+				model.addMerge(part.getParent(), part);
+		}
+		model.runMerge();
 		
 		return model;
 	}

@@ -97,7 +97,7 @@ public class AnimationParenting
 			{
 				String name = parentCompound.getString("Merged" + j);
 				PartObj mergedPart = model.getPartObjFromName(name);
-				model.merge(parent, mergedPart);
+				model.addMerge(parent, mergedPart);
 				j++;
 			}	
 		}

@@ -40,8 +40,10 @@ public class EntitySetupGui extends GuiEntityRenderer
 		if(i == 1 && hoveredPart != null) {
 			PartObj selectedPartObj = (PartObj) selectedPart;
 			PartObj hoveredPartObj = (PartObj) hoveredPart;			
-			if(isShiftKeyDown())
-				controller.getEntityModel().merge(selectedPartObj, hoveredPartObj);
+			if(isShiftKeyDown()) {
+				controller.getEntityModel().addMerge(selectedPartObj, hoveredPartObj);
+				controller.getEntityModel().runMerge();
+			}
 			else 
 				controller.attemptParent(selectedPartObj, hoveredPartObj);
 		}
