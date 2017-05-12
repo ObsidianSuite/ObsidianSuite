@@ -220,10 +220,10 @@ public class ModelObj extends ModelBase {
 	 */
 	private void fixMergeParenting() {
 		for (PartObj part : getPartObjs()) {
-			if (part.getName().endsWith("_m") || !part.hasParent())
+			if (part.isMerged() || !part.hasParent())
 				continue;
 			PartObj parent = part.getParent();
-			while (parent.getName().endsWith("_m")) {
+			while (parent.isMerged()) {
 				parent = parent.getParent();
 			}
 			setParent(part, parent, false);
@@ -241,7 +241,6 @@ public class ModelObj extends ModelBase {
 
 	public void addMerge(PartObj part, PartObj partToMerge) {
 		part.addMergedPart(partToMerge);
-		//runMerge();
 	}
 	
 	private void merge(PartObj part, PartObj partToMerge) {

@@ -32,6 +32,7 @@ public class PartObj extends PartRotation
 	private PartObj parent;
 	private Set<PartObj> children = Sets.newHashSet();
 	private List<PartObj> mergedParts = new ArrayList<PartObj>();
+	private boolean merged = false;
 	private Bend bend = null;
 
 	public PartObj(ModelObj modelObject, GroupObject groupObj)
@@ -95,12 +96,21 @@ public class PartObj extends PartRotation
 	
 	public void addMergedPart(PartObj part) {
 		mergedParts.add(part);
+		part.setMerged(true);
 	}
-	
 
 	public List<PartObj> getMergedParts() {
 		return mergedParts;
 	}
+	
+	public boolean isMerged() {
+		return merged;
+	}
+	
+	public void setMerged(boolean merged) {
+		this.merged = merged;
+	}
+	
 
 	//------------------------------------------
 	//              Basics

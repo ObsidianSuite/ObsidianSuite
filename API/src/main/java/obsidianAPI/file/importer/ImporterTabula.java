@@ -8,8 +8,6 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-import javax.swing.JOptionPane;
-
 import org.apache.commons.io.IOUtils;
 
 import obsidianAPI.file.ObsidianFile;
