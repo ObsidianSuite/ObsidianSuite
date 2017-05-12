@@ -164,8 +164,8 @@ public class PartObj extends PartRotation
 				}
 			}
 
-			TextureCoordinate[] coordsToStore = new TextureCoordinate[3];
-			for (int i = 0; i < 3; i++)
+			TextureCoordinate[] coordsToStore = new TextureCoordinate[f.textureCoordinates.length];
+			for (int i = 0; i < f.textureCoordinates.length; i++)
 			{
 				coordsToStore[i] = new TextureCoordinate(f.textureCoordinates[i].u, f.textureCoordinates[i].v);
 			}
@@ -177,6 +177,19 @@ public class PartObj extends PartRotation
 	public void updateTextureCoordinates()
 	{
 		updateTextureCoordinates(false, false, true);
+	}
+	
+	public void addFacesFromPart(PartObj part) {
+		part.updateTextureCoordinates(false, false, false);
+		groupObj.faces.addAll(part.groupObj.faces);
+		for(Face f : part.groupObj.faces) {
+			TextureCoordinate[] coordsToStore = new TextureCoordinate[f.textureCoordinates.length];
+			for (int i = 0; i < f.textureCoordinates.length; i++)
+			{
+				coordsToStore[i] = new TextureCoordinate(f.textureCoordinates[i].u, f.textureCoordinates[i].v);
+			}
+			defaultTextureCoords.put(f, coordsToStore);
+		}
 	}
 
 	/**

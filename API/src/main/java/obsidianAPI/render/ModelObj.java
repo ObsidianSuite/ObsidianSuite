@@ -244,7 +244,7 @@ public class ModelObj extends ModelBase {
 	}
 	
 	private void merge(PartObj part, PartObj partToMerge) {
-		part.groupObj.faces.addAll(partToMerge.groupObj.faces);
+		part.addFacesFromPart(partToMerge);
 		removeParenting(partToMerge);
 		parts.remove(partToMerge);
 	}
