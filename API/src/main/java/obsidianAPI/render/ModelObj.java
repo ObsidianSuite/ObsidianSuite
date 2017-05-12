@@ -31,7 +31,6 @@ import obsidianAPI.render.part.PartObj;
 import obsidianAPI.render.part.prop.PartPropRotation;
 import obsidianAPI.render.part.prop.PartPropScale;
 import obsidianAPI.render.part.prop.PartPropTranslation;
-import scala.actors.threadpool.Arrays;
 
 public class ModelObj extends ModelBase
 {
@@ -46,12 +45,12 @@ public class ModelObj extends ModelBase
 
 	public static final float initRotFix = 180.0F;
 	public static final float offsetFixY = -1.5F;
-	
+
 	public ModelObj(String entityName, ResourceLocation objRes, ResourceLocation texture)
 	{
 		this(entityName, FileLoader.readObj(objRes), texture);
 	}
-	
+
 	public ModelObj(String entityName, WavefrontObject obj,  ResourceLocation texture)
 	{
 		this.entityName = entityName;
@@ -66,7 +65,7 @@ public class ModelObj extends ModelBase
 	{
 		return texture;
 	}
-	
+
 	public void loadSetup(InputStream stream)
 	{
 		try {
@@ -77,8 +76,8 @@ public class ModelObj extends ModelBase
 		}
 		catch (Exception e) {System.err.println("Unable to load model nbt for " + entityName);}
 	}
-	
-	
+
+
 	public NBTTagCompound createNBTTag()
 	{
 		NBTTagCompound nbt = new NBTTagCompound();
@@ -108,7 +107,7 @@ public class ModelObj extends ModelBase
 	{
 		return defaults.get(part).clone();
 	}
-	
+
 	private void loadObj(WavefrontObject model)
 	{
 		parts = createPartObjList(model.groupObjects);
@@ -210,25 +209,81 @@ public class ModelObj extends ModelBase
 	{
 		bends.remove(bend);
 	}
-	
-	public void merge(PartObj part, PartObj partToMerge) {
-		List<PartObj> partsToMerge = new ArrayList<PartObj>();
-		partsToMerge.add(partToMerge);
-		merge(part, partsToMerge);
+
+
+	public void mergeAll() {
+		fixMergeParenting();
+		for(PartObj topParent : getTopParents())
+			merge(topParent);
+	}
+
+	private void merge(PartObj part) {	
+		List<PartObj> childrenToMerge = new ArrayList<PartObj>();
+		for(PartObj child : part.getChildren()) {
+			if(!child.getChildren().isEmpty())
+				merge(child);
+			if(child.getName().endsWith("_m"))
+				childrenToMerge.add(child);
+		}
+
+		for(PartObj child : childrenToMerge)
+			merge(part, child);
 	}
 	
-	public void merge(PartObj part, List<PartObj> partsToMerge) {
-		for(PartObj partToMerge : partsToMerge) {
-			part.groupObj.faces.addAll(partToMerge.groupObj.faces);
-			
-			merge(part, new ArrayList<PartObj>(partToMerge.getChildren()));
-			
-			setParent(partToMerge, null, false);
-			parts.remove(partToMerge);
-			partToMerge.getChildren().clear();
-			part.addMergedPart(partToMerge);
+	/**
+	 * Adjust part parenting so parts that are parented to
+	 * parts that will be merged are parented to the parts
+	 * their old parents will merge into. 
+	 */
+	private void fixMergeParenting() {
+		for(PartObj part : getPartObjs()) {
+			if(part.getName().endsWith("_m") || !part.hasParent())
+				continue;
+			PartObj parent = part.getParent();
+			while(parent.getName().endsWith("_m")) {
+				parent = parent.getParent();
+			}
+			setParent(part, parent, false);
 		}
 	}
+
+	private List<PartObj> getTopParents() {
+		List<PartObj> topParents = new ArrayList<PartObj>();
+		for(PartObj part : getPartObjs()) {
+			if(!part.hasParent())
+				topParents.add(part);
+		}
+		return topParents;
+	}
+
+	public void merge(PartObj part, PartObj partToMerge) {
+		System.out.println("merging " + partToMerge.getDisplayName() + " into " + part.getDisplayName());
+		part.groupObj.faces.addAll(partToMerge.groupObj.faces);
+		setParent(partToMerge, null, false);
+		part.getChildren().remove(partToMerge);
+		part.addMergedPart(partToMerge);
+		parts.remove(partToMerge);
+	}
+
+	//	public void merge(PartObj part, List<PartObj> partsToMerge) {
+	//		for(PartObj partToMerge : partsToMerge) {
+	//			part.groupObj.faces.addAll(partToMerge.groupObj.faces);
+	//			
+	//			List<PartObj> childrenToMerge = new ArrayList<PartObj>();
+	//			for(PartObj child : partToMerge.getChildren()) {
+	//				if(child.getName().endsWith("_m"))
+	//					childrenToMerge.add(child);
+	//			}
+	//			
+	//			if(childrenToMerge.size() > 0)
+	//				merge(part, new ArrayList<PartObj>(childrenToMerge));
+	//			
+	//			setParent(partToMerge, null, false);
+	//			parts.remove(partToMerge);
+	//			partToMerge.getChildren().removeAll(childrenToMerge);
+	//			part.addMergedPart(partToMerge);
+	//		}
+	//	}
 
 	//----------------------------------------------------------------
 	//							Rotation
@@ -256,12 +311,12 @@ public class ModelObj extends ModelBase
 		super.render(entity, time, distance, loop, lookY, lookX, scale);
 
 		setRotationAngles(time, distance, loop, lookY, lookX, scale, entity);
-		
+
 		GL11.glPushMatrix();
 		GL11.glRotatef(initRotFix, 1.0F, 0.0F, 0.0F);
 		GL11.glTranslatef(0.0F, offsetFixY, 0.0F);
 
-		
+
 		for(Part p : this.parts) 
 		{
 			if(p instanceof PartObj)
@@ -271,8 +326,8 @@ public class ModelObj extends ModelBase
 					part.render();
 			}
 			//TODO entity movement via PartEntityPos
-//			else if(p instanceof PartEntityPos)
-//				((PartEntityPos) p).move(entity);
+			//			else if(p instanceof PartEntityPos)
+			//				((PartEntityPos) p).move(entity);
 		}
 
 		for (Bend bend : bends)
@@ -299,7 +354,7 @@ public class ModelObj extends ModelBase
 	{
 		return new PartObj(this, group);
 	}
-	
+
 	public Part getPartFromName(String name) 
 	{
 		for(Part part : parts)
@@ -311,7 +366,7 @@ public class ModelObj extends ModelBase
 		}
 		throw new RuntimeException("No part found for '" + name + "'");
 	}
-	
+
 	public PartObj getPartObjFromName(String name) 
 	{
 		for(Part p : parts)

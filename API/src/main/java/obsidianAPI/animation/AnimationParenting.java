@@ -99,7 +99,7 @@ public class AnimationParenting
 				PartObj mergedPart = model.getPartObjFromName(name);
 				model.merge(parent, mergedPart);
 				j++;
-			}
+			}	
 		}
 	}
 }
