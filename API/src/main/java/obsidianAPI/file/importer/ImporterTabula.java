@@ -14,6 +14,7 @@ import javax.swing.JOptionPane;
 
 import org.apache.commons.io.IOUtils;
 
+import obsidianAPI.MathHelper;
 import obsidianAPI.file.ObsidianFile;
 import obsidianAPI.render.ModelObj;
 import obsidianAPI.render.part.PartObj;
@@ -127,11 +128,28 @@ public class ImporterTabula implements ModelImporter {
 			return getBoxRotationPoint(box);
 
 		float[] absRotPoint = getBoxRotationPoint(box);
+		MathHelper.rotateVertex(absRotPoint, MathHelper.createRotationMatrixFromAngles(getAbsRotation(boxes, parent, model)), new float[]{0,0,0});
+		
+		
 		float[] parentAbsRotPoint = getAbsoluteBoxRotationPoint(boxes, parent, model);
 		for(int i = 0; i < 3; i++)
 			absRotPoint[i] += parentAbsRotPoint[i];
 	
 		return absRotPoint;
+	}
+	
+	private static float[] getAbsRotation(List<TabulaBox> boxes, TabulaBox box, ModelObj model) {
+		TabulaBox parent = getTabulaBoxParent(boxes, box, model);
+		if(parent == null)
+			return getBoxRotation(box);
+		
+		float[] absRot = getBoxRotation(box);
+		
+		float[] parentAbsRot = getAbsRotation(boxes, parent, model);
+		for(int i = 0; i < 3; i++)
+			absRot[i] += parentAbsRot[i];
+	
+		return absRot;
 	}
 	
 	private static TabulaBox getTabulaBox(List<TabulaBox> boxes, PartObj obj) {
@@ -152,6 +170,10 @@ public class ImporterTabula implements ModelImporter {
 	
 	private static float[] getBoxRotationPoint(TabulaBox box) {
 		return new float[]{box.rotationPointX, box.rotationPointY, box.rotationPointZ};
+	}
+	
+	private static float[] getBoxRotation(TabulaBox box) {
+		return new float[]{(float) (box.rotateAngleX/180F*Math.PI), (float) (box.rotateAngleY/180F*Math.PI), (float) (box.rotateAngleZ/180F*Math.PI)};
 	}
 	
 	private static String containsDuplicateParts(TabulaModel tblModel) {
