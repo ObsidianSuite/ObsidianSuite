@@ -1,26 +1,27 @@
 package updater;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 
 public class UpdaterMain {
 
-	public static void main(String[] args) {
-		
-		
-		
+	private static final String versionLink = "https://raw.githubusercontent.com/DaBigJoe/ObsidianSuite/updater/VERSION.md";
 
+	public static void main(String[] args) {
 		try {
-			URL url = new URL("https://raw.githubusercontent.com/DaBigJoe/ObsidianSuite/updater/VERSION.md");
-			BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream(), "UTF-8"));
-		    for (String line; (line = reader.readLine()) != null;) {
-		        System.out.println(line);
-		    }
+			System.out.println(getVersion("Test"));
+		} catch (Exception e) {e.printStackTrace();}
+	}
+
+	private static String getVersion(String softwareName) throws IOException, SoftwareNotFoundException {
+		BufferedReader reader = new BufferedReader(new InputStreamReader(new URL(versionLink).openStream(), "UTF-8"));
+		for (String line; (line = reader.readLine()) != null;) {
+			if(line.contains(softwareName))
+				return line.substring(softwareName.length()+1);
 		}
-		catch (Exception e) {
-			
-		}
+		throw new SoftwareNotFoundException(softwareName);
 	}
 	
 }

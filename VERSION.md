@@ -1,1 +1,1 @@
-Test v1.0.0
+ObsidianAnimator v0.3.0-Alpha
