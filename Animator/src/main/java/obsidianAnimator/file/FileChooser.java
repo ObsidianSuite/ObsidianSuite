@@ -1,18 +1,17 @@
 package obsidianAnimator.file;
 
 
-import java.awt.Component;
-import java.io.File;
+import obsidianAPI.file.FileHandler;
 
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
-
-import obsidianAPI.file.FileHandler;
+import java.awt.Component;
+import java.io.File;
 
 public class FileChooser
 {
 
-	public static final FileNameExtensionFilter allModelFilter = new FileNameExtensionFilter("All Models", FileHandler.obsidianModelExtension, FileHandler.tabulaModelExtension);
+	public static final FileNameExtensionFilter allModelFilter = new FileNameExtensionFilter("All Models", FileHandler.obsidianModelExtension, FileHandler.tabulaModelExtension, FileHandler.qubbleModelExtension);
 	public static final FileNameExtensionFilter obsidianModelFilter = new FileNameExtensionFilter("Obsidian Models", FileHandler.obsidianModelExtension);
 	public static final FileNameExtensionFilter animationFilter = new FileNameExtensionFilter("Obsidian Animations", FileHandler.animationExtension);
 	public static final FileNameExtensionFilter textureFilter = new FileNameExtensionFilter("PNG", FileHandler.textureExtension);
