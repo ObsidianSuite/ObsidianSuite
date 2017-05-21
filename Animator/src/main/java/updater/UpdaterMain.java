@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.net.URLConnection;
 
 public class UpdaterMain {
 
@@ -11,17 +12,23 @@ public class UpdaterMain {
 
 	public static void main(String[] args) {
 		try {
-			System.out.println(getVersion("Test"));
+			System.out.println(getVersion("ObsidianAnimator"));
 		} catch (Exception e) {e.printStackTrace();}
 	}
 
 	private static String getVersion(String softwareName) throws IOException, SoftwareNotFoundException {
-		BufferedReader reader = new BufferedReader(new InputStreamReader(new URL(versionLink).openStream(), "UTF-8"));
+		URLConnection connection = new URL(versionLink).openConnection();
+		connection.setUseCaches(false);
+		BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), "UTF-8"));
+		String version = null;
 		for (String line; (line = reader.readLine()) != null;) {
 			if(line.contains(softwareName))
-				return line.substring(softwareName.length()+1);
+				version = line.substring(softwareName.length()+1);
 		}
-		throw new SoftwareNotFoundException(softwareName);
+		reader.close();
+		if(version == null)
+			throw new SoftwareNotFoundException(softwareName);
+		return version;
 	}
 	
 }
