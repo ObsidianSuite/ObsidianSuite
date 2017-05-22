@@ -18,43 +18,47 @@ public class UpdaterMain {
 	
 	public static void main(String[] args) {
 		try {
-			String version = getVersion(animatorID);
-			URL url = generateDownloadURL(animatorID, version, "zip");
-			download(url, new File(generateFileName(animatorID, version, "zip")));
-		} catch (Exception e) {e.printStackTrace();}
+			download(animatorID);
+		} catch (IOException | SoftwareNotFoundException e) {
+			e.printStackTrace();
+		}
 	}
-
-	private static String getVersion(String softwareID) throws IOException, SoftwareNotFoundException {
-		String softwareName = "Obsidian" + softwareID;
+	
+	private static void download(String softwareName) throws IOException, SoftwareNotFoundException {
+		String version = getVersion(softwareName);
+		String tag = generateTag(softwareName, version);
+		String fileName = generateFileName(softwareName, version, "zip");
+		URL downloadURL = generateDownloadURL(tag, fileName);
+		File downloadFile = new File(fileName);
+		FileUtils.copyURLToFile(downloadURL, downloadFile);
+	}
+	
+	private static String getVersion(String softwareName) throws IOException, SoftwareNotFoundException {
+		String completeName = "Obsidian" + softwareName;
 		URLConnection connection = new URL(versionLink).openConnection();
 		connection.setUseCaches(false);
 		BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), "UTF-8"));
 		String version = null;
 		for (String line; (line = reader.readLine()) != null;) {
-			if(line.contains(softwareName))
-				version = line.substring(softwareName.length()+1);
+			if(line.contains(completeName))
+				version = line.substring(completeName.length()+1);
 		}
 		reader.close();
 		if(version == null)
-			throw new SoftwareNotFoundException(softwareName);
+			throw new SoftwareNotFoundException(completeName);
 		return version;
 	}
-
-	/**
-	 * E.g. https://github.com/DaBigJoe/ObsidianSuite/releases/download/Animator_v0.3.0-Alpha/ObsidianAnimator_v0.3.0-Alpha.zip
-	 * 																			^							^
-	 * @throws MalformedURLException 
-	 */
-	private static URL generateDownloadURL(String softwareID, String version, String extension) throws MalformedURLException {
-		return new URL(baseDownloadLink + softwareID + "_" + version + "/" + generateFileName(softwareID, version, extension));
+	
+	private static URL generateDownloadURL(String tag, String fileName) throws MalformedURLException {
+		return new URL(baseDownloadLink + tag + "/" + fileName);
+	}
+	
+	private static String generateTag(String softwareName, String version) {
+		return String.format("%s_%s", softwareName, version);
 	}
 	
 	private static String generateFileName(String softwareID, String version, String extension) {
 		return String.format("Obsidian%s_%s.%s", softwareID, version, extension);
-	}
-	
-	private static void download(URL url, File file) throws IOException {
-		FileUtils.copyURLToFile(url, file);
 	}
 	
 }
