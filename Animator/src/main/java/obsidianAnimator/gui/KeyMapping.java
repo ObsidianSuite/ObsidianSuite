@@ -17,20 +17,31 @@ public class KeyMapping
 
     public void addKey(int frameKey, int minecraftKey, String actionMapKey, Action action)
     {
-        addKey(frameKey, minecraftKey, false, actionMapKey, action);
+        addKey(frameKey, minecraftKey, false, false, actionMapKey, action);
     }
 
     public void addCtrlKey(int frameKey, int minecraftKey, String actionMapKey, Action action)
     {
-        addKey(frameKey, minecraftKey, true, actionMapKey, action);
+        addKey(frameKey, minecraftKey, true, false, actionMapKey, action);
     }
 
-    private void addKey(int frameKey, int minecraftKey, boolean ctrl, String actionMapKey, Action action)
+    public void addCtrlShiftKey(int frameKey, int minecraftKey, String actionMapKey, Action action)
+    {
+        addKey(frameKey, minecraftKey, true, true, actionMapKey, action);
+    }
+
+    private void addKey(int frameKey, int minecraftKey, boolean ctrl, boolean shift, String actionMapKey, Action action)
     {
         InputMap inputMap = frame.getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
         ActionMap actionMap = frame.getRootPane().getActionMap();
 
-        KeyStroke keyStroke = ctrl ? KeyStroke.getKeyStroke(frameKey, InputEvent.CTRL_DOWN_MASK, true)
+        int modifiers = 0;
+        if (ctrl)
+            modifiers |= InputEvent.CTRL_DOWN_MASK;
+        if (shift)
+            modifiers |= InputEvent.SHIFT_DOWN_MASK;
+
+        KeyStroke keyStroke = ctrl || shift ? KeyStroke.getKeyStroke(frameKey, modifiers, true)
                                    : KeyStroke.getKeyStroke(frameKey, 0);
 
         inputMap.put(keyStroke, actionMapKey);

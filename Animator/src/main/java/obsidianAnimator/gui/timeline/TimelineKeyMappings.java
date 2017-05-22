@@ -1,5 +1,7 @@
 package obsidianAnimator.gui.timeline;
 
+import com.google.common.collect.Lists;
+import obsidianAPI.render.part.Part;
 import obsidianAnimator.gui.KeyMapping;
 import org.lwjgl.input.Keyboard;
 
@@ -31,8 +33,10 @@ public class TimelineKeyMappings
 		keyMappings.addCtrlKey(KeyEvent.VK_R, Keyboard.KEY_R,"rPressed", new ResetAction());
 		keyMappings.addCtrlKey(KeyEvent.VK_C, Keyboard.KEY_C, "cPressed", new CopyAction());
 		keyMappings.addCtrlKey(KeyEvent.VK_V, Keyboard.KEY_V, "vPressed", new PasteAction());
-		keyMappings.addCtrlKey(KeyEvent.VK_PLUS, Keyboard.KEY_ADD, "addPressed", new AddAction());
-		keyMappings.addCtrlKey(KeyEvent.VK_MINUS, Keyboard.KEY_SUBTRACT, "removePressed", new RemoveAction());
+		keyMappings.addCtrlShiftKey(KeyEvent.VK_PLUS, Keyboard.KEY_ADD, "addAllPressed", new AddAction(true));
+		keyMappings.addCtrlShiftKey(KeyEvent.VK_MINUS, Keyboard.KEY_SUBTRACT, "removeAllPressed", new RemoveAction(true));
+		keyMappings.addCtrlKey(KeyEvent.VK_PLUS, Keyboard.KEY_ADD, "addPressed", new AddAction(false));
+		keyMappings.addCtrlKey(KeyEvent.VK_MINUS, Keyboard.KEY_SUBTRACT, "removePressed", new RemoveAction(false));
 
         int[] numpadKey = new int[] {
         		Keyboard.KEY_NUMPAD0, Keyboard.KEY_NUMPAD1, Keyboard.KEY_NUMPAD2, Keyboard.KEY_NUMPAD3,
@@ -256,15 +260,32 @@ public class TimelineKeyMappings
 
 	private class AddAction extends AbstractAction
 	{
-        @Override
+		private final boolean allParts;
+
+		private AddAction(boolean allParts) {this.allParts = allParts;}
+
+		@Override
         public void actionPerformed(ActionEvent e)
         {
         	int time = (int) controller.getTime();
-			for (Keyframe frame : controller.keyframeController.getAllFrames())
+        	if (allParts)
 			{
-				if (frame.frameTime >= time)
+				for (Keyframe frame : controller.keyframeController.getAllFrames())
 				{
-					frame.frameTime++;
+					if (frame.frameTime >= time)
+					{
+						frame.frameTime++;
+					}
+				}
+			}
+			else if (controller.getSelectedPart() != null)
+			{
+				for (Keyframe frame : controller.keyframeController.getPartKeyframes(controller.getSelectedPart()))
+				{
+					if (frame.frameTime >= time)
+					{
+						frame.frameTime++;
+					}
 				}
 			}
 
@@ -276,23 +297,49 @@ public class TimelineKeyMappings
 
     private class RemoveAction extends AbstractAction
 	{
+		private final boolean allParts;
+
+		private RemoveAction(boolean allParts) {this.allParts = allParts;}
+
         @Override
         public void actionPerformed(ActionEvent e)
         {
         	int time = (int) controller.getTime();
-			for (Keyframe frame : controller.keyframeController.getAllFrames())
+        	if (allParts)
 			{
-				if (frame.frameTime == time)
+				for (Keyframe frame : controller.keyframeController.getAllFrames())
 				{
-					controller.keyframeController.deleteKeyframe(frame.part,frame.frameTime);
+					if (frame.frameTime == time)
+					{
+						controller.keyframeController.deleteKeyframe(frame.part, frame.frameTime);
+					}
+				}
+
+				for (Keyframe frame : controller.keyframeController.getAllFrames())
+				{
+					if (frame.frameTime > time)
+					{
+						frame.frameTime--;
+					}
 				}
 			}
-
-			for (Keyframe frame : controller.keyframeController.getAllFrames())
+			else if (controller.getSelectedPart() != null)
 			{
-				if (frame.frameTime > time)
+				Part selectedPart = controller.getSelectedPart();
+				for (Keyframe frame : Lists.newArrayList(controller.keyframeController.getPartKeyframes(selectedPart)))
 				{
-					frame.frameTime--;
+					if (frame.frameTime == time)
+					{
+						controller.keyframeController.deleteKeyframe(frame.part, frame.frameTime);
+					}
+				}
+
+				for (Keyframe frame : controller.keyframeController.getPartKeyframes(selectedPart))
+				{
+					if (frame.frameTime > time)
+					{
+						frame.frameTime--;
+					}
 				}
 			}
 
