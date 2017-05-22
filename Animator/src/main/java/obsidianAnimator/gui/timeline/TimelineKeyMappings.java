@@ -1,24 +1,22 @@
 package obsidianAnimator.gui.timeline;
 
+import obsidianAnimator.gui.KeyMapping;
+import org.lwjgl.input.Keyboard;
+
+import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 
-import javax.swing.AbstractAction;
-
-import org.lwjgl.input.Keyboard;
-
-import obsidianAnimator.gui.KeyMapping;
-
-public class TimelineKeyMappings 
+public class TimelineKeyMappings
 {
-	
+
 	private KeyMapping keyMappings;
 	private TimelineController controller;
-	
+
 	public TimelineKeyMappings(TimelineController controller)
 	{
 		this.controller = controller;
-		
+
         keyMappings = new KeyMapping(controller.timelineFrame);
 
         keyMappings.addKey(KeyEvent.VK_SPACE, Keyboard.KEY_SPACE, "spacePressed", new SpaceAction());
@@ -33,6 +31,8 @@ public class TimelineKeyMappings
 		keyMappings.addCtrlKey(KeyEvent.VK_R, Keyboard.KEY_R,"rPressed", new ResetAction());
 		keyMappings.addCtrlKey(KeyEvent.VK_C, Keyboard.KEY_C, "cPressed", new CopyAction());
 		keyMappings.addCtrlKey(KeyEvent.VK_V, Keyboard.KEY_V, "vPressed", new PasteAction());
+		keyMappings.addCtrlKey(KeyEvent.VK_PLUS, Keyboard.KEY_ADD, "addPressed", new AddAction());
+		keyMappings.addCtrlKey(KeyEvent.VK_MINUS, Keyboard.KEY_SUBTRACT, "removePressed", new RemoveAction());
 
         int[] numpadKey = new int[] {
         		Keyboard.KEY_NUMPAD0, Keyboard.KEY_NUMPAD1, Keyboard.KEY_NUMPAD2, Keyboard.KEY_NUMPAD3,
@@ -44,12 +44,12 @@ public class TimelineKeyMappings
 			keyMappings.addKey(KeyEvent.VK_NUMPAD0 + j, numpadKey[j], "numpad" + j, new ChangeViewAction(j));
         }
 	}
-	
-	public void handleMinecraftKey(int par2) 
+
+	public void handleMinecraftKey(int par2)
 	{
 		keyMappings.handleMinecraftKey(par2);
 	}
-	
+
 	/* ---------------------------------------------------- *
 	 * 				   		Actions							*
 	 * ---------------------------------------------------- */
@@ -57,7 +57,7 @@ public class TimelineKeyMappings
 	private class SpaceAction extends AbstractAction
 	{
 		@Override
-		public void actionPerformed(ActionEvent arg0) 
+		public void actionPerformed(ActionEvent arg0)
 		{
 			controller.keyframeController.addKeyframe();
 		}
@@ -66,7 +66,7 @@ public class TimelineKeyMappings
 	private class WAction extends AbstractAction
 	{
 		@Override
-		public void actionPerformed(ActionEvent arg0) 
+		public void actionPerformed(ActionEvent arg0)
 		{
 			for(int i = 0; i < controller.timelineGui.parts.size(); i++)
 			{
@@ -78,33 +78,33 @@ public class TimelineKeyMappings
 						controller.timelineGui.updatePart(controller.timelineGui.parts.get(controller.timelineGui.parts.size() - 1));
 					break;
 				}
-			}			
+			}
 		}
 	}
 
 	private class SAction extends AbstractAction
 	{
 		@Override
-		public void actionPerformed(ActionEvent arg0) 
+		public void actionPerformed(ActionEvent arg0)
 		{
 			for(int i = 0; i < controller.timelineGui.parts.size(); i++)
 			{
 				if(controller.timelineGui.parts.get(i).equals(controller.timelineGui.selectedPart))
-				{					
+				{
 					if(i < controller.timelineGui.parts.size() - 1)
 						controller.timelineGui.updatePart(controller.timelineGui.parts.get(i+1));
 					else
 						controller.timelineGui.updatePart(controller.timelineGui.parts.get(0));
 					break;
 				}
-			}		
+			}
 		}
 	}
 
 	private class AAction extends AbstractAction
 	{
 		@Override
-		public void actionPerformed(ActionEvent arg0) 
+		public void actionPerformed(ActionEvent arg0)
 		{
 			controller.setExceptionPart(null);
 			controller.setTime(controller.getTime() > 0 ? controller.getTime() - 1 : controller.getTime());
@@ -116,7 +116,7 @@ public class TimelineKeyMappings
 	private class DAction extends AbstractAction
 	{
 		@Override
-		public void actionPerformed(ActionEvent arg0) 
+		public void actionPerformed(ActionEvent arg0)
 		{
 			controller.setExceptionPart(null);
 			controller.setTime(controller.getTime() < controller.keyframeController.panel.getTimelineLength() ? controller.getTime() + 1 : controller.getTime());
@@ -128,36 +128,36 @@ public class TimelineKeyMappings
 	private class UndoAction extends AbstractAction
 	{
 		@Override
-		public void actionPerformed(ActionEvent arg0) 
+		public void actionPerformed(ActionEvent arg0)
 		{
-			controller.versionController.undo();		
+			controller.versionController.undo();
 		}
 	}
 
 	private class RedoAction extends AbstractAction
 	{
 		@Override
-		public void actionPerformed(ActionEvent arg0) 
+		public void actionPerformed(ActionEvent arg0)
 		{
-			controller.versionController.redo();		
+			controller.versionController.redo();
 		}
 	}
 
 	private class DeleteAction extends AbstractAction
 	{
 		@Override
-		public void actionPerformed(ActionEvent arg0) 
+		public void actionPerformed(ActionEvent arg0)
 		{
-			controller.keyframeController.deleteKeyframe();		
+			controller.keyframeController.deleteKeyframe();
 		}
 	}
 
 	private class EscAction extends AbstractAction
 	{
 		@Override
-		public void actionPerformed(ActionEvent arg0) 
+		public void actionPerformed(ActionEvent arg0)
 		{
-			controller.close();		
+			controller.close();
 		}
 	}
 
@@ -184,7 +184,7 @@ public class TimelineKeyMappings
 					controller.getSelectedPart().setToOriginalValues();
 				}
 			}
-			
+
 		}
 	}
 
@@ -254,4 +254,51 @@ public class TimelineKeyMappings
 		}
 	}
 
+	private class AddAction extends AbstractAction
+	{
+        @Override
+        public void actionPerformed(ActionEvent e)
+        {
+        	int time = (int) controller.getTime();
+			for (Keyframe frame : controller.keyframeController.getAllFrames())
+			{
+				if (frame.frameTime >= time)
+				{
+					frame.frameTime++;
+				}
+			}
+
+			controller.updateAnimationParts();
+            controller.setExceptionPart(null);
+            controller.refresh();
+        }
+    }
+
+    private class RemoveAction extends AbstractAction
+	{
+        @Override
+        public void actionPerformed(ActionEvent e)
+        {
+        	int time = (int) controller.getTime();
+			for (Keyframe frame : controller.keyframeController.getAllFrames())
+			{
+				if (frame.frameTime == time)
+				{
+					controller.keyframeController.deleteKeyframe(frame.part,frame.frameTime);
+				}
+			}
+
+			for (Keyframe frame : controller.keyframeController.getAllFrames())
+			{
+				if (frame.frameTime > time)
+				{
+					frame.frameTime--;
+				}
+			}
+
+			controller.updateAnimationParts();
+            controller.setExceptionPart(null);
+            controller.refresh();
+        }
+    }
 }
