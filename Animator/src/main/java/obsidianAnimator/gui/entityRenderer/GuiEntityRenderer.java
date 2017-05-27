@@ -178,7 +178,7 @@ public class GuiEntityRenderer extends GuiBlack
 	protected void mouseClickMove(int x, int y, int button, long par3Long) 
 	{
 		super.mouseClickMove(x, y, button, par3Long);
-		if(button == 2)
+		if(button == 1)
 		{
 			if(prevMouseMoveX == 0)
 			{
