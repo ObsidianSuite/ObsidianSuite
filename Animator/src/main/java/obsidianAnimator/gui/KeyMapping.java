@@ -1,17 +1,20 @@
 package obsidianAnimator.gui;
 
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Multimap;
 import net.minecraft.client.gui.GuiScreen;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
+import java.util.Collection;
 import java.util.Map;
 
 public class KeyMapping
 {
     private final JFrame frame;
-    private final Map<Integer, KeyAction> actionByMinecraftKey = Maps.newHashMap();
+    private final Multimap<Integer, KeyAction> actionByMinecraftKey = HashMultimap.create();
 
     public KeyMapping(JFrame frame) {this.frame = frame;}
 
@@ -42,38 +45,40 @@ public class KeyMapping
             modifiers |= InputEvent.SHIFT_DOWN_MASK;
 
         KeyStroke keyStroke = ctrl || shift ? KeyStroke.getKeyStroke(frameKey, modifiers, true)
-                                   : KeyStroke.getKeyStroke(frameKey, 0);
+                                            : KeyStroke.getKeyStroke(frameKey, 0);
 
         inputMap.put(keyStroke, actionMapKey);
         actionMap.put(actionMapKey, action);
 
-        actionByMinecraftKey.put(minecraftKey, new KeyAction(ctrl, action));
+        actionByMinecraftKey.put(minecraftKey, new KeyAction(ctrl, shift, action));
     }
 
     public boolean handleMinecraftKey(int key)
     {
-        KeyAction action = actionByMinecraftKey.get(key);
-
-        //TODO GuiScreen.isCtrlKeyDown() only work if the MC screen is in focus, not the swing frame.
-        if (action != null && (!action.ctrl || GuiScreen.isCtrlKeyDown()))
+        Collection<KeyAction> actions = actionByMinecraftKey.get(key);
+        for (KeyAction action : actions)
         {
-            action.action.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_FIRST, ""));
-
-            return true;
-        } else
-        {
-            return false;
+            if (action.shift == GuiScreen.isShiftKeyDown() &&
+                    action.ctrl == GuiScreen.isCtrlKeyDown())
+            {
+                action.action.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_FIRST, ""));
+                return true;
+            }
         }
+
+        return false;
     }
 
     private class KeyAction
     {
         private final boolean ctrl;
+        private final boolean shift;
         private final Action action;
 
-        private KeyAction(boolean ctrl, Action action)
+        private KeyAction(boolean ctrl, boolean shift, Action action)
         {
             this.ctrl = ctrl;
+            this.shift = shift;
             this.action = action;
         }
     }
