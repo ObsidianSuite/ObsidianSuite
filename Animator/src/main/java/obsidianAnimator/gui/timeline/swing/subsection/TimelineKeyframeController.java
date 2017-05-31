@@ -261,7 +261,8 @@ public class TimelineKeyframeController extends TimelineControllerSub
 
 	public List<Keyframe> getPartKeyframes(Part part)
 	{
-		return keyframes.get(part);
+		List<Keyframe> frames = this.keyframes.get(part);
+		return frames == null ? Collections.emptyList() : frames;
 	}
 
 }
