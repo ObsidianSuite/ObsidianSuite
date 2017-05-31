@@ -33,10 +33,10 @@ public class TimelineKeyMappings
 		keyMappings.addCtrlKey(KeyEvent.VK_R, Keyboard.KEY_R,"rPressed", new ResetAction());
 		keyMappings.addCtrlKey(KeyEvent.VK_C, Keyboard.KEY_C, "cPressed", new CopyAction());
 		keyMappings.addCtrlKey(KeyEvent.VK_V, Keyboard.KEY_V, "vPressed", new PasteAction());
-		keyMappings.addCtrlShiftKey(KeyEvent.VK_PLUS, Keyboard.KEY_ADD, "addAllPressed", new AddAction(true));
-		keyMappings.addCtrlShiftKey(KeyEvent.VK_MINUS, Keyboard.KEY_SUBTRACT, "removeAllPressed", new RemoveAction(true));
-		keyMappings.addCtrlKey(KeyEvent.VK_PLUS, Keyboard.KEY_ADD, "addPressed", new AddAction(false));
-		keyMappings.addCtrlKey(KeyEvent.VK_MINUS, Keyboard.KEY_SUBTRACT, "removePressed", new RemoveAction(false));
+		keyMappings.addCtrlShiftKey(KeyEvent.VK_ADD, Keyboard.KEY_ADD, "addAllPressed", new AddAction(true));
+		keyMappings.addCtrlShiftKey(KeyEvent.VK_SUBTRACT, Keyboard.KEY_SUBTRACT, "removeAllPressed", new RemoveAction(true));
+		keyMappings.addCtrlKey(KeyEvent.VK_ADD, Keyboard.KEY_ADD, "addPressed", new AddAction(false));
+		keyMappings.addCtrlKey(KeyEvent.VK_SUBTRACT, Keyboard.KEY_SUBTRACT, "removePressed", new RemoveAction(false));
 
         int[] numpadKey = new int[] {
         		Keyboard.KEY_NUMPAD0, Keyboard.KEY_NUMPAD1, Keyboard.KEY_NUMPAD2, Keyboard.KEY_NUMPAD3,
