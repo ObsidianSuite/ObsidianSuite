@@ -2,7 +2,7 @@
 	"versionList": [
 		{
 			"mcVersion":"Minecraft 1.7.10",
-			"modVersion":"v0.3.0-Alpha",
+			"modVersion":"0.3.0",
 			"changeLog": [
                 "+ Better Tabula support",
                 "+ Merge tool"
@@ -13,7 +13,7 @@
 		},
 		{
 			"mcVersion":"Minecraft 1.7.10",
-			"modVersion":"v0.3.1-Alpha",
+			"modVersion":"0.3.1",
 			"changeLog": [
                 "+ Version Checker Support",
                 "+ Qubble Importer (gegy1000)"
