@@ -3,22 +3,31 @@ package obsidianAnimator.gui.timeline.swing.subsection;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.BorderFactory;
+import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 public class TimelinePartPanel extends JPanel
 {
 	
-	protected JLabel partName, partX, partY, partZ;
+	protected JLabel partName;
+	protected JButton partX, partY, partZ;
 	
 	public TimelinePartPanel(TimelinePartController controller)
 	{		
 		partName = new JLabel();
-		partX = new JLabel();
-		partY = new JLabel();
-		partZ = new JLabel();
+		partX = new JButton();
+		partY = new JButton();
+		partZ = new JButton();
+		
+		partX.addActionListener(new PartLabelListener());
+		partY.addActionListener(new PartLabelListener());
+		partZ.addActionListener(new PartLabelListener());
 
 		setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
@@ -38,6 +47,15 @@ public class TimelinePartPanel extends JPanel
 		setBorder(BorderFactory.createTitledBorder("Part"));
 	}
 	
+	private class PartLabelListener implements ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			JOptionPane.showMessageDialog(TimelinePartPanel.this, "Test");			
+		}
+
+		
+	}
 
 
 }
