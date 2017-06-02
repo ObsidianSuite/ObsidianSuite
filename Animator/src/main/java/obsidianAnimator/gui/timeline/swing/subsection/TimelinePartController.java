@@ -25,19 +25,19 @@ public class TimelinePartController extends TimelineControllerSub
 	public void updatePartLabels()
 	{
 		String name = "No part selected";
-		String x="-",y="-",z="-";
+		double x=0,y=0,z=0;
 		if(getSelectedPart() != null)
 		{
 			Part part = getSelectedPart();
 			name = part.getDisplayName();
-			x = df.format(part.getValue(0));
-			y = df.format(part.getValue(1));
-			z = df.format(part.getValue(2));
+			x = part.getValue(0);
+			y = part.getValue(1);
+			z = part.getValue(2);
 		}
 		panel.partName.setText(name);
-		panel.partX.setText("X: " + x);
-		panel.partY.setText("Y: " + y);
-		panel.partZ.setText("Z: " + z);
+		panel.xSpinner.setValue(x);
+		panel.ySpinner.setValue(y);
+		panel.zSpinner.setValue(z);
 	}
 
 }
