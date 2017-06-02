@@ -15,7 +15,7 @@ public class EntitySetupGui extends GuiEntityRenderer
 		super(entityName);		
 		this.controller = controller;
 	}
-	
+
 	@Override 
 	public void processRay()
 	{
@@ -40,13 +40,15 @@ public class EntitySetupGui extends GuiEntityRenderer
 		if(i == 1 && hoveredPart != null) {
 			PartObj selectedPartObj = (PartObj) selectedPart;
 			PartObj hoveredPartObj = (PartObj) hoveredPart;			
-			if(isShiftKeyDown()) {
-				controller.getEntityModel().addMerge(selectedPartObj, hoveredPartObj);
-				controller.getEntityModel().runMerge();
-				controller.refresh();
+			if(selectedPart != hoveredPart) {
+				if(isShiftKeyDown()) {
+					controller.getEntityModel().addMerge(selectedPartObj, hoveredPartObj);
+					controller.getEntityModel().runMerge();
+					controller.refresh();
+				}
+				else 
+					controller.attemptParent(selectedPartObj, hoveredPartObj);
 			}
-			else 
-				controller.attemptParent(selectedPartObj, hoveredPartObj);
 		}
 	}
 }
