@@ -1,18 +1,17 @@
 package obsidianAPI.file;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.nbt.CompressedStreamTools;
+import net.minecraft.util.ResourceLocation;
+import obsidianAPI.animation.AnimationSequence;
+import org.apache.commons.io.IOUtils;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-
-import org.apache.commons.io.IOUtils;
-
-import net.minecraft.client.Minecraft;
-import net.minecraft.nbt.CompressedStreamTools;
-import net.minecraft.util.ResourceLocation;
-import obsidianAPI.animation.AnimationSequence;
 
 public class FileHandler 
 {
@@ -21,6 +20,7 @@ public class FileHandler
 	public static final String tabulaModelExtension = "tbl";
 	public static final String animationExtension = "oba";
 	public static final String textureExtension = "png";
+	public static final String qubbleModelExtension = "qbl";
 
 	public static final String homePath = generateHomePath();
 	public static final String animationPath = homePath + "mods/animation";
