@@ -12,7 +12,6 @@ import cpw.mods.fml.common.event.FMLInterModComms;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.common.MinecraftForge;
-import obsidianAPI.file.FileHandler;
 import obsidianAnimator.block.BlockBase;
 import obsidianAnimator.block.BlockGrid;
 
@@ -23,7 +22,8 @@ public class ObsidianAnimator
     public static final String MODID = "ObsidianAnimator";
     public static final String MODNAME = "Obsidian Animator";
     public static final String VERSION = "0.3.0-Alpha";
-	
+    private static final String VERSION_LINK = "https://raw.githubusercontent.com/DaBigJoe/ObsidianSuite/autoupdater/VERSION.json";
+    
 	@Mod.Instance("ObsidianAnimator")
 	public static ObsidianAnimator instance;
 
@@ -32,11 +32,11 @@ public class ObsidianAnimator
     
     public static final Block Base = new BlockBase();
     public static final Block Grid = new BlockGrid();
-    		
+    
 	@Mod.EventHandler
 	public void init(FMLInitializationEvent event)
 	{		
-		FMLInterModComms.sendRuntimeMessage(MODID, "VersionChecker", "addVersionCheck", link);
+		FMLInterModComms.sendRuntimeMessage(MODID, "VersionChecker", "addVersionCheck", VERSION_LINK);
 		
 		instance = this;		
 		proxy.init();
