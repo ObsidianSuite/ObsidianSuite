@@ -1,17 +1,17 @@
 package obsidianAPI.file;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.util.HashMap;
-import java.util.Map;
-
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
 import obsidianAPI.exceptions.MissingImporterException;
 import obsidianAPI.file.importer.FileLoader;
+import obsidianAPI.file.importer.ImporterQubble;
 import obsidianAPI.file.importer.ImporterTabula;
 import obsidianAPI.file.importer.ModelImporter;
 import obsidianAPI.render.ModelObj;
+
+import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ModelFileHandler {
 
@@ -24,11 +24,12 @@ public class ModelFileHandler {
 
 	public ModelFileHandler() {
 		importers.put(FileHandler.tabulaModelExtension, ImporterTabula.instance);
+		importers.put(FileHandler.qubbleModelExtension, ImporterQubble.instance);
 	}
 
 	public <T extends ModelObj> T importModel(File file, Class<T> clazz) throws MissingImporterException {
 		String fileName = file.getName();
-		String extension = fileName.substring(fileName.indexOf(".") + 1, fileName.length());
+		String extension = fileName.substring(fileName.lastIndexOf(".") + 1, fileName.length());
 		
 		//If importing from obsidian file, just load
 		if(extension.equals("obm")) {
