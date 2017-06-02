@@ -8,6 +8,7 @@ import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
+import cpw.mods.fml.common.event.FMLInterModComms;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.common.MinecraftForge;
@@ -35,6 +36,8 @@ public class ObsidianAnimator
 	@Mod.EventHandler
 	public void init(FMLInitializationEvent event)
 	{		
+		FMLInterModComms.sendRuntimeMessage(MODID, "VersionChecker", "addVersionCheck", link);
+		
 		instance = this;		
 		proxy.init();
 		proxy.registerBlocks();

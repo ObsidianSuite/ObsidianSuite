@@ -1,1 +1,0 @@
-Animator v0.3.0-Alpha
