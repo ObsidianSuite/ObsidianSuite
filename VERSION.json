@@ -2,23 +2,23 @@
 	"versionList": [
 		{
 			"mcVersion":"Minecraft 1.7.10",
-			"modVersion":"0.3.0",
-			"changeLog": [
-                "+ Better Tabula support",
-                "+ Merge tool"
-			],
-			"updateURL":"https://github.com/DaBigJoe/ObsidianSuite/releases/download/Animator_v0.3.0-Alpha/ObsidianAnimator_v0.3.0-Alpha.jar",
-			"isDirectLink":"true",
-			"newFileName":""
-		},
-		{
-			"mcVersion":"Minecraft 1.7.10",
-			"modVersion":"0.3.1",
+			"modVersion":"0.3.1-Alpha",
 			"changeLog": [
                 "+ Version Checker Support",
                 "+ Qubble Importer (gegy1000)"
 			],
 			"updateURL":"https://github.com/DaBigJoe/ObsidianSuite/releases/download/Animator_v0.3.1-Alpha/ObsidianAnimator_v0.3.1-Alpha.jar",
+			"isDirectLink":"true",
+			"newFileName":""
+		},
+		{
+			"mcVersion":"Minecraft 1.7.10",
+			"modVersion":"0.3.0-Alpha",
+			"changeLog": [
+                "+ Better Tabula support",
+                "+ Merge tool"
+			],
+			"updateURL":"https://github.com/DaBigJoe/ObsidianSuite/releases/download/Animator_v0.3.0-Alpha/ObsidianAnimator_v0.3.0-Alpha.jar",
 			"isDirectLink":"true",
 			"newFileName":""
 		}
