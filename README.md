@@ -12,6 +12,10 @@
 * Run '..\gradlew build' from repestive directory. 
 	Note building the Animator and Mod will also build the API.
 	
+### Compatability ###
+
+Version Checker: http://www.minecraftforum.net/forums/mapping-and-modding/minecraft-mods/2091981-version-checker-auto-update-mods-and-clean
+	
 ### tcn2obj ###
 
 The Obsidian Suite makes use of tcn2obj to convert Tabula/Techne models to Wavefront (.obj) models.
