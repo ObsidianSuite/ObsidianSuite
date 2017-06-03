@@ -71,7 +71,7 @@ task eclipse(overwrite: true) {
 def animatorProjects = [project(':API'),project(':Animator')]
 animatorProjects.each { subproject -> evaluationDependsOn(subproject.path)}
 task buildAnimatorWithAPI( type: Jar, dependsOn: animatorProjects.tasks["build"] ) {
-    baseName = 'ObsidianAnimator_v0.3.2-Alpha'
+    baseName = 'ObsidianAnimator_v0.3.3-Alpha'
     animatorProjects.each { subproject -> from subproject.configurations.archives.allArtifacts.files.collect {
             zipTree(it)
         }
