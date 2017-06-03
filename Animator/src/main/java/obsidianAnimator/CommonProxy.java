@@ -16,7 +16,8 @@ public class CommonProxy
 
 	public void registerModels() 
 	{
-		ModelHandler.loadModelFromResource("player");
+		ModelHandler.loadModelFromResource("ObsidianPlayer");
+		ModelHandler.loadModelFromResource("ObsidianCow");
 	}
 
 	public void registerRendering() {}
