@@ -19,7 +19,7 @@ public class ClientProxy extends CommonProxy
 	public void registerRendering()
 	{
 		RenderDummyPlayer dummyPlayerRenderer = new RenderDummyPlayer(FileLoader.loadModelFromResources("DummyPlayer", obsidianPlayerModelRL, obsidianPlayerTextureRL, ModelDummyPlayer.class));
-		RenderPlayerAnimated playerRenderer = new RenderPlayerAnimated(FileLoader.loadModelFromResources("Player", obsidianPlayerModelRL, obsidianPlayerTextureRL, ModelAnimatedPlayer.class));
+		RenderPlayerAnimated playerRenderer = new RenderPlayerAnimated(FileLoader.loadModelFromResources("player", obsidianPlayerModelRL, obsidianPlayerTextureRL, ModelAnimatedPlayer.class));
 		
 		RenderingRegistry.registerEntityRenderingHandler(EntityDummyPlayer.class, dummyPlayerRenderer);
 		RenderingRegistry.registerEntityRenderingHandler(EntityPlayer.class, playerRenderer);

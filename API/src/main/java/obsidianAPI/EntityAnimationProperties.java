@@ -109,7 +109,7 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
                 animationStartTime = now;
                 nextFrame = 0;
                 onFinished = null;
-                loop = loopAnim;
+                loop = next != null ? loopAnim : false;
                 activeAnimation = next;
             };
         }

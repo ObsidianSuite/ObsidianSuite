@@ -38,7 +38,7 @@ public class ModelAnimatedPlayer extends ModelAnimated
 				if(!entity.isCollidedVertically)
 					state = "SprintJump";
 				else
-					state = "Sprint";
+					state = "SprintF";
 			}
 			else if(entity.isSneaking())
 				state = "Crouch";
@@ -63,12 +63,15 @@ public class ModelAnimatedPlayer extends ModelAnimated
 		}	
 		
 		GuiDebug.instance.stateText = state;
-		
-		if(state.equals("WalkF") && isIdle(animProps))
+				
+		if(state.equals("WalkF") && !isAnimationActive(animProps, "WalkF"))
 		{
-			System.out.println("Setting");
 			animProps.setActiveAnimation(this, "WalkF", true);
 		} 
+		else if(state.equals("SprintF") && !isAnimationActive(animProps, "SprintF"))
+		{
+			animProps.setActiveAnimation(this, "SprintF", true);
+		}
 		else if(!isIdle(animProps) && state.equals("Idle"))
 		{
 			animProps.clearAnimation(this);

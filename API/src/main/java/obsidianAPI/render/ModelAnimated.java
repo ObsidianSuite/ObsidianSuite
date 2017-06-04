@@ -7,6 +7,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.obj.WavefrontObject;
 import obsidianAPI.EntityAnimationProperties;
 import obsidianAPI.animation.AnimationSequence;
+import obsidianAPI.registry.AnimationRegistry;
 import obsidianAPI.render.part.Part;
 
 public abstract class ModelAnimated extends ModelObj
@@ -30,18 +31,25 @@ public abstract class ModelAnimated extends ModelObj
 		{
 			updateAnimation(swingTime, entity, animProps);
 			
+			
 			AnimationSequence seq = animProps.getActiveAnimation();
-			if (seq == null)
+			
+			
+			if (seq == null && AnimationRegistry.getAnimation(entityName, "Idle") != null)
 			{
 				animProps.setActiveAnimation(this,"Idle",true);
 				seq = animProps.getActiveAnimation();
 			}
+			
 			
 			if(seq != null) {
 				animProps.updateFrameTime();
 				float time = animProps.getAnimationFrameTime();
 				animateToPartValues(animProps, seq.getPartValuesAtTime(this, time));
 				animProps.updateAnimation(this, time);
+			}
+			else {
+				doDefaultAnimations(swingTime, swingMax, f2, lookX, lookY, f5, entity);
 			}
 		}
 	}
@@ -67,7 +75,15 @@ public abstract class ModelAnimated extends ModelObj
 
 	protected boolean isIdle(EntityAnimationProperties animProps)
 	{
-		return animProps.getActiveAnimation() == null || animProps.getActiveAnimation().getName().equals("Idle");
+		return animProps.getActiveAnimation() == null || animProps.getActiveAnimation().getName().equals("Idle") 
+				|| animProps.getActiveAnimation().getName().equals("transition_idle");
+	}
+	
+	protected boolean isAnimationActive(EntityAnimationProperties animProps, String animationName)
+	{		
+		if(animProps.getActiveAnimation() == null)
+			return false;
+		return animProps.getActiveAnimation().getName().equals(animationName) || animProps.getActiveAnimation().getName().equals("transition_" + animationName);
 	}
 
 	protected void animateToPartValues(EntityAnimationProperties animProps, Map<String, float[]> partValues)
