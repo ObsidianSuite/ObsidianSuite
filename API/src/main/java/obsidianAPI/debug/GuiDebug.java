@@ -7,7 +7,8 @@ import net.minecraft.client.gui.ScaledResolution;
 public class GuiDebug extends Gui {
 
 	public static GuiDebug instance;
-	public String text = "";
+	public String stateText = "";
+	public String animationText = "";
 	private Minecraft mc;
 	
 	public GuiDebug(Minecraft mc)
@@ -19,7 +20,8 @@ public class GuiDebug extends Gui {
 	public void draw() {
 		ScaledResolution scaled = new ScaledResolution(mc, mc.displayWidth, mc.displayHeight);
 		int width = scaled.getScaledWidth();
-		drawCenteredString(mc.fontRenderer, text, width - 40, 2, Integer.parseInt("FFFF00", 16));
+		drawCenteredString(mc.fontRenderer, stateText, width - 40, 2, Integer.parseInt("FFFF00", 16));
+		drawCenteredString(mc.fontRenderer, animationText, width - 40, 12, Integer.parseInt("FFFF00", 16));
 	}
 	
 	

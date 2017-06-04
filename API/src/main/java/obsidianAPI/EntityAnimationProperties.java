@@ -99,8 +99,11 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
         {
             loop = false;
             AnimationSequence next = AnimationRegistry.getAnimation(entityName, binding);
-
-            activeAnimation = Util.createTransition(model,next.getName(), currentValues, next.getPartValuesAtTime(model,0f),transitionTime);
+            
+            if(next != null)
+            	activeAnimation = Util.createTransition(model,next.getName(), currentValues, next.getPartValuesAtTime(model,0f),transitionTime);
+            else
+            	activeAnimation = Util.createTransition(model, "idle", currentValues, getOriginalValues(model),transitionTime);
             onFinished = () ->
             {
                 animationStartTime = now;

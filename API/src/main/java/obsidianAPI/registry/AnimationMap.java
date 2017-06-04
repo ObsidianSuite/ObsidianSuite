@@ -46,7 +46,7 @@ class AnimationMap
 	
 	AnimationSequence getAnimation(String binding)
 	{
-		//TODO error handling here if animation is null.
+		//TODO error handling here if animation is null. Should return null but maybe notify in debug?
 		return map.get(binding);
 	}
 	

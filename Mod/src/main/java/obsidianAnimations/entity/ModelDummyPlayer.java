@@ -3,6 +3,7 @@ package obsidianAnimations.entity;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.obj.WavefrontObject;
+import obsidianAPI.EntityAnimationProperties;
 import obsidianAPI.render.ModelAnimated;
 
 public class ModelDummyPlayer extends ModelAnimated
@@ -23,6 +24,11 @@ public class ModelDummyPlayer extends ModelAnimated
 		super.setRotationAngles(swingTime, swingMax, f2, lookX, lookY, f5, entity);
 		//head.setValue((float) (lookY/180F*Math.PI), 0);
 		//chestLw.setValue((float) (-lookX/180F*Math.PI), 1);
+	}
+
+	@Override
+	protected void updateAnimation(float swingTime, Entity entity, EntityAnimationProperties animProps) {
+		
 	}	
 
 }
