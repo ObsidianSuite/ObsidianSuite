@@ -45,6 +45,11 @@ public class FileLoader {
 		return model;
 	}
 	
+	public static <T extends ModelObj> T fromFile(File file, Class<T> clazz)
+	{
+		return fromFile(file, null, clazz);
+	}
+	
 	/**
 	 * Create a model instance of a specific class from an Obsidian Model file.
 	 * @param file File to create from
@@ -52,7 +57,7 @@ public class FileLoader {
 	 * 	Must also have constructor String.class, WavefrontObject.class, ResourceLocation.class
 	 * @return Model instance of class clazz.
 	 */
-	public static <T extends ModelObj> T fromFile(File file, Class<T> clazz)
+	public static <T extends ModelObj> T fromFile(File file, ResourceLocation textureOverride, Class<T> clazz)
 	{
 		T model = null;
 
@@ -68,7 +73,11 @@ public class FileLoader {
 			dataEntry = zipFile.getEntry(ModelFileHandler.SETUP_NAME);
 			
 			WavefrontObject obj = readObj(entityName, zipFile.getInputStream(modelEntry));
-			ResourceLocation texture = readTexture(entityName, zipFile.getInputStream(textureEntry));
+			ResourceLocation texture;
+			if(textureOverride != null)
+				texture = textureOverride;
+			else
+				texture = readTexture(entityName, zipFile.getInputStream(textureEntry));
 
 			//Create model instance of specific class
 			Constructor<T> ctor = clazz.getConstructor(String.class, WavefrontObject.class, ResourceLocation.class);
@@ -87,12 +96,18 @@ public class FileLoader {
 		return model;
 	}
 	
-	public static <T extends ModelObj> T loadModelFromResource(String entityName, ResourceLocation resLoc, Class<T> clazz)
+	/**
+	 * Load a model from a resource location.
+	 * Texture override is optional, it is used instead of the texture location generated from the modelResource.
+	 * Should be supplied in mods but not in the animator.
+	 * Null if not supplied
+	 */
+	public static <T extends ModelObj> T loadModelFromResources(String entityName, ResourceLocation modelResource, ResourceLocation textureOverride, Class<T> clazz)
 	{
 		T model = null;
 		
 		try {
-			IResource res = Minecraft.getMinecraft().getResourceManager().getResource(resLoc);
+			IResource res = Minecraft.getMinecraft().getResourceManager().getResource(modelResource);
 			
 			File tmpFile = new File(entityName + ".obm");
 			InputStream is = res.getInputStream();
@@ -100,7 +115,9 @@ public class FileLoader {
 			IOUtils.copy(is, os);
 			is.close();
 			os.close();
-			model = FileLoader.fromFile(tmpFile, clazz);
+			model = FileLoader.fromFile(tmpFile, textureOverride, clazz);
+			if(textureOverride != null) 
+				model.setTexture(textureOverride);
 			tmpFile.delete();
 		} catch (IOException e) {
 			System.out.println("Could not load " + entityName + " model from resource");

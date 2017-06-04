@@ -13,13 +13,16 @@ import obsidianAnimations.entity.RenderDummyPlayer;
 public class ClientProxy extends CommonProxy
 {	
 	
-	private ResourceLocation obsidianPlayerResLoc = new ResourceLocation("mod_obsidian_animations:models/ObsidianPlayer.obm");
-
+	private ResourceLocation obsidianPlayerModelRL = new ResourceLocation("mod_obsidian_animations:models/ObsidianPlayer.obm");
+	private ResourceLocation obsidianPlayerTextureRL = new ResourceLocation("mod_obsidian_animations:models/ObsidianPlayer.png");
 	
 	public void registerRendering()
 	{
-		RenderingRegistry.registerEntityRenderingHandler(EntityDummyPlayer.class, new RenderDummyPlayer(FileLoader.loadModelFromResource("DummyPlayer", obsidianPlayerResLoc, ModelDummyPlayer.class)));
-		RenderingRegistry.registerEntityRenderingHandler(EntityPlayer.class, new RenderPlayerAnimated(FileLoader.loadModelFromResource("Player", obsidianPlayerResLoc, ModelAnimatedPlayer.class)));
+		RenderDummyPlayer dummyPlayerRenderer = new RenderDummyPlayer(FileLoader.loadModelFromResources("DummyPlayer", obsidianPlayerModelRL, obsidianPlayerTextureRL, ModelDummyPlayer.class));
+		RenderPlayerAnimated playerRenderer = new RenderPlayerAnimated(FileLoader.loadModelFromResources("Player", obsidianPlayerModelRL, obsidianPlayerTextureRL, ModelAnimatedPlayer.class));
+		
+		RenderingRegistry.registerEntityRenderingHandler(EntityDummyPlayer.class, dummyPlayerRenderer);
+		RenderingRegistry.registerEntityRenderingHandler(EntityPlayer.class, playerRenderer);
 	}
 }
 

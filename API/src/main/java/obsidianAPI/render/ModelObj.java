@@ -34,7 +34,7 @@ import obsidianAPI.render.part.prop.PartPropTranslation;
 
 public class ModelObj extends ModelBase {
 
-	private final ResourceLocation texture;
+	private ResourceLocation texture;
 	public final WavefrontObject obj;
 	public final String entityName;
 	public ArrayList<Part> parts;
@@ -56,6 +56,10 @@ public class ModelObj extends ModelBase {
 
 	public ResourceLocation getTexture() {
 		return texture;
+	}
+	
+	public void setTexture(ResourceLocation texture) {
+		this.texture = texture;
 	}
 
 	public void loadSetup(InputStream stream) {
