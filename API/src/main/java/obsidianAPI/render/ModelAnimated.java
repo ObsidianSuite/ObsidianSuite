@@ -29,12 +29,10 @@ public abstract class ModelAnimated extends ModelObj
 		}
 		else
 		{
+			animProps.updateFrameTime();
+			
 			updateAnimation(swingTime, entity, animProps);
-			
-			
 			AnimationSequence seq = animProps.getActiveAnimation();
-			
-			
 			if (seq == null && AnimationRegistry.getAnimation(entityName, "Idle") != null)
 			{
 				animProps.setActiveAnimation(this,"Idle",true);
@@ -43,7 +41,6 @@ public abstract class ModelAnimated extends ModelObj
 			
 			
 			if(seq != null) {
-				animProps.updateFrameTime();
 				float time = animProps.getAnimationFrameTime();
 				animateToPartValues(animProps, seq.getPartValuesAtTime(this, time));
 				animProps.updateAnimation(this, time);

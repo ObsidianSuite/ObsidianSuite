@@ -1,7 +1,12 @@
 package obsidianAPI;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.MathHelper;
@@ -12,10 +17,7 @@ import obsidianAPI.animation.AnimationSequence;
 import obsidianAPI.registry.AnimationRegistry;
 import obsidianAPI.render.ModelObj;
 import obsidianAPI.render.part.Part;
-
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import obsidianAPI.render.part.PartObj;
 
 public class EntityAnimationProperties implements IExtendedEntityProperties
 {
@@ -103,9 +105,10 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
             if(next != null)
             	activeAnimation = Util.createTransition(model,next.getName(), currentValues, next.getPartValuesAtTime(model,0f),transitionTime);
             else
-            	activeAnimation = Util.createTransition(model, "idle", currentValues, getOriginalValues(model),transitionTime);
+            	activeAnimation = Util.createTransition(model, "idle", currentValues, getOriginalValues(model), transitionTime);
             onFinished = () ->
             {
+            	System.out.println("Done");
                 animationStartTime = now;
                 nextFrame = 0;
                 onFinished = null;
@@ -179,6 +182,7 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
         if (activeAnimation != null)
         {
             Part part = model.getPartFromName("entitypos");
+            PartObj bodyUp = model.getPartObjFromName("bodyUp");
             if (part != null)
             {
                 float entityPosX = part.getValue(0);
@@ -191,6 +195,11 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
                 float f5 = MathHelper.cos(entity.rotationYaw * (float)Math.PI / 180.0F);
                 entity.setPosition(entity.posX + (double)(strafe * f5 - forward * f4), entity.posY,entity.posZ + (double)(forward * f5 + strafe * f4));
 
+                
+                float[] rp = bodyUp.getRotationPoint();
+                rp[1] = part.getValue(1);
+                bodyUp.setRotationPoint(rp);
+                
                 prevEntityPosX = entityPosX;
                 prevEntityPosZ = entityPosZ;
             }

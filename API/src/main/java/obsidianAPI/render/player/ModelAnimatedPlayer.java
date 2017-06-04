@@ -41,7 +41,7 @@ public class ModelAnimatedPlayer extends ModelAnimated
 					state = "SprintF";
 			}
 			else if(entity.isSneaking())
-				state = "Crouch";
+				state = "CrouchF";
 			else {
 				if(!entity.isCollidedVertically)
 					state = "RunJump";
@@ -71,6 +71,10 @@ public class ModelAnimatedPlayer extends ModelAnimated
 		else if(state.equals("SprintF") && !isAnimationActive(animProps, "SprintF"))
 		{
 			animProps.setActiveAnimation(this, "SprintF", true);
+		}
+		else if(state.equals("CrouchF") && !isAnimationActive(animProps, "CrouchF"))
+		{
+			animProps.setActiveAnimation(this, "CrouchF", true);
 		}
 		else if(!isIdle(animProps) && state.equals("Idle"))
 		{
