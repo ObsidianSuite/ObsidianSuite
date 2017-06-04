@@ -4,6 +4,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.obj.WavefrontObject;
+import obsidianAPI.debug.GuiDebug;
 import obsidianAPI.render.ModelAnimated;
 import obsidianAPI.render.part.PartObj;
 
@@ -11,6 +12,7 @@ public class ModelAnimatedPlayer extends ModelAnimated
 {
 
 	private PartObj head, bodyUp, armUpL, armUpR, legUpL, legUpR;
+	private float previousSwingTime = 0.0F;
 	
 	public ModelAnimatedPlayer(String entityName, WavefrontObject object, ResourceLocation texture)
 	{
@@ -31,6 +33,38 @@ public class ModelAnimatedPlayer extends ModelAnimated
 		//Look TODO sort head lookX
         head.setValue(lookY/(180F/(float)Math.PI), 0);
         
+        //System.out.println(swingTime - previousSwingTime);
+        
+        if(swingTime - previousSwingTime > 0.05F) {
+        	if(entity.isSprinting()) {
+        		if(!entity.isCollidedVertically)
+                	GuiDebug.instance.text = "SprintJump";
+        		else
+                	GuiDebug.instance.text = "Sprint";
+        	}
+        	else if(entity.isSneaking())
+            	GuiDebug.instance.text = "Crouch";
+        	else {
+        		if(!entity.isCollidedVertically)
+                	GuiDebug.instance.text = "RunJump";
+        		else
+                	GuiDebug.instance.text = "Run";
+        	}
+        }
+        else if(this.onGround != 0F){
+        	GuiDebug.instance.text = "Swing";
+        }
+        else if(!entity.isCollidedVertically) {
+        	GuiDebug.instance.text = "Jump";
+        }
+        else {
+        	if(entity.isSneaking())
+            	GuiDebug.instance.text = "CrouchedIdle";
+        	else
+        		GuiDebug.instance.text = "Idle";
+        }
+        
+        
         //Walking - swing time changing.
         armUpR.setValue(MathHelper.cos(swingTime * 0.6662F + (float)Math.PI) * 2.0F * swingMax * 0.5F, 0);
         armUpL.setValue(MathHelper.cos(swingTime * 0.6662F) * 2.0F * swingMax * 0.5F, 0);
@@ -40,7 +74,7 @@ public class ModelAnimatedPlayer extends ModelAnimated
         legUpL.setValue(MathHelper.cos(swingTime * 0.6662F + (float)Math.PI) * 1.4F * swingMax, 0);
         legUpR.setValue(0.0F, 2);
         legUpL.setValue(0.0F, 2);
-
+        
         //Riding
 //        if (this.isRiding)
 //        {
@@ -142,6 +176,9 @@ public class ModelAnimatedPlayer extends ModelAnimated
 //            armUpR.rotateAngleX += MathHelper.sin(p_78087_3_ * 0.067F) * 0.05F;
 //            armUpL.rotateAngleX -= MathHelper.sin(p_78087_3_ * 0.067F) * 0.05F;
 //        }
+        
+        //Update Swing Time
+        previousSwingTime = swingTime;
 	}
 
 }
