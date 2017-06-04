@@ -45,10 +45,6 @@ public class ModelObj extends ModelBase {
 	public static final float initRotFix = 180.0F;
 	public static final float offsetFixY = -1.5F;
 
-	public ModelObj(String entityName, ResourceLocation objRes, ResourceLocation texture) {
-		this(entityName, FileLoader.readObj(objRes), texture);
-	}
-
 	public ModelObj(String entityName, WavefrontObject obj, ResourceLocation texture) {
 		this.entityName = entityName;
 		this.obj = obj;

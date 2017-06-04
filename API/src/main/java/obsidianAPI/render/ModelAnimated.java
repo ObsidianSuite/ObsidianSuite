@@ -1,18 +1,19 @@
 package obsidianAPI.render;
 
+import java.util.Map;
+
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.client.model.obj.WavefrontObject;
 import obsidianAPI.EntityAnimationProperties;
 import obsidianAPI.animation.AnimationSequence;
 import obsidianAPI.render.part.Part;
 
-import java.util.Map;
-
 public abstract class ModelAnimated extends ModelObj
 {
-	public ModelAnimated(String entityName, ResourceLocation modelLocation, ResourceLocation textureLocation)
+	public ModelAnimated(String entityName, WavefrontObject wavefrontObj, ResourceLocation textureLocation)
 	{
-		super(entityName, modelLocation, textureLocation);
+		super(entityName, wavefrontObj, textureLocation);
 	}
 
 	@Override

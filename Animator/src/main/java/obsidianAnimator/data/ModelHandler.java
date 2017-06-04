@@ -36,7 +36,7 @@ public class ModelHandler
 		try {
 			ResourceLocation modelResource = generateInternalModelResourceLocation(entityName);
 			IResource res = Minecraft.getMinecraft().getResourceManager().getResource(modelResource);
-			
+
 			File tmpFile = new File(entityName + ".obm");
 			InputStream is = res.getInputStream();
 			OutputStream os = new FileOutputStream(tmpFile);
@@ -45,13 +45,18 @@ public class ModelHandler
 			os.close();
 			ModelObj_Animator model = FileLoader.fromFile(tmpFile, ModelObj_Animator.class);
 			tmpFile.delete();
-			addModel(model);
-			Minecraft.getMinecraft().refreshResources();
+
 		} catch (IOException e) {
 			System.out.println("Could not load " + entityName + " model from resource");
 			e.printStackTrace();
 		}
 
+		ResourceLocation modelResource = generateInternalModelResourceLocation(entityName);
+		ModelObj_Animator model = FileLoader.loadModelFromResource(entityName, modelResource, ModelObj_Animator.class);
+		if(model != null) {
+			addModel(model);
+			Minecraft.getMinecraft().refreshResources();
+		}
 	}
 
 	/**

@@ -1,11 +1,18 @@
 package obsidianAPI.file.importer;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.reflect.Constructor;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import org.apache.commons.io.IOUtils;
+
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.resources.IResource;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.obj.WavefrontObject;
 import obsidianAPI.file.FileHandler;
@@ -80,9 +87,27 @@ public class FileLoader {
 		return model;
 	}
 	
-	public static WavefrontObject readObj(ResourceLocation resourceLocation)
+	public static <T extends ModelObj> T loadModelFromResource(String entityName, ResourceLocation resLoc, Class<T> clazz)
 	{
-		return new WavefrontObject(resourceLocation);
+		T model = null;
+		
+		try {
+			IResource res = Minecraft.getMinecraft().getResourceManager().getResource(resLoc);
+			
+			File tmpFile = new File(entityName + ".obm");
+			InputStream is = res.getInputStream();
+			OutputStream os = new FileOutputStream(tmpFile);
+			IOUtils.copy(is, os);
+			is.close();
+			os.close();
+			model = FileLoader.fromFile(tmpFile, clazz);
+			tmpFile.delete();
+		} catch (IOException e) {
+			System.out.println("Could not load " + entityName + " model from resource");
+			e.printStackTrace();
+		}
+
+		return model;
 	}
 	
 	private static WavefrontObject readObj(String entityName, InputStream inputStream)
