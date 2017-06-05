@@ -78,7 +78,6 @@ public class ModelAnimatedPlayer extends ModelAnimated
 		}
 		else if(!isIdle(animProps) && state.equals("Idle"))
 		{
-			//System.out.println("Clearing");
 			animProps.returnToIdle(this);
 		}
 		
@@ -93,6 +92,9 @@ public class ModelAnimatedPlayer extends ModelAnimated
 		//Look TODO sort head lookX
 		head.setValue(lookY/(180F/(float)Math.PI), 0);
 
+		if(entity.isSneaking())
+			head.setValue(head.getValue(0) - 0.7F, 0);
+		
 		EntityAnimationProperties animProps = (EntityAnimationProperties) entity.getExtendedProperties("Animation");
 		if (animProps == null)
 			GuiDebug.instance.animationText = "null";
