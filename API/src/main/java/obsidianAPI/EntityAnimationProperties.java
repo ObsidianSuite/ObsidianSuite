@@ -39,7 +39,7 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
 	private Runnable onFinished;
 
 	private float frameTime = 0f;
-
+	
     @Override
     public void init(Entity entity, World world)
     {
@@ -80,7 +80,7 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
     }
 
     public void setActiveAnimation(ModelObj model, String binding, boolean loopAnim, float transitionTime)
-    {
+    {    	
         Map<String, float[]> currentValues;
         if (activeAnimation != null)
         {
@@ -99,6 +99,8 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
         prevEntityPosZ = 0f;
         if (transitionTime > 0.001f)
         {
+        	updateFrameTime();
+        	        	
             loop = false;
             AnimationSequence next = AnimationRegistry.getAnimation(entityName, binding);
             
@@ -108,7 +110,6 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
             	activeAnimation = Util.createTransition(model, "idle", currentValues, getOriginalValues(model), transitionTime);
             onFinished = () ->
             {
-            	System.out.println("Done");
                 animationStartTime = now;
                 nextFrame = 0;
                 onFinished = null;
@@ -123,17 +124,16 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
         }
     }
 
-    public void clearAnimation(ModelObj model, float transitionTime)
+    public void returnToIdle(ModelObj model, float transitionTime)
     {
-        if (activeAnimation == null || !activeAnimation.getName().equals("Idle"))
-        {
-            setActiveAnimation(model, "Idle", true,transitionTime);
-        }
+        if(activeAnimation == null || activeAnimation.getName().equals("Idle"))
+        	return;
+        setActiveAnimation(model, "Idle", true,transitionTime);
     }
 
-    public void clearAnimation(ModelObj model)
+    public void returnToIdle(ModelObj model)
     {
-        clearAnimation(model,0.25f);
+    	returnToIdle(model,0.25f);
     }
 
     public void setMultiplier(float multiplier)
@@ -219,10 +219,10 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
                 {
                     onFinished.run();
                 }
-                else
-                {
-                    clearAnimation(model);
-                }
+//                else
+//                {
+//                    returnToIdle(model);
+//                }
             }
         }
     }

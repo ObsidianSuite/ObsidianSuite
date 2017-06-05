@@ -79,5 +79,11 @@ public class AnimationRegistry
 			throw new UnregisteredEntityException(entityType);
 		return entityMap.get(entityType).getAnimation(binding);
 	}
+	
+	public static boolean hasIdleAnimation(String entityName) {
+		if(!entityMap.containsKey(entityName))
+			throw new UnregisteredEntityException(entityName);
+		return entityMap.get(entityName).getAnimation("Idle") != null;
+	}
 
 }

@@ -33,13 +33,12 @@ public abstract class ModelAnimated extends ModelObj
 			
 			updateAnimation(swingTime, entity, animProps);
 			AnimationSequence seq = animProps.getActiveAnimation();
-			if (seq == null && AnimationRegistry.getAnimation(entityName, "Idle") != null)
-			{
-				animProps.setActiveAnimation(this,"Idle",true);
-				seq = animProps.getActiveAnimation();
-			}
-			
-			
+//			if (seq == null && AnimationRegistry.getAnimation(entityName, "Idle") != null)
+//			{
+//				animProps.setActiveAnimation(this,"Idle",true);
+//				seq = animProps.getActiveAnimation();
+//			}
+						
 			if(seq != null) {
 				float time = animProps.getAnimationFrameTime();
 				animateToPartValues(animProps, seq.getPartValuesAtTime(this, time));
@@ -57,18 +56,6 @@ public abstract class ModelAnimated extends ModelObj
 	{
 		parts.forEach(Part::setToOriginalValues);
 	}
-	
-//	protected void updateMoveAnimation(Entity entity, EntityAnimationProperties animProps)
-//	{
-//		boolean isMoving = isMoving(entity);
-//		if (isMoving && isIdle(animProps))
-//		{
-//			animProps.setActiveAnimation(this,"WalkF", true);
-//		} else if (!isMoving && !isIdle(animProps) && animProps.getActiveAnimation().getName().equals("WalkF"))
-//		{
-//			animProps.clearAnimation(this);
-//		}
-//	}
 
 	protected boolean isIdle(EntityAnimationProperties animProps)
 	{

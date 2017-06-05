@@ -78,7 +78,8 @@ public class ModelAnimatedPlayer extends ModelAnimated
 		}
 		else if(!isIdle(animProps) && state.equals("Idle"))
 		{
-			animProps.clearAnimation(this);
+			//System.out.println("Clearing");
+			animProps.returnToIdle(this);
 		}
 		
 		previousSwingTime = swingTime;
