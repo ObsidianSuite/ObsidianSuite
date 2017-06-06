@@ -33,7 +33,7 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
 
 	private int nextFrame = 0;
 
-	private float prevEntityPosX, prevEntityPosY, prevEntityPosZ;
+	private float prevEntityPosX, prevEntityPosZ;
 
 	private Runnable onFinished;
 
@@ -184,31 +184,18 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
 			Part entityPos = model.getPartFromName("entitypos");
             PartObj bodyUp = model.getPartObjFromName("bodyUp");
             if (entityPos != null)
-            {
+            {            	
                 float entityPosX = entityPos.getValue(0);
-                float entityPosY = entityPos.getValue(1);
                 float entityPosZ = entityPos.getValue(2);
 
                 float strafe = entityPosX - prevEntityPosX;
-                float heightDiff = entityPosY - prevEntityPosY;
                 float forward = entityPosZ - prevEntityPosZ;
 
                 float f4 = MathHelper.sin(entity.rotationYaw * (float)Math.PI / 180.0F);
                 float f5 = MathHelper.cos(entity.rotationYaw * (float)Math.PI / 180.0F);
                 entity.setPosition(entity.posX + (double)(strafe * f5 - forward * f4), entity.posY,entity.posZ + (double)(forward * f5 + strafe * f4));
-
-                
-                float[] rp = bodyUp.getRotationPoint();
-                //System.out.println(heightDiff);
-                rp[2] = -entityPosY;
-                bodyUp.setRotationPoint(rp, false);
-                
-                //System.out.println("Here");
-                
-                System.out.println(bodyUp.getRotationPoint()[2]);
                 
                 prevEntityPosX = entityPosX;
-                prevEntityPosY = entityPosY;
                 prevEntityPosZ = entityPosZ;
             }
 

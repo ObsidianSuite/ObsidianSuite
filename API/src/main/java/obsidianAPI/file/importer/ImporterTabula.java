@@ -101,7 +101,7 @@ public class ImporterTabula implements ModelImporter {
 			rotationPoint[0] = -boxRotationPoint[0]/16F;
 			rotationPoint[1] = boxRotationPoint[1]/16F - 1.5F;
 			rotationPoint[2] = boxRotationPoint[2]/16F;
-			part.setRotationPoint(rotationPoint, true);
+			part.setRotationPoint(rotationPoint);
 		}
 		
 		//Merging

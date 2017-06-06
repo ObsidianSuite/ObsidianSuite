@@ -42,7 +42,7 @@ public class PartData {
 			rotationPoint[0] = base.getFloat(ROTPX);
 			rotationPoint[1] = base.getFloat(ROTPY);
 			rotationPoint[2] = base.getFloat(ROTPZ);
-			p.setRotationPoint(rotationPoint, true);
+			p.setRotationPoint(rotationPoint);
 
 			float[] originalValues = new float[3];
 			originalValues[0] = base.getFloat(ORIGINALX);

@@ -2,6 +2,8 @@ package obsidianAPI.render;
 
 import java.util.Map;
 
+import org.lwjgl.opengl.GL11;
+
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.obj.WavefrontObject;
@@ -30,15 +32,15 @@ public abstract class ModelAnimated extends ModelObj
 		else
 		{
 			animProps.updateFrameTime();
-			
+
 			updateAnimation(swingTime, entity, animProps);
 			AnimationSequence seq = animProps.getActiveAnimation();
-//			if (seq == null && AnimationRegistry.getAnimation(entityName, "Idle") != null)
-//			{
-//				animProps.setActiveAnimation(this,"Idle",true);
-//				seq = animProps.getActiveAnimation();
-//			}
-						
+			//			if (seq == null && AnimationRegistry.getAnimation(entityName, "Idle") != null)
+			//			{
+			//				animProps.setActiveAnimation(this,"Idle",true);
+			//				seq = animProps.getActiveAnimation();
+			//			}
+
 			if(seq != null) {
 				float time = animProps.getAnimationFrameTime();
 				animateToPartValues(animProps, seq.getPartValuesAtTime(this, time));
@@ -47,11 +49,14 @@ public abstract class ModelAnimated extends ModelObj
 			else {
 				doDefaultAnimations(swingTime, swingMax, f2, lookX, lookY, f5, entity);
 			}
+
+			Part entityPos = getPartFromName("entitypos");
+			GL11.glTranslatef(0, -entityPos.getValue(1), 0);
 		}
 	}
 
 	protected abstract void updateAnimation(float swingTime, Entity entity, EntityAnimationProperties animProps);
-	
+
 	protected void doDefaultAnimations(float swingTime, float swingMax, float f2, float lookX, float lookY, float f5, Entity entity)
 	{
 		parts.forEach(Part::setToOriginalValues);
@@ -62,7 +67,7 @@ public abstract class ModelAnimated extends ModelObj
 		return animProps.getActiveAnimation() == null || animProps.getActiveAnimation().getName().equals("Idle") 
 				|| animProps.getActiveAnimation().getName().equals("transition_idle");
 	}
-	
+
 	protected boolean isAnimationActive(EntityAnimationProperties animProps, String animationName)
 	{		
 		if(animProps.getActiveAnimation() == null)
