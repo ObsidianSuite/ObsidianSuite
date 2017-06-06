@@ -93,10 +93,17 @@ public class TimelineKeyMappings
 		{
 			for(int i = 0; i < controller.timelineGui.entityModel.parts.size(); i++)
 			{
+<<<<<<< HEAD
 				if(controller.timelineGui.entityModel.parts.get(i).equals(controller.timelineGui.selectedPart))
-				{
+				{					
 					if(i < controller.timelineGui.entityModel.parts.size() - 1)
 						controller.timelineGui.updatePart(controller.timelineGui.entityModel.parts.get(i+1));
+=======
+				if(controller.timelineGui.parts.get(i).equals(controller.timelineGui.selectedPart))
+				{
+					if(i < controller.timelineGui.parts.size() - 1)
+						controller.timelineGui.updatePart(controller.timelineGui.parts.get(i+1));
+>>>>>>> 5eb053b911a1b0b94c30be924bcb461bfc1db58d
 					else
 						controller.timelineGui.updatePart(controller.timelineGui.entityModel.parts.get(0));
 					break;

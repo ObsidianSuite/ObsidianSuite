@@ -1,14 +1,11 @@
 package obsidianAnimator.gui.timeline.swing.subsection;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import javax.swing.JLayeredPane;
 import javax.swing.JOptionPane;
 
+import com.google.common.collect.Lists;
 import obsidianAPI.animation.AnimationPart;
 import obsidianAPI.render.part.Part;
 import obsidianAnimator.gui.timeline.Keyframe;
@@ -101,6 +98,18 @@ public class TimelineKeyframeController extends TimelineControllerSub
 			}
 			keyframes.put(mr, partKfs);
 		}
+	}
+
+	public Collection<Keyframe> getAllFrames()
+	{
+		List<Keyframe> ret = Lists.newArrayList();
+
+		for (List<Keyframe> frames : keyframes.values())
+		{
+			ret.addAll(frames);
+		}
+
+		return ret;
 	}
 
 	/**
@@ -264,7 +273,8 @@ public class TimelineKeyframeController extends TimelineControllerSub
 
 	public List<Keyframe> getPartKeyframes(Part part)
 	{
-		return keyframes.get(part);
+		List<Keyframe> frames = this.keyframes.get(part);
+		return frames == null ? Collections.emptyList() : frames;
 	}
 
 }
