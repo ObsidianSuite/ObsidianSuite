@@ -50,6 +50,7 @@ public abstract class ModelAnimated extends ModelObj
 				doDefaultAnimations(swingTime, swingMax, f2, lookX, lookY, f5, entity);
 			}
 
+			//Translate for vertical y pos
 			Part entityPos = getPartFromName("entitypos");
 			GL11.glTranslatef(0, -entityPos.getValue(1), 0);
 		}
