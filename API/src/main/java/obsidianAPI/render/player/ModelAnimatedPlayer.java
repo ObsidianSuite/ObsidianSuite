@@ -8,7 +8,6 @@ import obsidianAPI.EntityAnimationProperties;
 import obsidianAPI.animation.AnimationSequence;
 import obsidianAPI.debug.GuiDebug;
 import obsidianAPI.render.ModelAnimated;
-import obsidianAPI.render.part.Part;
 import obsidianAPI.render.part.PartObj;
 
 public class ModelAnimatedPlayer extends ModelAnimated
@@ -16,6 +15,14 @@ public class ModelAnimatedPlayer extends ModelAnimated
 
 	private PartObj head, bodyUp, armUpL, armUpR, legUpL, legUpR;
 	private float previousSwingTime = 0.0F;
+	
+	//Debugging
+	private String previousState = "";
+	private long startTime = 0L;
+	private long endTime = 0l;
+	private float prevHeight = 0.0F; 
+	private float totalTime = 0.0F;
+	private int readings = 0;
 
 	public ModelAnimatedPlayer(String entityName, WavefrontObject object, ResourceLocation texture)
 	{
@@ -63,7 +70,44 @@ public class ModelAnimatedPlayer extends ModelAnimated
 		}	
 		
 		GuiDebug.instance.stateText = state;
-				
+		
+		//Jump height debugging
+		if(state.equals("Jump") || previousState.equals("Jump")) {
+			float currentTime = (System.nanoTime()-startTime)/1000000000F;
+			float height = (float) (entity.posY-5.62F);
+			if(height != prevHeight) {
+				//Calculations
+				float outputTime = totalTime/(float)readings;
+				outputTime = Math.round(outputTime*1000F)/1000F;
+				float outputHeight = Math.round(prevHeight*1000F)/1000F;
+				//Output
+				System.out.println(outputTime + " " + outputHeight);
+				//Reset
+				totalTime = currentTime;
+				readings = 1;
+			}			
+			else {
+				totalTime += currentTime;
+				readings++;
+			}
+			prevHeight = height;
+		}
+		else {
+			prevHeight = 0.0F;
+			totalTime = 0;
+			readings = 0;
+		}
+		
+		//Timing debug
+		if(!state.equals(previousState)) {
+			endTime = System.nanoTime();
+			float duration = (endTime - startTime)/1000000000F;
+			if(previousState.equals("Jump"))
+				System.out.println(previousState + " lasted for " + duration + " seconds");
+			startTime = endTime;
+		}
+			
+		//States -> Animations
 		if(state.equals("WalkF") && !isAnimationActive(animProps, "WalkF"))
 		{
 			animProps.setActiveAnimation(this, "WalkF", true);
@@ -82,6 +126,7 @@ public class ModelAnimatedPlayer extends ModelAnimated
 		}
 		
 		previousSwingTime = swingTime;
+		previousState = state;
 	}
 
 	@Override
