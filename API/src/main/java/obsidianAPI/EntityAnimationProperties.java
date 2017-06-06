@@ -33,8 +33,7 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
 
 	private int nextFrame = 0;
 
-	private float prevEntityPosX;
-	private float prevEntityPosZ;
+	private float prevEntityPosX, prevEntityPosY, prevEntityPosZ;
 
 	private Runnable onFinished;
 
@@ -95,8 +94,9 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
         nextFrame = 0;
         onFinished = null;
 
-        prevEntityPosX = 0f;
-        prevEntityPosZ = 0f;
+//        prevEntityPosX = 0f;
+//        prevEntityPosY = 0f;
+//        prevEntityPosZ = 0f;
         if (transitionTime > 0.001f)
         {
         	updateFrameTime();
@@ -181,14 +181,16 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
     {
         if (activeAnimation != null)
         {
-            Part part = model.getPartFromName("entitypos");
+			Part entityPos = model.getPartFromName("entitypos");
             PartObj bodyUp = model.getPartObjFromName("bodyUp");
-            if (part != null)
+            if (entityPos != null)
             {
-                float entityPosX = part.getValue(0);
-                float entityPosZ = part.getValue(2);
+                float entityPosX = entityPos.getValue(0);
+                float entityPosY = entityPos.getValue(1);
+                float entityPosZ = entityPos.getValue(2);
 
                 float strafe = entityPosX - prevEntityPosX;
+                float heightDiff = entityPosY - prevEntityPosY;
                 float forward = entityPosZ - prevEntityPosZ;
 
                 float f4 = MathHelper.sin(entity.rotationYaw * (float)Math.PI / 180.0F);
@@ -197,10 +199,16 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
 
                 
                 float[] rp = bodyUp.getRotationPoint();
-                rp[1] = part.getValue(1);
-                bodyUp.setRotationPoint(rp);
+                //System.out.println(heightDiff);
+                rp[2] = -entityPosY;
+                bodyUp.setRotationPoint(rp, false);
+                
+                //System.out.println("Here");
+                
+                System.out.println(bodyUp.getRotationPoint()[2]);
                 
                 prevEntityPosX = entityPosX;
+                prevEntityPosY = entityPosY;
                 prevEntityPosZ = entityPosZ;
             }
 

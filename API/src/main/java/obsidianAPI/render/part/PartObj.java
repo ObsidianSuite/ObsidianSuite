@@ -23,7 +23,7 @@ import obsidianAPI.render.bend.Bend;
  */
 public class PartObj extends PartRotation
 {
-	private float[] rotationPoint;
+	private float[] rotationPoint, originalRotationPoint;
 	public GroupObject groupObj;
 	private String displayName;
 
@@ -41,6 +41,7 @@ public class PartObj extends PartRotation
 		this.groupObj = groupObj;
 		this.displayName = getName();
 		this.rotationPoint = new float[]{0,0,0};
+		this.originalRotationPoint = new float[]{0,0,0};
 		setDefaultTCsToCurrentTCs();
 	}
 
@@ -127,9 +128,14 @@ public class PartObj extends PartRotation
 		this.displayName = displayName;
 	}
 
-	public void setRotationPoint(float[] rot)
+	/**
+	 * Set rotation point, and set original too if setOriginal is true.
+	 */
+	public void setRotationPoint(float[] rot, boolean setOriginal)
 	{
 		rotationPoint = rot;
+		if(setOriginal)
+			originalRotationPoint = rot.clone();
 	}
 
 	public float getRotationPoint(int i)
@@ -140,6 +146,10 @@ public class PartObj extends PartRotation
 	public float[] getRotationPoint()
 	{
 		return rotationPoint;
+	}
+	
+	public float[] getOriginalRotationPoint() {
+		return originalRotationPoint;
 	}
 
 	//------------------------------------------

@@ -151,7 +151,7 @@ public class ImporterQubble implements ModelImporter
 				rotationPoint[0] = -unparentedCuboid.getPositionX() / 16F;
 				rotationPoint[1] = unparentedCuboid.getPositionY() / 16F - 1.5F;
 				rotationPoint[2] = unparentedCuboid.getPositionZ() / 16F;
-				part.setRotationPoint(rotationPoint);
+				part.setRotationPoint(rotationPoint, true);
 			}
 
 			//Merging
