@@ -72,40 +72,40 @@ public class ModelAnimatedPlayer extends ModelAnimated
 		GuiDebug.instance.stateText = state;
 		
 		//Jump height debugging
-		if(state.equals("Jump") || previousState.equals("Jump")) {
-			float currentTime = (System.nanoTime()-startTime)/1000000000F;
-			float height = (float) (entity.posY-5.62F);
-			if(height != prevHeight) {
-				//Calculations
-				float outputTime = totalTime/(float)readings;
-				outputTime = Math.round(outputTime*1000F)/1000F;
-				float outputHeight = Math.round(prevHeight*1000F)/1000F;
-				//Output
-				System.out.println(outputTime + " " + outputHeight);
-				//Reset
-				totalTime = currentTime;
-				readings = 1;
-			}			
-			else {
-				totalTime += currentTime;
-				readings++;
-			}
-			prevHeight = height;
-		}
-		else {
-			prevHeight = 0.0F;
-			totalTime = 0;
-			readings = 0;
-		}
+//		if(state.equals("Jump") || previousState.equals("Jump")) {
+//			float currentTime = (System.nanoTime()-startTime)/1000000000F;
+//			float height = (float) (entity.posY-5.62F);
+//			if(height != prevHeight) {
+//				//Calculations
+//				float outputTime = totalTime/(float)readings;
+//				outputTime = Math.round(outputTime*1000F)/1000F;
+//				float outputHeight = Math.round(prevHeight*1000F)/1000F;
+//				//Output
+//				System.out.println(outputTime + " " + outputHeight);
+//				//Reset
+//				totalTime = currentTime;
+//				readings = 1;
+//			}			
+//			else {
+//				totalTime += currentTime;
+//				readings++;
+//			}
+//			prevHeight = height;
+//		}
+//		else {
+//			prevHeight = 0.0F;
+//			totalTime = 0;
+//			readings = 0;
+//		}
 		
 		//Timing debug
-		if(!state.equals(previousState)) {
-			endTime = System.nanoTime();
-			float duration = (endTime - startTime)/1000000000F;
-			if(previousState.equals("Jump"))
-				System.out.println(previousState + " lasted for " + duration + " seconds");
-			startTime = endTime;
-		}
+//		if(!state.equals(previousState)) {
+//			endTime = System.nanoTime();
+//			float duration = (endTime - startTime)/1000000000F;
+//			if(previousState.equals("Jump"))
+//				System.out.println(previousState + " lasted for " + duration + " seconds");
+//			startTime = endTime;
+//		}
 			
 		//States -> Animations
 		if(state.equals("WalkF") && !isAnimationActive(animProps, "WalkF"))
@@ -119,6 +119,10 @@ public class ModelAnimatedPlayer extends ModelAnimated
 		else if(state.equals("CrouchF") && !isAnimationActive(animProps, "CrouchF"))
 		{
 			animProps.setActiveAnimation(this, "CrouchF", true);
+		}
+		else if(state.equals("Jump") && !isAnimationActive(animProps, "Jump"))
+		{
+			animProps.setActiveAnimation(this, "Jump", true, 0F);
 		}
 		else if(!isIdle(animProps) && state.equals("Idle"))
 		{
