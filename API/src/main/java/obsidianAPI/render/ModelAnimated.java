@@ -61,19 +61,13 @@ public abstract class ModelAnimated extends ModelObj
 	{
 		parts.forEach(Part::setToOriginalValues);
 	}
-
-	protected boolean isIdle(EntityAnimationProperties animProps)
-	{
-		return animProps.getActiveAnimation() == null || animProps.getActiveAnimation().getName().equals("Idle") 
-				|| animProps.getActiveAnimation().getName().equals("transition_idle");
+	
+	public boolean isMoving(float swingTime) {
+		return swingTime - previousSwingTime > 0.05F;
 	}
 
 	protected void animateToPartValues(EntityAnimationProperties animProps, Map<String, float[]> partValues)
 	{
 		parts.forEach(p -> p.setValues(partValues.get(p.getName())));
-	}
-	
-	public boolean isMoving(float swingTime) {
-		return swingTime - previousSwingTime > 0.05F;
 	}
 }

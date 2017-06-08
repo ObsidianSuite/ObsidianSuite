@@ -78,36 +78,37 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
 	public void updateActiveAnimation(float swingTime, float swingMax, float clock, float lookX, float lookY, float f5, ModelAnimated model, Entity entity) 
 	{
 		Queue<IAnimationWrapper> tempQueue = AnimationRegistry.getAnimationListCopy(entityName);
-		AnimationSequence seq = null;
 		IAnimationWrapper wrapper;
 		while((wrapper = tempQueue.poll()) != null) {
-			if(wrapper.isActive(swingTime, swingMax, clock, lookX, lookY, f5, model, entity)) {
-				seq = wrapper.getAnimation();
+			if(wrapper.isActive(swingTime, swingMax, clock, lookX, lookY, f5, model, entity))
 				break;
-			}
 		}
 		
-		if(seq != null) {
-			if(!isAnimationActive(seq.getName())) 
-				setActiveAnimation(model, seq, true);
+		if(wrapper != null) {
+			if(!isAnimationActive(wrapper.getAnimation().getName())) 
+				setActiveAnimation(model, wrapper);
 		}
-		else
-			returnToIdle(model);
+		else {
+			if(!isIdle()) 
+				returnToIdle(model);
+		}
 	}
 
-    public void setActiveAnimation(ModelObj model, String binding, boolean loop)
-    {
-        setActiveAnimation(model, binding, loop, 0.25f);
+    public void setActiveAnimation(ModelObj model, IAnimationWrapper wrapper)
+    {    	
+    	setActiveAnimation(model, wrapper.getAnimation(), wrapper.getLoops(), wrapper.getTransitionTime());
     }
     
-    public void setActiveAnimation(ModelObj model,  AnimationSequence sequence, boolean loop)
-    {
-        setActiveAnimation(model, sequence, loop, 0.25f);
-    }
-
-    public void setActiveAnimation(ModelObj model, String binding, boolean loopAnim, float transitionTime)
+    public void setActiveAnimation(ModelObj model, String binding)
     {    	
-    	setActiveAnimation(model, AnimationRegistry.getAnimation(entityName, binding), loopAnim, transitionTime);
+    	IAnimationWrapper wrapper = AnimationRegistry.getAnimationWrapper(entityName, binding);
+    	setActiveAnimation(model, wrapper.getAnimation(), wrapper.getLoops(), wrapper.getTransitionTime());
+    }
+    
+    public void setActiveAnimation(ModelObj model, String binding, boolean loopAnim, float transitionTime)
+    { 
+    	AnimationSequence sequence = AnimationRegistry.getAnimation(entityName, binding);
+    	setActiveAnimation(model, sequence, loopAnim, transitionTime);
     }
     
     public void setActiveAnimation(ModelObj model, AnimationSequence sequence, boolean loopAnim, float transitionTime)
@@ -158,7 +159,7 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
     {
         if(activeAnimation == null || activeAnimation.getName().equals("Idle"))
         	return;
-        setActiveAnimation(model, "Idle", true,transitionTime);
+        setActiveAnimation(model, "Idle", true, transitionTime);
     }
 
     public void returnToIdle(ModelObj model)
@@ -272,6 +273,12 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
 		if(activeAnimation == null)
 			return false;
 		return activeAnimation.getName().equals(animationName) || activeAnimation.getName().equals("transition_" + animationName);
+	}
+	
+
+	private boolean isIdle()
+	{
+		return activeAnimation == null || activeAnimation.getName().equals("Idle") || activeAnimation.getName().equals("transition_idle");
 	}
 
 }

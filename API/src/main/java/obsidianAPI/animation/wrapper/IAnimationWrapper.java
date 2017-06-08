@@ -21,4 +21,14 @@ public interface IAnimationWrapper {
 	 */
 	public int getPriority();
 	
+	/**
+	 * @return Whether the given animation loops or not.
+	 */
+	public boolean getLoops();
+	
+	/**
+	 * @return The amount of time given to transition to this animation.
+	 */
+	public float getTransitionTime();
+	
 }

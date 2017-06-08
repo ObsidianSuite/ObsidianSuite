@@ -79,13 +79,19 @@ public class AnimationRegistry
 		entityMap.get(entityType).registerAnimation(binding, wrapper);
 	}
 	
-	public static void registerAnimation(String entityType, String binding, ResourceLocation resource, int priority, IsActiveFunction isActiveFunction)
+	public static void registerAnimation(String entityType, String binding, ResourceLocation resource, int priority, boolean loops, float transitionTime, IsActiveFunction isActiveFunction)
 	{
 		try {
-			registerAnimation(entityType, binding, new FunctionAnimationWrapper(resource, priority, isActiveFunction));
+			AnimationSequence seq = loadAnimation(resource);
+			registerAnimation(entityType, binding, new FunctionAnimationWrapper(seq, priority, loops, transitionTime, isActiveFunction));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public static void registerAnimation(String entityType, String binding, ResourceLocation resource, int priority, boolean loops, IsActiveFunction isActiveFunction)
+	{
+		registerAnimation(entityType, binding, resource, priority, loops, 0.25F, isActiveFunction);
 	}
 	
 	public static AnimationSequence getAnimation(String entityType, String binding)

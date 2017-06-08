@@ -1,23 +1,15 @@
 package obsidianAPI.animation.wrapper;
 
-import java.io.IOException;
-
 import net.minecraft.entity.Entity;
-import net.minecraft.util.ResourceLocation;
 import obsidianAPI.animation.AnimationSequence;
-import obsidianAPI.registry.AnimationRegistry;
 import obsidianAPI.render.ModelAnimated;
 
 public class FunctionAnimationWrapper extends AnimationWrapper {
 
 	private IsActiveFunction isActiveFunction;
-		
-	public FunctionAnimationWrapper(ResourceLocation resourceLocation, int priority, IsActiveFunction isActiveFunction) throws IOException {
-		this(AnimationRegistry.loadAnimation(resourceLocation), priority, isActiveFunction);
-	}
 	
-	public FunctionAnimationWrapper(AnimationSequence animation, int priority, IsActiveFunction isActiveFunction) {
-		super(animation, priority);
+	public FunctionAnimationWrapper(AnimationSequence animation, int priority, boolean loops, float transitionTime, IsActiveFunction isActiveFunction) {
+		super(animation, priority, loops, transitionTime);
 		this.isActiveFunction = isActiveFunction;
 	}
 	
