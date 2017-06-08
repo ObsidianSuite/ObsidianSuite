@@ -3,6 +3,7 @@ package obsidianAPI.render.part;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import net.minecraft.client.Minecraft;
+import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.obj.Face;
 import net.minecraftforge.client.model.obj.GroupObject;
@@ -151,20 +152,18 @@ public class PartObj extends PartRotation
 		}
 	}
 
-	public void updateTextureCoordinates()
+	public void updateTextureCoordinates(Entity entity)
 	{
-		updateTextureCoordinates(false, false, true);
+		updateTextureCoordinates(entity, false, false, true);
 	}
 
 	/**
 	 * Change the texture coordinates and texture if the part is highlighted.
 	 */
-	public void updateTextureCoordinates(boolean mainHighlight, boolean otherHighlight, boolean bindTexture)
+	public void updateTextureCoordinates(Entity entity, boolean mainHighlight, boolean otherHighlight, boolean bindTexture)
 	{
-		ResourceLocation texture = modelObj.getTexture();
-
 		if (bindTexture)
-			Minecraft.getMinecraft().getTextureManager().bindTexture(texture);
+			Minecraft.getMinecraft().getTextureManager().bindTexture(modelObj.getTexture(entity));
 
 		for (Face f : groupObj.faces)
 		{
@@ -172,19 +171,19 @@ public class PartObj extends PartRotation
 		}
 	}
 
-	public void render()
+	public void render(Entity entity)
 	{
 		GL11.glPushMatrix();
 		move();
-		updateTextureCoordinates();
+		updateTextureCoordinates(entity);
 		groupObj.render();
 
 		//Do for children - rotation for parent compensated for!
         for (PartObj child : getChildren())
-            child.render();
+            child.render(entity);
 
         GL11.glPopMatrix();
-		Minecraft.getMinecraft().getTextureManager().bindTexture(modelObj.getTexture());
+		Minecraft.getMinecraft().getTextureManager().bindTexture(modelObj.getTexture(entity));
 	}
 
 	/**

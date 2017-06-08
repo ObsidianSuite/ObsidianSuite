@@ -1,5 +1,6 @@
 package obsidianAPI.render.bend;
 
+import net.minecraft.entity.Entity;
 import net.minecraftforge.client.model.obj.Vertex;
 import obsidianAPI.render.part.PartObj;
 import org.lwjgl.opengl.GL11;
@@ -238,7 +239,7 @@ public class Bend
             compensatePartRotation(q);
     }
 
-    public void render()
+    public void render(Entity entity)
     {
         GL11.glPushMatrix();
 
@@ -248,7 +249,7 @@ public class Bend
         for (int i = 0; i < bendSplit; i++)
         {
             BendPart part = bendParts.get(i);
-            part.updateTextureCoordinates(false, false, parent.modelObj);
+            part.updateTextureCoordinates(entity, false, false, parent.modelObj);
             part.render();
         }
         GL11.glPopMatrix();

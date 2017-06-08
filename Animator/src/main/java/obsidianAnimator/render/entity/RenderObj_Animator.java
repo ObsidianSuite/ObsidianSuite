@@ -35,7 +35,7 @@ public class RenderObj_Animator extends RenderLiving
 	@Override
 	protected ResourceLocation getEntityTexture(Entity entity) 
 	{
-		return modelObj.getTexture();
+		return modelObj.getTexture(entity);
 	}
 
 	public void setModel(ModelObj_Animator model)
