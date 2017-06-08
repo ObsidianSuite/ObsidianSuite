@@ -1,14 +1,10 @@
 package obsidianAPI.registry;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.IResource;
-import net.minecraft.nbt.CompressedStreamTools;
-import net.minecraft.util.ResourceLocation;
 import obsidianAPI.animation.AnimationSequence;
+import obsidianAPI.animation.wrapper.IAnimationWrapper;
 
 /**
  * A class for storing animation sequences.
@@ -18,42 +14,33 @@ class AnimationMap
 {
 	
 	//Map to store animations
-	private Map<String, AnimationSequence> map;
+	private Map<String, IAnimationWrapper> map;
 	
 	AnimationMap()
 	{
-		map = new HashMap<String, AnimationSequence>();
+		map = new HashMap<String, IAnimationWrapper>();
 	}
 	
 	/**
 	 * Registers an animation by adding it to the map with a specific binding.
 	 * Can fail is file doesn't exist at resource location.
 	 */
-	void registerAnimation(String binding, ResourceLocation resource)
+	void registerAnimation(String binding, IAnimationWrapper wrapper)
 	{
-		//Attempt to load sequence from resource location.
-		try
-		{
-			AnimationSequence seq = loadAnimation(resource);
-			map.put(binding, seq);
-		}
-		catch(IOException e)
-		{
-			System.out.println("Unable to load animation:");
-			e.printStackTrace();
-		}
+		map.put(binding, wrapper);
 	}
 	
 	AnimationSequence getAnimation(String binding)
 	{
-		//TODO error handling here if animation is null. Should return null but maybe notify in debug?
-		return map.get(binding);
+		//TODO error handling here if wrapper is null. Should return null but maybe notify in debug?
+		IAnimationWrapper wrapper = map.get(binding);
+		return wrapper != null ? wrapper.getAnimation() : null;
 	}
 	
-	private AnimationSequence loadAnimation(ResourceLocation resource) throws IOException
+	IAnimationWrapper getAnimationWrapper(String binding)
 	{
-        IResource res = Minecraft.getMinecraft().getResourceManager().getResource(resource);
-		return new AnimationSequence(CompressedStreamTools.readCompressed(res.getInputStream()));
+		//TODO error handling here if wrapper is null. Should return null but maybe notify in debug?
+		return map.get(binding);
 	}
 	
 }

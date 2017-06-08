@@ -1,15 +1,18 @@
 package obsidianAPI.registry;
 
-import java.util.ArrayList;
+import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import cpw.mods.fml.common.FMLCommonHandler;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.resources.IResource;
+import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import obsidianAPI.ObsidianEventHandler;
 import obsidianAPI.animation.AnimationSequence;
+import obsidianAPI.animation.wrapper.IAnimationWrapper;
 import obsidianAPI.exceptions.UnregisteredEntityException;
 
 public class AnimationRegistry 
@@ -66,11 +69,11 @@ public class AnimationRegistry
 	 *  to access the animation.
 	 * Entity must be already registered.
 	 */
-	public static void registerAnimation(String entityType, String binding, ResourceLocation resource)
+	public static void registerAnimation(String entityType, String binding, IAnimationWrapper wrapper)
 	{
 		if(!entityMap.containsKey(entityType))
 			throw new UnregisteredEntityException(entityType);
-		entityMap.get(entityType).registerAnimation(binding, resource);
+		entityMap.get(entityType).registerAnimation(binding, wrapper);
 	}
 	
 	public static AnimationSequence getAnimation(String entityType, String binding)
@@ -80,10 +83,17 @@ public class AnimationRegistry
 		return entityMap.get(entityType).getAnimation(binding);
 	}
 	
-	public static boolean hasIdleAnimation(String entityName) {
-		if(!entityMap.containsKey(entityName))
-			throw new UnregisteredEntityException(entityName);
-		return entityMap.get(entityName).getAnimation("Idle") != null;
+	public static IAnimationWrapper getAnimationWrapper(String entityType, String binding)
+	{
+		if(!entityMap.containsKey(entityType))
+			throw new UnregisteredEntityException(entityType);
+		return entityMap.get(entityType).getAnimationWrapper(binding);
+	}
+	
+	public static AnimationSequence loadAnimation(ResourceLocation resource) throws IOException
+	{
+        IResource res = Minecraft.getMinecraft().getResourceManager().getResource(resource);
+		return new AnimationSequence(CompressedStreamTools.readCompressed(res.getInputStream()));
 	}
 
 }
