@@ -14,7 +14,6 @@ public class ModelAnimatedPlayer extends ModelAnimated
 {
 
 	private PartObj head, bodyUp, armUpL, armUpR, legUpL, legUpR;
-	private float previousSwingTime = 0.0F;
 	
 	//Debugging
 	private String previousState = "";
@@ -38,36 +37,36 @@ public class ModelAnimatedPlayer extends ModelAnimated
 
 	@Override
 	protected void updateAnimation(float swingTime, Entity entity, EntityAnimationProperties animProps) {
-		String state;
+		String state = "";
 		
-		if(swingTime - previousSwingTime > 0.05F) {
-			if(entity.isSprinting()) {
-				if(!entity.isCollidedVertically)
-					state = "SprintJump";
-				else
-					state = "SprintF";
-			}
-			else if(entity.isSneaking())
-				state = "CrouchF";
-			else {
-				if(!entity.isCollidedVertically)
-					state = "RunJump";
-				else
-					state = "WalkF";
-			}
-		}
-		else if(this.onGround != 0F){
-			state = "Swing";
-		}
-		else if(!entity.isCollidedVertically) {
-			state = "Jump";
-		}
-		else {
-			if(entity.isSneaking())
-				state = "CrouchedIdle";
-			else
-				state = "Idle";
-		}	
+//		if(swingTime - previousSwingTime > 0.05F) {
+//			if(entity.isSprinting()) {
+//				if(!entity.isCollidedVertically)
+//					state = "SprintJump";
+//				else
+//					state = "SprintF";
+//			}
+//			else if(entity.isSneaking())
+//				state = "CrouchF";
+//			else {
+//				if(!entity.isCollidedVertically)
+//					state = "RunJump";
+//				else
+//					state = "WalkF";
+//			}
+//		}
+//		else if(this.onGround != 0F){
+//			state = "Swing";
+//		}
+//		else if(!entity.isCollidedVertically) {
+//			state = "Jump";
+//		}
+//		else {
+//			if(entity.isSneaking())
+//				state = "CrouchedIdle";
+//			else
+//				state = "Idle";
+//		}	
 		
 		GuiDebug.instance.stateText = state;
 		
@@ -108,28 +107,27 @@ public class ModelAnimatedPlayer extends ModelAnimated
 //		}
 			
 		//States -> Animations
-		if(state.equals("WalkF") && !isAnimationActive(animProps, "WalkF"))
-		{
-			animProps.setActiveAnimation(this, "WalkF", true);
-		} 
-		else if(state.equals("SprintF") && !isAnimationActive(animProps, "SprintF"))
-		{
-			animProps.setActiveAnimation(this, "SprintF", true);
-		}
-		else if(state.equals("CrouchF") && !isAnimationActive(animProps, "CrouchF"))
-		{
-			animProps.setActiveAnimation(this, "CrouchF", true);
-		}
-		else if(state.equals("Jump") && !isAnimationActive(animProps, "Jump"))
-		{
-			animProps.setActiveAnimation(this, "Jump", true, 0F);
-		}
-		else if(!isIdle(animProps) && state.equals("Idle"))
-		{
-			animProps.returnToIdle(this);
-		}
+//		if(state.equals("WalkF") && !isAnimationActive(animProps, "WalkF"))
+//		{
+//			animProps.setActiveAnimation(this, "WalkF", true);
+//		} 
+//		else if(state.equals("SprintF") && !isAnimationActive(animProps, "SprintF"))
+//		{
+//			animProps.setActiveAnimation(this, "SprintF", true);
+//		}
+//		else if(state.equals("CrouchF") && !isAnimationActive(animProps, "CrouchF"))
+//		{
+//			animProps.setActiveAnimation(this, "CrouchF", true);
+//		}
+//		else if(state.equals("Jump") && !isAnimationActive(animProps, "Jump"))
+//		{
+//			animProps.setActiveAnimation(this, "Jump", true, 0F);
+//		}
+//		else if(!isIdle(animProps) && state.equals("Idle"))
+//		{
+//			animProps.returnToIdle(this);
+//		}
 		
-		previousSwingTime = swingTime;
 		previousState = state;
 	}
 

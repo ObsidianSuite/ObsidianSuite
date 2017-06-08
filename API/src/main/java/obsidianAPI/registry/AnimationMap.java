@@ -20,7 +20,7 @@ class AnimationMap
 	private Map<String, IAnimationWrapper> map;
 	
 	//Priority queue of animation wrappers
-	private Queue<IAnimationWrapper> animationList = new PriorityQueue<IAnimationWrapper>(0, new AnimationWrapperComparator());
+	private Queue<IAnimationWrapper> animationList = new PriorityQueue<IAnimationWrapper>(1, new AnimationWrapperComparator());
 	
 	AnimationMap()
 	{
@@ -58,5 +58,9 @@ class AnimationMap
 		}
     	
     }
+
+	public PriorityQueue<IAnimationWrapper> getAnimationListCopy() {
+		return new PriorityQueue<IAnimationWrapper>(animationList);
+	}
 	
 }

@@ -9,37 +9,34 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.obj.WavefrontObject;
 import obsidianAPI.EntityAnimationProperties;
 import obsidianAPI.animation.AnimationSequence;
-import obsidianAPI.registry.AnimationRegistry;
 import obsidianAPI.render.part.Part;
 
 public abstract class ModelAnimated extends ModelObj
 {
+	
+	private float previousSwingTime = 0.0F;
+	
 	public ModelAnimated(String entityName, WavefrontObject wavefrontObj, ResourceLocation textureLocation)
 	{
 		super(entityName, wavefrontObj, textureLocation);
 	}
 
 	@Override
-	public void setRotationAngles(float swingTime, float swingMax, float f2, float lookX, float lookY, float f5, Entity entity)
+	public void setRotationAngles(float swingTime, float swingMax, float clock, float lookX, float lookY, float f5, Entity entity)
 	{
-		super.setRotationAngles(swingTime, swingMax, f2, lookX, lookY, f5, entity);
+		super.setRotationAngles(swingTime, swingMax, clock, lookX, lookY, f5, entity);
 
 		EntityAnimationProperties animProps = (EntityAnimationProperties) entity.getExtendedProperties("Animation");
 		if (animProps == null)
 		{
-			doDefaultAnimations(swingTime, swingMax, f2, lookX, lookY, f5, entity);
+			doDefaultAnimations(swingTime, swingMax, clock, lookX, lookY, f5, entity);
 		}
 		else
 		{
 			animProps.updateFrameTime();
-
-			updateAnimation(swingTime, entity, animProps);
+			animProps.updateActiveAnimation(swingTime, swingMax, clock, lookX, lookY, f5, this, entity);
+			
 			AnimationSequence seq = animProps.getActiveAnimation();
-			//			if (seq == null && AnimationRegistry.getAnimation(entityName, "Idle") != null)
-			//			{
-			//				animProps.setActiveAnimation(this,"Idle",true);
-			//				seq = animProps.getActiveAnimation();
-			//			}
 
 			if(seq != null) {
 				float time = animProps.getAnimationFrameTime();
@@ -47,18 +44,20 @@ public abstract class ModelAnimated extends ModelObj
 				animProps.updateAnimation(this, time);
 			}
 			else {
-				doDefaultAnimations(swingTime, swingMax, f2, lookX, lookY, f5, entity);
+				doDefaultAnimations(swingTime, swingMax, clock, lookX, lookY, f5, entity);
 			}
 
 			//Translate for vertical y pos
 			Part entityPos = getPartFromName("entitypos");
 			GL11.glTranslatef(0, -entityPos.getValue(1), 0);
+			
+			previousSwingTime = swingTime;
 		}
 	}
 
 	protected abstract void updateAnimation(float swingTime, Entity entity, EntityAnimationProperties animProps);
 
-	protected void doDefaultAnimations(float swingTime, float swingMax, float f2, float lookX, float lookY, float f5, Entity entity)
+	protected void doDefaultAnimations(float swingTime, float swingMax, float clock, float lookX, float lookY, float f5, Entity entity)
 	{
 		parts.forEach(Part::setToOriginalValues);
 	}
@@ -69,15 +68,12 @@ public abstract class ModelAnimated extends ModelObj
 				|| animProps.getActiveAnimation().getName().equals("transition_idle");
 	}
 
-	protected boolean isAnimationActive(EntityAnimationProperties animProps, String animationName)
-	{		
-		if(animProps.getActiveAnimation() == null)
-			return false;
-		return animProps.getActiveAnimation().getName().equals(animationName) || animProps.getActiveAnimation().getName().equals("transition_" + animationName);
-	}
-
 	protected void animateToPartValues(EntityAnimationProperties animProps, Map<String, float[]> partValues)
 	{
 		parts.forEach(p -> p.setValues(partValues.get(p.getName())));
+	}
+	
+	public boolean isMoving(float swingTime) {
+		return swingTime - previousSwingTime > 0.05F;
 	}
 }

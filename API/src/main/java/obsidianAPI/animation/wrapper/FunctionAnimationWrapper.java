@@ -6,6 +6,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
 import obsidianAPI.animation.AnimationSequence;
 import obsidianAPI.registry.AnimationRegistry;
+import obsidianAPI.render.ModelAnimated;
 
 public class FunctionAnimationWrapper extends AnimationWrapper {
 
@@ -21,13 +22,13 @@ public class FunctionAnimationWrapper extends AnimationWrapper {
 	}
 	
 	@Override
-	public boolean isActive(float swingTime, float swingMax, float clock, float lookX, float lookY, float f5, Entity entity) {
-		return isActiveFunction.apply(swingTime, swingMax, clock, lookX, lookY, f5, entity);
+	public boolean isActive(float swingTime, float swingMax, float clock, float lookX, float lookY, float f5, ModelAnimated model, Entity entity) {
+		return isActiveFunction.apply(swingTime, swingMax, clock, lookX, lookY, f5, model, entity);
 	}
 
 	@FunctionalInterface
 	public interface IsActiveFunction { 
-		public boolean apply (float swingTime, float swingMax, float clock, float lookX, float lookY, float f5, Entity entity);
+		public boolean apply (float swingTime, float swingMax, float clock, float lookX, float lookY, float f5, ModelAnimated model, Entity entity);
 	}
 	
 }

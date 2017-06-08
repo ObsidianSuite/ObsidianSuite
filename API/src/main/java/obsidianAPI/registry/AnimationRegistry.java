@@ -3,6 +3,7 @@ package obsidianAPI.registry;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.PriorityQueue;
 
 import cpw.mods.fml.common.FMLCommonHandler;
 import net.minecraft.client.Minecraft;
@@ -99,6 +100,12 @@ public class AnimationRegistry
 		if(!entityMap.containsKey(entityType))
 			throw new UnregisteredEntityException(entityType);
 		return entityMap.get(entityType).getAnimationWrapper(binding);
+	}
+	
+	public static PriorityQueue<IAnimationWrapper> getAnimationListCopy(String entityName) {
+		if(!entityMap.containsKey(entityName))
+			throw new UnregisteredEntityException(entityName);
+		return entityMap.get(entityName).getAnimationListCopy();
 	}
 	
 	public static AnimationSequence loadAnimation(ResourceLocation resource) throws IOException

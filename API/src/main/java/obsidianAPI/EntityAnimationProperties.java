@@ -1,10 +1,8 @@
 package obsidianAPI;
 
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.PriorityQueue;
 import java.util.Queue;
 
 import com.google.common.collect.Lists;
@@ -19,9 +17,9 @@ import obsidianAPI.animation.ActionPointCallback;
 import obsidianAPI.animation.AnimationSequence;
 import obsidianAPI.animation.wrapper.IAnimationWrapper;
 import obsidianAPI.registry.AnimationRegistry;
+import obsidianAPI.render.ModelAnimated;
 import obsidianAPI.render.ModelObj;
 import obsidianAPI.render.part.Part;
-import obsidianAPI.render.part.PartObj;
 
 public class EntityAnimationProperties implements IExtendedEntityProperties
 {
@@ -76,13 +74,43 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
         else
             frameTime = Util.getAnimationFrameTime(now, animationStartTime, 0, activeAnimation.getFPS(), multiplier);
     }
+    
+	public void updateActiveAnimation(float swingTime, float swingMax, float clock, float lookX, float lookY, float f5, ModelAnimated model, Entity entity) 
+	{
+		Queue<IAnimationWrapper> tempQueue = AnimationRegistry.getAnimationListCopy(entityName);
+		AnimationSequence seq = null;
+		IAnimationWrapper wrapper;
+		while((wrapper = tempQueue.poll()) != null) {
+			if(wrapper.isActive(swingTime, swingMax, clock, lookX, lookY, f5, model, entity)) {
+				seq = wrapper.getAnimation();
+				break;
+			}
+		}
+		
+		if(seq != null) {
+			if(!isAnimationActive(seq.getName())) 
+				setActiveAnimation(model, seq, true);
+		}
+		else
+			returnToIdle(model);
+	}
 
     public void setActiveAnimation(ModelObj model, String binding, boolean loop)
     {
         setActiveAnimation(model, binding, loop, 0.25f);
     }
+    
+    public void setActiveAnimation(ModelObj model,  AnimationSequence sequence, boolean loop)
+    {
+        setActiveAnimation(model, sequence, loop, 0.25f);
+    }
 
     public void setActiveAnimation(ModelObj model, String binding, boolean loopAnim, float transitionTime)
+    {    	
+    	setActiveAnimation(model, AnimationRegistry.getAnimation(entityName, binding), loopAnim, transitionTime);
+    }
+    
+    public void setActiveAnimation(ModelObj model, AnimationSequence sequence, boolean loopAnim, float transitionTime)
     {    	
         Map<String, float[]> currentValues;
         if (activeAnimation != null)
@@ -105,10 +133,9 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
         	updateFrameTime();
         	        	
             loop = false;
-            AnimationSequence next = AnimationRegistry.getAnimation(entityName, binding);
             
-            if(next != null)
-            	activeAnimation = Util.createTransition(model,next.getName(), currentValues, next.getPartValuesAtTime(model,0f),transitionTime);
+            if(sequence != null)
+            	activeAnimation = Util.createTransition(model, sequence.getName(), currentValues, sequence.getPartValuesAtTime(model,0f),transitionTime);
             else
             	activeAnimation = Util.createTransition(model, "idle", currentValues, getOriginalValues(model), transitionTime);
             onFinished = () ->
@@ -116,14 +143,14 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
                 animationStartTime = now;
                 nextFrame = 0;
                 onFinished = null;
-                loop = next != null ? loopAnim : false;
-                activeAnimation = next;
+                loop = sequence != null ? loopAnim : false;
+                activeAnimation = sequence;
             };
         }
         else
         {
             this.loop = loopAnim;
-            activeAnimation = AnimationRegistry.getAnimation(entityName, binding);
+            activeAnimation = sequence;
         }
     }
 
@@ -239,4 +266,12 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
             }
         }
     }
+    
+	private boolean isAnimationActive(String animationName)
+	{		
+		if(activeAnimation == null)
+			return false;
+		return activeAnimation.getName().equals(animationName) || activeAnimation.getName().equals("transition_" + animationName);
+	}
+
 }
