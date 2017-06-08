@@ -1,8 +1,11 @@
 package obsidianAPI;
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.PriorityQueue;
+import java.util.Queue;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -14,6 +17,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.IExtendedEntityProperties;
 import obsidianAPI.animation.ActionPointCallback;
 import obsidianAPI.animation.AnimationSequence;
+import obsidianAPI.animation.wrapper.IAnimationWrapper;
 import obsidianAPI.registry.AnimationRegistry;
 import obsidianAPI.render.ModelObj;
 import obsidianAPI.render.part.Part;
@@ -38,6 +42,9 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
 	private Runnable onFinished;
 
 	private float frameTime = 0f;
+	
+	private Queue<IAnimationWrapper> animationList = new PriorityQueue<IAnimationWrapper>(1, new AnimationWrapperComparator());
+	
 	
     @Override
     public void init(Entity entity, World world)
@@ -93,9 +100,8 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
         animationStartTime = now;
         nextFrame = 0;
         onFinished = null;
-
+        //TODO add these back in?
 //        prevEntityPosX = 0f;
-//        prevEntityPosY = 0f;
 //        prevEntityPosZ = 0f;
         if (transitionTime > 0.001f)
         {
@@ -182,7 +188,6 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
         if (activeAnimation != null)
         {
 			Part entityPos = model.getPartFromName("entitypos");
-            PartObj bodyUp = model.getPartObjFromName("bodyUp");
             if (entityPos != null)
             {            	
                 float entityPosX = entityPos.getValue(0);
@@ -236,5 +241,14 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
                 }
             }
         }
+    }
+    
+    private class AnimationWrapperComparator implements Comparator<IAnimationWrapper>{
+
+		@Override
+		public int compare(IAnimationWrapper o1, IAnimationWrapper o2) {
+			return o1.getPriority() - o2.getPriority();
+		}
+    	
     }
 }

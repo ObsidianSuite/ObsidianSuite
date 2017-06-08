@@ -16,7 +16,7 @@ public interface IAnimationWrapper {
 	public boolean isActive(float swingTime, float swingMax, float clock, float lookX, float lookY, float f5, Entity entity);
 	
 	/**
-	 * @return Priority of this animation. 0 highest, 100 lowest. 
+	 * @return Priority of this animation. Lower number = lower priority. 
 	 */
 	public int getPriority();
 	
