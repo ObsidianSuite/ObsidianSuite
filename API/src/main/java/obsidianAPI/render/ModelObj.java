@@ -54,7 +54,7 @@ public class ModelObj extends ModelBase {
 		init();
 	}
 
-	public ResourceLocation getTexture() {
+	public ResourceLocation getTexture(Entity entity) {
 		return texture;
 	}
 	
@@ -154,7 +154,7 @@ public class ModelObj extends ModelBase {
 			for (Part p : parts) {
 				if (p instanceof PartObj) {
 					PartObj obj = (PartObj) p;
-					obj.updateTextureCoordinates(false, false, false);
+					obj.updateTextureCoordinates(null, false, false, false);
 				}
 			}
 
@@ -293,7 +293,7 @@ public class ModelObj extends ModelBase {
 			if (p instanceof PartObj) {
 				PartObj part = (PartObj) p;
 				if (!part.hasParent())
-					part.render();
+					part.render(entity);
 			}
 			// TODO entity movement via PartEntityPos
 			// else if(p instanceof PartEntityPos)
@@ -301,7 +301,7 @@ public class ModelObj extends ModelBase {
 		}
 
 		for (Bend bend : bends) {
-			bend.render();
+			bend.render(entity);
 		}
 
 		GL11.glPopMatrix();

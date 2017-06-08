@@ -1,6 +1,7 @@
 package obsidianAnimator.render.entity;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.obj.Face;
 import net.minecraftforge.client.model.obj.GroupObject;
@@ -97,16 +98,16 @@ public class PartObj_Animator extends PartObj
 	}
 
 	@Override
-	public void updateTextureCoordinates()
+	public void updateTextureCoordinates(Entity entity)
 	{	
-		updateTextureCoordinates(((ModelObj_Animator) modelObj).isMainHighlight(this), ((ModelObj_Animator) modelObj).isPartHighlighted(this), true);
+		updateTextureCoordinates(entity, ((ModelObj_Animator) modelObj).isMainHighlight(this), ((ModelObj_Animator) modelObj).isPartHighlighted(this), true);
 	}
 
 	/**
 	 * Change the texture coordinates and texture if the part is highlighted.
 	 */
 	@Override
-	public void updateTextureCoordinates(boolean mainHighlight, boolean otherHighlight, boolean bindTexture)
+	public void updateTextureCoordinates(Entity entity, boolean mainHighlight, boolean otherHighlight, boolean bindTexture)
 	{		
 		boolean useHighlightCoords = true;
 		ResourceLocation texture;
@@ -116,7 +117,7 @@ public class PartObj_Animator extends PartObj
 			texture = ModelObj_Animator.whiteResLoc;
 		else
 		{
-			texture = modelObj.getTexture();
+			texture = modelObj.getTexture(entity);
 			useHighlightCoords = false;
 		}
 
