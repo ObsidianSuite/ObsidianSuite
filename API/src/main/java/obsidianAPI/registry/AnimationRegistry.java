@@ -12,6 +12,8 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import obsidianAPI.ObsidianEventHandler;
 import obsidianAPI.animation.AnimationSequence;
+import obsidianAPI.animation.wrapper.FunctionAnimationWrapper;
+import obsidianAPI.animation.wrapper.FunctionAnimationWrapper.IsActiveFunction;
 import obsidianAPI.animation.wrapper.IAnimationWrapper;
 import obsidianAPI.exceptions.UnregisteredEntityException;
 
@@ -74,6 +76,15 @@ public class AnimationRegistry
 		if(!entityMap.containsKey(entityType))
 			throw new UnregisteredEntityException(entityType);
 		entityMap.get(entityType).registerAnimation(binding, wrapper);
+	}
+	
+	public static void registerAnimation(String entityType, String binding, ResourceLocation resource, int priority, IsActiveFunction isActiveFunction)
+	{
+		try {
+			registerAnimation(entityType, binding, new FunctionAnimationWrapper(resource, priority, isActiveFunction));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public static AnimationSequence getAnimation(String entityType, String binding)

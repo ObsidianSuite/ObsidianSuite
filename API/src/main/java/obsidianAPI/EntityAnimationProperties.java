@@ -41,10 +41,7 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
 
 	private Runnable onFinished;
 
-	private float frameTime = 0f;
-	
-	private Queue<IAnimationWrapper> animationList = new PriorityQueue<IAnimationWrapper>(1, new AnimationWrapperComparator());
-	
+	private float frameTime = 0f;	
 	
     @Override
     public void init(Entity entity, World world)
@@ -241,14 +238,5 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
                 }
             }
         }
-    }
-    
-    private class AnimationWrapperComparator implements Comparator<IAnimationWrapper>{
-
-		@Override
-		public int compare(IAnimationWrapper o1, IAnimationWrapper o2) {
-			return o1.getPriority() - o2.getPriority();
-		}
-    	
     }
 }

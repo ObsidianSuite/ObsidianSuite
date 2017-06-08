@@ -1,7 +1,10 @@
 package obsidianAPI.registry;
 
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.PriorityQueue;
+import java.util.Queue;
 
 import obsidianAPI.animation.AnimationSequence;
 import obsidianAPI.animation.wrapper.IAnimationWrapper;
@@ -13,8 +16,11 @@ import obsidianAPI.animation.wrapper.IAnimationWrapper;
 class AnimationMap 
 {
 	
-	//Map to store animations
+	//Map of bindings to animation wrappers
 	private Map<String, IAnimationWrapper> map;
+	
+	//Priority queue of animation wrappers
+	private Queue<IAnimationWrapper> animationList = new PriorityQueue<IAnimationWrapper>(0, new AnimationWrapperComparator());
 	
 	AnimationMap()
 	{
@@ -28,6 +34,7 @@ class AnimationMap
 	void registerAnimation(String binding, IAnimationWrapper wrapper)
 	{
 		map.put(binding, wrapper);
+		animationList.add(wrapper);
 	}
 	
 	AnimationSequence getAnimation(String binding)
@@ -42,5 +49,14 @@ class AnimationMap
 		//TODO error handling here if wrapper is null. Should return null but maybe notify in debug?
 		return map.get(binding);
 	}
+	
+    private class AnimationWrapperComparator implements Comparator<IAnimationWrapper>{
+
+		@Override
+		public int compare(IAnimationWrapper o1, IAnimationWrapper o2) {
+			return o1.getPriority() - o2.getPriority();
+		}
+    	
+    }
 	
 }
