@@ -41,6 +41,8 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
 
 	private float frameTime = 0f;	
 	
+	public float previousSwingTime = 0.0F;
+	
     @Override
     public void init(Entity entity, World world)
     {

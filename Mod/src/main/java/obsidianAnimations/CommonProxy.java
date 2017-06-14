@@ -53,16 +53,16 @@ public class CommonProxy
 		//		}	
 		
 		IsActiveFunction isWalking = (swingTime, swingMax, clock, lookX, lookY, f5, model, entity) -> { 
-			return model.isMoving(swingTime) && !entity.isSprinting() && !entity.isSneaking() && entity.isCollidedVertically;
+			return model.isMoving(entity, swingTime) && !entity.isSprinting() && !entity.isSneaking() && entity.isCollidedVertically;
 		};
 		IsActiveFunction isSprinting = (swingTime, swingMax, clock, lookX, lookY, f5, model, entity) -> { 
-			return model.isMoving(swingTime) && entity.isSprinting() && entity.isCollidedVertically;
+			return model.isMoving(entity, swingTime) && entity.isSprinting() && entity.isCollidedVertically;
 		};
 		IsActiveFunction isSneaking = (swingTime, swingMax, clock, lookX, lookY, f5, model, entity) -> { 
-			return model.isMoving(swingTime) && entity.isSneaking() && entity.isCollidedVertically;
+			return model.isMoving(entity, swingTime) && entity.isSneaking() && entity.isCollidedVertically;
 		};
 		IsActiveFunction isJumping = (swingTime, swingMax, clock, lookX, lookY, f5, model, entity) -> { 
-			return !model.isMoving(swingTime) && !entity.isCollidedVertically;
+			return !model.isMoving(entity, swingTime) && !entity.isCollidedVertically;
 		};
 
 		AnimationRegistry.registerEntity(EntityPlayer.class, "player");
