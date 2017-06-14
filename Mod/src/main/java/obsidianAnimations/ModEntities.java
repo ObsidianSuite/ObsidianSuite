@@ -25,7 +25,7 @@ public class ModEntities
 		int secondaryColor = rand.nextInt() * 16777215;
 
 		EntityRegistry.registerGlobalEntityID(entityClass, name, entityID);
-		EntityRegistry.registerModEntity(entityClass, name, entityID, ObsidianAnimations.instance, 64, 1, true);
+		EntityRegistry.registerModEntity(entityClass, name, entityID, ObsidianAnimations.instance, 64, 3, true);
 		EntityList.entityEggs.put(Integer.valueOf(entityID), new EntityList.EntityEggInfo(entityID, primaryColor, secondaryColor));
 	}
 

@@ -10,13 +10,12 @@ public class ModelSaiga extends ModelAnimated {
 
 	public ModelSaiga(String entityName, WavefrontObject wavefrontObj, ResourceLocation textureLocation) {
 		super(entityName, wavefrontObj, textureLocation);
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override
 	protected void updateAnimation(float swingTime, Entity entity, EntityAnimationProperties animProps) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 }

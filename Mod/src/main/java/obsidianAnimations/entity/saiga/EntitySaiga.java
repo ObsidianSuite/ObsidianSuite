@@ -15,7 +15,6 @@ public class EntitySaiga extends EntityCreature
 		super(world);
 		this.tasks.taskEntries.clear();
         this.tasks.addTask(0, new EntityAIWanderAlways(this, 1.0D));
-        this.tasks.addTask(1, new EntityAITempt(this, 1.0D, Items.wheat, false));
 	}
 	
 	@Override
