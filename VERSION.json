@@ -7,7 +7,7 @@
                 "+ Cow model",
 				"~ Updated player model"
 			],
-			"updateURL":"https://github.com/DaBigJoe/ObsidianSuite/releases/download/Animator_v0.3.3-Alpha/ObsidianAnimator_v0.3.3-Alpha.jar",
+			"updateURL":"https://github.com/ObsidianSuite/ObsidianSuite/releases/download/Animator_v0.3.3-Alpha/ObsidianAnimator_v0.3.3-Alpha.jar",
 			"isDirectLink":"true",
 			"newFileName":""
 		},
@@ -20,7 +20,7 @@
 				"~ View rotation swapped from middle mouse button to right mouse button",
 				"~ Bug fixes"
 			],
-			"updateURL":"https://github.com/DaBigJoe/ObsidianSuite/releases/download/Animator_v0.3.2-Alpha/ObsidianAnimator_v0.3.2-Alpha.jar",
+			"updateURL":"https://github.com/ObsidianSuite/ObsidianSuite/releases/download/Animator_v0.3.2-Alpha/ObsidianAnimator_v0.3.2-Alpha.jar",
 			"isDirectLink":"true",
 			"newFileName":""
 		},
@@ -31,7 +31,7 @@
                 "+ Version Checker Support",
                 "+ Qubble Importer (gegy1000)"
 			],
-			"updateURL":"https://github.com/DaBigJoe/ObsidianSuite/releases/download/Animator_v0.3.1-Alpha/ObsidianAnimator_v0.3.1-Alpha.jar",
+			"updateURL":"https://github.com/ObsidianSuite/ObsidianSuite/releases/download/Animator_v0.3.1-Alpha/ObsidianAnimator_v0.3.1-Alpha.jar",
 			"isDirectLink":"true",
 			"newFileName":""
 		},
@@ -42,7 +42,7 @@
                 "+ Better Tabula support",
                 "+ Merge tool"
 			],
-			"updateURL":"https://github.com/DaBigJoe/ObsidianSuite/releases/download/Animator_v0.3.0-Alpha/ObsidianAnimator_v0.3.0-Alpha.jar",
+			"updateURL":"https://github.com/ObsidianSuite/ObsidianSuite/releases/download/Animator_v0.3.0-Alpha/ObsidianAnimator_v0.3.0-Alpha.jar",
 			"isDirectLink":"true",
 			"newFileName":""
 		}

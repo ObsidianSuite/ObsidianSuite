@@ -48,7 +48,7 @@ task eclipse(overwrite: true) {
 	outputs.file "$projectDir/eclipse"
 
 	def zipFile = file('tmp.zip')
-	def url = new URL('https://github.com/DaBigJoe/ObsidianSuite/releases/download/v1.0/ObsidianSuiteEclipseFolder.zip')
+	def url = new URL('https://github.com/ObsidianSuite/ObsidianSuite/releases/download/v1.0/ObsidianSuiteEclipseFolder.zip')
 	
 	doFirst {
 		if (!zipFile.exists()) {
