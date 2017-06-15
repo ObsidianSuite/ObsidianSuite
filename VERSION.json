@@ -2,6 +2,16 @@
 	"versionList": [
 		{
 			"mcVersion":"Minecraft 1.7.10",
+			"modVersion":"0.3.4-Alpha",
+			"changeLog": [
+				"~ Changed versioning to reflect GitHub repository change."
+			],
+			"updateURL":"https://github.com/ObsidianSuite/ObsidianSuite/releases/download/Animator_v0.3.4-Alpha/ObsidianAnimator_v0.3.4-Alpha.jar",
+			"isDirectLink":"true",
+			"newFileName":""
+		},
+		{
+			"mcVersion":"Minecraft 1.7.10",
 			"modVersion":"0.3.3-Alpha",
 			"changeLog": [
                 "+ Cow model",
