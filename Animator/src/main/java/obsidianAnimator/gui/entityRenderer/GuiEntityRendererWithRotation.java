@@ -3,6 +3,7 @@ package obsidianAnimator.gui.entityRenderer;
 import java.nio.ByteBuffer;
 import java.nio.DoubleBuffer;
 
+import obsidianAPI.render.part.PartPropRotation;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 
@@ -262,10 +263,17 @@ public class GuiEntityRendererWithRotation extends GuiEntityRenderer
 			partObj = (PartObj) selectedPart;
 			partObj.postRenderAll();
 		}
-		else if(selectedPart instanceof PartRotation) //Prop rotation
+		else if(selectedPart instanceof PartPropRotation) //Prop rotation
 		{
 			ItemStack itemstack = entityToRender.getHeldItem();
-			ModelHandler.modelRenderer.transformToItemCentreAndRotate(itemstack);
+			if (selectedPart.getName().equals("prop_rot"))
+			{
+				ModelHandler.modelRenderer.transformToItemCentreAndRotateRight(itemstack);
+			}
+			else
+			{
+				ModelHandler.modelRenderer.transformToItemCentreAndRotateLeft(ModelHandler.modelRenderer.getLeftItem());
+			}
 		}
 	}
 

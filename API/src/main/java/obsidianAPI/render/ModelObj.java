@@ -194,6 +194,10 @@ public class ModelObj extends ModelBase
 			parts.add(new PartPropRotation(this));
 			parts.add(new PartPropTranslation(this));
 			parts.add(new PartPropScale(this));
+
+			parts.add(new PartPropRotation(this,"prop_rot_l"));
+			parts.add(new PartPropTranslation(this, "prop_trans_l"));
+			parts.add(new PartPropScale(this, "prop_scale_l"));
 		}
 		partGroups = new PartGroups(this);
 	}

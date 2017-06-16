@@ -10,5 +10,9 @@ public class PartPropTranslation extends Part
 		super(mObj, "prop_trans");
 	}
 
+	public PartPropTranslation(ModelObj mObj, String name)
+	{
+		super(mObj, name);
+	}
 }
 

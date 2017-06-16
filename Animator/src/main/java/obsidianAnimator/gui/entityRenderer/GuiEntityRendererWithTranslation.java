@@ -1,21 +1,14 @@
 package obsidianAnimator.gui.entityRenderer;
 
-import org.lwjgl.opengl.GL11;
-
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Vec3;
-import obsidianAPI.Util;
-import obsidianAPI.render.part.Part;
-import obsidianAPI.render.part.PartEntityPos;
-import obsidianAPI.render.part.PartObj;
-import obsidianAPI.render.part.PartPropScale;
-import obsidianAPI.render.part.PartPropTranslation;
-import obsidianAPI.render.part.PartRotation;
+import obsidianAPI.render.part.*;
 import obsidianAnimator.data.ModelHandler;
 import obsidianAnimator.render.MathHelper;
 import obsidianAnimator.render.RayTrace;
+import org.lwjgl.opengl.GL11;
 
 public class GuiEntityRendererWithTranslation extends GuiEntityRendererWithRotation
 {
@@ -80,11 +73,16 @@ public class GuiEntityRendererWithTranslation extends GuiEntityRendererWithRotat
 				GL11.glPopMatrix();
 				super.processRay();
 				return;
-			}
-			else if(selectedPart instanceof PartPropTranslation || selectedPart instanceof PartPropScale)
-			{	
+			} else if (selectedPart instanceof PartPropTranslation || selectedPart instanceof PartPropScale)
+			{
 				ItemStack itemstack = entityToRender.getHeldItem();
-				ModelHandler.modelRenderer.transformToItemCentre(itemstack);
+				if (selectedPart.getName().equals("prop_trans") || selectedPart.getName().equals("prop_scale"))
+				{
+					ModelHandler.modelRenderer.transformToItemCentreRight(itemstack);
+				} else
+				{
+					ModelHandler.modelRenderer.transformToItemCentreLeft(ModelHandler.modelRenderer.getLeftItem());
+				}
 			}
 
 

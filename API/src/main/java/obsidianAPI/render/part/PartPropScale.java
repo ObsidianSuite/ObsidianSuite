@@ -10,4 +10,8 @@ public class PartPropScale extends Part
 		super(mObj, "prop_scale");
 	}
 
+	public PartPropScale(ModelObj mObj, String name)
+	{
+		super(mObj, name);
+	}
 }

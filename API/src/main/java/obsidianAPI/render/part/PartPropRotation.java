@@ -10,4 +10,8 @@ public class PartPropRotation extends PartRotation
 		super(mObj, "prop_rot");
 	}
 
+	public PartPropRotation(ModelObj modelObj, String name)
+	{
+		super(modelObj, name);
+	}
 }

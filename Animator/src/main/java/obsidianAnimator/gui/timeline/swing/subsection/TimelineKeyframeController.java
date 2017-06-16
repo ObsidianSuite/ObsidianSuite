@@ -178,7 +178,7 @@ public class TimelineKeyframeController extends TimelineControllerSub
 	{
 		String partName = kf.part.getName();
 
-		if((partName.equals("entitypos") || partName.equals("prop_rot") || partName.equals("prop_trans")) && !partName.equals(part.getName()))
+		if((partName.equals("entitypos") || partName.startsWith("prop_rot") || partName.startsWith("prop_trans")) && !partName.equals(part.getName()))
 			JOptionPane.showMessageDialog(mainController.timelineFrame, partName + " can only copy to itself.");
 		else
 			addKeyframe(new Keyframe(time, part, kf.values.clone()));
