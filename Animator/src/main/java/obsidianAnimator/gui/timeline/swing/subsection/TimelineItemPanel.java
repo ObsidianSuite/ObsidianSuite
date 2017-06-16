@@ -11,6 +11,7 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 
 import net.minecraft.client.Minecraft;
+import obsidianAnimator.data.ModelHandler;
 import obsidianAnimator.gui.GuiInventoryChooseItem;
 
 public class TimelineItemPanel extends JPanel
@@ -23,30 +24,57 @@ public class TimelineItemPanel extends JPanel
 		GridBagConstraints c = new GridBagConstraints();
 		c.gridx = 0;
 		c.gridy = 0;
-		c.insets = new Insets(2,5,2,5);
+		c.insets = new Insets(2,2,2,2);
 		c.ipadx = 10;
 		c.fill = GridBagConstraints.BOTH;
 
-		JButton itemButton = new JButton("Choose Right Hand Item");
+		JButton itemButton = new JButton("Choose Right");
 		itemButton.addActionListener(new ActionListener()
 		{
 			@Override
 			public void actionPerformed(ActionEvent e) 
 			{
 				controller.getTimelineFrame().setVisible(false);
-				Minecraft.getMinecraft().displayGuiScreen(new GuiInventoryChooseItem(controller, controller.getEntityToRender()));
+				Minecraft.getMinecraft().displayGuiScreen(new GuiInventoryChooseItem(false, controller, controller.getEntityToRender()));
 			}
 		});
 		add(itemButton, c);
 
-		c.gridy = 1;
-		JButton emptyItemButton = new JButton("Empty Right Hand");
+		c.gridx = 1;
+		JButton emptyItemButton = new JButton("Empty");
 		emptyItemButton.addActionListener(new ActionListener()
 		{
 			@Override
 			public void actionPerformed(ActionEvent e) 
 			{
 		    	controller.getEntityToRender().setCurrentItem(null); 
+			}
+		});
+		add(emptyItemButton, c);
+
+		c.gridy=1;
+		c.gridx = 0;
+		itemButton = new JButton("Choose Left");
+		itemButton.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				controller.getTimelineFrame().setVisible(false);
+				Minecraft.getMinecraft().displayGuiScreen(new GuiInventoryChooseItem(true, controller, controller.getEntityToRender()));
+			}
+		});
+		add(itemButton, c);
+
+		c.gridy=1;
+		c.gridx = 1;
+		emptyItemButton = new JButton("Empty");
+		emptyItemButton.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				ModelHandler.modelRenderer.setLeftItem(null);
 			}
 		});
 		add(emptyItemButton, c);

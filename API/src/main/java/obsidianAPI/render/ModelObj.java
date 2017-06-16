@@ -102,10 +102,14 @@ public class ModelObj extends ModelBase {
 	private void loadObj(WavefrontObject model) {
 		parts = createPartObjList(model.groupObjects);
 		parts.add(new PartEntityPos(this));
-		if (entityName.equals("player")) {
+		if (entityName.equals("ObsidianPlayer")) {
 			parts.add(new PartPropRotation(this));
 			parts.add(new PartPropTranslation(this));
 			parts.add(new PartPropScale(this));
+
+			parts.add(new PartPropRotation(this,"prop_rot_l"));
+			parts.add(new PartPropTranslation(this, "prop_trans_l"));
+			parts.add(new PartPropScale(this, "prop_scale_l"));
 		}
 		partGroups = new PartGroups(this);
 	}
@@ -328,7 +332,7 @@ public class ModelObj extends ModelBase {
 				return part;
 			}
 		}
-		throw new RuntimeException("No part found for '" + name + "'");
+		throw new RuntimeException("No part found for '" + name + "' for entity " + entityName);
 	}
 
 	public PartObj getPartObjFromName(String name) {
