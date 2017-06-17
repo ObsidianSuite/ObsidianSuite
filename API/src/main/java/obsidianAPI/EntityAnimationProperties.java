@@ -132,6 +132,10 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
 
     public void setMultiplier(float multiplier)
     {
+        if (frameTime > 0)
+        {
+            animationStartTime = (long) (now - (now - animationStartTime) * (double) this.multiplier / (double) multiplier);
+        }
         this.multiplier = multiplier;
     }
 
