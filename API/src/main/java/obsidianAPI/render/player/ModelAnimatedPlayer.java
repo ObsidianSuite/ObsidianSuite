@@ -33,10 +33,30 @@ public class ModelAnimatedPlayer extends ModelAnimated
 		legUpL = getPartObjFromName("legUpL");
 		legUpR = getPartObjFromName("legUpR");		
 	}
-	
 
 	@Override
-	protected void updateAnimation(float swingTime, Entity entity, EntityAnimationProperties animProps) {
+	public void setRotationAngles(float swingTime, float swingMax, float clock, float lookX, float lookY, float f5, Entity entity) 
+	{				
+		super.setRotationAngles(swingTime, swingMax, clock, lookX, lookY, f5, entity);		
+
+		//Look TODO sort head lookX
+		head.setValue(lookY/(180F/(float)Math.PI), 0);
+
+		if(entity.isSneaking())
+			head.setValue(head.getValue(0) - 0.7F, 0);
+		
+		EntityAnimationProperties animProps = (EntityAnimationProperties) entity.getExtendedProperties("Animation");
+		if (animProps == null)
+			GuiDebug.instance.animationText = "null";
+		else
+		{
+			AnimationSequence seq = animProps.getActiveAnimation();
+			if (seq == null)
+				GuiDebug.instance.animationText = "null";
+			else
+				GuiDebug.instance.animationText = seq.getName();
+		}		
+		
 		String state = "";	
 		
 		GuiDebug.instance.stateText = state;
@@ -78,30 +98,6 @@ public class ModelAnimatedPlayer extends ModelAnimated
 //		}
 		
 		previousState = state;
-	}
-
-	@Override
-	public void setRotationAngles(float swingTime, float swingMax, float clock, float lookX, float lookY, float f5, Entity entity) 
-	{				
-		super.setRotationAngles(swingTime, swingMax, clock, lookX, lookY, f5, entity);		
-
-		//Look TODO sort head lookX
-		head.setValue(lookY/(180F/(float)Math.PI), 0);
-
-		if(entity.isSneaking())
-			head.setValue(head.getValue(0) - 0.7F, 0);
-		
-		EntityAnimationProperties animProps = (EntityAnimationProperties) entity.getExtendedProperties("Animation");
-		if (animProps == null)
-			GuiDebug.instance.animationText = "null";
-		else
-		{
-			AnimationSequence seq = animProps.getActiveAnimation();
-			if (seq == null)
-				GuiDebug.instance.animationText = "null";
-			else
-				GuiDebug.instance.animationText = seq.getName();
-		}		
 	}
 	
 	@Override

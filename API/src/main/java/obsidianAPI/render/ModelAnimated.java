@@ -13,9 +13,7 @@ import obsidianAPI.render.part.Part;
 
 public abstract class ModelAnimated extends ModelObj
 {
-	
-	private float previousSwingTime = 0.0F;
-	
+		
 	public ModelAnimated(String entityName, WavefrontObject wavefrontObj, ResourceLocation textureLocation)
 	{
 		super(entityName, wavefrontObj, textureLocation);
@@ -51,19 +49,19 @@ public abstract class ModelAnimated extends ModelObj
 			Part entityPos = getPartFromName("entitypos");
 			GL11.glTranslatef(0, -entityPos.getValue(1), 0);
 			
-			previousSwingTime = swingTime;
+			animProps.previousSwingTime = swingTime;
 		}
 	}
-
-	protected abstract void updateAnimation(float swingTime, Entity entity, EntityAnimationProperties animProps);
 
 	protected void doDefaultAnimations(float swingTime, float swingMax, float clock, float lookX, float lookY, float f5, Entity entity)
 	{
 		parts.forEach(Part::setToOriginalValues);
 	}
 	
-	public boolean isMoving(float swingTime) {
-		return swingTime - previousSwingTime > 0.05F;
+	//TODO should probably do this elsewhere, maybe in an entity class instead?
+	public boolean isMoving(Entity entity, float swingTime) {
+		EntityAnimationProperties animProps = (EntityAnimationProperties) entity.getExtendedProperties("Animation");
+		return animProps != null ? swingTime - animProps.previousSwingTime > 0.05F : false;
 	}
 
 	protected void animateToPartValues(EntityAnimationProperties animProps, Map<String, float[]> partValues)

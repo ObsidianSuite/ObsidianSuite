@@ -48,6 +48,11 @@ public class AnimationSequence
 		return animationName;
 	}
 
+	public void setName(String animationName)
+	{
+		this.animationName = animationName;
+	}
+	
 	public void setAnimations(List<AnimationPart> animations)
 	{
 		partsByPartName.clear();

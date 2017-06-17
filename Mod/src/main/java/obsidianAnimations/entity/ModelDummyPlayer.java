@@ -26,9 +26,4 @@ public class ModelDummyPlayer extends ModelAnimated
 		//chestLw.setValue((float) (-lookX/180F*Math.PI), 1);
 	}
 
-	@Override
-	protected void updateAnimation(float swingTime, Entity entity, EntityAnimationProperties animProps) {
-		
-	}	
-
 }

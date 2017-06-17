@@ -77,6 +77,7 @@ public class AnimationRegistry
 		if(!entityMap.containsKey(entityType))
 			throw new UnregisteredEntityException(entityType);
 		entityMap.get(entityType).registerAnimation(binding, wrapper);
+		wrapper.getAnimation().setName(binding);
 	}
 	
 	public static void registerAnimation(String entityType, String binding, ResourceLocation resource, int priority, boolean loops, float transitionTime, IsActiveFunction isActiveFunction)
