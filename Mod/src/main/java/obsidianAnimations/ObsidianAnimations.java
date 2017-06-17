@@ -24,10 +24,11 @@ public class ObsidianAnimations
 		proxy.init();
 		proxy.registerAnimations();
 		
-		EventHandlerDebug eventHandler = new EventHandlerDebug();
-        MinecraftForge.EVENT_BUS.register(eventHandler);
-        if(FMLCommonHandler.instance().getEffectiveSide().isClient())
-            FMLCommonHandler.instance().bus().register(eventHandler);
+        if(FMLCommonHandler.instance().getEffectiveSide().isClient()) {
+    		EventHandlerDebug eventHandlerDebug = new EventHandlerDebug();
+            MinecraftForge.EVENT_BUS.register(eventHandlerDebug);
+            FMLCommonHandler.instance().bus().register(eventHandlerDebug);
+        }
 	}
 	
 	
