@@ -7,18 +7,19 @@ import net.minecraft.util.ResourceLocation;
 public class RenderPlayerAnimated extends RenderPlayer
 {
 	
-	private static final ResourceLocation texture = new ResourceLocation("mod_obsidian_animations:models/player.png");
+	private ModelAnimatedPlayer modelAnimatedPlayer;
 	
-	public RenderPlayerAnimated()
+	public RenderPlayerAnimated(ModelAnimatedPlayer modelAnimatedPlayer)
 	{
 		super();
-		this.mainModel = new ModelAnimatedPlayer();
+		this.modelAnimatedPlayer = modelAnimatedPlayer;
+		this.mainModel = modelAnimatedPlayer;
 	}
 	
 	@Override
 	protected ResourceLocation getEntityTexture(Entity p_110775_1_) 
 	{
-		return texture;
+		return modelAnimatedPlayer.getTexture();
 	}
 
 }
