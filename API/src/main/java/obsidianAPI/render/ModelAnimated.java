@@ -61,7 +61,7 @@ public abstract class ModelAnimated extends ModelObj
 	//TODO should probably do this elsewhere, maybe in an entity class instead?
 	public boolean isMoving(Entity entity, float swingTime) {
 		EntityAnimationProperties animProps = (EntityAnimationProperties) entity.getExtendedProperties("Animation");
-		return animProps != null ? swingTime - animProps.previousSwingTime > 0.05F : false;
+		return animProps != null ? swingTime - animProps.previousSwingTime > 0.02F : false;
 	}
 
 	protected void animateToPartValues(EntityAnimationProperties animProps, Map<String, float[]> partValues)

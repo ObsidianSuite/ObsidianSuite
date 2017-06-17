@@ -87,8 +87,9 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
 		}
 		
 		if(wrapper != null) {
-			if(!isAnimationActive(wrapper.getAnimation().getName())) {
-				setActiveAnimation(model, wrapper);
+			String name = wrapper.getAnimation().getName();
+			if(!isAnimationActive(name)) {
+				setActiveAnimation(model, wrapper.getAnimation(), wrapper.getLoops(), wrapper.getTransitionTime());
 			}
 		}
 		else {
@@ -96,23 +97,6 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
 				returnToIdle(model);
 		}
 	}
-
-    public void setActiveAnimation(ModelObj model, IAnimationWrapper wrapper)
-    {    	
-    	setActiveAnimation(model, wrapper.getAnimation(), wrapper.getLoops(), wrapper.getTransitionTime());
-    }
-    
-    public void setActiveAnimation(ModelObj model, String binding)
-    {    	
-    	IAnimationWrapper wrapper = AnimationRegistry.getAnimationWrapper(entityName, binding);
-    	setActiveAnimation(model, wrapper.getAnimation(), wrapper.getLoops(), wrapper.getTransitionTime());
-    }
-    
-    public void setActiveAnimation(ModelObj model, String binding, boolean loopAnim, float transitionTime)
-    { 
-    	AnimationSequence sequence = AnimationRegistry.getAnimation(entityName, binding);
-    	setActiveAnimation(model, sequence, loopAnim, transitionTime);
-    }
     
     public void setActiveAnimation(ModelObj model, AnimationSequence sequence, boolean loopAnim, float transitionTime)
     {    	
@@ -162,7 +146,7 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
     {
         if(activeAnimation == null || activeAnimation.getName().equals("Idle"))
         	return;
-        setActiveAnimation(model, "Idle", true, transitionTime);
+        setActiveAnimation(model, AnimationRegistry.getAnimation(entityName, "Idle"), true, transitionTime);
     }
 
     public void returnToIdle(ModelObj model)
@@ -246,7 +230,7 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
             {
                 if (loop)
                 {
-                    setActiveAnimation(model, activeAnimation.getName(), true, 0f);
+                    setActiveAnimation(model, AnimationRegistry.getAnimation(entityName, activeAnimation.getName()), true, 0f);
                 } else if (onFinished != null)
                 {
                     onFinished.run();
