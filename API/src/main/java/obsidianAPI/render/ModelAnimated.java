@@ -53,8 +53,6 @@ public abstract class ModelAnimated extends ModelObj
 		}
 	}
 
-	protected abstract void updateAnimation(float swingTime, Entity entity, EntityAnimationProperties animProps);
-
 	protected void doDefaultAnimations(float swingTime, float swingMax, float clock, float lookX, float lookY, float f5, Entity entity)
 	{
 		parts.forEach(Part::setToOriginalValues);

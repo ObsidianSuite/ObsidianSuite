@@ -78,7 +78,7 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
     }
     
 	public void updateActiveAnimation(float swingTime, float swingMax, float clock, float lookX, float lookY, float f5, ModelAnimated model, Entity entity) 
-	{
+	{		
 		Queue<IAnimationWrapper> tempQueue = AnimationRegistry.getAnimationListCopy(entityName);
 		IAnimationWrapper wrapper;
 		while((wrapper = tempQueue.poll()) != null) {
@@ -87,8 +87,9 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
 		}
 		
 		if(wrapper != null) {
-			if(!isAnimationActive(wrapper.getAnimation().getName())) 
+			if(!isAnimationActive(wrapper.getAnimation().getName())) {
 				setActiveAnimation(model, wrapper);
+			}
 		}
 		else {
 			if(!isIdle()) 

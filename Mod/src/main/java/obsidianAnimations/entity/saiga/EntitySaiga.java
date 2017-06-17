@@ -2,8 +2,6 @@ package obsidianAnimations.entity.saiga;
 
 import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.ai.EntityAITempt;
-import net.minecraft.init.Items;
 import net.minecraft.world.World;
 import obsidianAnimations.entity.ai.EntityAIWanderAlways;
 
