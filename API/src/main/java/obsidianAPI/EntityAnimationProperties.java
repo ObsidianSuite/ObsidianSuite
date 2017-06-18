@@ -40,6 +40,7 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
 	private int activeAnimationFPS;
 	private Map<Integer, Set<String>> activeAnimationActionPoints;
 	private boolean loop;
+	private Runnable onFinished;
 	private final List<ActionPointCallback> actionPointCallbacks = Lists.newLinkedList();
 
 	@Override
@@ -113,11 +114,25 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
 		animationStartTime = now;
 		nextFrame = 0;
 
-		this.loop = loopAnim;
 		activeAnimation = sequence != null ? sequence.getName() : null;
-		
+
 		if(sendPacket)
-			AnimationNetworkHandler.network.sendToAll(new PacketAnimationStart(entity, activeAnimation, animationStartTime, loop, transitionTime));
+			AnimationNetworkHandler.network.sendToAll(new PacketAnimationStart(entity, activeAnimation, animationStartTime, loopAnim, transitionTime));
+		
+		if (transitionTime > 0.01f)
+		{
+			loop = false;
+			activeAnimation = "transition_" + activeAnimation;
+			onFinished = () ->
+			{
+				System.out.println(loopAnim);
+				onFinished = null;
+				updateFrameTime();
+				setActiveAnimation(sequence, loopAnim, 0, false);
+			};
+		}
+		else
+			this.loop = loopAnim;
 	}
 
 	private void returnToIdle(float transitionTime)
@@ -156,6 +171,8 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
 			{
 				if (loop)
 					setActiveAnimation(AnimationRegistry.getAnimation(entityName, activeAnimation), true, 0f, false);
+				else if(onFinished != null)
+					onFinished.run();
 			}
 		}
 	}

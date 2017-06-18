@@ -15,7 +15,7 @@ public abstract class ModelAnimated extends ModelObj
 {
 		
 	//TODO this should be half if SP
-	public static float DEF_TRANSITION_TIME = 0.5f;
+	public static float DEF_TRANSITION_TIME = 0.25f;
 	
 	public ModelAnimated(String entityName, WavefrontObject wavefrontObj, ResourceLocation textureLocation)
 	{

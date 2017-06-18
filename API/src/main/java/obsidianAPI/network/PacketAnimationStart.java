@@ -54,6 +54,7 @@ public class PacketAnimationStart implements IMessage {
 		public IMessage onMessage(PacketAnimationStart message, MessageContext ctx) {
 			Entity entity = Minecraft.getMinecraft().theWorld.getEntityByID(message.entityID);
 			if(entity != null) {
+				System.out.println("Animating " + message.animationName + " " + message.animationStartTime + " " + message.loopAnim + " " + message.transitionTime);
 				ModelAnimated model = ((RenderAnimated) RenderManager.instance.getEntityRenderObject(entity)).getModel();
 				EntityAnimationPropertiesClient.get(entity).setActiveAnimation(model, message.animationName, message.animationStartTime, message.loopAnim, message.transitionTime);
 			}

@@ -83,6 +83,7 @@ public class EntityAnimationPropertiesClient implements IExtendedEntityPropertie
 				onFinished = null;
 				loop = sequence != null ? loopAnim : false;
 				activeAnimation = sequence;
+				this.animationStartTime = System.nanoTime();
 			};
 		}
 		else
