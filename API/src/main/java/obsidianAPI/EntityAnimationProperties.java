@@ -7,22 +7,19 @@ import java.util.Queue;
 import java.util.Set;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 import net.minecraftforge.common.IExtendedEntityProperties;
 import obsidianAPI.animation.ActionPointCallback;
 import obsidianAPI.animation.AnimationSequence;
 import obsidianAPI.animation.wrapper.IAnimationWrapper;
 import obsidianAPI.animation.wrapper.IEntityAnimated;
+import obsidianAPI.network.AnimationNetworkHandler;
+import obsidianAPI.network.PacketAnimationStart;
 import obsidianAPI.registry.AnimationRegistry;
-import obsidianAPI.render.ModelAnimated;
-import obsidianAPI.render.ModelObj;
-import obsidianAPI.render.part.Part;
 
 public class EntityAnimationProperties implements IExtendedEntityProperties
 {
@@ -129,6 +126,7 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
 				loop = sequence != null ? loopAnim : false;
 				activeAnimation = sequence != null ? sequence.getName() : null;
 				System.out.println(activeAnimation);
+				AnimationNetworkHandler.network.sendToAll(new PacketAnimationStart(activeAnimation));
 			};
 		}
 		else
@@ -138,6 +136,7 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
 		}
 
 		System.out.println(activeAnimation);
+		AnimationNetworkHandler.network.sendToAll(new PacketAnimationStart(activeAnimation));
 	}
 
 	private void returnToIdle(float transitionTime)
