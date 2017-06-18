@@ -10,7 +10,6 @@ import com.google.common.collect.Lists;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
 import net.minecraftforge.common.IExtendedEntityProperties;
@@ -42,6 +41,8 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
 	private boolean loop;
 	private Runnable onFinished;
 	private final List<ActionPointCallback> actionPointCallbacks = Lists.newLinkedList();
+	
+	public double prevX, prevZ;
 
 	@Override
 	public void init(Entity entity, World world)
@@ -90,6 +91,9 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
 			if(!isIdle()) 
 				returnToIdle();
 		}
+		
+		prevX = entity.posX;
+		prevZ = entity.posZ;
 	}
 
 	public void setActiveAnimation(AnimationSequence sequence, boolean loopAnim, float transitionTime)

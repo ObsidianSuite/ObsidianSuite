@@ -1,10 +1,13 @@
 package obsidianAPI;
 
+import java.util.Map;
+
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
 import obsidianAPI.animation.AnimationPart;
 import obsidianAPI.animation.AnimationSequence;
+import obsidianAPI.animation.wrapper.IEntityAnimated;
 import obsidianAPI.render.ModelObj;
-
-import java.util.Map;
 
 public class Util
 {
@@ -46,4 +49,15 @@ public class Util
 
         return seq;
     }
+	
+	public static boolean isEntityMoving(EntityLivingBase entity) {
+		boolean isMoving;
+		if(entity instanceof IEntityAnimated)
+			isMoving = ((IEntityAnimated) entity).isMoving();
+		else if(entity instanceof EntityPlayer)
+			isMoving = Math.abs(entity.posX - EntityAnimationProperties.get(entity).prevX) > 0.01F || Math.abs(entity.posZ - EntityAnimationProperties.get(entity).prevZ) > 0.01F;
+		else
+			isMoving = entity.limbSwingAmount > 0.02F;
+		return isMoving;
+	}
 }

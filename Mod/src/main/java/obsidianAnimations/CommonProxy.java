@@ -1,7 +1,9 @@
 package obsidianAnimations;
 
-import net.minecraft.client.entity.EntityClientPlayerMP;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ResourceLocation;
+import obsidianAPI.EntityAnimationProperties;
+import obsidianAPI.Util;
 import obsidianAPI.animation.wrapper.FunctionAnimationWrapper.IsActiveFunction;
 import obsidianAPI.animation.wrapper.IEntityAnimated;
 import obsidianAPI.registry.AnimationRegistry;
@@ -54,42 +56,22 @@ public class CommonProxy
 		//		}	
 		
 		IsActiveFunction isWalking = (entity) -> { 
-			boolean isMoving;
-			if(entity instanceof IEntityAnimated)
-				isMoving = ((IEntityAnimated) entity).isMoving();
-			else
-				isMoving = entity.limbSwingAmount > 0.02F;
-			return isMoving && !entity.isSprinting() && !entity.isSneaking() && entity.isCollidedVertically;
+			return Util.isEntityMoving(entity) && !entity.isSprinting() && !entity.isSneaking() && entity.onGround;
 		};
 		IsActiveFunction isSprinting = (entity) -> { 
-			boolean isMoving;
-			if(entity instanceof IEntityAnimated)
-				isMoving = ((IEntityAnimated) entity).isMoving();
-			else
-				isMoving = entity.limbSwingAmount > 0.02F;
-			return isMoving && entity.isSprinting() && entity.isCollidedVertically;
+			return Util.isEntityMoving(entity) && entity.isSprinting() && entity.onGround;
 		};
 		IsActiveFunction isSneaking = (entity) -> { 
-			boolean isMoving;
-			if(entity instanceof IEntityAnimated)
-				isMoving = ((IEntityAnimated) entity).isMoving();
-			else
-				isMoving = entity.limbSwingAmount > 0.02F;
-			return isMoving && entity.isSneaking() && entity.isCollidedVertically;
+			return Util.isEntityMoving(entity) && entity.isSneaking() && entity.onGround;
 		};
 		IsActiveFunction isJumping = (entity) -> { 
-			boolean isMoving;
-			if(entity instanceof IEntityAnimated)
-				isMoving = ((IEntityAnimated) entity).isMoving();
-			else
-				isMoving = entity.limbSwingAmount > 0.02F;
-			return !isMoving && !entity.isCollidedVertically;
+			return !Util.isEntityMoving(entity) && !entity.onGround;
 		};
 		IsActiveFunction returnTrue = (iEntityAnimated) -> { 
 			return true;
 		};
 
-		AnimationRegistry.registerEntity(EntityClientPlayerMP.class, "player");
+		AnimationRegistry.registerEntity(EntityPlayer.class, "player");
 		AnimationRegistry.registerAnimation("player", "WalkF", new ResourceLocation("mod_obsidian_animations:animations/player/WalkF.oba"), 0, true, isWalking);
 		AnimationRegistry.registerAnimation("player", "SprintF", new ResourceLocation("mod_obsidian_animations:animations/player/SprintF.oba"), 1, true, isSprinting);
 		AnimationRegistry.registerAnimation("player", "CrouchF", new ResourceLocation("mod_obsidian_animations:animations/player/CrouchF.oba"), 2, true, isSneaking);	
