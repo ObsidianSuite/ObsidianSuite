@@ -1,8 +1,6 @@
 package obsidianAPI.animation.wrapper;
 
-import net.minecraft.entity.EntityLivingBase;
 import obsidianAPI.animation.AnimationSequence;
-import obsidianAPI.render.ModelAnimated;
 
 public class FunctionAnimationWrapper extends AnimationWrapper {
 
@@ -14,13 +12,13 @@ public class FunctionAnimationWrapper extends AnimationWrapper {
 	}
 	
 	@Override
-	public boolean isActive(EntityLivingBase entity, ModelAnimated model) {
-		return isActiveFunction.apply(entity, model);
+	public boolean isActive(IEntityAnimated entity) {
+		return isActiveFunction.apply(entity);
 	}
 
 	@FunctionalInterface
 	public interface IsActiveFunction { 
-		public boolean apply (EntityLivingBase entity, ModelAnimated model);
+		public boolean apply (IEntityAnimated entity);
 	}
 	
 }

@@ -25,25 +25,24 @@ public class ObsidianAnimations
 		instance = this;		
 		proxy.init();
 		proxy.registerAnimations();
-		
-        if(FMLCommonHandler.instance().getEffectiveSide().isClient()) {
-    		EventHandlerDebug eventHandlerDebug = new EventHandlerDebug();
-            MinecraftForge.EVENT_BUS.register(eventHandlerDebug);
-            FMLCommonHandler.instance().bus().register(eventHandlerDebug);
-        }
+
+		if(FMLCommonHandler.instance().getEffectiveSide().isClient()) {
+			EventHandlerDebug eventHandlerDebug = new EventHandlerDebug();
+			MinecraftForge.EVENT_BUS.register(eventHandlerDebug);
+			FMLCommonHandler.instance().bus().register(eventHandlerDebug);
+		}
 	}
-	
+
 	@EventHandler
 	public void load(FMLInitializationEvent event)
 	{
-		if(FMLCommonHandler.instance().getEffectiveSide().isServer())
-			MinecraftForge.EVENT_BUS.register(new ObsidianEventHandler());
-		
-//		ObsidianEventHandler eventHandler = new ObsidianEventHandler();
-//		MinecraftForge.EVENT_BUS.register(eventHandler);
-//
-//		if(FMLCommonHandler.instance().getEffectiveSide().isClient())
-//			FMLCommonHandler.instance().bus().register(eventHandler);
+		MinecraftForge.EVENT_BUS.register(new ObsidianEventHandler());
+
+		//		ObsidianEventHandler eventHandler = new ObsidianEventHandler();
+		//		MinecraftForge.EVENT_BUS.register(eventHandler);
+		//
+		//		if(FMLCommonHandler.instance().getEffectiveSide().isClient())
+		//			FMLCommonHandler.instance().bus().register(eventHandler);
 	}
-	
+
 }

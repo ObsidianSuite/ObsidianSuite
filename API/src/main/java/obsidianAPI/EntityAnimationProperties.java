@@ -17,6 +17,7 @@ import net.minecraftforge.common.IExtendedEntityProperties;
 import obsidianAPI.animation.ActionPointCallback;
 import obsidianAPI.animation.AnimationSequence;
 import obsidianAPI.animation.wrapper.IAnimationWrapper;
+import obsidianAPI.animation.wrapper.IEntityAnimated;
 import obsidianAPI.registry.AnimationRegistry;
 import obsidianAPI.render.ModelAnimated;
 import obsidianAPI.render.ModelObj;
@@ -59,16 +60,10 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
     }
 
     @Override
-    public void saveNBTData(NBTTagCompound compound)
-    {
-
-    }
+    public void saveNBTData(NBTTagCompound compound) {}
 
     @Override
-    public void loadNBTData(NBTTagCompound compound)
-    {
-
-    }
+    public void loadNBTData(NBTTagCompound compound) {}
 
     public void updateFrameTime()
     {
@@ -80,81 +75,83 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
             frameTime = Util.getAnimationFrameTime(now, animationStartTime, 0, activeAnimation.getFPS(), multiplier);
     }
     
-	public void updateActiveAnimation(ModelAnimated model) 
+	public void updateActiveAnimation() 
 	{		
 		Queue<IAnimationWrapper> tempQueue = AnimationRegistry.getAnimationListCopy(entityName);
 		IAnimationWrapper wrapper;
 		while((wrapper = tempQueue.poll()) != null) {
-			if(wrapper.isActive(entity, model))
+			if(wrapper.isActive((IEntityAnimated) entity))
 				break;
 		}
 		
 		if(wrapper != null) {
 			String name = wrapper.getAnimation().getName();
 			if(!isAnimationActive(name)) {
-				setActiveAnimation(model, wrapper.getAnimation(), wrapper.getLoops(), wrapper.getTransitionTime());
+				setActiveAnimation(wrapper.getAnimation(), wrapper.getLoops(), wrapper.getTransitionTime());
 			}
 		}
 		else {
 			if(!isIdle()) 
-				returnToIdle(model);
+				returnToIdle();
 		}
 	}
     
-    public void setActiveAnimation(ModelObj model, AnimationSequence sequence, boolean loopAnim, float transitionTime)
+    public void setActiveAnimation(AnimationSequence sequence, boolean loopAnim, float transitionTime)
     {    	
-        Map<String, float[]> currentValues;
-        if (activeAnimation != null)
-        {
-            currentValues = getCurrentValues(model);
-        } else
-        {
-            currentValues = getOriginalValues(model);
-        }
-
-        multiplier = 1f;
-        animationStartTime = now;
-        nextFrame = 0;
-        onFinished = null;
-        //TODO add these back in?
-//        prevEntityPosX = 0f;
-//        prevEntityPosZ = 0f;
-        if (transitionTime > 0.001f)
-        {
-        	updateFrameTime();
-        	        	
-            loop = false;
-            
-            if(sequence != null)
-            	activeAnimation = Util.createTransition(model, sequence.getName(), currentValues, sequence.getPartValuesAtTime(model,0f),transitionTime);
-            else
-            	activeAnimation = Util.createTransition(model, "idle", currentValues, getOriginalValues(model), transitionTime);
-            onFinished = () ->
-            {
-                animationStartTime = now;
-                nextFrame = 0;
-                onFinished = null;
-                loop = sequence != null ? loopAnim : false;
-                activeAnimation = sequence;
-            };
-        }
-        else
-        {
-            this.loop = loopAnim;
-            activeAnimation = sequence;
-        }
+    	String name = sequence != null ? sequence.getName() : "null";
+    	System.out.println(name);
+//        Map<String, float[]> currentValues;
+//        if (activeAnimation != null)
+//        {
+//            currentValues = getCurrentValues(model);
+//        } else
+//        {
+//            currentValues = getOriginalValues(model);
+//        }
+//
+//        multiplier = 1f;
+//        animationStartTime = now;
+//        nextFrame = 0;
+//        onFinished = null;
+//        //TODO add these back in?
+////        prevEntityPosX = 0f;
+////        prevEntityPosZ = 0f;
+//        if (transitionTime > 0.001f)
+//        {
+//        	updateFrameTime();
+//        	        	
+//            loop = false;
+//            
+//            if(sequence != null)
+//            	activeAnimation = Util.createTransition(model, sequence.getName(), currentValues, sequence.getPartValuesAtTime(model,0f),transitionTime);
+//            else
+//            	activeAnimation = Util.createTransition(model, "idle", currentValues, getOriginalValues(model), transitionTime);
+//            onFinished = () ->
+//            {
+//                animationStartTime = now;
+//                nextFrame = 0;
+//                onFinished = null;
+//                loop = sequence != null ? loopAnim : false;
+//                activeAnimation = sequence;
+//            };
+//        }
+//        else
+//        {
+//            this.loop = loopAnim;
+//            activeAnimation = sequence;
+//        }
     }
 
-    public void returnToIdle(ModelObj model, float transitionTime)
+    public void returnToIdle(float transitionTime)
     {
         if(activeAnimation == null || activeAnimation.getName().equals("Idle"))
         	return;
-        setActiveAnimation(model, AnimationRegistry.getAnimation(entityName, "Idle"), true, transitionTime);
+        setActiveAnimation(AnimationRegistry.getAnimation(entityName, "Idle"), true, transitionTime);
     }
 
-    public void returnToIdle(ModelObj model)
+    public void returnToIdle()
     {
-    	returnToIdle(model,0.25f);
+    	returnToIdle(0.25f);
     }
 
     public void setMultiplier(float multiplier)
@@ -233,7 +230,7 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
             {
                 if (loop)
                 {
-                    setActiveAnimation(model, AnimationRegistry.getAnimation(entityName, activeAnimation.getName()), true, 0f);
+                    setActiveAnimation(AnimationRegistry.getAnimation(entityName, activeAnimation.getName()), true, 0f);
                 } else if (onFinished != null)
                 {
                     onFinished.run();

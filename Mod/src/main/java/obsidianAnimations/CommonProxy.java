@@ -1,5 +1,6 @@
 package obsidianAnimations;
 
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ResourceLocation;
 import obsidianAPI.animation.wrapper.FunctionAnimationWrapper.IsActiveFunction;
@@ -52,19 +53,23 @@ public class CommonProxy
 		//				state = "Idle";
 		//		}	
 		
-		IsActiveFunction isWalking = (entity, model) -> { 
-			return model.isMoving(entity) && !entity.isSprinting() && !entity.isSneaking() && entity.isCollidedVertically;
+		IsActiveFunction isWalking = (iEntityAnimated) -> { 
+			Entity entity = (Entity) iEntityAnimated;
+			return iEntityAnimated.isMoving() && !entity.isSprinting() && !entity.isSneaking() && entity.isCollidedVertically;
 		};
-		IsActiveFunction isSprinting = (entity, model) -> { 
-			return model.isMoving(entity) && entity.isSprinting() && entity.isCollidedVertically;
+		IsActiveFunction isSprinting = (iEntityAnimated) -> { 
+			Entity entity = (Entity) iEntityAnimated;
+			return iEntityAnimated.isMoving() && entity.isSprinting() && entity.isCollidedVertically;
 		};
-		IsActiveFunction isSneaking = (entity, model) -> { 
-			return model.isMoving(entity) && entity.isSneaking() && entity.isCollidedVertically;
+		IsActiveFunction isSneaking = (iEntityAnimated) -> { 
+			Entity entity = (Entity) iEntityAnimated;
+			return iEntityAnimated.isMoving() && entity.isSneaking() && entity.isCollidedVertically;
 		};
-		IsActiveFunction isJumping = (entity, model) -> { 
-			return !model.isMoving(entity) && !entity.isCollidedVertically;
+		IsActiveFunction isJumping = (iEntityAnimated) -> { 
+			Entity entity = (Entity) iEntityAnimated;
+			return !iEntityAnimated.isMoving() && !entity.isCollidedVertically;
 		};
-		IsActiveFunction returnTrue = (entity, model) -> { 
+		IsActiveFunction returnTrue = (iEntityAnimated) -> { 
 			return true;
 		};
 

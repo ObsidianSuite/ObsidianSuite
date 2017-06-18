@@ -1,5 +1,6 @@
 package obsidianAPI;
 
+import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -16,8 +17,16 @@ public class ObsidianEventHandler
 	public void onEntityConstructing(EntityConstructing e)
 	{
 		Entity entity = e.entity;
-		if(AnimationRegistry.isRegisteredClass(entity.getClass()))
-			entity.registerExtendedProperties(EntityAnimationProperties.EXT_PROP_NAME, new EntityAnimationProperties());
+		if(AnimationRegistry.isRegisteredClass(entity.getClass())) {
+			if(FMLCommonHandler.instance().getEffectiveSide().isServer()) {
+				System.out.println("Registering on server");
+				entity.registerExtendedProperties(EntityAnimationProperties.EXT_PROP_NAME, new EntityAnimationProperties());
+			}
+			else {
+				System.out.println("Registering on client");
+				entity.registerExtendedProperties(EntityAnimationPropertiesClient.EXT_PROP_NAME, new EntityAnimationPropertiesClient());
+			}
+		}
 	}
 	
 	@SubscribeEvent
@@ -26,8 +35,7 @@ public class ObsidianEventHandler
 		EntityLivingBase entity = e.entityLiving;
 		EntityAnimationProperties animationProps = EntityAnimationProperties.get(entity);
 		if(animationProps != null && animationProps.getEntityName().equals("saiga")) {	
-			if(entity.limbSwingAmount > 0.02)
-				System.out.println("Walking!");
+			animationProps.updateActiveAnimation();
 		}
 	}
 

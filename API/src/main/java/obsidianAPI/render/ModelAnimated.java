@@ -8,7 +8,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.obj.WavefrontObject;
-import obsidianAPI.EntityAnimationProperties;
+import obsidianAPI.EntityAnimationPropertiesClient;
 import obsidianAPI.animation.AnimationSequence;
 import obsidianAPI.render.part.Part;
 
@@ -25,7 +25,7 @@ public abstract class ModelAnimated extends ModelObj
 	{
 		super.setRotationAngles(swingTime, swingMax, clock, lookX, lookY, f5, entity);
 
-		EntityAnimationProperties animProps = (EntityAnimationProperties) entity.getExtendedProperties("Animation");
+		EntityAnimationPropertiesClient animProps = EntityAnimationPropertiesClient.get(entity);
 		if (animProps == null)
 		{
 			doDefaultAnimations(swingTime, swingMax, clock, lookX, lookY, f5, entity);
@@ -33,14 +33,13 @@ public abstract class ModelAnimated extends ModelObj
 		else
 		{
 			animProps.updateFrameTime();
-			animProps.updateActiveAnimation(this);
 			
 			AnimationSequence seq = animProps.getActiveAnimation();
 
 			if(seq != null) {
 				float time = animProps.getAnimationFrameTime();
-				animateToPartValues(animProps, seq.getPartValuesAtTime(this, time));
-				animProps.updateAnimation(this, time);
+				animateToPartValues(seq.getPartValuesAtTime(this, time));
+				animProps.tickAnimation(this, time);
 			}
 			else {
 				doDefaultAnimations(swingTime, swingMax, clock, lookX, lookY, f5, entity);
@@ -49,8 +48,6 @@ public abstract class ModelAnimated extends ModelObj
 			//Translate for vertical y pos
 			Part entityPos = getPartFromName("entitypos");
 			GL11.glTranslatef(0, -entityPos.getValue(1), 0);
-			
-			animProps.previousSwingTime = swingTime;
 		}
 	}
 
@@ -58,12 +55,8 @@ public abstract class ModelAnimated extends ModelObj
 	{
 		parts.forEach(Part::setToOriginalValues);
 	}
-	
-	public boolean isMoving(EntityLivingBase entity) {
-		return entity.limbSwingAmount > 0.02F;
-	}
 
-	protected void animateToPartValues(EntityAnimationProperties animProps, Map<String, float[]> partValues)
+	protected void animateToPartValues(Map<String, float[]> partValues)
 	{
 		parts.forEach(p -> p.setValues(partValues.get(p.getName())));
 	}
