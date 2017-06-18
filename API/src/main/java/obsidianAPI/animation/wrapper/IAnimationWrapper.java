@@ -1,7 +1,7 @@
 package obsidianAPI.animation.wrapper;
 
+import net.minecraft.entity.EntityLivingBase;
 import obsidianAPI.animation.AnimationSequence;
-import obsidianAPI.render.ModelAnimated;
 
 public interface IAnimationWrapper {
 
@@ -13,7 +13,7 @@ public interface IAnimationWrapper {
 	/**
 	 * Work out if the current animation should be played.
 	 */
-	public boolean isActive(IEntityAnimated entity);
+	public boolean isActive(EntityLivingBase entity);
 	
 	/**
 	 * @return Priority of this animation. Lower number = lower priority. 

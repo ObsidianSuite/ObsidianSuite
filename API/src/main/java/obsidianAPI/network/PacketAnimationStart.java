@@ -8,9 +8,10 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
 import obsidianAPI.EntityAnimationPropertiesClient;
+import obsidianAPI.render.IRenderAnimated;
 import obsidianAPI.render.ModelAnimated;
-import obsidianAPI.render.RenderAnimated;
 
 public class PacketAnimationStart implements IMessage {
 
@@ -54,8 +55,9 @@ public class PacketAnimationStart implements IMessage {
 		public IMessage onMessage(PacketAnimationStart message, MessageContext ctx) {
 			Entity entity = Minecraft.getMinecraft().theWorld.getEntityByID(message.entityID);
 			if(entity != null) {
-				System.out.println("Animating " + message.animationName + " " + message.animationStartTime + " " + message.loopAnim + " " + message.transitionTime);
-				ModelAnimated model = ((RenderAnimated) RenderManager.instance.getEntityRenderObject(entity)).getModel();
+				if(entity instanceof EntityPlayer)
+					System.out.println("Animating " + message.animationName + " " + message.animationStartTime + " " + message.loopAnim + " " + message.transitionTime);
+				ModelAnimated model = ((IRenderAnimated) RenderManager.instance.getEntityRenderObject(entity)).getModel();
 				EntityAnimationPropertiesClient.get(entity).setActiveAnimation(model, message.animationName, message.animationStartTime, message.loopAnim, message.transitionTime);
 			}
 			return null;

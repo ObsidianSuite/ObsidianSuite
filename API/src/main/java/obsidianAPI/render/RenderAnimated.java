@@ -4,7 +4,7 @@ import net.minecraft.client.renderer.entity.RenderLiving;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
 
-public class RenderAnimated extends RenderLiving
+public class RenderAnimated extends RenderLiving implements IRenderAnimated
 {
 
 	private ModelAnimated model;
@@ -15,6 +15,7 @@ public class RenderAnimated extends RenderLiving
 		this.model = model;
 	}
 	
+	@Override
 	public ModelAnimated getModel() {
 		return model;
 	}

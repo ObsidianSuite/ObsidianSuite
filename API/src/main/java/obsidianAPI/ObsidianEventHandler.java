@@ -27,7 +27,7 @@ public class ObsidianEventHandler
 		EntityLivingBase entity = e.entityLiving;
 		if(!entity.worldObj.isRemote) {
 			EntityAnimationProperties animationProps = EntityAnimationProperties.get(entity);
-			if(animationProps != null && animationProps.getEntityName().equals("saiga")) {	
+			if(animationProps != null) {	
 				animationProps.updateActiveAnimation();
 				animationProps.runAnimationTick();
 			}

@@ -10,13 +10,13 @@ import com.google.common.collect.Lists;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
 import net.minecraftforge.common.IExtendedEntityProperties;
 import obsidianAPI.animation.ActionPointCallback;
 import obsidianAPI.animation.AnimationSequence;
 import obsidianAPI.animation.wrapper.IAnimationWrapper;
-import obsidianAPI.animation.wrapper.IEntityAnimated;
 import obsidianAPI.network.AnimationNetworkHandler;
 import obsidianAPI.network.PacketAnimationStart;
 import obsidianAPI.registry.AnimationRegistry;
@@ -76,10 +76,10 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
 		Queue<IAnimationWrapper> tempQueue = AnimationRegistry.getAnimationListCopy(entityName);
 		IAnimationWrapper wrapper;
 		while((wrapper = tempQueue.poll()) != null) {
-			if(wrapper.isActive((IEntityAnimated) entity))
+			if(wrapper.isActive(entity))
 				break;
 		}
-
+		
 		if(wrapper != null) {
 			String name = wrapper.getAnimation().getName();
 			if(!isAnimationActive(name)) {
