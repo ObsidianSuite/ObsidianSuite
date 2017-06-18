@@ -26,14 +26,7 @@ public class AnimationRegistry
 	
 	private static Map<Class, String> registeredClasses = new HashMap<Class, String>();
 	
-	public static void init()
-	{
-		ObsidianEventHandler eventHandler = new ObsidianEventHandler();
-		MinecraftForge.EVENT_BUS.register(eventHandler);
-
-		if(FMLCommonHandler.instance().getEffectiveSide().isClient())
-			FMLCommonHandler.instance().bus().register(eventHandler);
-	}
+	public static void init() {}
 	
 	public static void registerEntity(Class entityClass, String entityType)
 	{
