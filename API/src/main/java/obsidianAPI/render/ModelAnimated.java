@@ -39,7 +39,7 @@ public abstract class ModelAnimated extends ModelObj
 			if(seq != null) {
 				float time = animProps.getAnimationFrameTime();
 				animateToPartValues(seq.getPartValuesAtTime(this, time));
-				//animProps.tickAnimation(this, time);
+				animProps.runAnimationTick(this);
 			}
 			else {
 				doDefaultAnimations(swingTime, swingMax, clock, lookX, lookY, f5, entity);

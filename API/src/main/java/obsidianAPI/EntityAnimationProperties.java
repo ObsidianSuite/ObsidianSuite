@@ -125,8 +125,7 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
 				onFinished = null;
 				loop = sequence != null ? loopAnim : false;
 				activeAnimation = sequence != null ? sequence.getName() : null;
-				System.out.println(activeAnimation);
-				AnimationNetworkHandler.network.sendToAll(new PacketAnimationStart(activeAnimation));
+				AnimationNetworkHandler.network.sendToAll(new PacketAnimationStart(entity, activeAnimation, animationStartTime, loop, 0.0F));
 			};
 		}
 		else
@@ -135,8 +134,7 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
 			activeAnimation = sequence != null ? sequence.getName() : null;
 		}
 
-		System.out.println(activeAnimation);
-		AnimationNetworkHandler.network.sendToAll(new PacketAnimationStart(activeAnimation));
+		AnimationNetworkHandler.network.sendToAll(new PacketAnimationStart(entity, activeAnimation, animationStartTime, loop, 0.0F));
 	}
 
 	private void returnToIdle(float transitionTime)
