@@ -45,17 +45,17 @@ public class ModelAnimatedPlayer extends ModelAnimated
 		if(entity.isSneaking())
 			head.setValue(head.getValue(0) - 0.7F, 0);
 		
-		EntityAnimationProperties animProps = (EntityAnimationProperties) entity.getExtendedProperties("Animation");
-		if (animProps == null)
-			GuiDebug.instance.animationText = "null";
-		else
-		{
-			AnimationSequence seq = animProps.getActiveAnimation();
-			if (seq == null)
-				GuiDebug.instance.animationText = "null";
-			else
-				GuiDebug.instance.animationText = seq.getName();
-		}		
+//		EntityAnimationProperties animProps = (EntityAnimationProperties) entity.getExtendedProperties("Animation");
+//		if (animProps == null)
+//			GuiDebug.instance.animationText = "null";
+//		else
+//		{
+//			AnimationSequence seq = animProps.getActiveAnimation();
+//			if (seq == null)
+//				GuiDebug.instance.animationText = "null";
+//			else
+//				GuiDebug.instance.animationText = seq.getName();
+//		}		
 		
 		String state = "";	
 		

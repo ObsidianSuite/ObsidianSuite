@@ -18,14 +18,10 @@ public class ObsidianEventHandler
 	{
 		Entity entity = e.entity;
 		if(AnimationRegistry.isRegisteredClass(entity.getClass())) {
-			if(FMLCommonHandler.instance().getEffectiveSide().isServer()) {
-				System.out.println("Registering on server");
+			if(FMLCommonHandler.instance().getEffectiveSide().isServer())
 				entity.registerExtendedProperties(EntityAnimationProperties.EXT_PROP_NAME, new EntityAnimationProperties());
-			}
-			else {
-				System.out.println("Registering on client");
+			else
 				entity.registerExtendedProperties(EntityAnimationPropertiesClient.EXT_PROP_NAME, new EntityAnimationPropertiesClient());
-			}
 		}
 	}
 	
@@ -36,6 +32,7 @@ public class ObsidianEventHandler
 		EntityAnimationProperties animationProps = EntityAnimationProperties.get(entity);
 		if(animationProps != null && animationProps.getEntityName().equals("saiga")) {	
 			animationProps.updateActiveAnimation();
+			animationProps.runAnimationTick();
 		}
 	}
 

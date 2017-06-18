@@ -99,6 +99,10 @@ public class AnimationSequence
 	{
 		partsByPartName.clear();
 	}
+	
+	public Map<Integer, Set<String>> getAllActionPoints() {
+		return actionPoints;
+	}
 
 	public Collection<String> getActionPoints(int time)
 	{

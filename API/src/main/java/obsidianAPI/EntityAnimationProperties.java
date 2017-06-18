@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.Set;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -26,55 +27,52 @@ import obsidianAPI.render.part.Part;
 public class EntityAnimationProperties implements IExtendedEntityProperties
 {
 	public static final String EXT_PROP_NAME = "ObsidianAnimation";
-	
-    private final List<ActionPointCallback> actionPointCallbacks = Lists.newLinkedList();
-    private EntityLivingBase entity;
-    private String entityName;
-    private AnimationSequence activeAnimation;
-    private long animationStartTime;
-    private boolean loop;
-    private float multiplier = 1f;
 
-    private long now;
+	private EntityLivingBase entity;
+	private String entityName;
 
-	private int nextFrame = 0;
-
-	private float prevEntityPosX, prevEntityPosZ;
-
-	private Runnable onFinished;
-
+	private long now;
+	private long animationStartTime;
 	private float frameTime = 0f;	
-	
-	public float previousSwingTime = 0.0F;
-	
-    @Override
-    public void init(Entity entity, World world)
-    {
-        this.entity = (EntityLivingBase) entity;
-        entityName = AnimationRegistry.getEntityName(entity.getClass());
-    }
+	private int nextFrame = 0;
+	private float multiplier = 1f;
 
-    public void addActionPointCallback(ActionPointCallback callback)
-    {
-        actionPointCallbacks.add(callback);
-    }
+	private String activeAnimation;
+	private float activeAnimationLength;
+	private int activeAnimationFPS;
+	private Map<Integer, Set<String>> activeAnimationActionPoints;
+	private boolean loop;
+	private Runnable onFinished;
+	private final List<ActionPointCallback> actionPointCallbacks = Lists.newLinkedList();
 
-    @Override
-    public void saveNBTData(NBTTagCompound compound) {}
+	@Override
+	public void init(Entity entity, World world)
+	{
+		this.entity = (EntityLivingBase) entity;
+		entityName = AnimationRegistry.getEntityName(entity.getClass());
+	}
 
-    @Override
-    public void loadNBTData(NBTTagCompound compound) {}
+	public void addActionPointCallback(ActionPointCallback callback)
+	{
+		actionPointCallbacks.add(callback);
+	}
 
-    public void updateFrameTime()
-    {
-        now = System.nanoTime();
+	@Override
+	public void saveNBTData(NBTTagCompound compound) {}
 
-        if (activeAnimation == null)
-            frameTime = 0f;
-        else
-            frameTime = Util.getAnimationFrameTime(now, animationStartTime, 0, activeAnimation.getFPS(), multiplier);
-    }
-    
+	@Override
+	public void loadNBTData(NBTTagCompound compound) {}
+
+	private void updateFrameTime()
+	{
+		now = System.nanoTime();
+
+		if (activeAnimation == null)
+			frameTime = 0f;
+		else
+			frameTime = Util.getAnimationFrameTime(now, animationStartTime, 0, activeAnimationFPS, multiplier);
+	}
+
 	public void updateActiveAnimation() 
 	{		
 		Queue<IAnimationWrapper> tempQueue = AnimationRegistry.getAnimationListCopy(entityName);
@@ -83,7 +81,7 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
 			if(wrapper.isActive((IEntityAnimated) entity))
 				break;
 		}
-		
+
 		if(wrapper != null) {
 			String name = wrapper.getAnimation().getName();
 			if(!isAnimationActive(name)) {
@@ -95,187 +93,134 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
 				returnToIdle();
 		}
 	}
-    
-    public void setActiveAnimation(AnimationSequence sequence, boolean loopAnim, float transitionTime)
-    {    	
-    	String name = sequence != null ? sequence.getName() : "null";
-    	System.out.println(name);
-//        Map<String, float[]> currentValues;
-//        if (activeAnimation != null)
-//        {
-//            currentValues = getCurrentValues(model);
-//        } else
-//        {
-//            currentValues = getOriginalValues(model);
-//        }
-//
-//        multiplier = 1f;
-//        animationStartTime = now;
-//        nextFrame = 0;
-//        onFinished = null;
-//        //TODO add these back in?
-////        prevEntityPosX = 0f;
-////        prevEntityPosZ = 0f;
-//        if (transitionTime > 0.001f)
-//        {
-//        	updateFrameTime();
-//        	        	
-//            loop = false;
-//            
-//            if(sequence != null)
-//            	activeAnimation = Util.createTransition(model, sequence.getName(), currentValues, sequence.getPartValuesAtTime(model,0f),transitionTime);
-//            else
-//            	activeAnimation = Util.createTransition(model, "idle", currentValues, getOriginalValues(model), transitionTime);
-//            onFinished = () ->
-//            {
-//                animationStartTime = now;
-//                nextFrame = 0;
-//                onFinished = null;
-//                loop = sequence != null ? loopAnim : false;
-//                activeAnimation = sequence;
-//            };
-//        }
-//        else
-//        {
-//            this.loop = loopAnim;
-//            activeAnimation = sequence;
-//        }
-    }
 
-    public void returnToIdle(float transitionTime)
-    {
-        if(activeAnimation == null || activeAnimation.getName().equals("Idle"))
-        	return;
-        setActiveAnimation(AnimationRegistry.getAnimation(entityName, "Idle"), true, transitionTime);
-    }
+	public void setActiveAnimation(AnimationSequence sequence, boolean loopAnim, float transitionTime)
+	{    	
+		if(sequence != null) {
+			activeAnimation = sequence.getName();
+			activeAnimationLength = sequence.getTotalTime();
+			activeAnimationFPS = sequence.getFPS();
+			activeAnimationActionPoints = sequence.getAllActionPoints();
+		}
+		else {
+			activeAnimation = null;
+			activeAnimationActionPoints = null;
+		}
 
-    public void returnToIdle()
-    {
-    	returnToIdle(0.25f);
-    }
+		multiplier = 1f;
+		animationStartTime = now;
+		nextFrame = 0;
+		onFinished = null;
+		if (transitionTime > 0.001f)
+		{
+			updateFrameTime();
 
-    public void setMultiplier(float multiplier)
-    {
-        if (frameTime > 0)
-        {
-            animationStartTime = (long) (now - (now - animationStartTime) * (double) this.multiplier / (double) multiplier);
-        }
-        this.multiplier = multiplier;
-    }
+			loop = false;
 
-    private Map<String, float[]> getOriginalValues(ModelObj model)
-    {
-        Map<String, float[]> values = Maps.newHashMap();
+			activeAnimation = "transition_" + activeAnimation;
+			activeAnimationFPS = 10;
+			activeAnimationLength = transitionTime*activeAnimationFPS;
 
-        for (Part part : model.parts)
-        {
-            values.put(part.getName(), part.getOriginalValues());
-        }
+			onFinished = () ->
+			{
+				animationStartTime = now;
+				nextFrame = 0;
+				onFinished = null;
+				loop = sequence != null ? loopAnim : false;
+				activeAnimation = sequence != null ? sequence.getName() : null;
+				System.out.println(activeAnimation);
+			};
+		}
+		else
+		{
+			this.loop = loopAnim;
+			activeAnimation = sequence != null ? sequence.getName() : null;
+		}
 
-        return values;
-    }
+		System.out.println(activeAnimation);
+	}
 
-    private Map<String, float[]> getCurrentValues(ModelObj model)
-    {
-        Map<String, float[]> values = Maps.newHashMap();
+	private void returnToIdle(float transitionTime)
+	{
+		if(activeAnimation == null || activeAnimation.equals("Idle"))
+			return;
+		setActiveAnimation(AnimationRegistry.getAnimation(entityName, "Idle"), true, transitionTime);
+	}
 
-        float time = getAnimationFrameTime();
+	private void returnToIdle()
+	{
+		returnToIdle(0.25f);
+	}
 
-        for (Part part : model.parts)
-        {
-            values.put(part.getName(), activeAnimation.getPartValueAtTime(part, time));
-        }
+	public void setMultiplier(float multiplier)
+	{
+		if (frameTime > 0)
+		{
+			animationStartTime = (long) (now - (now - animationStartTime) * (double) this.multiplier / (double) multiplier);
+		}
+		this.multiplier = multiplier;
+	}
 
-        return values;
-    }
+	public void runAnimationTick()
+	{
+		updateFrameTime();
+		if (activeAnimation != null)
+		{
+			while (frameTime > nextFrame)
+			{
+				fireActions(nextFrame);
+				nextFrame++;
+			}
 
-    public float getAnimationFrameTime()
-    {
-        return frameTime;
-    }
+			if (frameTime > activeAnimationLength)
+			{
+				if (loop)
+				{
+					setActiveAnimation(AnimationRegistry.getAnimation(entityName, activeAnimation), true, 0f);
+				} else if (onFinished != null)
+				{
+					onFinished.run();
+				}
+			}
+		}
+	}
 
-    public AnimationSequence getActiveAnimation()
-    {
-        return activeAnimation;
-    }
+	private void fireActions(int frame)
+	{
+		if (activeAnimation != null)
+		{
+			if(activeAnimationActionPoints != null) {
+				Collection<String> actions = activeAnimationActionPoints.get(frame);
+				if(actions != null) {
+					for (String action : actions)
+					{
+						for (ActionPointCallback callback : actionPointCallbacks)
+						{
+							callback.onActionPoint(entity, action);
+						}
+					}
+				}
+			}
+		}
+	}
 
-    public void updateAnimation(ModelObj model, float time)
-    {
-        if (activeAnimation != null)
-        {
-			Part entityPos = model.getPartFromName("entitypos");
-            if (entityPos != null)
-            {            	
-                float entityPosX = entityPos.getValue(0);
-                float entityPosZ = entityPos.getValue(2);
-
-                float strafe = entityPosX - prevEntityPosX;
-                float forward = entityPosZ - prevEntityPosZ;
-
-                float f4 = MathHelper.sin(entity.rotationYaw * (float)Math.PI / 180.0F);
-                float f5 = MathHelper.cos(entity.rotationYaw * (float)Math.PI / 180.0F);
-                entity.setPosition(entity.posX + (double)(strafe * f5 - forward * f4), entity.posY,entity.posZ + (double)(forward * f5 + strafe * f4));
-                
-                prevEntityPosX = entityPosX;
-                prevEntityPosZ = entityPosZ;
-            }
-
-            while (time > nextFrame)
-            {
-                fireActions(nextFrame);
-                nextFrame++;
-            }
-
-            if (time > activeAnimation.getTotalTime())
-            {
-                if (loop)
-                {
-                    setActiveAnimation(AnimationRegistry.getAnimation(entityName, activeAnimation.getName()), true, 0f);
-                } else if (onFinished != null)
-                {
-                    onFinished.run();
-                }
-//                else
-//                {
-//                    returnToIdle(model);
-//                }
-            }
-        }
-    }
-
-    private void fireActions(int frame)
-    {
-        if (activeAnimation != null)
-        {
-            Collection<String> actions = activeAnimation.getActionPoints(frame);
-
-            for (String action : actions)
-            {
-                for (ActionPointCallback callback : actionPointCallbacks)
-                {
-                    callback.onActionPoint(entity, action);
-                }
-            }
-        }
-    }
-    
 	private boolean isAnimationActive(String animationName)
 	{		
 		if(activeAnimation == null)
-			return false;
-		return activeAnimation.getName().equals(animationName) || activeAnimation.getName().equals("transition_" + animationName);
+			return animationName.equals("Idle");
+		return activeAnimation.equals(animationName) || activeAnimation.equals("transition_" + animationName);
 	}
-	
+
 
 	private boolean isIdle()
 	{
-		return activeAnimation == null || activeAnimation.getName().equals("Idle") || activeAnimation.getName().equals("transition_idle");
+		return activeAnimation == null || activeAnimation.equals("Idle") || activeAnimation.equals("transition_idle");
 	}
-	
+
 	public static EntityAnimationProperties get(Entity e) {
 		return (EntityAnimationProperties) e.getExtendedProperties(EXT_PROP_NAME);
 	}
-	
+
 	public String getEntityName() {
 		return entityName;
 	}
