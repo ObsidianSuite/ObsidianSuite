@@ -52,19 +52,19 @@ public class CommonProxy
 		//				state = "Idle";
 		//		}	
 		
-		IsActiveFunction isWalking = (swingTime, swingMax, clock, lookX, lookY, f5, model, entity) -> { 
-			return model.isMoving(entity, swingTime) && !entity.isSprinting() && !entity.isSneaking() && entity.isCollidedVertically;
+		IsActiveFunction isWalking = (entity, model) -> { 
+			return model.isMoving(entity) && !entity.isSprinting() && !entity.isSneaking() && entity.isCollidedVertically;
 		};
-		IsActiveFunction isSprinting = (swingTime, swingMax, clock, lookX, lookY, f5, model, entity) -> { 
-			return model.isMoving(entity, swingTime) && entity.isSprinting() && entity.isCollidedVertically;
+		IsActiveFunction isSprinting = (entity, model) -> { 
+			return model.isMoving(entity) && entity.isSprinting() && entity.isCollidedVertically;
 		};
-		IsActiveFunction isSneaking = (swingTime, swingMax, clock, lookX, lookY, f5, model, entity) -> { 
-			return model.isMoving(entity, swingTime) && entity.isSneaking() && entity.isCollidedVertically;
+		IsActiveFunction isSneaking = (entity, model) -> { 
+			return model.isMoving(entity) && entity.isSneaking() && entity.isCollidedVertically;
 		};
-		IsActiveFunction isJumping = (swingTime, swingMax, clock, lookX, lookY, f5, model, entity) -> { 
-			return !model.isMoving(entity, swingTime) && !entity.isCollidedVertically;
+		IsActiveFunction isJumping = (entity, model) -> { 
+			return !model.isMoving(entity) && !entity.isCollidedVertically;
 		};
-		IsActiveFunction returnTrue = (swingTime, swingMax, clock, lookX, lookY, f5, model, entity) -> { 
+		IsActiveFunction returnTrue = (entity, model) -> { 
 			return true;
 		};
 

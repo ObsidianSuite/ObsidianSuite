@@ -215,12 +215,7 @@ public class ModelAnimatedPlayer extends ModelAnimated
 		//            armUpL.rotateAngleX -= MathHelper.sin(p_78087_3_ * 0.067F) * 0.05F;
 		//        }
 	}
-	
-	@Override
-	public boolean isMoving(Entity entity, float swingTime) {
-		EntityAnimationProperties animProps = (EntityAnimationProperties) entity.getExtendedProperties("Animation");
-		return animProps != null ? swingTime - animProps.previousSwingTime > 0.05F : false;
-	}
+
 
 }
 

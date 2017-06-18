@@ -9,6 +9,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
@@ -23,8 +24,10 @@ import obsidianAPI.render.part.Part;
 
 public class EntityAnimationProperties implements IExtendedEntityProperties
 {
+	public static final String EXT_PROP_NAME = "ObsidianAnimation";
+	
     private final List<ActionPointCallback> actionPointCallbacks = Lists.newLinkedList();
-    private Entity entity;
+    private EntityLivingBase entity;
     private String entityName;
     private AnimationSequence activeAnimation;
     private long animationStartTime;
@@ -46,7 +49,7 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
     @Override
     public void init(Entity entity, World world)
     {
-        this.entity = entity;
+        this.entity = (EntityLivingBase) entity;
         entityName = AnimationRegistry.getEntityName(entity.getClass());
     }
 
@@ -77,12 +80,12 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
             frameTime = Util.getAnimationFrameTime(now, animationStartTime, 0, activeAnimation.getFPS(), multiplier);
     }
     
-	public void updateActiveAnimation(float swingTime, float swingMax, float clock, float lookX, float lookY, float f5, ModelAnimated model, Entity entity) 
+	public void updateActiveAnimation(ModelAnimated model) 
 	{		
 		Queue<IAnimationWrapper> tempQueue = AnimationRegistry.getAnimationListCopy(entityName);
 		IAnimationWrapper wrapper;
 		while((wrapper = tempQueue.poll()) != null) {
-			if(wrapper.isActive(swingTime, swingMax, clock, lookX, lookY, f5, model, entity))
+			if(wrapper.isActive(entity, model))
 				break;
 		}
 		
@@ -270,6 +273,14 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
 	private boolean isIdle()
 	{
 		return activeAnimation == null || activeAnimation.getName().equals("Idle") || activeAnimation.getName().equals("transition_idle");
+	}
+	
+	public static EntityAnimationProperties get(Entity e) {
+		return (EntityAnimationProperties) e.getExtendedProperties(EXT_PROP_NAME);
+	}
+	
+	public String getEntityName() {
+		return entityName;
 	}
 
 }

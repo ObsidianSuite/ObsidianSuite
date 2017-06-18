@@ -4,7 +4,6 @@ import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.EntityAIWander;
 import net.minecraft.world.World;
-import obsidianAnimations.entity.ai.EntityAIEat;
 
 public class EntitySaiga extends EntityCreature
 {
@@ -14,7 +13,7 @@ public class EntitySaiga extends EntityCreature
 		super(world);
 		this.tasks.taskEntries.clear();
         this.tasks.addTask(0, new EntityAIWander(this, 1.0D));
-        this.tasks.addTask(1, new EntityAIEat(this));
+        //this.tasks.addTask(1, new EntityAIEat(this));
 	}
 	
 	@Override

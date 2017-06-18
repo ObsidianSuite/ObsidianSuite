@@ -5,6 +5,7 @@ import java.util.Map;
 import org.lwjgl.opengl.GL11;
 
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.obj.WavefrontObject;
 import obsidianAPI.EntityAnimationProperties;
@@ -32,7 +33,7 @@ public abstract class ModelAnimated extends ModelObj
 		else
 		{
 			animProps.updateFrameTime();
-			animProps.updateActiveAnimation(swingTime, swingMax, clock, lookX, lookY, f5, this, entity);
+			animProps.updateActiveAnimation(this);
 			
 			AnimationSequence seq = animProps.getActiveAnimation();
 
@@ -58,10 +59,8 @@ public abstract class ModelAnimated extends ModelObj
 		parts.forEach(Part::setToOriginalValues);
 	}
 	
-	//TODO should probably do this elsewhere, maybe in an entity class instead?
-	public boolean isMoving(Entity entity, float swingTime) {
-		EntityAnimationProperties animProps = (EntityAnimationProperties) entity.getExtendedProperties("Animation");
-		return animProps != null ? swingTime - animProps.previousSwingTime > 0.02F : false;
+	public boolean isMoving(EntityLivingBase entity) {
+		return entity.limbSwingAmount > 0.02F;
 	}
 
 	protected void animateToPartValues(EntityAnimationProperties animProps, Map<String, float[]> partValues)
