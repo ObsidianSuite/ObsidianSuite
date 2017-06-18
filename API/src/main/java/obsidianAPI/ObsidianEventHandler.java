@@ -2,8 +2,6 @@ package obsidianAPI;
 
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraftforge.event.entity.EntityEvent.EntityConstructing;
@@ -18,15 +16,13 @@ public class ObsidianEventHandler
 	{
 		Entity entity = e.entity;
 		if(AnimationRegistry.isRegisteredClass(entity.getClass())) {
-			if(FMLCommonHandler.instance().getEffectiveSide().isServer())
-				entity.registerExtendedProperties(EntityAnimationProperties.EXT_PROP_NAME, new EntityAnimationProperties());
-			else
+			entity.registerExtendedProperties(EntityAnimationProperties.EXT_PROP_NAME, new EntityAnimationProperties());
+			if(FMLCommonHandler.instance().getEffectiveSide().isClient())
 				entity.registerExtendedProperties(EntityAnimationPropertiesClient.EXT_PROP_NAME, new EntityAnimationPropertiesClient());
 		}
 	}
 	
 	@SubscribeEvent
-	@SideOnly(Side.SERVER)
 	public void onEntityUpdate(LivingUpdateEvent e) {
 		EntityLivingBase entity = e.entityLiving;
 		EntityAnimationProperties animationProps = EntityAnimationProperties.get(entity);

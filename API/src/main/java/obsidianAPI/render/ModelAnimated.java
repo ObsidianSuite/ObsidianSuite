@@ -5,7 +5,6 @@ import java.util.Map;
 import org.lwjgl.opengl.GL11;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.obj.WavefrontObject;
 import obsidianAPI.EntityAnimationPropertiesClient;
@@ -15,6 +14,9 @@ import obsidianAPI.render.part.Part;
 public abstract class ModelAnimated extends ModelObj
 {
 		
+	//TODO this should be half if SP
+	public static float DEF_TRANSITION_TIME = 0.5f;
+	
 	public ModelAnimated(String entityName, WavefrontObject wavefrontObj, ResourceLocation textureLocation)
 	{
 		super(entityName, wavefrontObj, textureLocation);

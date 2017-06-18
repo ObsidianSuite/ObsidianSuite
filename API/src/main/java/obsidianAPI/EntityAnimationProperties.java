@@ -20,6 +20,7 @@ import obsidianAPI.animation.wrapper.IEntityAnimated;
 import obsidianAPI.network.AnimationNetworkHandler;
 import obsidianAPI.network.PacketAnimationStart;
 import obsidianAPI.registry.AnimationRegistry;
+import obsidianAPI.render.ModelAnimated;
 
 public class EntityAnimationProperties implements IExtendedEntityProperties
 {
@@ -39,7 +40,6 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
 	private int activeAnimationFPS;
 	private Map<Integer, Set<String>> activeAnimationActionPoints;
 	private boolean loop;
-	private Runnable onFinished;
 	private final List<ActionPointCallback> actionPointCallbacks = Lists.newLinkedList();
 
 	@Override
@@ -93,6 +93,11 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
 
 	public void setActiveAnimation(AnimationSequence sequence, boolean loopAnim, float transitionTime)
 	{    	
+		setActiveAnimation(sequence, loopAnim, transitionTime, true);
+	}
+	
+	private void setActiveAnimation(AnimationSequence sequence, boolean loopAnim, float transitionTime, boolean sendPacket)
+	{    	
 		if(sequence != null) {
 			activeAnimation = sequence.getName();
 			activeAnimationLength = sequence.getTotalTime();
@@ -107,34 +112,14 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
 		multiplier = 1f;
 		animationStartTime = now;
 		nextFrame = 0;
-		onFinished = null;
-		if (transitionTime > 0.001f)
-		{
-			updateFrameTime();
 
-			loop = false;
+		this.loop = loopAnim;
+		activeAnimation = sequence != null ? sequence.getName() : null;
 
-			activeAnimation = "transition_" + activeAnimation;
-			activeAnimationFPS = 10;
-			activeAnimationLength = transitionTime*activeAnimationFPS;
-
-			onFinished = () ->
-			{
-				animationStartTime = now;
-				nextFrame = 0;
-				onFinished = null;
-				loop = sequence != null ? loopAnim : false;
-				activeAnimation = sequence != null ? sequence.getName() : null;
-				AnimationNetworkHandler.network.sendToAll(new PacketAnimationStart(entity, activeAnimation, animationStartTime, loop, 0.0F));
-			};
-		}
-		else
-		{
-			this.loop = loopAnim;
-			activeAnimation = sequence != null ? sequence.getName() : null;
-		}
-
-		AnimationNetworkHandler.network.sendToAll(new PacketAnimationStart(entity, activeAnimation, animationStartTime, loop, 0.0F));
+		System.out.println(activeAnimation);
+		
+		if(sendPacket)
+			AnimationNetworkHandler.network.sendToAll(new PacketAnimationStart(entity, activeAnimation, animationStartTime, loop, transitionTime));
 	}
 
 	private void returnToIdle(float transitionTime)
@@ -146,7 +131,7 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
 
 	private void returnToIdle()
 	{
-		returnToIdle(0.25f);
+		returnToIdle(ModelAnimated.DEF_TRANSITION_TIME);
 	}
 
 	public void setMultiplier(float multiplier)
@@ -172,12 +157,7 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
 			if (frameTime > activeAnimationLength)
 			{
 				if (loop)
-				{
-					setActiveAnimation(AnimationRegistry.getAnimation(entityName, activeAnimation), true, 0f);
-				} else if (onFinished != null)
-				{
-					onFinished.run();
-				}
+					setActiveAnimation(AnimationRegistry.getAnimation(entityName, activeAnimation), true, 0f, false);
 			}
 		}
 	}

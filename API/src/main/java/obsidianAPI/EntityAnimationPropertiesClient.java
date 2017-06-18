@@ -1,6 +1,5 @@
 package obsidianAPI;
 
-import java.util.Collection;
 import java.util.Map;
 
 import com.google.common.collect.Maps;
@@ -11,7 +10,6 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 import net.minecraftforge.common.IExtendedEntityProperties;
-import obsidianAPI.animation.ActionPointCallback;
 import obsidianAPI.animation.AnimationSequence;
 import obsidianAPI.registry.AnimationRegistry;
 import obsidianAPI.render.ModelAnimated;
@@ -103,7 +101,7 @@ public class EntityAnimationPropertiesClient implements IExtendedEntityPropertie
 
 	public void returnToIdle(ModelAnimated model)
 	{
-		returnToIdle(model, 0.25f);
+		returnToIdle(model, ModelAnimated.DEF_TRANSITION_TIME);
 	}
 
 	private Map<String, float[]> getOriginalValues(ModelObj model)
@@ -144,9 +142,6 @@ public class EntityAnimationPropertiesClient implements IExtendedEntityPropertie
 
 	public void runAnimationTick(ModelAnimated model)
 	{
-		
-		
-		
 		if (activeAnimation != null)
 		{
 			Part entityPos = model.getPartFromName("entitypos");
@@ -177,11 +172,6 @@ public class EntityAnimationPropertiesClient implements IExtendedEntityPropertie
 			}
 		}
 	}
-
-//	private boolean isIdle()
-//	{
-//		return activeAnimation == null || activeAnimation.getName().equals("Idle") || activeAnimation.getName().equals("transition_idle");
-//	}
 
 	public static EntityAnimationPropertiesClient get(Entity e) {
 		return (EntityAnimationPropertiesClient) e.getExtendedProperties(EXT_PROP_NAME);

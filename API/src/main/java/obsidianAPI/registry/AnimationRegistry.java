@@ -19,6 +19,7 @@ import obsidianAPI.animation.wrapper.FunctionAnimationWrapper;
 import obsidianAPI.animation.wrapper.FunctionAnimationWrapper.IsActiveFunction;
 import obsidianAPI.animation.wrapper.IAnimationWrapper;
 import obsidianAPI.exceptions.UnregisteredEntityException;
+import obsidianAPI.render.ModelAnimated;
 
 public class AnimationRegistry 
 {
@@ -87,7 +88,7 @@ public class AnimationRegistry
 	
 	public static void registerAnimation(String entityType, String binding, ResourceLocation resource, int priority, boolean loops, IsActiveFunction isActiveFunction)
 	{
-		registerAnimation(entityType, binding, resource, priority, loops, 0.25F, isActiveFunction);
+		registerAnimation(entityType, binding, resource, priority, loops, ModelAnimated.DEF_TRANSITION_TIME, isActiveFunction);
 	}
 	
 	public static AnimationSequence getAnimation(String entityType, String binding)
