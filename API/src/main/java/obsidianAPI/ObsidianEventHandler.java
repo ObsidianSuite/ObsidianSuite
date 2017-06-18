@@ -21,14 +21,16 @@ public class ObsidianEventHandler
 				entity.registerExtendedProperties(EntityAnimationPropertiesClient.EXT_PROP_NAME, new EntityAnimationPropertiesClient());
 		}
 	}
-	
+
 	@SubscribeEvent
 	public void onEntityUpdate(LivingUpdateEvent e) {
 		EntityLivingBase entity = e.entityLiving;
-		EntityAnimationProperties animationProps = EntityAnimationProperties.get(entity);
-		if(animationProps != null && animationProps.getEntityName().equals("saiga")) {	
-			animationProps.updateActiveAnimation();
-			animationProps.runAnimationTick();
+		if(!entity.worldObj.isRemote) {
+			EntityAnimationProperties animationProps = EntityAnimationProperties.get(entity);
+			if(animationProps != null && animationProps.getEntityName().equals("saiga")) {	
+				animationProps.updateActiveAnimation();
+				animationProps.runAnimationTick();
+			}
 		}
 	}
 

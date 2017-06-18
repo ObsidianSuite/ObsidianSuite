@@ -115,8 +115,6 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
 
 		this.loop = loopAnim;
 		activeAnimation = sequence != null ? sequence.getName() : null;
-
-		System.out.println(activeAnimation);
 		
 		if(sendPacket)
 			AnimationNetworkHandler.network.sendToAll(new PacketAnimationStart(entity, activeAnimation, animationStartTime, loop, transitionTime));

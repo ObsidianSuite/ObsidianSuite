@@ -19,17 +19,17 @@ public class PacketAnimationStart implements IMessage {
 	private long animationStartTime;
 	private boolean loopAnim;
 	private float transitionTime;
-	
+
 	public PacketAnimationStart() {}
-	
+
 	public PacketAnimationStart(Entity entity, String animationName, long animationStartTime, boolean loopAnim, float transitionTime) {
 		this.entityID = entity.getEntityId();
-		this.animationName = animationName;
+		this.animationName = animationName != null ? animationName : "null";
 		this.animationStartTime = animationStartTime;
 		this.loopAnim = loopAnim;
 		this.transitionTime = transitionTime;
 	}
-	
+
 	@Override
 	public void fromBytes(ByteBuf buf) {
 		entityID = buf.readInt();
@@ -47,17 +47,19 @@ public class PacketAnimationStart implements IMessage {
 		buf.writeBoolean(loopAnim);
 		buf.writeFloat(transitionTime);
 	}
-	
+
 	public static class PacketAnimationStartHandler implements IMessageHandler<PacketAnimationStart, IMessage> {
 
 		@Override
 		public IMessage onMessage(PacketAnimationStart message, MessageContext ctx) {
 			Entity entity = Minecraft.getMinecraft().theWorld.getEntityByID(message.entityID);
-			ModelAnimated model = ((RenderAnimated) RenderManager.instance.getEntityRenderObject(entity)).getModel();
-			EntityAnimationPropertiesClient.get(entity).setActiveAnimation(model, message.animationName, message.animationStartTime, message.loopAnim, message.transitionTime);
+			if(entity != null) {
+				ModelAnimated model = ((RenderAnimated) RenderManager.instance.getEntityRenderObject(entity)).getModel();
+				EntityAnimationPropertiesClient.get(entity).setActiveAnimation(model, message.animationName, message.animationStartTime, message.loopAnim, message.transitionTime);
+			}
 			return null;
 		}
-		
+
 	}
 
 }
