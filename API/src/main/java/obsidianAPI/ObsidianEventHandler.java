@@ -20,7 +20,7 @@ public class ObsidianEventHandler
 	@SubscribeEvent
 	@SideOnly(Side.SERVER)
 	public void onEntityUpdate(LivingUpdateEvent e) {
-		System.out.println("Running entity update event");
+
 	}
 
 }

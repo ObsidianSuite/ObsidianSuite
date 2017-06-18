@@ -1,6 +1,7 @@
 package obsidianAPI.registry;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.PriorityQueue;
@@ -9,6 +10,7 @@ import cpw.mods.fml.common.FMLCommonHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.IResource;
 import net.minecraft.nbt.CompressedStreamTools;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import obsidianAPI.ObsidianEventHandler;
@@ -110,8 +112,14 @@ public class AnimationRegistry
 	
 	public static AnimationSequence loadAnimation(ResourceLocation resource) throws IOException
 	{
-        IResource res = Minecraft.getMinecraft().getResourceManager().getResource(resource);
-		return new AnimationSequence(CompressedStreamTools.readCompressed(res.getInputStream()));
+		return new AnimationSequence(CompressedStreamTools.readCompressed(getResourceStream(resource)));
+	}
+	
+	private static InputStream getResourceStream(ResourceLocation resource) throws IOException {
+		if(FMLCommonHandler.instance().getEffectiveSide().isServer())
+	        return AnimationRegistry.class.getClassLoader().getResourceAsStream("assets/" + resource.getResourceDomain() + "/" + resource.getResourcePath());
+		else
+			return Minecraft.getMinecraft().getResourceManager().getResource(resource).getInputStream();
 	}
 
 }
