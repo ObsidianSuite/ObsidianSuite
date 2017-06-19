@@ -2,6 +2,7 @@ package obsidianAnimations;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ResourceLocation;
+import obsidianAPI.Util;
 import obsidianAPI.animation.wrapper.FunctionAnimationWrapper.IsActiveFunction;
 import obsidianAPI.registry.AnimationRegistry;
 import obsidianAnimations.entity.saiga.EntitySaiga;
@@ -16,7 +17,7 @@ public class CommonProxy
 
 	public void registerRendering() {}
 
-	public void registerAnimations()
+	public void registerAnimations() 
 	{
 		AnimationRegistry.init();
 		//		AnimationRegistry.registerEntity(EntityDummyPlayer.class, "dummy");
@@ -52,19 +53,19 @@ public class CommonProxy
 		//				state = "Idle";
 		//		}	
 		
-		IsActiveFunction isWalking = (swingTime, swingMax, clock, lookX, lookY, f5, model, entity) -> { 
-			return model.isMoving(entity, swingTime) && !entity.isSprinting() && !entity.isSneaking() && entity.isCollidedVertically;
+		IsActiveFunction isWalking = (entity) -> { 
+			return Util.isEntityMoving(entity) && !entity.isSprinting() && !entity.isSneaking() && entity.onGround;
 		};
-		IsActiveFunction isSprinting = (swingTime, swingMax, clock, lookX, lookY, f5, model, entity) -> { 
-			return model.isMoving(entity, swingTime) && entity.isSprinting() && entity.isCollidedVertically;
+		IsActiveFunction isSprinting = (entity) -> { 
+			return Util.isEntityMoving(entity) && entity.isSprinting() && entity.onGround;
 		};
-		IsActiveFunction isSneaking = (swingTime, swingMax, clock, lookX, lookY, f5, model, entity) -> { 
-			return model.isMoving(entity, swingTime) && entity.isSneaking() && entity.isCollidedVertically;
+		IsActiveFunction isSneaking = (entity) -> { 
+			return Util.isEntityMoving(entity) && entity.isSneaking() && entity.onGround;
 		};
-		IsActiveFunction isJumping = (swingTime, swingMax, clock, lookX, lookY, f5, model, entity) -> { 
-			return !model.isMoving(entity, swingTime) && !entity.isCollidedVertically;
+		IsActiveFunction isJumping = (entity) -> { 
+			return !Util.isEntityMoving(entity) && !entity.onGround;
 		};
-		IsActiveFunction returnTrue = (swingTime, swingMax, clock, lookX, lookY, f5, model, entity) -> { 
+		IsActiveFunction returnTrue = (iEntityAnimated) -> { 
 			return true;
 		};
 
@@ -73,15 +74,14 @@ public class CommonProxy
 		AnimationRegistry.registerAnimation("player", "SprintF", new ResourceLocation("mod_obsidian_animations:animations/player/SprintF.oba"), 1, true, isSprinting);
 		AnimationRegistry.registerAnimation("player", "CrouchF", new ResourceLocation("mod_obsidian_animations:animations/player/CrouchF.oba"), 2, true, isSneaking);	
 		AnimationRegistry.registerAnimation("player", "Jump", new ResourceLocation("mod_obsidian_animations:animations/player/Jump.oba"), 3, false, 0.0F, isJumping);	
-		//AnimationRegistry.registerAnimation("player", "MovementTest", new ResourceLocation("mod_obsidian_animations:animations/player/MovementTest.oba"), 4, returnTrue);	
+		//AnimationRegistry.registerAnimation("player", "MovementTest", new ResourceLocation("mod_obsidian_animations:animations/player/MovementTest.oba"), 4, true, returnTrue);	
 		//AnimationRegistry.registerAnimation("player", "Idle", new ResourceLocation("mod_obsidian_animations:animations/player/Idle.oba"), 1, returnTrue);
 		
 		AnimationRegistry.registerEntity(EntitySaiga.class, "saiga");
 		AnimationRegistry.registerAnimation("saiga", "Walk", new ResourceLocation("mod_obsidian_animations:animations/saiga/Walk.oba"), 0, true, isWalking);
+		//AnimationRegistry.registerAnimation("saiga", "MovementTest", new ResourceLocation("mod_obsidian_animations:animations/saiga/SaigaMoveTest.oba"), 50, true, returnTrue);
 		AnimationRegistry.registerAnimation("saiga", "Idle", new ResourceLocation("mod_obsidian_animations:animations/saiga/SaigaIdle.oba"), 100, true, returnTrue);
-
 	}
-
 
 }
 

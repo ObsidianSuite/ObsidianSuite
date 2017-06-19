@@ -7,13 +7,15 @@ import org.lwjgl.opengl.GL11;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.obj.WavefrontObject;
-import obsidianAPI.EntityAnimationProperties;
+import obsidianAPI.EntityAnimationPropertiesClient;
 import obsidianAPI.animation.AnimationSequence;
 import obsidianAPI.render.part.Part;
 
 public abstract class ModelAnimated extends ModelObj
 {
 		
+	public static float DEF_TRANSITION_TIME = 0.3f;
+	
 	public ModelAnimated(String entityName, WavefrontObject wavefrontObj, ResourceLocation textureLocation)
 	{
 		super(entityName, wavefrontObj, textureLocation);
@@ -24,7 +26,7 @@ public abstract class ModelAnimated extends ModelObj
 	{
 		super.setRotationAngles(swingTime, swingMax, clock, lookX, lookY, f5, entity);
 
-		EntityAnimationProperties animProps = (EntityAnimationProperties) entity.getExtendedProperties("Animation");
+		EntityAnimationPropertiesClient animProps = EntityAnimationPropertiesClient.get(entity);
 		if (animProps == null)
 		{
 			doDefaultAnimations(swingTime, swingMax, clock, lookX, lookY, f5, entity);
@@ -32,14 +34,13 @@ public abstract class ModelAnimated extends ModelObj
 		else
 		{
 			animProps.updateFrameTime();
-			animProps.updateActiveAnimation(swingTime, swingMax, clock, lookX, lookY, f5, this, entity);
 			
 			AnimationSequence seq = animProps.getActiveAnimation();
 
 			if(seq != null) {
 				float time = animProps.getAnimationFrameTime();
-				animateToPartValues(animProps, seq.getPartValuesAtTime(this, time));
-				animProps.updateAnimation(this, time);
+				animateToPartValues(seq.getPartValuesAtTime(this, time));
+				animProps.runAnimationTick(this);
 			}
 			else {
 				doDefaultAnimations(swingTime, swingMax, clock, lookX, lookY, f5, entity);
@@ -48,8 +49,6 @@ public abstract class ModelAnimated extends ModelObj
 			//Translate for vertical y pos
 			Part entityPos = getPartFromName("entitypos");
 			GL11.glTranslatef(0, -entityPos.getValue(1), 0);
-			
-			animProps.previousSwingTime = swingTime;
 		}
 	}
 
@@ -57,14 +56,8 @@ public abstract class ModelAnimated extends ModelObj
 	{
 		parts.forEach(Part::setToOriginalValues);
 	}
-	
-	//TODO should probably do this elsewhere, maybe in an entity class instead?
-	public boolean isMoving(Entity entity, float swingTime) {
-		EntityAnimationProperties animProps = (EntityAnimationProperties) entity.getExtendedProperties("Animation");
-		return animProps != null ? swingTime - animProps.previousSwingTime > 0.05F : false;
-	}
 
-	protected void animateToPartValues(EntityAnimationProperties animProps, Map<String, float[]> partValues)
+	protected void animateToPartValues(Map<String, float[]> partValues)
 	{
 		parts.forEach(p -> p.setValues(partValues.get(p.getName())));
 	}

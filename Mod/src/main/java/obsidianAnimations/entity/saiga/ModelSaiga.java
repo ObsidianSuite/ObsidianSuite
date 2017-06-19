@@ -3,7 +3,7 @@ package obsidianAnimations.entity.saiga;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.obj.WavefrontObject;
-import obsidianAPI.EntityAnimationProperties;
+import obsidianAPI.EntityAnimationPropertiesClient;
 import obsidianAPI.animation.AnimationSequence;
 import obsidianAPI.debug.GuiDebug;
 import obsidianAPI.render.ModelAnimated;
@@ -19,7 +19,7 @@ public class ModelSaiga extends ModelAnimated {
 			Entity entity) {
 		super.setRotationAngles(swingTime, swingMax, clock, lookX, lookY, f5, entity);
 		
-		EntityAnimationProperties animProps = (EntityAnimationProperties) entity.getExtendedProperties("Animation");
+		EntityAnimationPropertiesClient animProps = EntityAnimationPropertiesClient.get(entity);
 		if (animProps == null)
 			GuiDebug.instance.animationText = "null";
 		else
