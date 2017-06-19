@@ -17,7 +17,7 @@ import obsidianAPI.animation.ActionPointCallback;
 import obsidianAPI.animation.AnimationSequence;
 import obsidianAPI.animation.wrapper.IAnimationWrapper;
 import obsidianAPI.network.AnimationNetworkHandler;
-import obsidianAPI.network.PacketAnimationStart;
+import obsidianAPI.network.MessageAnimationStart;
 import obsidianAPI.registry.AnimationRegistry;
 import obsidianAPI.render.ModelAnimated;
 
@@ -119,9 +119,9 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
 		nextFrame = 0;
 
 		activeAnimation = sequence != null ? sequence.getName() : null;
-
+		
 		if(sendPacket)
-			AnimationNetworkHandler.network.sendToAll(new PacketAnimationStart(entity, activeAnimation, animationStartTime, loopAnim, transitionTime));
+			AnimationNetworkHandler.network.sendToAll(new MessageAnimationStart(entity, activeAnimation, animationStartTime, loopAnim, transitionTime));
 		
 		if (transitionTime > 0.01f)
 		{

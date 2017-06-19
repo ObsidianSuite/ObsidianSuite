@@ -54,8 +54,8 @@ public class Util
 		boolean isMoving;
 		if(entity instanceof IEntityAnimated)
 			isMoving = ((IEntityAnimated) entity).isMoving();
-		else if(entity instanceof EntityPlayer)
-			isMoving = Math.abs(entity.posX - EntityAnimationProperties.get(entity).prevX) > 0.01F || Math.abs(entity.posZ - EntityAnimationProperties.get(entity).prevZ) > 0.01F;
+//		else if(entity instanceof EntityPlayer)
+//			isMoving = Math.abs(entity.posX - EntityAnimationProperties.get(entity).prevX) > 0.01F || Math.abs(entity.posZ - EntityAnimationProperties.get(entity).prevZ) > 0.01F;
 		else
 			isMoving = entity.limbSwingAmount > 0.02F;
 		return isMoving;

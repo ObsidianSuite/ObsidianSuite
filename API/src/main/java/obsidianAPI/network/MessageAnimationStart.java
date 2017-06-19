@@ -8,12 +8,11 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
 import obsidianAPI.EntityAnimationPropertiesClient;
 import obsidianAPI.render.IRenderAnimated;
 import obsidianAPI.render.ModelAnimated;
 
-public class PacketAnimationStart implements IMessage {
+public class MessageAnimationStart implements IMessage {
 
 	private int entityID;
 	private String animationName;
@@ -21,9 +20,9 @@ public class PacketAnimationStart implements IMessage {
 	private boolean loopAnim;
 	private float transitionTime;
 
-	public PacketAnimationStart() {}
+	public MessageAnimationStart() {}
 
-	public PacketAnimationStart(Entity entity, String animationName, long animationStartTime, boolean loopAnim, float transitionTime) {
+	public MessageAnimationStart(Entity entity, String animationName, long animationStartTime, boolean loopAnim, float transitionTime) {
 		this.entityID = entity.getEntityId();
 		this.animationName = animationName != null ? animationName : "null";
 		this.animationStartTime = animationStartTime;
@@ -49,10 +48,10 @@ public class PacketAnimationStart implements IMessage {
 		buf.writeFloat(transitionTime);
 	}
 
-	public static class PacketAnimationStartHandler implements IMessageHandler<PacketAnimationStart, IMessage> {
+	public static class MessageAnimationStartHandler implements IMessageHandler<MessageAnimationStart, IMessage> {
 
 		@Override
-		public IMessage onMessage(PacketAnimationStart message, MessageContext ctx) {
+		public IMessage onMessage(MessageAnimationStart message, MessageContext ctx) {
 			Entity entity = Minecraft.getMinecraft().theWorld.getEntityByID(message.entityID);
 			if(entity != null) {
 				ModelAnimated model = ((IRenderAnimated) RenderManager.instance.getEntityRenderObject(entity)).getModel();

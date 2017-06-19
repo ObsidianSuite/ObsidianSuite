@@ -3,7 +3,8 @@ package obsidianAPI.network;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import cpw.mods.fml.relauncher.Side;
-import obsidianAPI.network.PacketAnimationStart.PacketAnimationStartHandler;
+import obsidianAPI.network.MessageAnimationStart.MessageAnimationStartHandler;
+import obsidianAPI.network.MessagePlayerLimbSwing.MessagePlayerLimbSwingHandler;
 
 public class AnimationNetworkHandler {
 
@@ -14,7 +15,8 @@ public class AnimationNetworkHandler {
 	}
 	
 	private static void registerMessages() {
-		network.registerMessage(PacketAnimationStartHandler.class, PacketAnimationStart.class, 0, Side.CLIENT);
+		network.registerMessage(MessageAnimationStartHandler.class, MessageAnimationStart.class, 0, Side.CLIENT);
+		network.registerMessage(MessagePlayerLimbSwingHandler.class, MessagePlayerLimbSwing.class, 1, Side.SERVER);
 	}
 	
 }

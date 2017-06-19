@@ -5,9 +5,10 @@ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.event.entity.EntityEvent.EntityConstructing;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
+import obsidianAPI.network.AnimationNetworkHandler;
+import obsidianAPI.network.MessagePlayerLimbSwing;
 import obsidianAPI.registry.AnimationRegistry;
 
 public class ObsidianEventHandler 
@@ -27,17 +28,18 @@ public class ObsidianEventHandler
 	@SubscribeEvent
 	public void onEntityUpdate(LivingUpdateEvent e) {
 		EntityLivingBase entity = e.entityLiving;
+//		if(entity instanceof EntityPlayer) {
+//			System.out.println(entity.getClass() + " " + entity.limbSwing + " " + entity.limbSwingAmount );
+//		}
 		if(!entity.worldObj.isRemote) {
-			if(entity instanceof EntityPlayer) {
-				EntityPlayerMP player = (EntityPlayerMP) entity;
-				//System.out.println(entity.getClass() + " " + player.isSprinting() + " " + player.isSneaking() + " " + player.onGround + " " + player.posX + " " + player.prevPosX);
-			}
 			EntityAnimationProperties animationProps = EntityAnimationProperties.get(entity);
 			if(animationProps != null) {	
 				animationProps.updateActiveAnimation();
 				animationProps.runAnimationTick();
 			}
 		}
+		else if(entity instanceof EntityPlayer)
+			AnimationNetworkHandler.network.sendToServer(new MessagePlayerLimbSwing(entity));	
 	}
 
 }
