@@ -3,7 +3,6 @@ package obsidianAnimator.render.entity;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.block.Block;
-import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.entity.RenderLiving;
 import net.minecraft.entity.Entity;
@@ -62,7 +61,6 @@ public class RenderObj_Animator extends RenderLiving
         ItemStack itemstack1 = entity.getHeldItem();
 
         float f4;
-
 
 
         if (itemstack1 != null)
@@ -142,6 +140,7 @@ public class RenderObj_Animator extends RenderLiving
     {
         transformToItemCentre(itemstack, modelObj.getPartObjFromName("armLwL"), modelObj.getPartFromName("prop_trans_l"));
     }
+
     /**
      * Transform an existing GL11 matrix to the held item location.
      * Takes prop translation into account.
@@ -166,6 +165,8 @@ public class RenderObj_Animator extends RenderLiving
                 GL11.glTranslatef(-0.125f, -0.17F, 0.0f);
             else if (itemstack.getItem().isFull3D())
                 GL11.glTranslatef(0.00f, -0.22F, 0.04f);
+            else if (arm.getDisplayName().equals("armLwL")) // TODO: let the item decide this
+                GL11.glTranslatef(0.138f, -0.25f, 0.0f);
             else
                 GL11.glTranslatef(0, -0.30F, 0.2f);
         }
@@ -186,6 +187,7 @@ public class RenderObj_Animator extends RenderLiving
                                        modelObj.getPartFromName("prop_trans_l"),
                                        (PartRotation) modelObj.getPartFromName("prop_rot_l"));
     }
+
     /**
      * Transform an existing GL11 matrix to the held item location.
      * Takes prop rotation and translation into account.
