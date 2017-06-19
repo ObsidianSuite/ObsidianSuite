@@ -1,10 +1,12 @@
 package obsidianAnimations;
 
+import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ResourceLocation;
 import obsidianAPI.ObsidianAPIUtil;
 import obsidianAPI.animation.wrapper.FunctionAnimationWrapper.IsActiveFunction;
 import obsidianAPI.registry.AnimationRegistry;
+import obsidianAnimations.entity.ai.EntityAIEat;
 import obsidianAnimations.entity.saiga.EntitySaiga;
 
 public class CommonProxy
@@ -65,7 +67,14 @@ public class CommonProxy
 		IsActiveFunction isJumping = (entity) -> { 
 			return !ObsidianAPIUtil.isEntityMoving(entity) && !entity.onGround;
 		};
-		IsActiveFunction returnTrue = (iEntityAnimated) -> { 
+		IsActiveFunction isEating = (entity) -> { 
+			if(entity instanceof EntityLiving) {
+				EntityLiving entityLiving = (EntityLiving) entity;
+				return ObsidianAPIUtil.isEntityAITaskActive(entityLiving, EntityAIEat.name);
+			}
+			return false;
+		};
+		IsActiveFunction returnTrue = (entity) -> { 
 			return true;
 		};
 
@@ -79,7 +88,7 @@ public class CommonProxy
 		
 		AnimationRegistry.registerEntity(EntitySaiga.class, "saiga");
 		AnimationRegistry.registerAnimation("saiga", "Walk", new ResourceLocation("mod_obsidian_animations:animations/saiga/Walk.oba"), 0, true, isWalking);
-		//AnimationRegistry.registerAnimation("saiga", "MovementTest", new ResourceLocation("mod_obsidian_animations:animations/saiga/SaigaMoveTest.oba"), 50, true, returnTrue);
+		AnimationRegistry.registerAnimation("saiga", "Eat", new ResourceLocation("mod_obsidian_animations:animations/saiga/SaigaEat.oba"), 50, false, isEating);
 		AnimationRegistry.registerAnimation("saiga", "Idle", new ResourceLocation("mod_obsidian_animations:animations/saiga/SaigaIdle.oba"), 100, true, returnTrue);
 	}
 

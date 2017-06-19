@@ -67,6 +67,10 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
 	@Override
 	public void loadNBTData(NBTTagCompound compound) {}
 
+	public String getActiveAnimation() {
+		return activeAnimation;
+	}
+	
 	private void updateFrameTime()
 	{
 		now = System.nanoTime();

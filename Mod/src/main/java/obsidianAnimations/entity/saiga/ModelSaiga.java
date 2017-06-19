@@ -19,17 +19,17 @@ public class ModelSaiga extends ModelAnimated {
 			Entity entity) {
 		super.setRotationAngles(swingTime, swingMax, clock, lookX, lookY, f5, entity);
 		
-		EntityAnimationPropertiesClient animProps = EntityAnimationPropertiesClient.get(entity);
-		if (animProps == null)
-			GuiDebug.instance.animationText = "null";
-		else
-		{
-			AnimationSequence seq = animProps.getActiveAnimation();
-			if (seq == null)
-				GuiDebug.instance.animationText = "null";
-			else
-				GuiDebug.instance.animationText = seq.getName();
-		}		
+//		EntityAnimationPropertiesClient animProps = EntityAnimationPropertiesClient.get(entity);
+//		if (animProps == null)
+//			GuiDebug.instance.animationText = "null";
+//		else
+//		{
+//			AnimationSequence seq = animProps.getActiveAnimation();
+//			if (seq == null)
+//				GuiDebug.instance.animationText = "null";
+//			else
+//				GuiDebug.instance.animationText = seq.getName();
+//		}		
 	}
 
 }
