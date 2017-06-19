@@ -1,12 +1,18 @@
 package obsidianAPI;
 
-import obsidianAPI.animation.AnimationPart;
-import obsidianAPI.animation.AnimationSequence;
-import obsidianAPI.render.ModelObj;
-
 import java.util.Map;
 
-public class Util
+import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.ai.EntityAIBase;
+import net.minecraft.entity.ai.EntityAITasks.EntityAITaskEntry;
+import obsidianAPI.animation.AnimationPart;
+import obsidianAPI.animation.AnimationSequence;
+import obsidianAPI.animation.wrapper.IEntityAIAnimation;
+import obsidianAPI.animation.wrapper.IEntityAnimated;
+import obsidianAPI.render.ModelObj;
+
+public class ObsidianAPIUtil
 {
 
 
@@ -46,4 +52,26 @@ public class Util
 
         return seq;
     }
+	
+	public static boolean isEntityMoving(EntityLivingBase entity) {
+		boolean isMoving;
+		if(entity instanceof IEntityAnimated)
+			isMoving = ((IEntityAnimated) entity).isMoving();
+		else
+			isMoving = entity.limbSwingAmount > 0.02F;
+		return isMoving;
+	}
+	
+	public static boolean isEntityAITaskActive(EntityLiving entity, String AIName) {
+		for(Object obj : entity.tasks.taskEntries) {
+			EntityAITaskEntry taskEntry = (EntityAITaskEntry) obj;
+			EntityAIBase task = taskEntry.action;
+			if(task instanceof IEntityAIAnimation) {
+				IEntityAIAnimation animatedTask = (IEntityAIAnimation) task;
+				if(animatedTask.getAIName().equals(AIName))
+					return true;
+			}
+		}
+		return false;
+	}
 }

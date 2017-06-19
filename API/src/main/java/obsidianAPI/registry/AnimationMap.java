@@ -1,14 +1,13 @@
 package obsidianAPI.registry;
 
-import java.io.IOException;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.PriorityQueue;
+import java.util.Queue;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.IResource;
-import net.minecraft.nbt.CompressedStreamTools;
-import net.minecraft.util.ResourceLocation;
 import obsidianAPI.animation.AnimationSequence;
+import obsidianAPI.animation.wrapper.IAnimationWrapper;
 
 /**
  * A class for storing animation sequences.
@@ -17,43 +16,51 @@ import obsidianAPI.animation.AnimationSequence;
 class AnimationMap 
 {
 	
-	//Map to store animations
-	private Map<String, AnimationSequence> map;
+	//Map of bindings to animation wrappers
+	private Map<String, IAnimationWrapper> map;
+	
+	//Priority queue of animation wrappers
+	private Queue<IAnimationWrapper> animationList = new PriorityQueue<IAnimationWrapper>(1, new AnimationWrapperComparator());
 	
 	AnimationMap()
 	{
-		map = new HashMap<String, AnimationSequence>();
+		map = new HashMap<String, IAnimationWrapper>();
 	}
 	
 	/**
 	 * Registers an animation by adding it to the map with a specific binding.
 	 * Can fail is file doesn't exist at resource location.
 	 */
-	void registerAnimation(String binding, ResourceLocation resource)
+	void registerAnimation(String binding, IAnimationWrapper wrapper)
 	{
-		//Attempt to load sequence from resource location.
-		try
-		{
-			AnimationSequence seq = loadAnimation(resource);
-			map.put(binding, seq);
-		}
-		catch(IOException e)
-		{
-			System.out.println("Unable to load animation:");
-			e.printStackTrace();
-		}
+		map.put(binding, wrapper);
+		animationList.add(wrapper);
 	}
 	
 	AnimationSequence getAnimation(String binding)
 	{
-		//TODO error handling here if animation is null.
+		//TODO error handling here if wrapper is null. Should return null but maybe notify in debug?
+		IAnimationWrapper wrapper = map.get(binding);
+		return wrapper != null ? wrapper.getAnimation() : null;
+	}
+	
+	IAnimationWrapper getAnimationWrapper(String binding)
+	{
+		//TODO error handling here if wrapper is null. Should return null but maybe notify in debug?
 		return map.get(binding);
 	}
 	
-	private AnimationSequence loadAnimation(ResourceLocation resource) throws IOException
-	{
-        IResource res = Minecraft.getMinecraft().getResourceManager().getResource(resource);
-		return new AnimationSequence(CompressedStreamTools.readCompressed(res.getInputStream()));
+    private class AnimationWrapperComparator implements Comparator<IAnimationWrapper>{
+
+		@Override
+		public int compare(IAnimationWrapper o1, IAnimationWrapper o2) {
+			return o1.getPriority() - o2.getPriority();
+		}
+    	
+    }
+
+	public PriorityQueue<IAnimationWrapper> getAnimationListCopy() {
+		return new PriorityQueue<IAnimationWrapper>(animationList);
 	}
 	
 }

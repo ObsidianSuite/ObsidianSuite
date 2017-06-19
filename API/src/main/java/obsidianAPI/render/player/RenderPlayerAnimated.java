@@ -3,22 +3,30 @@ package obsidianAPI.render.player;
 import net.minecraft.client.renderer.entity.RenderPlayer;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
+import obsidianAPI.render.IRenderAnimated;
+import obsidianAPI.render.ModelAnimated;
 
-public class RenderPlayerAnimated extends RenderPlayer
+public class RenderPlayerAnimated extends RenderPlayer implements IRenderAnimated
 {
 	
-	private static final ResourceLocation texture = new ResourceLocation("mod_obsidian_animations:models/player.png");
+	private ModelAnimatedPlayer modelAnimatedPlayer;
 	
-	public RenderPlayerAnimated()
+	public RenderPlayerAnimated(ModelAnimatedPlayer modelAnimatedPlayer)
 	{
 		super();
-		this.mainModel = new ModelAnimatedPlayer();
+		this.modelAnimatedPlayer = modelAnimatedPlayer;
+		this.mainModel = modelAnimatedPlayer;
 	}
 	
 	@Override
 	protected ResourceLocation getEntityTexture(Entity p_110775_1_) 
 	{
-		return texture;
+		return modelAnimatedPlayer.getTexture();
+	}
+
+	@Override
+	public ModelAnimated getModel() {
+		return modelAnimatedPlayer;
 	}
 
 }

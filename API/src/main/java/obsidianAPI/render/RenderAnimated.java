@@ -4,22 +4,26 @@ import net.minecraft.client.renderer.entity.RenderLiving;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
 
-public class RenderObj extends RenderLiving
+public class RenderAnimated extends RenderLiving implements IRenderAnimated
 {
 
-	private ResourceLocation texture;
+	private ModelAnimated model;
 	
-	public RenderObj(ModelAnimated model, ResourceLocation texture)
+	public RenderAnimated(ModelAnimated model)
 	{
-		//TODO shadow size?
 		super(model, 1.0F);
-		this.texture = texture;
+		this.model = model;
+	}
+	
+	@Override
+	public ModelAnimated getModel() {
+		return model;
 	}
 	
 	@Override
 	protected ResourceLocation getEntityTexture(Entity p_110775_1_) 
 	{
-		return texture;
+		return model.getTexture();
 	}
 
 }

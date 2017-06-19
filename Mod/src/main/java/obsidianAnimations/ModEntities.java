@@ -5,6 +5,7 @@ import java.util.Random;
 import cpw.mods.fml.common.registry.EntityRegistry;
 import net.minecraft.entity.EntityList;
 import obsidianAnimations.entity.EntityDummyPlayer;
+import obsidianAnimations.entity.saiga.EntitySaiga;
 
 public class ModEntities 
 {
@@ -12,6 +13,7 @@ public class ModEntities
 	public static void registerEntities()
 	{
 		registerEntity(EntityDummyPlayer.class, "DummyPlayer");
+		registerEntity(EntitySaiga.class, "Saiga");
 	}
 
 	public static void registerEntity(Class entityClass, String name)
@@ -23,7 +25,7 @@ public class ModEntities
 		int secondaryColor = rand.nextInt() * 16777215;
 
 		EntityRegistry.registerGlobalEntityID(entityClass, name, entityID);
-		EntityRegistry.registerModEntity(entityClass, name, entityID, ObsidianAnimations.instance, 64, 1, true);
+		EntityRegistry.registerModEntity(entityClass, name, entityID, ObsidianAnimations.instance, 64, 3, true);
 		EntityList.entityEggs.put(Integer.valueOf(entityID), new EntityList.EntityEggInfo(entityID, primaryColor, secondaryColor));
 	}
 

@@ -1,16 +1,13 @@
 package obsidianAnimations.entity;
 
-import java.io.IOException;
+import obsidianAPI.render.RenderAnimated;
 
-import net.minecraft.util.ResourceLocation;
-import obsidianAPI.render.RenderObj;
-
-public class RenderDummyPlayer extends RenderObj
+public class RenderDummyPlayer extends RenderAnimated
 {
-	
-	public RenderDummyPlayer()
+		
+	public RenderDummyPlayer(ModelDummyPlayer player)
 	{
-		super(new ModelDummyPlayer(), new ResourceLocation("mod_obsidian_animations:models/player.png"));
+		super(player);
 	}
 
 }

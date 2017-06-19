@@ -3,7 +3,7 @@ package obsidianAnimator.gui.timeline;
 import java.io.File;
 
 import net.minecraft.client.Minecraft;
-import obsidianAPI.Util;
+import obsidianAPI.ObsidianAPIUtil;
 import obsidianAPI.animation.AnimationPart;
 import obsidianAPI.animation.AnimationSequence;
 import obsidianAPI.file.FileHandler;
@@ -148,7 +148,7 @@ public class TimelineController
 	{
 		if(inputController.isPlaying())
 		{
-			setTime(Util.getAnimationFrameTime(inputController.getPlayStartTimeNano(), inputController.getPlayStartTimeFrame(), currentAnimation.getFPS(), animationController.getTimeMultiplier()));
+			setTime(ObsidianAPIUtil.getAnimationFrameTime(inputController.getPlayStartTimeNano(), inputController.getPlayStartTimeFrame(), currentAnimation.getFPS(), animationController.getTimeMultiplier()));
 			setExceptionPart(null);
 			if(getTime() >= currentAnimation.getTotalTime())
 			{

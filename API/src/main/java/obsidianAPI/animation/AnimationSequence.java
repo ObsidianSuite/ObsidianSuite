@@ -48,6 +48,11 @@ public class AnimationSequence
 		return animationName;
 	}
 
+	public void setName(String animationName)
+	{
+		this.animationName = animationName;
+	}
+
 	public void setAnimations(List<AnimationPart> animations)
 	{
 		partsByPartName.clear();
@@ -84,6 +89,11 @@ public class AnimationSequence
 		}
 		return parts.values();
 	}
+	
+	public TreeMap<Integer, AnimationPart> getPartAnimationMap(String partName)
+	{
+		return partsByPartName.get(partName);
+	}
 
 	public void addAnimation(AnimationPart part)
 	{
@@ -93,6 +103,10 @@ public class AnimationSequence
 	public void clearAnimations()
 	{
 		partsByPartName.clear();
+	}
+
+	public Map<Integer, Set<String>> getAllActionPoints() {
+		return actionPoints;
 	}
 
 	public Collection<String> getActionPoints(int time)
@@ -204,7 +218,21 @@ public class AnimationSequence
 			return part.getOriginalValues();
 	}
 
-	private AnimationPart findPartForTime(TreeMap<Integer,AnimationPart> parts, int time)
+	public static float[] getPartValueAtTime(TreeMap<Integer, AnimationPart> animations, float time)
+	{
+		if(animations != null && animations.size() > 0)
+		{
+			AnimationPart anim = findPartForTime(animations, MathHelper.floor_float(time));
+			if (anim == null)
+				anim = animations.lastEntry().getValue();
+			float frameTime = Math.min(time - anim.getStartTime(), anim.getEndTime() - anim.getStartTime());
+			return anim.getPartRotationAtTime(null, frameTime);
+		}
+		else
+			return new float[]{0,0,0};
+	}
+
+	private static AnimationPart findPartForTime(TreeMap<Integer,AnimationPart> parts, int time)
 	{
 		Map.Entry<Integer, AnimationPart> entry = parts.floorEntry(time);
 		if (entry != null)
