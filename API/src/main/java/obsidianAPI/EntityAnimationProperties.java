@@ -5,15 +5,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
+import java.util.TreeMap;
 
 import com.google.common.collect.Lists;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 import net.minecraftforge.common.IExtendedEntityProperties;
 import obsidianAPI.animation.ActionPointCallback;
+import obsidianAPI.animation.AnimationPart;
 import obsidianAPI.animation.AnimationSequence;
 import obsidianAPI.animation.wrapper.IAnimationWrapper;
 import obsidianAPI.network.AnimationNetworkHandler;
@@ -38,11 +42,12 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
 	private float activeAnimationLength;
 	private int activeAnimationFPS;
 	private Map<Integer, Set<String>> activeAnimationActionPoints;
+	private TreeMap<Integer, AnimationPart> entityPosAnimations;
 	private boolean loop;
 	private Runnable onFinished;
 	private final List<ActionPointCallback> actionPointCallbacks = Lists.newLinkedList();
 	
-	public double prevX, prevZ;
+	private float prevEntityPosX, prevEntityPosZ;
 
 	@Override
 	public void init(Entity entity, World world)
@@ -91,9 +96,6 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
 			if(!isIdle()) 
 				returnToIdle();
 		}
-		
-		prevX = entity.posX;
-		prevZ = entity.posZ;
 	}
 
 	public void setActiveAnimation(AnimationSequence sequence, boolean loopAnim, float transitionTime)
@@ -108,10 +110,12 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
 			activeAnimationLength = sequence.getTotalTime();
 			activeAnimationFPS = sequence.getFPS();
 			activeAnimationActionPoints = sequence.getAllActionPoints();
+			entityPosAnimations = sequence.getPartAnimationMap("entitypos");
 		}
 		else {
 			activeAnimation = null;
 			activeAnimationActionPoints = null;
+			entityPosAnimations = null;
 		}
 
 		multiplier = 1f;
@@ -123,13 +127,14 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
 		if(sendPacket)
 			AnimationNetworkHandler.network.sendToAll(new MessageAnimationStart(entity, activeAnimation, animationStartTime, loopAnim, transitionTime));
 		
+		prevEntityPosX = 0f;
+		prevEntityPosZ = 0f;
 		if (transitionTime > 0.01f)
 		{
 			loop = false;
 			activeAnimation = "transition_" + activeAnimation;
 			onFinished = () ->
 			{
-				System.out.println(loopAnim);
 				onFinished = null;
 				updateFrameTime();
 				setActiveAnimation(sequence, loopAnim, 0, false);
@@ -165,6 +170,31 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
 		updateFrameTime();
 		if (activeAnimation != null)
 		{
+			if(entityPosAnimations != null) {
+				float[] values = AnimationSequence.getPartValueAtTime(entityPosAnimations, MathHelper.floor_float(frameTime));
+				
+				float entityPosX = values[0];
+				float entityPosZ = values[2];
+								
+				float strafe = entityPosX - prevEntityPosX;
+				float forward = entityPosZ - prevEntityPosZ;
+				
+				float f4 = MathHelper.sin(entity.rotationYaw * (float)Math.PI / 180.0F);
+				float f5 = MathHelper.cos(entity.rotationYaw * (float)Math.PI / 180.0F);
+				
+				double posX = entity.posX + (double)(strafe * f5 - forward * f4);
+				double posY = entity.posY;
+				double posZ = entity.posZ + (double)(forward * f5 + strafe * f4);	
+				
+				if(entity instanceof EntityLivingBase && !(entity instanceof EntityPlayer)) {
+					EntityLivingBase elb = (EntityLivingBase) entity;
+					elb.setPositionAndUpdate(posX, posY, posZ);
+				}
+				
+				prevEntityPosX = entityPosX;
+				prevEntityPosZ = entityPosZ;
+			}
+			
 			while (frameTime > nextFrame)
 			{
 				fireActions(nextFrame);

@@ -1,15 +1,18 @@
 package obsidianAPI;
 
 import java.util.Map;
+import java.util.TreeMap;
 
 import com.google.common.collect.Maps;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 import net.minecraftforge.common.IExtendedEntityProperties;
+import obsidianAPI.animation.AnimationPart;
 import obsidianAPI.animation.AnimationSequence;
 import obsidianAPI.registry.AnimationRegistry;
 import obsidianAPI.render.ModelAnimated;
@@ -146,11 +149,11 @@ public class EntityAnimationPropertiesClient implements IExtendedEntityPropertie
 		if (activeAnimation != null)
 		{
 			Part entityPos = model.getPartFromName("entitypos");
-			if (entityPos != null)
+			if (entityPos != null && this.entity.equals(Minecraft.getMinecraft().thePlayer))
 			{            	
 				float entityPosX = entityPos.getValue(0);
 				float entityPosZ = entityPos.getValue(2);
-
+				
 				float strafe = entityPosX - prevEntityPosX;
 				float forward = entityPosZ - prevEntityPosZ;
 
