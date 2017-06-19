@@ -28,9 +28,6 @@ public class ObsidianEventHandler
 	@SubscribeEvent
 	public void onEntityUpdate(LivingUpdateEvent e) {
 		EntityLivingBase entity = e.entityLiving;
-//		if(entity instanceof EntityPlayer) {
-//			System.out.println(entity.getClass() + " " + entity.limbSwing + " " + entity.limbSwingAmount );
-//		}
 		if(!entity.worldObj.isRemote) {
 			EntityAnimationProperties animationProps = EntityAnimationProperties.get(entity);
 			if(animationProps != null) {	

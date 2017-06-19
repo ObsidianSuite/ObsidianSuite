@@ -2,7 +2,7 @@ package obsidianAnimations;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ResourceLocation;
-import obsidianAPI.Util;
+import obsidianAPI.ObsidianAPIUtil;
 import obsidianAPI.animation.wrapper.FunctionAnimationWrapper.IsActiveFunction;
 import obsidianAPI.registry.AnimationRegistry;
 import obsidianAnimations.entity.saiga.EntitySaiga;
@@ -54,16 +54,16 @@ public class CommonProxy
 		//		}	
 		
 		IsActiveFunction isWalking = (entity) -> { 
-			return Util.isEntityMoving(entity) && !entity.isSprinting() && !entity.isSneaking() && entity.onGround;
+			return ObsidianAPIUtil.isEntityMoving(entity) && !entity.isSprinting() && !entity.isSneaking() && entity.onGround;
 		};
 		IsActiveFunction isSprinting = (entity) -> { 
-			return Util.isEntityMoving(entity) && entity.isSprinting() && entity.onGround;
+			return ObsidianAPIUtil.isEntityMoving(entity) && entity.isSprinting() && entity.onGround;
 		};
 		IsActiveFunction isSneaking = (entity) -> { 
-			return Util.isEntityMoving(entity) && entity.isSneaking() && entity.onGround;
+			return ObsidianAPIUtil.isEntityMoving(entity) && entity.isSneaking() && entity.onGround;
 		};
 		IsActiveFunction isJumping = (entity) -> { 
-			return !Util.isEntityMoving(entity) && !entity.onGround;
+			return !ObsidianAPIUtil.isEntityMoving(entity) && !entity.onGround;
 		};
 		IsActiveFunction returnTrue = (iEntityAnimated) -> { 
 			return true;

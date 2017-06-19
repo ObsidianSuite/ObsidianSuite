@@ -12,6 +12,10 @@ import obsidianAPI.EntityAnimationPropertiesClient;
 import obsidianAPI.render.IRenderAnimated;
 import obsidianAPI.render.ModelAnimated;
 
+/**
+ * Server -> Client
+ * Server tells client that an animation has started.
+ */
 public class MessageAnimationStart implements IMessage {
 
 	private int entityID;

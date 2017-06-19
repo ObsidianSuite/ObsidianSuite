@@ -40,12 +40,6 @@ public class ObsidianAnimations
 	public void load(FMLInitializationEvent event)
 	{
 		MinecraftForge.EVENT_BUS.register(new ObsidianEventHandler());
-
-		//		ObsidianEventHandler eventHandler = new ObsidianEventHandler();
-		//		MinecraftForge.EVENT_BUS.register(eventHandler);
-		//
-		//		if(FMLCommonHandler.instance().getEffectiveSide().isClient())
-		//			FMLCommonHandler.instance().bus().register(eventHandler);
 	}
 
 }

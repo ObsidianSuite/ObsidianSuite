@@ -3,7 +3,7 @@ package obsidianAPI.animation;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import obsidianAPI.Quaternion;
-import obsidianAPI.Util;
+import obsidianAPI.ObsidianAPIUtil;
 import obsidianAPI.render.part.Part;
 import obsidianAPI.render.part.PartObj;
 import obsidianAPI.render.part.PartRotation;

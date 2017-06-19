@@ -2,6 +2,9 @@ package obsidianAPI.animation.wrapper;
 
 import obsidianAPI.animation.AnimationSequence;
 
+/**
+ * A basic implementation of IAnimationWrapper
+ */
 public abstract class AnimationWrapper implements IAnimationWrapper {
 
 	private AnimationSequence animation;

@@ -3,6 +3,11 @@ package obsidianAPI.animation.wrapper;
 import net.minecraft.entity.EntityLivingBase;
 import obsidianAPI.animation.AnimationSequence;
 
+/**
+ * A wrapper for animations. 
+ * Contains extra information that {@link AnimationSequence} does not:
+ *   Priority, loop, transition time, and a method to determine if the animation should be played.
+ */
 public interface IAnimationWrapper {
 
 	/**
@@ -16,7 +21,7 @@ public interface IAnimationWrapper {
 	public boolean isActive(EntityLivingBase entity);
 	
 	/**
-	 * @return Priority of this animation. Lower number = lower priority. 
+	 * @return Priority of this animation. Higher number = lower priority. 
 	 */
 	public int getPriority();
 	

@@ -9,7 +9,7 @@ import obsidianAPI.animation.AnimationSequence;
 import obsidianAPI.animation.wrapper.IEntityAnimated;
 import obsidianAPI.render.ModelObj;
 
-public class Util
+public class ObsidianAPIUtil
 {
 
 

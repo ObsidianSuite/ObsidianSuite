@@ -74,7 +74,7 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
 		if (activeAnimation == null)
 			frameTime = 0f;
 		else
-			frameTime = Util.getAnimationFrameTime(now, animationStartTime, 0, activeAnimationFPS, multiplier);
+			frameTime = ObsidianAPIUtil.getAnimationFrameTime(now, animationStartTime, 0, activeAnimationFPS, multiplier);
 	}
 
 	public void updateActiveAnimation() 

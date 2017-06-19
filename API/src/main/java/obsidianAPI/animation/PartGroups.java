@@ -8,7 +8,7 @@ import java.util.Map.Entry;
 
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import obsidianAPI.Util;
+import obsidianAPI.ObsidianAPIUtil;
 import obsidianAPI.render.ModelObj;
 import obsidianAPI.render.part.Part;
 import obsidianAPI.render.part.PartObj;

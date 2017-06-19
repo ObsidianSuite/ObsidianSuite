@@ -52,7 +52,7 @@ public class EntityAnimationPropertiesClient implements IExtendedEntityPropertie
 		if (activeAnimation == null)
 			frameTime = 0f;
 		else
-			frameTime = Util.getAnimationFrameTime(System.nanoTime(), animationStartTime, 0, activeAnimation.getFPS(), 1.0f);
+			frameTime = ObsidianAPIUtil.getAnimationFrameTime(System.nanoTime(), animationStartTime, 0, activeAnimation.getFPS(), 1.0f);
 	}
 
 	public void setActiveAnimation(ModelAnimated model, String animationName, long animationStartTime, boolean loopAnim, float transitionTime)
@@ -78,9 +78,9 @@ public class EntityAnimationPropertiesClient implements IExtendedEntityPropertie
 			loop = false;
 
 			if(sequence != null)
-				activeAnimation = Util.createTransition(model, sequence.getName(), currentValues, sequence.getPartValuesAtTime(model,0f),transitionTime);
+				activeAnimation = ObsidianAPIUtil.createTransition(model, sequence.getName(), currentValues, sequence.getPartValuesAtTime(model,0f),transitionTime);
 			else
-				activeAnimation = Util.createTransition(model, "idle", currentValues, getOriginalValues(model), transitionTime);
+				activeAnimation = ObsidianAPIUtil.createTransition(model, "idle", currentValues, getOriginalValues(model), transitionTime);
 			onFinished = () ->
 			{
 				onFinished = null;
