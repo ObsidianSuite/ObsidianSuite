@@ -161,12 +161,17 @@ public class TimelineKeyframeController extends TimelineControllerSub
 
 	public void deleteKeyframe()
 	{
-		boolean removed = deleteKeyframe(mainController.timelineGui.selectedPart, (int) getTime());
+		Part selectedPart = mainController.timelineGui.selectedPart;
+		boolean removed = deleteKeyframe(selectedPart, (int) getTime());
 
 		mainController.timelineFrame.repaint();
 
 		if (removed)
 		{
+			if (keyframes.get(selectedPart).isEmpty())
+			{
+				selectedPart.setToOriginalValues();
+			}
 			mainController.setExceptionPart(null);
 			mainController.updateAnimationParts();
 		}
