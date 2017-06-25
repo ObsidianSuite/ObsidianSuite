@@ -1,75 +1,68 @@
 package obsidianAnimator.gui.timeline.swing;
 
-import java.awt.Toolkit;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
-import obsidianAPI.animation.AnimationSequence;
+import com.google.common.collect.Lists;
 import obsidianAnimator.gui.timeline.TimelineController;
+import obsidianAnimator.gui.timeline.changes.AnimationChange;
+
+import java.awt.*;
+import java.util.List;
 
 public class TimelineVersionController extends TimelineControllerSub
 {
 
-	private int animationVersion;
-	private List<AnimationSequence> animationVersions;
+    private int animationVersion = -1;
+    private List<AnimationChange> changes = Lists.newArrayList();
 
-	public TimelineVersionController(TimelineController controller) 
-	{
-		super(controller);
+    public TimelineVersionController(TimelineController controller)
+    {
+        super(controller);
+    }
 
-		animationVersion = 0;
-		animationVersions = new ArrayList<AnimationSequence>();
-	}
+    public void applyChange(AnimationChange change)
+    {
+        while (changes.size() > animationVersion + 1)
+        {
+            changes.remove(changes.size() - 1);
+        }
+        animationVersion++;
 
-	public void updateAnimation(AnimationSequence sequence)
-	{
-		//Remove all animations in front of current animation.
-		//If undo has been called and then changes made, the state that was undone from is now out of sync, so remove it.
-		//Several undo's could have been done together, so remove all in front.
-		Iterator<AnimationSequence> iter = animationVersions.iterator();
-		int i = 0;
-		while(iter.hasNext())
-		{
-			iter.next();
-			if(i > animationVersion)
-				iter.remove();
-			i++;
-		}
-		//Add new version to animation versions and update animationVersion and controller.currentAnimation
-		animationVersions.add(sequence);
-		animationVersion = animationVersions.size() - 1;
-		mainController.currentAnimation = sequence;
+        change.apply(mainController, mainController.currentAnimation);
+        onChange();
 
-		mainController.animationController.onAnimationLengthChange();
-	}
-	
-	public void undo()
-	{
-		if(animationVersion > 0)
-		{
-			animationVersion --;
-			mainController.currentAnimation = animationVersions.get(animationVersion);
-			mainController.keyframeController.loadKeyframes();
-			mainController.setExceptionPart(null);
-			mainController.refresh();
-		}
-		else
-			Toolkit.getDefaultToolkit().beep();
-	}
+        changes.add(change);
+    }
 
-	public void redo()
-	{
-		if(animationVersion < animationVersions.size() - 1)
-		{
-			animationVersion ++;
-			mainController.currentAnimation = animationVersions.get(animationVersion);
-			mainController.keyframeController.loadKeyframes();
-			mainController.setExceptionPart(null);
-			mainController.refresh();
-		}
-		else
-			Toolkit.getDefaultToolkit().beep();
-	}
-	
+    public void undo()
+    {
+        if (animationVersion >= 0)
+        {
+            changes.get(animationVersion).undo(mainController, mainController.currentAnimation);
+            animationVersion--;
+            onChange();
+        } else
+        {
+            Toolkit.getDefaultToolkit().beep();
+        }
+    }
+
+    public void redo()
+    {
+        if (animationVersion < changes.size() - 1 && changes.size() > 0)
+        {
+            changes.get(animationVersion + 1).apply(mainController, mainController.currentAnimation);
+            animationVersion++;
+            onChange();
+        } else
+        {
+            Toolkit.getDefaultToolkit().beep();
+        }
+    }
+
+    private void onChange()
+    {
+        mainController.updateAnimationParts();
+        mainController.setExceptionPart(null);
+        mainController.refresh();
+        mainController.animationController.onAnimationLengthChange();
+    }
 }
