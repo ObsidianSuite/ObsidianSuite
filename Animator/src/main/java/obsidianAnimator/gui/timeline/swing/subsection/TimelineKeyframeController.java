@@ -1,17 +1,17 @@
 package obsidianAnimator.gui.timeline.swing.subsection;
 
-import java.util.*;
-
-import javax.swing.JLayeredPane;
-import javax.swing.JOptionPane;
-
 import com.google.common.collect.Lists;
 import obsidianAPI.animation.AnimationPart;
 import obsidianAPI.render.part.Part;
 import obsidianAnimator.gui.timeline.Keyframe;
 import obsidianAnimator.gui.timeline.TimelineController;
+import obsidianAnimator.gui.timeline.changes.ChangeCreateKeyframe;
+import obsidianAnimator.gui.timeline.changes.ChangeSetValues;
 import obsidianAnimator.gui.timeline.swing.TimelineControllerSub;
 import obsidianAnimator.gui.timeline.swing.component.CopyLabel;
+
+import javax.swing.*;
+import java.util.*;
 
 public class TimelineKeyframeController extends TimelineControllerSub
 {
@@ -75,13 +75,13 @@ public class TimelineKeyframeController extends TimelineControllerSub
 				}
 				if(animpart.isEndPosDifferentToStartPos() || getCurrentAnimation().multiPartSequence(partName))
 				{
-					Keyframe kf = new Keyframe((int) animpart.getEndTime(), mr, animpart.getEndPosition());
+					Keyframe kf = new Keyframe(animpart.getEndTime(), mr, animpart.getEndPosition());
 					partKfs.add(kf);
 				}
 			}
 			else
 			{
-				Keyframe kf = new Keyframe((int) animpart.getEndTime(), mr, animpart.getEndPosition());
+				Keyframe kf = new Keyframe(animpart.getEndTime(), mr, animpart.getEndPosition());
 				partKfs.add(kf);
 			}
 			keyframes.put(mr, partKfs);
@@ -118,16 +118,6 @@ public class TimelineKeyframeController extends TimelineControllerSub
 		return null;
 	}
 
-	public void addKeyframe()
-	{
-		if(mainController.timelineGui.selectedPart != null)
-		{
-			Part part = mainController.timelineGui.selectedPart;
-			Keyframe kf = new Keyframe((int) getTime(), mainController.timelineGui.selectedPart, part.getValues());
-			addKeyframe(kf);
-		}
-	}
-
 	public void addKeyframe(Keyframe kf)
 	{
 		List<Keyframe> partKeyframes = keyframes.get(kf.part);
@@ -144,27 +134,6 @@ public class TimelineKeyframeController extends TimelineControllerSub
 
 		partKeyframes.add(kf);
 		panel.refresthLineColours();
-		mainController.updateAnimationParts();
-	}
-
-	public void deleteKeyframe()
-	{
-		Part selectedPart = mainController.timelineGui.selectedPart;
-		boolean removed = deleteKeyframe(selectedPart, (int) getTime());
-
-		mainController.timelineFrame.repaint();
-
-		if (removed)
-		{
-			if (keyframes.get(selectedPart).isEmpty())
-			{
-				selectedPart.setToOriginalValues();
-			}
-			mainController.setExceptionPart(null);
-			mainController.updateAnimationParts();
-		}
-
-		mainController.refresh();
 	}
 
 	public boolean deleteKeyframe(Part part, int time)
@@ -181,17 +150,24 @@ public class TimelineKeyframeController extends TimelineControllerSub
 
 	public void copyKeyframe(Keyframe kf, Part part, int time)
 	{
-		String partName = kf.part.getName();
+		if (kf.frameTime != time)
+		{
+			String partName = kf.part.getName();
 
-		if((partName.equals("entitypos") || partName.startsWith("prop_rot") || partName.startsWith("prop_trans")) && !partName.equals(part.getName()))
-			JOptionPane.showMessageDialog(mainController.timelineFrame, partName + " can only copy to itself.");
-		else
-			addKeyframe(new Keyframe(time, part, kf.values.clone()));
-	}
-
-	public boolean keyframeExists()
-	{
-		return getExistingKeyframe() != null;
+			if ((partName.equals("entitypos") || partName.startsWith("prop_rot") || partName.startsWith("prop_trans")) && !partName.equals(part.getName()))
+				JOptionPane.showMessageDialog(mainController.timelineFrame, partName + " can only copy to itself.");
+			else
+			{
+				Keyframe keyframe = getKeyframe(part, time);
+				if (keyframe != null)
+				{
+					mainController.versionController.applyChange(new ChangeSetValues(keyframe.values, kf.values, part.getName(), time));
+				} else
+				{
+					mainController.versionController.applyChange(new ChangeCreateKeyframe(part.getName(), time, kf.values));
+				}
+			}
+		}
 	}
 
 	public Keyframe getExistingKeyframe()

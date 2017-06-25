@@ -1,7 +1,5 @@
 package obsidianAnimator.gui.timeline;
 
-import java.io.File;
-
 import net.minecraft.client.Minecraft;
 import obsidianAPI.Util;
 import obsidianAPI.animation.AnimationPart;
@@ -10,17 +8,14 @@ import obsidianAPI.render.part.Part;
 import obsidianAnimator.file.FileHandler;
 import obsidianAnimator.gui.GuiBlack;
 import obsidianAnimator.gui.frames.HomeFrame;
+import obsidianAnimator.gui.timeline.changes.ChangeSetFPS;
 import obsidianAnimator.gui.timeline.swing.TimelineFrame;
 import obsidianAnimator.gui.timeline.swing.TimelineVersionController;
-import obsidianAnimator.gui.timeline.swing.subsection.TimelineAnimationController;
-import obsidianAnimator.gui.timeline.swing.subsection.TimelineInputController;
-import obsidianAnimator.gui.timeline.swing.subsection.TimelineItemController;
-import obsidianAnimator.gui.timeline.swing.subsection.TimelineKeyframeController;
-import obsidianAnimator.gui.timeline.swing.subsection.TimelineMovementController;
-import obsidianAnimator.gui.timeline.swing.subsection.TimelinePartController;
-import obsidianAnimator.gui.timeline.swing.subsection.TimelineRenderController;
+import obsidianAnimator.gui.timeline.swing.subsection.*;
 
-public class TimelineController 
+import java.io.File;
+
+public class TimelineController
 {
 
 	//The Minecraft Gui for the timeline. Contains the entity.
@@ -31,7 +26,7 @@ public class TimelineController
 
 	//Animation
 	public File animationFile;
-	public AnimationSequence currentAnimation;
+	public final AnimationSequence currentAnimation;
 
 	//Controllers
 	public final TimelineAnimationController animationController;
@@ -42,36 +37,36 @@ public class TimelineController
 	public final TimelineInputController inputController;
 	public final TimelineVersionController versionController;
 	public final TimelineKeyframeController keyframeController;
-	
+
 	//Key mapping
 	private TimelineKeyMappings keyMappings;
-	
+
 	//Fields
 	private float time = 0.0F;
 	private Part exceptionPart = null;
 	private float[] copiedValues = null;
-	
+
 	public TimelineController(File animationFile, AnimationSequence animation)
 	{
 		this.currentAnimation = animation;
 		this.animationFile = animationFile;
 
 		timelineGui = new TimelineGui(this);
-		
+
 		animationController = new TimelineAnimationController(this);
 		renderController = new TimelineRenderController(this);
+		keyframeController = new TimelineKeyframeController(this);
 		partController = new TimelinePartController(this);
 		movementController = new TimelineMovementController(this);
 		itemController = new TimelineItemController(this);
 		inputController = new TimelineInputController(this);
 		versionController = new TimelineVersionController(this);
-		keyframeController = new TimelineKeyframeController(this);
-				
+
 		timelineFrame = new TimelineFrame(this);
 		keyframeController.loadKeyframes();
 
-		this.keyMappings = new TimelineKeyMappings(this);		
-		
+		this.keyMappings = new TimelineKeyMappings(this);
+
 		keyframeController.initCopyLabel();
 		updateAnimationParts();
 	}
@@ -79,18 +74,18 @@ public class TimelineController
 	/* ---------------------------------------------------- *
 	 * 				   		General						    *
 	 * ---------------------------------------------------- */
-	
+
 	public void display()
 	{
 		Minecraft.getMinecraft().displayGuiScreen(timelineGui);
 		timelineFrame.setVisible(true);
 	}
-	
+
 	protected void handleMinecraftKey(int key)
 	{
 		keyMappings.handleMinecraftKey(key);
 	}
-	
+
 	public void refresh()
 	{
 		inputController.updatePlayPauseButton();
@@ -98,21 +93,19 @@ public class TimelineController
 		keyframeController.panel.refresthLineColours();
 		movementController.updateEntityMovement();
 		keyframeController.refreshSliderAndTextBox();
-		timelineFrame.repaint();	
+		timelineFrame.repaint();
 	}
 
-	
+
 	public void updateAnimationFPS(int fps)
 	{
-		AnimationSequence sequence = currentAnimation.copy();
-		sequence.setFPS(fps);
-		versionController.updateAnimation(sequence);
-	}
-	
+        versionController.applyChange(new ChangeSetFPS(currentAnimation.getFPS(), fps));
+    }
+
 	public void updateAnimationParts()
 	{
 		//Create new animation object if new version
-		AnimationSequence sequence = currentAnimation.copy();
+		AnimationSequence sequence = currentAnimation;
 		sequence.clearAnimations();
 		//Generate animation from controller.keyframes.
 		for(Part part : keyframeController.getPartsWithKeyframes())
@@ -126,16 +119,17 @@ public class TimelineController
 				}
 				else if(keyframeController.doesPartOnlyHaveOneKeyframe(part))
 				{
-					//Used for parts that only have one keyframe and where that keyframe is at the beginning 
+					//Used for parts that only have one keyframe and where that keyframe is at the beginning
 					//The part will maintain that rotation throughout the whole animation.
 					sequence.addAnimation(new AnimationPart(0, keyframeController.getLastKeyFrameTime(), kf.values, kf.values, part));
 				}
 			}
 		}
-		sequence.setFPS(currentAnimation.getFPS());
-		versionController.updateAnimation(sequence);
+
+		animationController.onAnimationLengthChange();
+		//versionController.updateAnimation(sequence);
 	}
-	
+
 	public void close()
 	{
 		timelineFrame.dispose();
@@ -143,7 +137,7 @@ public class TimelineController
 		Minecraft.getMinecraft().displayGuiScreen(new GuiBlack());
 		new HomeFrame().display();
 	}
-	
+
 	public void onGuiDraw()
 	{
 		if(inputController.isPlaying())
@@ -165,15 +159,15 @@ public class TimelineController
 				}
 			}
 		}
-		
+
 		refresh();
 
 		if(movementController.getEntityMovement() != null && movementController.isMovementActive())
 			movementController.getEntityMovement().moveEntity(getTime(), timelineGui.entityToRender);
-	
+
 		currentAnimation.animateAll(getTime(), timelineGui.entityModel, getExceptionPart() != null ? getExceptionPart().getName() : "");
 	}
-	
+
 	public Part getSelectedPart()
 	{
 		return timelineGui.selectedPart;
@@ -183,13 +177,13 @@ public class TimelineController
 	{
 		return time;
 	}
-	
+
 	public void setTime(float time)
 	{
 		this.time = time;
 	}
 
-	public Part getExceptionPart() 
+	public Part getExceptionPart()
 	{
 		return exceptionPart;
 	}
@@ -199,21 +193,21 @@ public class TimelineController
 		this.exceptionPart = exceptionPart;
 	}
 
-	public float[] getCopiedValues() 
+	public float[] getCopiedValues()
 	{
 		return copiedValues.clone();
 	}
 
-	public void setCopiedValues(float[] copiedValues) 
+	public void setCopiedValues(float[] copiedValues)
 	{
 		this.copiedValues = copiedValues.clone();
 	}
 
-	public void checkFramePartHighlighting() 
+	public void checkFramePartHighlighting()
 	{
 		Part frameHoveredPart = keyframeController.getHoveredPart();
 		if(frameHoveredPart != null)
 			timelineGui.hoveredPart = frameHoveredPart;
 	}
-	
+
 }

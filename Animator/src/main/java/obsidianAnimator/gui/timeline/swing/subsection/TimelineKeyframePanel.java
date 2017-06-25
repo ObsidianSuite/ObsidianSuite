@@ -1,40 +1,21 @@
 package obsidianAnimator.gui.timeline.swing.subsection;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.Rectangle;
-import java.awt.event.AdjustmentEvent;
-import java.awt.event.AdjustmentListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionListener;
-import java.text.DecimalFormat;
-import java.util.Dictionary;
-import java.util.Hashtable;
-import java.util.List;
+import obsidianAPI.render.part.Part;
+import obsidianAnimator.gui.timeline.BlankMouseListener;
+import obsidianAnimator.gui.timeline.Keyframe;
+import obsidianAnimator.gui.timeline.changes.ChangeDeleteKeyFrame;
+import obsidianAnimator.gui.timeline.changes.ChangeMoveKeyframe;
+import obsidianAnimator.gui.timeline.swing.component.CopyLabel;
 
-import javax.swing.BorderFactory;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollBar;
-import javax.swing.JSlider;
-import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.plaf.metal.MetalScrollBarUI;
-
-import obsidianAPI.render.part.Part;
-import obsidianAPI.render.part.PartObj;
-import obsidianAnimator.gui.timeline.BlankMouseListener;
-import obsidianAnimator.gui.timeline.Keyframe;
-import obsidianAnimator.gui.timeline.swing.component.CopyLabel;
+import java.awt.*;
+import java.awt.event.*;
+import java.util.Dictionary;
+import java.util.Hashtable;
+import java.util.List;
 
 public class TimelineKeyframePanel extends JPanel
 {
@@ -355,9 +336,9 @@ public class TimelineKeyframePanel extends JPanel
 						int kfx = timeToX(prevFrameTime);
 						int dx = Math.abs(kfx - e.getX());
 						int t = xToTime(e.getX());
-						if(t >= 0 && t <= 300)
+						if(t >= 0 && t <= 300 && t != prevFrameTime)
 						{
-							closestKeyframe.frameTime = t;
+							controller.mainController.versionController.applyChange(new ChangeMoveKeyframe(closestKeyframe.part.getName(), closestKeyframe.frameTime, t));
 							timeSlider.setValue(t);
 							repaint();
 						}
