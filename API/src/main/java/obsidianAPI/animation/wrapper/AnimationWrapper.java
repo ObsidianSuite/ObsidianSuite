@@ -1,6 +1,10 @@
 package obsidianAPI.animation.wrapper;
 
+import java.io.IOException;
+
+import net.minecraft.util.ResourceLocation;
 import obsidianAPI.animation.AnimationSequence;
+import obsidianAPI.registry.AnimationRegistry;
 
 /**
  * A basic implementation of IAnimationWrapper
@@ -11,6 +15,19 @@ public abstract class AnimationWrapper implements IAnimationWrapper {
 	private final int priority;
 	private final boolean loops;
 	private final float transitionTime;
+	
+	public AnimationWrapper(ResourceLocation resource, int priority, boolean loops, float transitionTime) {
+		try {
+			animation = AnimationRegistry.loadAnimation(resource);
+		} catch (IOException e) {
+			System.out.println("Unable to load animation from " + resource.getResourceDomain() + " " + resource.getResourcePath());
+			e.printStackTrace();
+			animation = null;
+		}
+		this.priority = priority;
+		this.loops = loops;
+		this.transitionTime = transitionTime;
+	}
 	
 	public AnimationWrapper(AnimationSequence animation, int priority, boolean loops, float transitionTime) {
 		this.animation = animation;

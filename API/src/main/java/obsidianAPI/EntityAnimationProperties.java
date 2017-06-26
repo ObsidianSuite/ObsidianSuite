@@ -108,7 +108,7 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
 	}
 	
 	private void setActiveAnimation(AnimationSequence sequence, boolean loopAnim, float transitionTime, boolean sendPacket)
-	{    	
+	{    			
 		if(sequence != null) {
 			activeAnimation = sequence.getName();
 			activeAnimationLength = sequence.getTotalTime();
@@ -137,6 +137,7 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
 		{
 			loop = false;
 			activeAnimation = "transition_" + activeAnimation;
+			activeAnimationLength = transitionTime;
 			onFinished = () ->
 			{
 				onFinished = null;
@@ -211,6 +212,8 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
 					setActiveAnimation(AnimationRegistry.getAnimation(entityName, activeAnimation), true, 0f, false);
 				else if(onFinished != null)
 					onFinished.run();
+				else
+					returnToIdle();
 			}
 		}
 	}

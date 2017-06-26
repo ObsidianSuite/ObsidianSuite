@@ -8,7 +8,7 @@ import net.minecraft.entity.ai.EntityAIBase;
 import net.minecraft.entity.ai.EntityAITasks.EntityAITaskEntry;
 import obsidianAPI.animation.AnimationPart;
 import obsidianAPI.animation.AnimationSequence;
-import obsidianAPI.animation.wrapper.IEntityAIAnimation;
+import obsidianAPI.animation.ai.IEntityAIAnimation;
 import obsidianAPI.animation.wrapper.IEntityAnimated;
 import obsidianAPI.render.ModelObj;
 
@@ -68,7 +68,7 @@ public class ObsidianAPIUtil
 			EntityAIBase task = taskEntry.action;
 			if(task instanceof IEntityAIAnimation) {
 				IEntityAIAnimation animatedTask = (IEntityAIAnimation) task;
-				if(animatedTask.getAIName().equals(AIName))
+				if(animatedTask.getAIName().equals(AIName) && animatedTask.isExecuting())
 					return true;
 			}
 		}
