@@ -1,40 +1,45 @@
 package obsidianAnimations.entity.ai;
 
 import net.minecraft.entity.EntityCreature;
-import net.minecraft.entity.ai.EntityAIBase;
-import obsidianAPI.EntityAnimationProperties;
-import obsidianAPI.animation.wrapper.IEntityAIAnimation;
+import obsidianAPI.animation.ai.EntityAIAnimationBase;
 
-public class EntityAIEat extends EntityAIBase implements IEntityAIAnimation {
+public class EntityAIEat extends EntityAIAnimationBase {
 
 	private EntityCreature entity;
-	private boolean isExecuting;
-	public static final String name = "Eat";
+	public static String name = "Eat";
+	private final int limit = 50;
+	private int counter = 0;
 	
 	public EntityAIEat(EntityCreature entity) {
+		super("Eat");
 		this.entity = entity;
-		this.isExecuting = false;
+		this.setMutexBits(7);
 	}
-
+	
 	@Override
-	public String getAIName() {
-		return name;
+	public void startExecuting() {
+		super.startExecuting();
+		counter = 0;
 	}
-
+	
 	@Override
-	public boolean isExecuting() {
-		return isExecuting;
+	public void resetTask() {
+		super.resetTask();
+		counter = 0;
 	}
 	
 	@Override
 	public boolean shouldExecute() {
-		isExecuting = entity.getRNG().nextInt(50) == 0;
-		return isExecuting;
+		return entity.getRNG().nextInt(50) == 0;
 	}
 	
 	public boolean continueExecuting()
 	{
-		return !EntityAnimationProperties.get(entity).getActiveAnimation().equals("Eat");
+		if(counter < limit) {
+			counter++;
+			return true;
+		}
+		return entity.getRNG().nextInt(200) == 0;
 	}
 
 }

@@ -1,4 +1,4 @@
-package obsidianAPI.animation.wrapper;
+package obsidianAPI.animation.ai;
 
 public interface IEntityAIAnimation {
 

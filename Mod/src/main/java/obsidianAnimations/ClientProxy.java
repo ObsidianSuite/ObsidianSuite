@@ -12,6 +12,9 @@ import obsidianAnimations.entity.RenderDummyPlayer;
 import obsidianAnimations.entity.saiga.EntitySaiga;
 import obsidianAnimations.entity.saiga.ModelSaiga;
 import obsidianAnimations.entity.saiga.RenderSaiga;
+import obsidianAnimations.fnaf.EntityFreddy;
+import obsidianAnimations.fnaf.ModelFreddyObsidian;
+import obsidianAnimations.fnaf.RenderFreddyObsidian;
 
 public class ClientProxy extends CommonProxy
 {	
@@ -20,6 +23,9 @@ public class ClientProxy extends CommonProxy
 	private ResourceLocation obsidianPlayerTextureRL = new ResourceLocation("mod_obsidian_animations:models/ObsidianPlayer.png");
 	private ResourceLocation saigaModelRL = new ResourceLocation("mod_obsidian_animations:models/Saiga.obm");
 	private ResourceLocation saigaTextureRL = new ResourceLocation("mod_obsidian_animations:models/Saiga.png");
+	
+	private ResourceLocation freddyModel = new ResourceLocation("fnafmod:obsidian/models/Freddy.obm");
+	private ResourceLocation freddyTexture = new ResourceLocation("fnafmod:obsidian/models/Freddy.png");
 	
 	public void registerRendering()
 	{
@@ -30,6 +36,9 @@ public class ClientProxy extends CommonProxy
 		RenderingRegistry.registerEntityRenderingHandler(EntityDummyPlayer.class, dummyPlayerRenderer);
 		RenderingRegistry.registerEntityRenderingHandler(EntityPlayer.class, playerRenderer);
 		RenderingRegistry.registerEntityRenderingHandler(EntitySaiga.class, saigaRenderer);
+		
+		 RenderingRegistry.registerEntityRenderingHandler(EntityFreddy.class,
+	        		new RenderFreddyObsidian(FileLoader.loadModelFromResources("Freddy", freddyModel, freddyTexture, ModelFreddyObsidian.class)));
 	}
 }
 

@@ -62,6 +62,22 @@ public class AnimationRegistry
 		return AnimationRegistry.registeredClasses.get(regClass);
 	}
 	
+	public static void registerAnimation(String entityType, String binding, ResourceLocation resource, int priority, boolean loops, IsActiveFunction isActiveFunction)
+	{
+		registerAnimation(entityType, binding, resource, priority, loops, ModelAnimated.DEF_TRANSITION_TIME, isActiveFunction);
+	}
+	
+	
+	public static void registerAnimation(String entityType, String binding, ResourceLocation resource, int priority, boolean loops, float transitionTime, IsActiveFunction isActiveFunction)
+	{
+		try {
+			AnimationSequence seq = loadAnimation(resource);
+			registerAnimation(entityType, binding, new FunctionAnimationWrapper(seq, priority, loops, transitionTime, isActiveFunction));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	/**
 	 * Add an animation for a given entity type.
 	 * The binding parameter is the string used
@@ -74,21 +90,6 @@ public class AnimationRegistry
 			throw new UnregisteredEntityException(entityType);
 		entityMap.get(entityType).registerAnimation(binding, wrapper);
 		wrapper.getAnimation().setName(binding);
-	}
-	
-	public static void registerAnimation(String entityType, String binding, ResourceLocation resource, int priority, boolean loops, float transitionTime, IsActiveFunction isActiveFunction)
-	{
-		try {
-			AnimationSequence seq = loadAnimation(resource);
-			registerAnimation(entityType, binding, new FunctionAnimationWrapper(seq, priority, loops, transitionTime, isActiveFunction));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-	
-	public static void registerAnimation(String entityType, String binding, ResourceLocation resource, int priority, boolean loops, IsActiveFunction isActiveFunction)
-	{
-		registerAnimation(entityType, binding, resource, priority, loops, ModelAnimated.DEF_TRANSITION_TIME, isActiveFunction);
 	}
 	
 	public static AnimationSequence getAnimation(String entityType, String binding)
