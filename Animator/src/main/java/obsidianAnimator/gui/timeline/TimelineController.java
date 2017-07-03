@@ -13,6 +13,7 @@ import obsidianAnimator.gui.timeline.swing.TimelineFrame;
 import obsidianAnimator.gui.timeline.swing.TimelineVersionController;
 import obsidianAnimator.gui.timeline.swing.subsection.*;
 
+import javax.swing.*;
 import java.io.File;
 
 public class TimelineController
@@ -51,6 +52,10 @@ public class TimelineController
 		this.currentAnimation = animation;
 		this.animationFile = animationFile;
 
+		disableSpaceAction("Button");
+		disableSpaceAction("CheckBox");
+		disableSpaceAction("ComboBox");
+
 		timelineGui = new TimelineGui(this);
 
 		animationController = new TimelineAnimationController(this);
@@ -69,6 +74,13 @@ public class TimelineController
 
 		keyframeController.initCopyLabel();
 		updateAnimationParts();
+	}
+
+	private void disableSpaceAction(String control)
+	{
+		InputMap im = (InputMap)UIManager.get(control+".focusInputMap");
+		im.put(KeyStroke.getKeyStroke("pressed SPACE"), "none");
+		im.put(KeyStroke.getKeyStroke("released SPACE"), "none");
 	}
 
 	/* ---------------------------------------------------- *
