@@ -67,7 +67,7 @@ public class TimelineKeyMappings
             Part part = controller.getSelectedPart();
             Keyframe keyframe = controller.keyframeController.getKeyframe(part, time);
 
-            if (keyframe == null)
+            if (keyframe == null && part != null)
             {
                 controller.versionController.applyChange(new ChangeCreateKeyframe(part.getName(), time, part.getValues()));
             }
