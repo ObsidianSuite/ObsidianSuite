@@ -54,7 +54,6 @@ public class TimelineController
 
 		disableSpaceAction("Button");
 		disableSpaceAction("CheckBox");
-		disableSpaceAction("ComboBox");
 
 		timelineGui = new TimelineGui(this);
 
