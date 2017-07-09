@@ -274,6 +274,7 @@ public class TimelineKeyframePanel extends JPanel
 	private class KeyframeLine extends JPanel
 	{		
 		Keyframe closestKeyframe;
+		int dragStartTime;
 		Part part;
 		boolean mouseWithin;
 		boolean keyframeTimeChanged;
@@ -320,6 +321,13 @@ public class TimelineKeyframePanel extends JPanel
 				@Override
 				public void mouseReleased(MouseEvent e) 
 				{
+					if (closestKeyframe != null && dragStartTime != closestKeyframe.frameTime)
+					{
+						int to = closestKeyframe.frameTime;
+						closestKeyframe.frameTime = dragStartTime;
+						controller.mainController.versionController.applyChange(new ChangeMoveKeyframe(closestKeyframe.part.getName(), dragStartTime, to));
+						closestKeyframe = null;
+					}
 					if(keyframeTimeChanged)
 						controller.mainController.updateAnimationParts();
 					keyframeTimeChanged = false;
@@ -338,7 +346,7 @@ public class TimelineKeyframePanel extends JPanel
 						int t = xToTime(e.getX());
 						if(t >= 0 && t <= 300 && t != prevFrameTime)
 						{
-							controller.mainController.versionController.applyChange(new ChangeMoveKeyframe(closestKeyframe.part.getName(), closestKeyframe.frameTime, t));
+							closestKeyframe.frameTime = t;
 							timeSlider.setValue(t);
 							repaint();
 						}
@@ -378,6 +386,10 @@ public class TimelineKeyframePanel extends JPanel
 				}
 			}
 			closestKeyframe = closestKf;
+			if (closestKeyframe != null)
+			{
+				dragStartTime = closestKeyframe.frameTime;
+			}
 		}
 
 		@Override
