@@ -41,7 +41,7 @@ public class EntityAutoMove
 		this.moveY = direction.y;
 		this.moveZ = direction.z;
 		this.fps = fps;
-		this.moveTotal = Math.abs(moveX) + Math.abs(moveY) + Math.abs(moveZ);
+        this.moveTotal = (float) Math.sqrt(moveX * moveX + moveY * moveY + moveZ * moveZ);
 	}
 
 	public void moveEntity(float time, Entity entity)
