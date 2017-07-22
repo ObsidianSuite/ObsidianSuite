@@ -122,16 +122,16 @@ public class AnimationNewFrame extends BaseFrame
 
 	private void chooseFolderPressed()
 	{
-		try
-		{
-			animationFolder = FileChooser.chooseAnimationFolder(frame);
-			String path = animationFolder.getAbsolutePath();
-			locationLabel.setText(path);
-			locationLabel.setToolTipText(path);
-			frame.revalidate();
-			frame.repaint();
-		}
-		catch(FileNotChosenException e){}
+//		try
+//		{
+//			animationFolder = FileChooser.chooseAnimationFolder(frame);
+//			String path = animationFolder.getAbsolutePath();
+//			locationLabel.setText(path);
+//			locationLabel.setToolTipText(path);
+//			frame.revalidate();
+//			frame.repaint();
+//		}
+//		catch(FileNotChosenException e){}
 	}
 
 	private void createPressed()

@@ -30,26 +30,26 @@ public class FileChooser
 	
 	public static File loadAnimationFile(Component parent) throws FileNotChosenException
 	{
-		File animationFile = getLoadLocationFromUser(parent, lastAnimationDirectory, animationFilter, JFileChooser.FILES_ONLY);
+		File animationFile = getFile(parent, lastAnimationDirectory, animationFilter, JFileChooser.FILES_ONLY);
 		lastAnimationDirectory = fc.getCurrentDirectory();
 		return animationFile;
 	}
 	
 	public static File loadImportFile(Component parent, FileNameExtensionFilter filter) throws FileNotChosenException
 	{
-		File modelFile = getLoadLocationFromUser(parent, lastModelDirectory, filter, JFileChooser.FILES_ONLY);
+		File modelFile = getFile(parent, lastModelDirectory, filter, JFileChooser.FILES_ONLY);
 		lastModelDirectory = fc.getCurrentDirectory();
 		return modelFile;
 	}
 	
-	public static File chooseAnimationFolder(Component parentComponent) throws FileNotChosenException
+	public static File saveAnimationFile(Component parentComponent) throws FileNotChosenException
 	{
-		File animationFolder = getLoadLocationFromUser(parentComponent, lastAnimationDirectory, null, JFileChooser.DIRECTORIES_ONLY);
+		File animationFolder = getFile(parentComponent, lastAnimationDirectory, null, JFileChooser.SAVE_DIALOG);
 		lastAnimationDirectory = fc.getCurrentDirectory();
 		return animationFolder;
 	}
 	
-	private static File getLoadLocationFromUser(Component parentComponent, File parentDirectory, FileNameExtensionFilter fileExtensionFilter, int fileSelectionMode) throws FileNotChosenException
+	private static File getFile(Component parentComponent, File parentDirectory, FileNameExtensionFilter fileExtensionFilter, int fileSelectionMode) throws FileNotChosenException
 	{
 		File file = null;
 		
