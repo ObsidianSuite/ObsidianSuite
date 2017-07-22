@@ -30,28 +30,28 @@ public class FileChooser
 	
 	public static File loadAnimationFile(Component parent) throws FileNotChosenException
 	{
-		File animationFile = getFile(parent, lastAnimationDirectory, animationFilter, JFileChooser.FILES_ONLY);
+		File animationFile = getFile(parent, lastAnimationDirectory, animationFilter, JFileChooser.FILES_ONLY, false);
 		lastAnimationDirectory = fc.getCurrentDirectory();
 		return animationFile;
 	}
 	
 	public static File loadImportFile(Component parent, FileNameExtensionFilter filter) throws FileNotChosenException
 	{
-		File modelFile = getFile(parent, lastModelDirectory, filter, JFileChooser.FILES_ONLY);
+		File modelFile = getFile(parent, lastModelDirectory, filter, JFileChooser.FILES_ONLY, false);
 		lastModelDirectory = fc.getCurrentDirectory();
 		return modelFile;
 	}
 	
 	public static File getSaveLocation(Component parentComponent) throws FileNotChosenException
 	{
-		File animationFile = getFile(parentComponent, lastAnimationDirectory, null, JFileChooser.SAVE_DIALOG);
+		File animationFile = getFile(parentComponent, lastAnimationDirectory, animationFilter, JFileChooser.FILES_ONLY, true);
 		if(animationFile == null)
 			throw new FileNotChosenException();
 		lastAnimationDirectory = fc.getCurrentDirectory();
 		return animationFile;
 	}
 	
-	private static File getFile(Component parentComponent, File parentDirectory, FileNameExtensionFilter fileExtensionFilter, int fileSelectionMode) throws FileNotChosenException
+	private static File getFile(Component parentComponent, File parentDirectory, FileNameExtensionFilter fileExtensionFilter, int fileSelectionMode, boolean saveDialog) throws FileNotChosenException
 	{
 		File file = null;
 		
@@ -61,7 +61,11 @@ public class FileChooser
 		fc.setFileFilter(fileExtensionFilter);
 		fc.setFileSelectionMode(fileSelectionMode);
 		
-		int returnVal = fc.showOpenDialog(parentComponent);
+		int returnVal;
+		if(saveDialog)
+			returnVal = fc.showSaveDialog(parentComponent);
+		else
+			returnVal = fc.showOpenDialog(parentComponent);
 		
 		if (returnVal == JFileChooser.APPROVE_OPTION) 
 			file = fc.getSelectedFile();
