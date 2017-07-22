@@ -6,10 +6,13 @@ import obsidianAPI.animation.AnimationPart;
 import obsidianAPI.animation.AnimationSequence;
 import obsidianAPI.file.FileHandler;
 import obsidianAPI.render.part.Part;
+import obsidianAnimator.file.FileChooser;
+import obsidianAnimator.file.FileNotChosenException;
 import obsidianAnimator.gui.GuiBlack;
 import obsidianAnimator.gui.frames.HomeFrame;
 import obsidianAnimator.gui.timeline.changes.ChangeSetFPS;
 import obsidianAnimator.gui.timeline.swing.TimelineFrame;
+import obsidianAnimator.gui.timeline.swing.TimelineMenuBarController;
 import obsidianAnimator.gui.timeline.swing.TimelineVersionController;
 import obsidianAnimator.gui.timeline.swing.subsection.*;
 
@@ -38,6 +41,7 @@ public class TimelineController
 	public final TimelineInputController inputController;
 	public final TimelineVersionController versionController;
 	public final TimelineKeyframeController keyframeController;
+	public final TimelineMenuBarController menubarController;
 
 	//Key mapping
 	private TimelineKeyMappings keyMappings;
@@ -46,6 +50,10 @@ public class TimelineController
 	private float time = 0.0F;
 	private Part exceptionPart = null;
 	private float[] copiedValues = null;
+
+	public TimelineController(AnimationSequence animation) {
+		this(null, animation);
+	}
 
 	public TimelineController(File animationFile, AnimationSequence animation)
 	{
@@ -65,6 +73,7 @@ public class TimelineController
 		itemController = new TimelineItemController(this);
 		inputController = new TimelineInputController(this);
 		versionController = new TimelineVersionController(this);
+		menubarController = new TimelineMenuBarController(this);
 
 		timelineFrame = new TimelineFrame(this);
 		keyframeController.loadKeyframes();
@@ -140,11 +149,38 @@ public class TimelineController
 		animationController.onAnimationLengthChange();
 		//versionController.updateAnimation(sequence);
 	}
+	
+	public void trySaveAs() {
+		//Get file location
+		File file;
+		try {
+			file = FileChooser.getSaveLocation(this.timelineFrame);
+		} catch (FileNotChosenException e) {
+			return;
+		}
+		
+		//Check if overwriting existing file
+		if(file.exists() && (animationFile == null || !file.getAbsolutePath().equals(animationFile.getAbsolutePath()))) {
+			//Prompt overwrite - exit method if don't want to overwrite.
+		}
+		animationFile = file;
+		save();
+	}
+	
+	public boolean isSaveLocationSet() {
+		return animationFile != null;
+	}
+	
+	public void save() {
+		if(!isSaveLocationSet())
+			return;
+		FileHandler.saveAnimationSequence(animationFile, currentAnimation);
+	}
 
 	public void close()
 	{
 		timelineFrame.dispose();
-		FileHandler.saveAnimationSequence(animationFile, currentAnimation);
+		//TODO check if unsaved changes
 		Minecraft.getMinecraft().displayGuiScreen(new GuiBlack());
 		new HomeFrame().display();
 	}

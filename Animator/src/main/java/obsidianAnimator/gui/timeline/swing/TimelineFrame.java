@@ -35,9 +35,9 @@ public class TimelineFrame extends JFrame
 		super("Timeline");
 		this.controller = controller;
 		this.actionsPanel = new ActionPointsPanel(controller);
+		this.setJMenuBar(new TimelineMenuBar(controller.menubarController));
 		
 		mainPanel = new JPanel();
-		this.setJMenuBar(new TimelineMenuBar());
 		mainPanel.add(controller.inputController.panel);
 		mainPanel.add(createRightPane());
 

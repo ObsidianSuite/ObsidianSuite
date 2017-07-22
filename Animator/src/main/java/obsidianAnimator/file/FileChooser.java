@@ -42,11 +42,13 @@ public class FileChooser
 		return modelFile;
 	}
 	
-	public static File saveAnimationFile(Component parentComponent) throws FileNotChosenException
+	public static File getSaveLocation(Component parentComponent) throws FileNotChosenException
 	{
-		File animationFolder = getFile(parentComponent, lastAnimationDirectory, null, JFileChooser.SAVE_DIALOG);
+		File animationFile = getFile(parentComponent, lastAnimationDirectory, null, JFileChooser.SAVE_DIALOG);
+		if(animationFile == null)
+			throw new FileNotChosenException();
 		lastAnimationDirectory = fc.getCurrentDirectory();
-		return animationFolder;
+		return animationFile;
 	}
 	
 	private static File getFile(Component parentComponent, File parentDirectory, FileNameExtensionFilter fileExtensionFilter, int fileSelectionMode) throws FileNotChosenException
