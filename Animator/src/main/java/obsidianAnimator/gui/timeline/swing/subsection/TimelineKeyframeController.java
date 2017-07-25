@@ -246,4 +246,8 @@ public class TimelineKeyframeController extends TimelineControllerSub
 		return frames == null ? Collections.emptyList() : frames;
 	}
 
+	public Map<Part, List<Keyframe>> getKeyframes()
+	{
+		return keyframes;
+	}
 }
