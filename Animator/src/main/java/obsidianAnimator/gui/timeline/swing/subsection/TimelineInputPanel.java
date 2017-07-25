@@ -1,5 +1,6 @@
 package obsidianAnimator.gui.timeline.swing.subsection;
 
+import obsidianAnimator.gui.timeline.changes.ChangeMirror;
 import obsidianAnimator.gui.timeline.changes.ChangeReverse;
 
 import java.awt.GridBagConstraints;
@@ -59,9 +60,6 @@ public class TimelineInputPanel extends JPanel
 			}
 		});
 
-		JButton reverseButton = new JButton("Reverse");
-		reverseButton.addActionListener(e -> controller.mainController.versionController.applyChange(new ChangeReverse()));
-
 		setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
 		c.fill = GridBagConstraints.BOTH;
@@ -80,11 +78,8 @@ public class TimelineInputPanel extends JPanel
 		add(renderPanel,c);
 		c.gridy = 5;
 		add(itemPanel,c);
-		c.gridy = 6;
-		c.insets = new Insets(2,5,5,5);
-		add(reverseButton,c);
 		c.insets = new Insets(2,5,10,5);
-		c.gridy = 7;
+		c.gridy = 6;
 		add(backButton,c);
 	}
 	

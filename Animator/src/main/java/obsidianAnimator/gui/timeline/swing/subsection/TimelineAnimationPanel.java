@@ -1,29 +1,24 @@
 package obsidianAnimator.gui.timeline.swing.subsection;
 
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
+import obsidianAnimator.gui.timeline.changes.ChangeMirror;
+import obsidianAnimator.gui.timeline.changes.ChangeReverse;
+
+import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JSlider;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
 public class TimelineAnimationPanel extends JPanel
 {
-	
+
 	public JLabel lengthFrameLabel;
 	public JLabel lengthSecondsLabel;
 	public JLabel fpsLabel;
 
 	public TimelineAnimationPanel(TimelineAnimationController controller)
-	{		
+	{
 		lengthFrameLabel = new JLabel();
 		lengthSecondsLabel = new JLabel();
 		fpsLabel = new JLabel(controller.getFPS() + " FPS");
@@ -32,7 +27,7 @@ public class TimelineAnimationPanel extends JPanel
 		fpsButton.addActionListener(new ActionListener()
 		{
 			@Override
-			public void actionPerformed(ActionEvent e) 
+			public void actionPerformed(ActionEvent e)
 			{
 				controller.getUserFPS();
 			}
@@ -58,11 +53,17 @@ public class TimelineAnimationPanel extends JPanel
 		resetButton.addActionListener(new ActionListener()
 		{
 			@Override
-			public void actionPerformed(ActionEvent e) 
+			public void actionPerformed(ActionEvent e)
 			{
 				slider.setValue(100);
 			}
 		});
+
+		JButton reverseButton = new JButton("Reverse");
+		reverseButton.addActionListener(e -> controller.mainController.versionController.applyChange(new ChangeReverse()));
+
+		JButton mirrorButton = new JButton("Mirror");
+		mirrorButton.addActionListener(e -> controller.mainController.versionController.applyChange(new ChangeMirror()));
 
 		setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
@@ -96,7 +97,13 @@ public class TimelineAnimationPanel extends JPanel
 		c.gridx = 1;
 		add(resetButton,c);
 
+        c.gridy = 4;
+        c.gridx = 0;
+        add(reverseButton, c);
+        c.gridx = 1;
+        add(mirrorButton, c);
+
 		setBorder(BorderFactory.createTitledBorder("Animation"));
 	}
-	
+
 }
