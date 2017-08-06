@@ -1,23 +1,36 @@
 package obsidianAnimator.gui.timeline;
 
+import java.io.File;
+
+import javax.swing.InputMap;
+import javax.swing.JOptionPane;
+import javax.swing.KeyStroke;
+import javax.swing.UIManager;
+
 import net.minecraft.client.Minecraft;
 import obsidianAPI.ObsidianAPIUtil;
 import obsidianAPI.animation.AnimationPart;
 import obsidianAPI.animation.AnimationSequence;
 import obsidianAPI.file.FileHandler;
 import obsidianAPI.render.part.Part;
+import obsidianAnimator.data.ModelHandler;
 import obsidianAnimator.file.FileChooser;
 import obsidianAnimator.file.FileNotChosenException;
 import obsidianAnimator.gui.GuiBlack;
+import obsidianAnimator.gui.frames.AnimationNewFrame;
+import obsidianAnimator.gui.frames.BaseFrame;
 import obsidianAnimator.gui.frames.HomeFrame;
 import obsidianAnimator.gui.timeline.changes.ChangeSetFPS;
 import obsidianAnimator.gui.timeline.swing.TimelineFrame;
 import obsidianAnimator.gui.timeline.swing.TimelineMenuBarController;
 import obsidianAnimator.gui.timeline.swing.TimelineVersionController;
-import obsidianAnimator.gui.timeline.swing.subsection.*;
-
-import javax.swing.*;
-import java.io.File;
+import obsidianAnimator.gui.timeline.swing.subsection.TimelineAnimationController;
+import obsidianAnimator.gui.timeline.swing.subsection.TimelineInputController;
+import obsidianAnimator.gui.timeline.swing.subsection.TimelineItemController;
+import obsidianAnimator.gui.timeline.swing.subsection.TimelineKeyframeController;
+import obsidianAnimator.gui.timeline.swing.subsection.TimelineMovementController;
+import obsidianAnimator.gui.timeline.swing.subsection.TimelinePartController;
+import obsidianAnimator.gui.timeline.swing.subsection.TimelineRenderController;
 
 public class TimelineController
 {
@@ -159,11 +172,21 @@ public class TimelineController
 			return;
 		}
 		
+		//Ensure extension is correct.
+        String fileName = file.getName();
+        if(fileName.contains("."))
+            fileName = fileName.substring(0, fileName.indexOf("."));
+        fileName += "." + FileHandler.animationExtension;
+        file = new File(file.getParentFile(), fileName);
+		
 		//Check if overwriting existing file
 		if(file.exists() && (animationFile == null || !file.getAbsolutePath().equals(animationFile.getAbsolutePath()))) {
 			//Prompt overwrite - exit method if don't want to overwrite.
+			if(JOptionPane.showConfirmDialog(timelineFrame, "A file already exists with this name.\n Overwrite?", "Overwrite File", JOptionPane.YES_NO_OPTION) == 1)
+				return;
 		}
-		animationFile = file;
+
+		animationFile = new File(file.getParentFile(), fileName);
 		save();
 	}
 	
@@ -173,16 +196,45 @@ public class TimelineController
 	
 	public void save() {
 		if(!isSaveLocationSet())
-			return;
-		FileHandler.saveAnimationSequence(animationFile, currentAnimation);
+			trySaveAs();
+		
+		String animationName = animationFile.getName().substring(0, animationFile.getName().indexOf("."));
+		currentAnimation.setName(animationName);
+		
+	    FileHandler.saveAnimationSequence(animationFile, currentAnimation);
 	}
 
-	public void close()
+	public void openAnimationNewFrame() {
+		close(new AnimationNewFrame());
+	}
+	
+	public void openAnimationChooser() {
+		try
+		{
+			File animationFile = FileChooser.loadAnimationFile(timelineFrame);
+			AnimationSequence sequence = FileHandler.getAnimationFromFile(animationFile);
+			if(ModelHandler.isModelImported(sequence.getEntityName()))
+			{
+				close(null);
+				new TimelineController(animationFile, sequence).display();
+			}
+			else
+				JOptionPane.showMessageDialog(timelineFrame, "You must import the " + sequence.getEntityName() + " model first.");
+		}
+		catch(FileNotChosenException e){}
+	}
+	
+	public void close() {
+		close(new HomeFrame());
+	}
+	
+	public void close(BaseFrame frameToShow)
 	{
-		timelineFrame.dispose();
 		//TODO check if unsaved changes
+		timelineFrame.dispose();
 		Minecraft.getMinecraft().displayGuiScreen(new GuiBlack());
-		new HomeFrame().display();
+		if(frameToShow != null)
+			frameToShow.display();
 	}
 
 	public void onGuiDraw()

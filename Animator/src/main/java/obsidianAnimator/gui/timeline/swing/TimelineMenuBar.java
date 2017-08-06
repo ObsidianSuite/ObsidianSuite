@@ -29,6 +29,12 @@ public class TimelineMenuBar extends JMenuBar {
 	
 	private JMenu createFileMenu() {
 		JMenu fileMenu = new JMenu("File");
+		fileMenu.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                refresh();
+            }
+		});
 		save = createCustomMenuItem("Save", controller.savePressed);
 		fileMenu.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 		
@@ -51,6 +57,7 @@ public class TimelineMenuBar extends JMenuBar {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				action.run();
+				refresh();
 			}
 		});
 		return menuItem;

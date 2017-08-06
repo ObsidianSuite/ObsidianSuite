@@ -21,141 +21,72 @@ import obsidianAnimator.file.FileNotChosenException;
 import obsidianAnimator.gui.timeline.TimelineGui;
 import obsidianAnimator.gui.timeline.TimelineController;
 
-public class AnimationNewFrame extends BaseFrame
-{
+public class AnimationNewFrame extends BaseFrame {
 
-	private JComboBox<String> entityDropDown;
-	private JTextField nameTextField;
-	private JLabel locationLabel;
+    private JComboBox<String> entityDropDown;
+    private String[] entites = ModelHandler.getModelList().toArray(new String[0]);
 
-	private String[] entites = ModelHandler.getModelList().toArray(new String[0]);
+    public AnimationNewFrame() {
+        super("New Animation");
+        addComponents();
+    }
 
-	private File animationFolder;
+    @Override
+    protected void addComponents() {
+        entityDropDown = new JComboBox<String>(entites);
+        entityDropDown.setPreferredSize(new Dimension(100, 25));
 
-	public AnimationNewFrame()
-	{
-		super("New Animation");
-		addComponents();
-	}
+        JButton create = new JButton("Create");
+        create.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                createPressed();
+            }
+        });
 
-	@Override
-	protected void addComponents()
-	{
-		entityDropDown = new JComboBox<String>(entites);
-		nameTextField = new JTextField();
-		locationLabel = new JLabel("No location set");
+        JButton cancel = new JButton("Cancel");
+        cancel.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                cancelPressed();
+            }
+        });
 
-		entityDropDown.setPreferredSize(new Dimension(100,25));
-		locationLabel.setPreferredSize(new Dimension(100,25));
+        // create.setPreferredSize(chooseFolder.getPreferredSize());
 
-		JButton chooseFolder = new JButton("Choose folder");
-		chooseFolder.addActionListener(new ActionListener() 
-		{	
-			@Override
-			public void actionPerformed(ActionEvent e) 
-			{
-				chooseFolderPressed();
-			}
-		});
+        GridBagConstraints c = new GridBagConstraints();
+        c.gridx = 0;
+        c.gridy = 0;
+        c.gridheight = 1;
+        c.gridwidth = 2;
+        c.anchor = GridBagConstraints.WEST;
+        c.fill = GridBagConstraints.BOTH;
+        c.insets = new Insets(2, 5, 2, 5);
 
-		JButton create = new JButton("Create");
-		create.addActionListener(new ActionListener()
-		{
-			@Override
-			public void actionPerformed(ActionEvent e) 
-			{
-				createPressed();
-			}
-		});
+        // Entity
+        mainPanel.add(new JLabel("Entity"), c);
+        c.gridy = 1;
+        mainPanel.add(entityDropDown, c);
 
-		JButton cancel = new JButton("Cancel");
-		cancel.addActionListener(new ActionListener()
-		{
-			@Override
-			public void actionPerformed(ActionEvent e) 
-			{
-				cancelPressed();
-			}
-		});
+        // Buttons
+        c.gridwidth = 1;
+        c.gridy = 2;
+        mainPanel.add(create, c);
+        c.gridx = 1;
+        mainPanel.add(cancel, c);
 
-		create.setPreferredSize(chooseFolder.getPreferredSize());
+    }
 
-		GridBagConstraints c = new GridBagConstraints();
-		c.gridx = 0;
-		c.gridy = 0;
-		c.gridheight = 1;
-		c.gridwidth = 2;
-		c.anchor = GridBagConstraints.WEST;
-		c.fill = GridBagConstraints.BOTH;
-		c.insets = new Insets(2,5,2,5);
+    private void createPressed() {
+        String entityName = (String) entityDropDown.getSelectedItem();
+        AnimationSequence sequence = new AnimationSequence(entityName, "new_animation");
+        frame.dispose();
+        new TimelineController(sequence).display();
+    }
 
-		//Entity
-		mainPanel.add(new JLabel("Entity"),c);
-		c.gridy = 1;
-		mainPanel.add(entityDropDown, c);
-
-		//Folder location
-		c.gridy = 2;
-		mainPanel.add(new JLabel("Location"), c);
-		c.gridwidth = 1;
-		c.gridy = 3;
-		mainPanel.add(locationLabel, c);
-		c.gridx = 1;
-		mainPanel.add(chooseFolder, c);
-
-		//Animation name
-		c.gridx = 0;
-		c.gridy = 4;
-		c.gridwidth = 2;
-		mainPanel.add(new JLabel("Name"),c);
-		c.gridy = 5;
-		mainPanel.add(nameTextField, c);
-
-		//Buttons
-		c.gridwidth = 1;
-		c.gridy = 6;
-		mainPanel.add(create,c);
-		c.gridx = 1;
-		mainPanel.add(cancel,c);
-
-	}
-
-	private void chooseFolderPressed()
-	{
-//		try
-//		{
-//			animationFolder = FileChooser.chooseAnimationFolder(frame);
-//			String path = animationFolder.getAbsolutePath();
-//			locationLabel.setText(path);
-//			locationLabel.setToolTipText(path);
-//			frame.revalidate();
-//			frame.repaint();
-//		}
-//		catch(FileNotChosenException e){}
-	}
-
-	private void createPressed()
-	{
-		String animationName = nameTextField.getText();
-		String entityName = (String) entityDropDown.getSelectedItem();
-		if(!animationName.equals(""))
-		{
-			File animationFile = new File(animationFolder, animationName + "." + FileHandler.animationExtension);
-			if(!animationFile.exists())
-			{
-				AnimationSequence sequence = new AnimationSequence(entityName, animationName);
-				frame.dispose();
-				new TimelineController(animationFile, sequence).display();
-			}
-			else
-				JOptionPane.showMessageDialog(frame, "An animation with that name already exists.");
-		}
-	}
-
-	private void cancelPressed()
-	{
-		frame.dispose();
-		new HomeFrame().display();
-	}
+    private void cancelPressed() {
+        frame.dispose();
+        new HomeFrame().display();
+    }
 
 }

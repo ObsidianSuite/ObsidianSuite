@@ -17,14 +17,14 @@ public class TimelineMenuBarController {
 	public final Runnable newPressed = new Runnable() {
 		@Override
 		public void run() {
-
+			mainController.openAnimationNewFrame();
 		}
 	};
 	
 	public final Runnable openPressed = new Runnable() {
 		@Override
 		public void run() {
-
+			mainController.openAnimationChooser();
 		}
 	};
 	
@@ -45,7 +45,7 @@ public class TimelineMenuBarController {
 	public final Runnable exitPressed = new Runnable() {
 		@Override
 		public void run() {
-
+			mainController.close();
 		}
 	};
 	
