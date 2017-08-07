@@ -52,18 +52,15 @@ public class EntitySetupController
 			int n = JOptionPane.showOptionDialog(frame, child.getDisplayName() + " already has a parent.", "Parenting issue",
 					JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE,null,options,options[0]);
 			if(n == 1)
-			{
-				getEntityModel().setParent(child, null, false);
-				refresh();
-			}
+				parent(null,child,false);
 		}
 		else
-			parent(parent, child);
+			parent(parent, child, false);
 	}
 
-	private void parent(PartObj parent, PartObj child)
+	private void parent(PartObj parent, PartObj child, boolean bend)
 	{
-		getEntityModel().setParent(child, parent, false);
+		getEntityModel().setParent(child, parent, bend);
 		refresh();
 	}
 	

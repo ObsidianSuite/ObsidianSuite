@@ -3,11 +3,14 @@ package obsidianAPI.render;
 import java.io.DataInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Nullable;
 
+import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.NBTTagString;
 import org.lwjgl.opengl.GL11;
 
 import com.google.common.collect.Maps;
@@ -34,11 +37,11 @@ import obsidianAPI.render.part.prop.PartPropTranslation;
 
 public class ModelObj extends ModelBase {
 
-	private ResourceLocation texture;
-	public final WavefrontObject obj;
 	public final String entityName;
-	public ArrayList<Part> parts;
-	protected ArrayList<Bend> bends = new ArrayList<Bend>();
+	public final WavefrontObject obj;
+	private ResourceLocation texture;
+	public List<Part> parts;
+	protected List<Bend> bends = new ArrayList<Bend>();
 	public PartGroups partGroups;
 	private Map<PartObj, float[]> defaults;
 
@@ -127,22 +130,26 @@ public class ModelObj extends ModelBase {
 		return partObjs;
 	}
 
-	public String getPartOrderAsString() {
-		String s = "";
-		for (PartObj p : getPartObjs()) {
-			s = s + p.getName() + ",";
+	public NBTTagList getPartOrderAsList()
+	{
+		NBTTagList list = new NBTTagList();
+		for(PartObj p : getPartObjs())
+		{
+			list.appendTag(new NBTTagString(p.getName()));
 		}
-		s = s.substring(0, s.length() - 1);
-		return s;
+		return list;
 	}
 
-	public void setPartOrderFromString(String order) {
+	public void setPartOrderFromList(NBTTagList order)
+	{
 		ArrayList<Part> newPartList = new ArrayList<Part>();
-		for (String partName : order.split(",")) {
-			newPartList.add(getPartFromName(partName));
+		for (int i = 0; i < order.tagCount(); i++)
+		{
+			newPartList.add(getPartFromName(order.getStringTagAt(i)));
 		}
-		for (Part part : parts) {
-			if (!newPartList.contains(part))
+		for(Part part : parts)
+		{
+			if(!newPartList.contains(part))
 				newPartList.add(part);
 		}
 		parts = newPartList;
