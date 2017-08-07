@@ -12,11 +12,14 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Nullable;
 
+import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.NBTTagString;
 import org.lwjgl.opengl.GL11;
 
 import com.google.common.collect.Maps;
@@ -46,7 +49,7 @@ public class ModelObj extends ModelBase
 
 	public final String entityName;
 	public WavefrontObject model;
-	public ArrayList<Part> parts;
+	public List<Part> parts;
 	protected ArrayList<Bend> bends = new ArrayList<Bend>();
 	public PartGroups partGroups;
 	private Map<PartObj, float[]> defaults;
@@ -55,19 +58,19 @@ public class ModelObj extends ModelBase
 	public static final float offsetFixY = -1.5F;
 
 	private final ResourceLocation txtRL;
-	
+
 	public ModelObj(String entityName, ResourceLocation modelLocation, ResourceLocation textureLocation)
 	{
 		this(entityName, null, modelLocation, textureLocation);
 	}
-	
+
 	public ModelObj(String entityName, File modelFile, ResourceLocation textureLocation)
-	{			
+	{
 		this(entityName, modelFile, null, textureLocation);
 	}
-	
+
 	protected ModelObj(String entityName, File modelFile, ResourceLocation modelLocation, ResourceLocation textureLocation)
-	{			
+	{
 		this.entityName = entityName;
 		defaults = Maps.newHashMap();
 		txtRL = textureLocation;
@@ -83,7 +86,7 @@ public class ModelObj extends ModelBase
 		return txtRL;
 	}
 
-	public void init() 
+	public void init()
 	{
 		for(Part p : this.parts)
 		{
@@ -96,44 +99,44 @@ public class ModelObj extends ModelBase
 				arr[2] = obj.getRotationPoint(2);
 				defaults.put(obj, arr);
 			}
-		}		
+		}
 	}
 
 	public float[] getDefaults(PartObj part)
 	{
 		return defaults.get(part).clone();
 	}
-	
+
 	private void load(ResourceLocation modelLocation)
 	{
-		try 
+		try
 		{
 			load(Minecraft.getMinecraft().getResourceManager().getResource(modelLocation).getInputStream());
-		} 
-		catch (IOException e) 
+		}
+		catch (IOException e)
 		{
 			e.printStackTrace();
-		}  
-	}
-	
-	private void load(File modelFile)
-	{
-		try 
-		{
-			load(new FileInputStream(modelFile));
-		} 
-		catch (IOException e) 
-		{
-			e.printStackTrace();
-		}  
+		}
 	}
 
-	private void load(InputStream stream) 
+	private void load(File modelFile)
 	{
-		try 
+		try
+		{
+			load(new FileInputStream(modelFile));
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
+	}
+
+	private void load(InputStream stream)
+	{
+		try
 		{
 			BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
-			
+
 			String nbtData = "";
 			String modelData = "";
 			String partData = "";
@@ -141,7 +144,7 @@ public class ModelObj extends ModelBase
 			int targetString = 0;
 			String currentLine = "";
 			while((currentLine = reader.readLine()) != null)
-			{				
+			{
 				if(currentLine.contains("# Model #"))
 					targetString = 1;
 				else if(currentLine.contains("# Part #"))
@@ -156,10 +159,10 @@ public class ModelObj extends ModelBase
 					}
 				}
 			}
-			
+
 			loadModel(modelData);
 			loadAdditionalPartData(partData);
-			
+
 			//Only load setup if it exists - it won't if file is fresh from Blender.
 			if(!nbtData.equals(""))
 			{
@@ -167,23 +170,23 @@ public class ModelObj extends ModelBase
 				File tmp = new File("tmp");
 				if(!tmp.exists())
 					tmp.createNewFile();
-				
+
 				FileWriter fw = new FileWriter(tmp);
 				BufferedWriter bw = new BufferedWriter(fw);
 				bw.write(nbtData);
 				bw.close();
 				fw.close();
-				
+
 				loadSetup(CompressedStreamTools.read(tmp));
-				
-				tmp.delete();				
+
+				tmp.delete();
 			}
 			reader.close();
-		} 
-		catch (FileNotFoundException e) {e.printStackTrace();} 
+		}
+		catch (FileNotFoundException e) {e.printStackTrace();}
 		catch (IOException e) {e.printStackTrace();}
 	}
-	
+
 	private void loadModel(String modelData) throws ModelFormatException, UnsupportedEncodingException
 	{
 		model = new WavefrontObject(this.entityName, new ByteArrayInputStream(modelData.getBytes("UTF-8")));
@@ -201,7 +204,7 @@ public class ModelObj extends ModelBase
 		}
 		partGroups = new PartGroups(this);
 	}
-	
+
 	private void loadAdditionalPartData(String partData)
 	{
 		PartObj currentPart = null;
@@ -217,7 +220,7 @@ public class ModelObj extends ModelBase
 			{
 				switch(i)
 				{
-				case 0: 
+				case 0:
 					for(Part p : parts)
 					{
 						if(p instanceof PartObj)
@@ -246,9 +249,9 @@ public class ModelObj extends ModelBase
 			}
 		}
 	}
-	
+
 	private void loadSetup(NBTTagCompound nbt)
-	{		
+	{
 		AnimationParenting.loadData(nbt.getCompoundTag("Parenting"), this);
 		partGroups.loadData(nbt.getCompoundTag("Groups"), this);
 	}
@@ -268,23 +271,22 @@ public class ModelObj extends ModelBase
 		return partObjs;
 	}
 
-	public String getPartOrderAsString()
+	public NBTTagList getPartOrderAsList()
 	{
-		String s = "";
+		NBTTagList list = new NBTTagList();
 		for(PartObj p : getPartObjs())
 		{
-			s = s + p.getName() + ",";
+			list.appendTag(new NBTTagString(p.getName()));
 		}
-		s = s.substring(0, s.length() - 1);
-		return s;
+		return list;
 	}
 
-	public void setPartOrderFromString(String order)
+	public void setPartOrderFromList(NBTTagList order)
 	{
 		ArrayList<Part> newPartList = new ArrayList<Part>();
-		for(String partName : order.split(","))
+		for (int i = 0; i < order.tagCount(); i++)
 		{
-			newPartList.add(getPartFromName(partName));
+			newPartList.add(getPartFromName(order.getStringTagAt(i)));
 		}
 		for(Part part : parts)
 		{
@@ -353,8 +355,8 @@ public class ModelObj extends ModelBase
 		model.rotateAngleZ = z;
 	}
 
-	public void setRotationAngles(float f, float f1, float f2, float f3, float f4, float f5, Entity entity) 
-	{				
+	public void setRotationAngles(float f, float f1, float f2, float f3, float f4, float f5, Entity entity)
+	{
 		super.setRotationAngles(f, f1, f2, f3, f4, f5, entity);
 	}
 
@@ -363,17 +365,17 @@ public class ModelObj extends ModelBase
 	//----------------------------------------------------------------
 
 	@Override
-	public void render(Entity entity, float time, float distance, float loop, float lookY, float lookX, float scale) 
-	{		
+	public void render(Entity entity, float time, float distance, float loop, float lookY, float lookX, float scale)
+	{
 		super.render(entity, time, distance, loop, lookY, lookX, scale);
 
 		setRotationAngles(time, distance, loop, lookY, lookX, scale, entity);
-		
+
 		GL11.glPushMatrix();
 		GL11.glRotatef(initRotFix, 1.0F, 0.0F, 0.0F);
 		GL11.glTranslatef(0.0F, offsetFixY, 0.0F);
 
-		for(Part p : this.parts) 
+		for(Part p : this.parts)
 		{
 			if(p instanceof PartObj)
 			{
@@ -428,7 +430,7 @@ public class ModelObj extends ModelBase
 	{
 		return new PartObj(this, group);
 	}
-	
+
 	public NBTTagCompound createNBTTag()
 	{
 		NBTTagCompound nbt = new NBTTagCompound();
@@ -436,8 +438,8 @@ public class ModelObj extends ModelBase
 		nbt.setTag("Groups", partGroups.getSaveData());
 		return nbt;
 	}
-	
-	public Part getPartFromName(String name) 
+
+	public Part getPartFromName(String name)
 	{
 		for(Part part : parts)
 		{
@@ -448,8 +450,8 @@ public class ModelObj extends ModelBase
 		}
 		throw new RuntimeException("No part found for '" + name + "'");
 	}
-	
-	public PartObj getPartObjFromName(String name) 
+
+	public PartObj getPartObjFromName(String name)
 	{
 		for(Part p : parts)
 		{

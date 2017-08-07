@@ -1,17 +1,17 @@
 package obsidianAPI.animation;
 
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
+import net.minecraftforge.common.util.Constants;
+import obsidianAPI.render.ModelObj;
+import obsidianAPI.render.part.Part;
+import obsidianAPI.render.part.PartObj;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
-import obsidianAPI.Util;
-import obsidianAPI.render.ModelObj;
-import obsidianAPI.render.part.Part;
-import obsidianAPI.render.part.PartObj;
 
 /**
  * Parts can be grouped together, eg upper and lower arm -> arm.
@@ -120,9 +120,13 @@ public class PartGroups
 		if(currentPos == model.parts.size() - 1 && change > 0)
 			flag = false;
 		if(flag)
-		{				
-			model.parts.remove(part);
-			model.parts.add(currentPos + change, part);
+		{
+			List<Part> parts = model.parts;
+			synchronized ( parts )
+			{
+				model.parts.remove(part);
+				model.parts.add(currentPos + change, part);
+			}
 		}
 	}
 
@@ -139,14 +143,15 @@ public class PartGroups
 			partList.appendTag(partCompound);
 		}
 		nbtToReturn.setTag("Groups", partList);
-		nbtToReturn.setString("PartOrder", model.getPartOrderAsString());
+		nbtToReturn.setTag("PartOrder", model.getPartOrderAsList());
 		return nbtToReturn;
 	}
 
 	public void loadData(NBTTagCompound compound, ModelObj model) 
 	{	
 		NBTTagList partList = compound.getTagList("Groups", 10);
-		model.setPartOrderFromString(compound.getString("PartOrder"));
+		if (compound.hasKey("PartOrder", Constants.NBT.TAG_LIST))
+			model.setPartOrderFromList(compound.getTagList("PartOrder", Constants.NBT.TAG_STRING));
 		for (int i = 0; i < partList.tagCount(); i++)
 		{
 			NBTTagCompound partCompound = partList.getCompoundTagAt(i);

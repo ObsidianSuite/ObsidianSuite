@@ -230,7 +230,7 @@ public class EntitySetupPartPanel extends JPanel
 		partPanels = newOrder;
 		removePartPanels();
 		addPartPanels();
-		partPanel.revalidate();
+		partMainPanel.revalidate();
 	}
 
 	/**
