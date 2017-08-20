@@ -172,10 +172,6 @@ public class AnimationSequence
 	 * Sets all the parts of a model to their rotation at a given time.
 	 * The part with name = exceptionPartName will not be rotated.
 	 */
-	/**
-	 * Sets all the parts of a model to their rotation at a given time.
-	 * The part with name = exceptionPartName will not be rotated.
-	 */
 	public void animateAll(float time, ModelObj entityModel, String exceptionPartName)
 	{
 		for(Part part : entityModel.parts)
