@@ -48,16 +48,19 @@ public class ModelObj_Animator extends ModelObj
 	{
 		PartObj closestPart = null;
 		Double min = null;
-		for(Part part : parts)
+		synchronized ( parts )
 		{
-			if(part instanceof PartObj_Animator)
+			for (Part part : parts)
 			{
-				PartObj_Animator p = (PartObj_Animator) part;
-				Double d = p.testRay();
-				if(d != null && (min == null || d < min))
+				if (part instanceof PartObj_Animator)
 				{
-					closestPart = p;
-					min = d;
+					PartObj_Animator p = (PartObj_Animator) part;
+					Double d = p.testRay();
+					if (d != null && (min == null || d < min))
+					{
+						closestPart = p;
+						min = d;
+					}
 				}
 			}
 		}

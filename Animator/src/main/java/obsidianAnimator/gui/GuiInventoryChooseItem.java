@@ -5,22 +5,25 @@ import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.item.ItemStack;
+import obsidianAnimator.data.ModelHandler;
 import obsidianAnimator.gui.timeline.swing.subsection.TimelineItemController;
 import obsidianAnimator.render.entity.EntityObj;
 
 @SideOnly(Side.CLIENT)
 public class GuiInventoryChooseItem extends GuiInventory
 {
-    
-	private TimelineItemController controller;
+
+    private final boolean leftHand;
+    private TimelineItemController controller;
 	private EntityObj entity;
-	
-    public GuiInventoryChooseItem(TimelineItemController controller, EntityObj entity)
+
+    public GuiInventoryChooseItem(boolean leftHand, TimelineItemController controller, EntityObj entity)
     {
         super(Minecraft.getMinecraft().thePlayer);
         this.allowUserInput = true;
         this.controller = controller;
         this.entity = entity;
+        this.leftHand = leftHand;
     }
     
     /**
@@ -42,7 +45,10 @@ public class GuiInventoryChooseItem extends GuiInventory
     
     public void setItemStack(ItemStack itemStack)
     {
-    	this.entity.setCurrentItem(itemStack); 
+        if (leftHand)
+            ModelHandler.modelRenderer.setLeftItem(itemStack);
+        else
+    	    this.entity.setCurrentItem(itemStack);
     	controller.display();
     }
 	

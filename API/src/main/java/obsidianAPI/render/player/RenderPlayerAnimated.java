@@ -19,9 +19,9 @@ public class RenderPlayerAnimated extends RenderPlayer implements IRenderAnimate
 	}
 	
 	@Override
-	protected ResourceLocation getEntityTexture(Entity p_110775_1_) 
+	protected ResourceLocation getEntityTexture(Entity entity) 
 	{
-		return modelAnimatedPlayer.getTexture();
+		return modelAnimatedPlayer.getTexture(entity);
 	}
 
 	@Override

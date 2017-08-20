@@ -1,5 +1,8 @@
 package obsidianAnimator.gui.timeline.swing.subsection;
 
+import obsidianAnimator.gui.timeline.changes.ChangeMirror;
+import obsidianAnimator.gui.timeline.changes.ChangeReverse;
+
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -75,8 +78,8 @@ public class TimelineInputPanel extends JPanel
 		add(renderPanel,c);
 		c.gridy = 5;
 		add(itemPanel,c);
-		c.gridy = 6;
 		c.insets = new Insets(2,5,10,5);
+		c.gridy = 6;
 		add(backButton,c);
 	}
 	

@@ -1,5 +1,6 @@
 package obsidianAnimator.render;
 
+import net.minecraft.entity.Entity;
 import net.minecraftforge.client.model.obj.Face;
 import net.minecraftforge.client.model.obj.Vertex;
 import obsidianAPI.render.bend.Bend;
@@ -85,7 +86,8 @@ public class Bend_Animator extends Bend
         return min;
     }
 
-    public void render()
+    @Override
+    public void render(Entity entity)
     {
         GL11.glPushMatrix();
 
@@ -104,7 +106,7 @@ public class Bend_Animator extends Bend
                 mainHighlight = i < bendSplit / 2 ? parentModel.isMainHighlight(parent) : childModel.isMainHighlight(child);
                 otherHighlight = i < bendSplit / 2 ? parentModel.isPartHighlighted(parent) : childModel.isPartHighlighted(child);
             }
-            part.updateTextureCoordinates(mainHighlight, otherHighlight, parent.modelObj);
+            part.updateTextureCoordinates(entity, mainHighlight, otherHighlight, parent.modelObj);
             part.render();
         }
         GL11.glPopMatrix();
