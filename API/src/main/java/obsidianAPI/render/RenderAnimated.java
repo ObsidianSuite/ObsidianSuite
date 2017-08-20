@@ -21,9 +21,9 @@ public class RenderAnimated extends RenderLiving implements IRenderAnimated
 	}
 	
 	@Override
-	protected ResourceLocation getEntityTexture(Entity p_110775_1_) 
+	protected ResourceLocation getEntityTexture(Entity entity) 
 	{
-		return model.getTexture();
+		return model.getTexture(entity);
 	}
 
 }

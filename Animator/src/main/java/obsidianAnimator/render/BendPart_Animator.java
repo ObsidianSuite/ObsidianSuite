@@ -1,6 +1,7 @@
 package obsidianAnimator.render;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.obj.Face;
 import net.minecraftforge.client.model.obj.TextureCoordinate;
@@ -20,7 +21,8 @@ public class BendPart_Animator extends BendPart
     /**
      * Change the texture coordinates and texture if the part is highlighted.
      */
-    public void updateTextureCoordinates(boolean mainHighlight, boolean otherHighlight, ModelObj modelObj)
+    @Override
+    public void updateTextureCoordinates(Entity entity, boolean mainHighlight, boolean otherHighlight, ModelObj modelObj)
     {
         boolean useHighlightCoords = true;
         ResourceLocation texture;
@@ -34,7 +36,7 @@ public class BendPart_Animator extends BendPart
             texture = ModelObj_Animator.whiteResLoc;
         else
         {
-            texture = modelObj.getTexture();
+            texture = modelObj.getTexture(entity);
             useHighlightCoords = false;
         }
 

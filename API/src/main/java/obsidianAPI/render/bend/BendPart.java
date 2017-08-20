@@ -1,6 +1,7 @@
 package obsidianAPI.render.bend;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.obj.Face;
 import net.minecraftforge.client.model.obj.GroupObject;
@@ -95,11 +96,11 @@ public class BendPart extends GroupObject
     /**
      * Change the texture coordinates and texture if the part is highlighted.
      */
-    public void updateTextureCoordinates(boolean mainHighlight, boolean otherHighlight, ModelObj modelObj)
+    public void updateTextureCoordinates(Entity entity, boolean mainHighlight, boolean otherHighlight, ModelObj modelObj)
     {
         ResourceLocation texture;
 
-        texture = modelObj.getTexture();
+        texture = modelObj.getTexture(entity);
 
         Minecraft.getMinecraft().getTextureManager().bindTexture(texture);
 
