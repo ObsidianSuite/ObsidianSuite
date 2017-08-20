@@ -37,8 +37,10 @@ public class ClientProxy extends CommonProxy
 		RenderingRegistry.registerEntityRenderingHandler(EntityPlayer.class, playerRenderer);
 		RenderingRegistry.registerEntityRenderingHandler(EntitySaiga.class, saigaRenderer);
 		
-		 RenderingRegistry.registerEntityRenderingHandler(EntityFreddy.class,
-	        		new RenderFreddyObsidian(FileLoader.loadModelFromResources("Freddy", freddyModel, freddyTexture, ModelFreddyObsidian.class)));
+		ModelFreddyObsidian modelFreddy = FileLoader.loadModelFromResources("Freddy", freddyModel, freddyTexture, ModelFreddyObsidian.class);
+		modelFreddy.setModelScale(0.1F);
+		RenderFreddyObsidian renderFreddy = new RenderFreddyObsidian(modelFreddy);
+		RenderingRegistry.registerEntityRenderingHandler(EntityFreddy.class,renderFreddy);
 	}
 }
 

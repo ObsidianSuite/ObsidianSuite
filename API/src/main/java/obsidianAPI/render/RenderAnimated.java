@@ -9,6 +9,11 @@ public class RenderAnimated extends RenderLiving implements IRenderAnimated
 
 	private ModelAnimated model;
 	
+	public RenderAnimated(ModelAnimated model)
+	{
+		this(model, 1.0F);
+	}
+	
 	public RenderAnimated(ModelAnimated model, float shadowSize)
 	{
 		super(model, shadowSize);
