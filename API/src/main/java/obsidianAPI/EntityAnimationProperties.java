@@ -66,10 +66,6 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
 
 	@Override
 	public void loadNBTData(NBTTagCompound compound) {}
-
-	public String getActiveAnimation() {
-		return activeAnimation;
-	}
 	
 	private void updateFrameTime()
 	{
@@ -253,9 +249,21 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
 	public static EntityAnimationProperties get(Entity e) {
 		return (EntityAnimationProperties) e.getExtendedProperties(EXT_PROP_NAME);
 	}
+	
+	public String getActiveAnimation() {
+		return activeAnimation;
+	}
 
 	public String getEntityName() {
 		return entityName;
+	}
+	
+	public long getAnimationStartTime() {
+		return animationStartTime;
+	}
+	
+	public boolean getLoopAnim() {
+		return this.loop;
 	}
 
 }
