@@ -7,7 +7,7 @@ public class RenderDummyPlayer extends RenderAnimated
 		
 	public RenderDummyPlayer(ModelDummyPlayer player)
 	{
-		super(player);
+		super(player, 1.0F);
 	}
 
 }

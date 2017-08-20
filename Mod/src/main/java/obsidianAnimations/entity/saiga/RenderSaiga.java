@@ -7,7 +7,7 @@ public class RenderSaiga extends RenderAnimated
 		
 	public RenderSaiga(ModelSaiga saiga)
 	{
-		super(saiga);
+		super(saiga, 0.8F);
 	}
 
 }

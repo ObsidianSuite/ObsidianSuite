@@ -3,14 +3,11 @@ package obsidianAPI.render;
 import java.io.DataInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Nullable;
 
-import net.minecraft.nbt.NBTTagList;
-import net.minecraft.nbt.NBTTagString;
 import org.lwjgl.opengl.GL11;
 
 import com.google.common.collect.Maps;
@@ -20,13 +17,15 @@ import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.NBTTagString;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.obj.GroupObject;
 import net.minecraftforge.client.model.obj.WavefrontObject;
 import obsidianAPI.animation.AnimationParenting;
 import obsidianAPI.animation.PartGroups;
+import obsidianAPI.animation.wrapper.IEntityAnimated;
 import obsidianAPI.file.PartData;
-import obsidianAPI.file.importer.FileLoader;
 import obsidianAPI.render.bend.Bend;
 import obsidianAPI.render.part.Part;
 import obsidianAPI.render.part.PartEntityPos;
@@ -299,7 +298,14 @@ public class ModelObj extends ModelBase {
 		GL11.glPushMatrix();
 		GL11.glRotatef(initRotFix, 1.0F, 0.0F, 0.0F);
 		GL11.glTranslatef(0.0F, offsetFixY, 0.0F);
-
+		
+		if(entity instanceof IEntityAnimated) {
+			float modelScale = ((IEntityAnimated) entity).getModelScale();
+			GL11.glScalef(modelScale, modelScale, modelScale);
+		}
+			
+		
+		
 		for (Part p : this.parts) {
 			if (p instanceof PartObj) {
 				PartObj part = (PartObj) p;

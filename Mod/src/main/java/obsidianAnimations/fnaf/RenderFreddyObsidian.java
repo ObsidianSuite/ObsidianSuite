@@ -6,6 +6,6 @@ import obsidianAPI.render.RenderAnimated;
 public class RenderFreddyObsidian extends RenderAnimated {
 
 	public RenderFreddyObsidian(ModelAnimated model) {
-		super(model);
+		super(model, 0.0F);
 	}
 }

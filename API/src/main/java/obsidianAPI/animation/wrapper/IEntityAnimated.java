@@ -7,4 +7,6 @@ public interface IEntityAnimated {
 	
 	public boolean isMoving();
 	
+	public float getModelScale();
+	
 }
