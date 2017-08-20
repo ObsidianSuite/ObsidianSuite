@@ -2,6 +2,7 @@ package obsidianAPI;
 
 import java.util.Map;
 
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.ai.EntityAIBase;
@@ -73,5 +74,9 @@ public class ObsidianAPIUtil
 			}
 		}
 		return false;
+	}
+	
+	public static boolean isAnimatedEntity(Entity entity) {
+		return entity != null ? EntityAnimationProperties.get(entity) != null : false;
 	}
 }

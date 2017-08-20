@@ -45,15 +45,6 @@ public class ModelAnimatedPlayer extends ModelAnimated
 		if(entity.isSneaking())
 			head.setValue(head.getValue(0) - 0.7F, 0);
 		
-		
-		
-		
-		
-		
-		
-		
-		
-		
 //		EntityAnimationProperties animProps = (EntityAnimationProperties) entity.getExtendedProperties("Animation");
 //		if (animProps == null)
 //			GuiDebug.instance.animationText = "null";
@@ -111,7 +102,8 @@ public class ModelAnimatedPlayer extends ModelAnimated
 	
 	@Override
 	protected void doDefaultAnimations(float swingTime, float swingMax, float clock, float lookX, float lookY, float f5, Entity entity) {
-
+		super.doDefaultAnimations(swingTime, swingMax, clock, lookX, lookY, f5, entity);
+		
 		//Walking - swing time changing.
 		armUpR.setValue(MathHelper.cos(swingTime * 0.6662F + (float)Math.PI) * 2.0F * swingMax * 0.5F, 0);
 		armUpL.setValue(MathHelper.cos(swingTime * 0.6662F) * 2.0F * swingMax * 0.5F, 0);
