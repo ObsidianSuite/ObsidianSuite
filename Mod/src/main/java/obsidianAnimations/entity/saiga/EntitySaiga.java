@@ -38,6 +38,11 @@ public class EntitySaiga extends EntityCreature implements IEntityAnimated
 	public boolean isMoving() {
 		return limbSwingAmount > 0.02F;
 	}
+
+	@Override
+	public float getModelScale() {
+		return 1.0f;
+	}
 	
 }
 
