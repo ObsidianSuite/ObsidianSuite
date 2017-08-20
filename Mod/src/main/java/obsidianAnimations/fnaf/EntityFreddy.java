@@ -107,10 +107,5 @@ public class EntityFreddy extends EntityMob implements IEntityAnimated {
 	public boolean isMoving() {
 		return limbSwingAmount > 0.02;
 	}
-
-	@Override
-	public float getModelScale() {
-		return 0.5F;
-	}
 	
 }

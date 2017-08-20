@@ -43,14 +43,20 @@ public class ModelObj extends ModelBase {
 	protected List<Bend> bends = new ArrayList<Bend>();
 	public PartGroups partGroups;
 	private Map<PartObj, float[]> defaults;
-
+	private float modelScale;
+	
 	public static final float initRotFix = 180.0F;
 	public static final float offsetFixY = -1.5F;
 
 	public ModelObj(String entityName, WavefrontObject obj, ResourceLocation texture) {
+		this(entityName, obj, texture, 1.0F);
+	}
+	
+	public ModelObj(String entityName, WavefrontObject obj, ResourceLocation texture, float modelScale) {
 		this.entityName = entityName;
 		this.obj = obj;
 		this.texture = texture;
+		this.modelScale = modelScale;
 		defaults = Maps.newHashMap();
 		loadObj(obj);
 		init();
@@ -114,6 +120,14 @@ public class ModelObj extends ModelBase {
 			parts.add(new PartPropScale(this, "prop_scale_l"));
 		}
 		partGroups = new PartGroups(this);
+	}
+	
+	public float getModelScale() {
+		return modelScale;
+	}
+	
+	public void setModelScale(float modelScale) {
+		this.modelScale = modelScale;
 	}
 
 	// ----------------------------------------------------------------
@@ -298,13 +312,7 @@ public class ModelObj extends ModelBase {
 		GL11.glPushMatrix();
 		GL11.glRotatef(initRotFix, 1.0F, 0.0F, 0.0F);
 		GL11.glTranslatef(0.0F, offsetFixY, 0.0F);
-		
-		if(entity instanceof IEntityAnimated) {
-			float modelScale = ((IEntityAnimated) entity).getModelScale();
-			GL11.glScalef(modelScale, modelScale, modelScale);
-		}
-			
-		
+		GL11.glScalef(modelScale, modelScale, modelScale);
 		
 		for (Part p : this.parts) {
 			if (p instanceof PartObj) {
