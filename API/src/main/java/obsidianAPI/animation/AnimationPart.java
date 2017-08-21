@@ -1,16 +1,14 @@
 package obsidianAPI.animation;
 
-import net.minecraft.nbt.NBTBase;
-import net.minecraft.nbt.NBTTagCompound;
-import obsidianAPI.Quaternion;
-import obsidianAPI.ObsidianAPIUtil;
-import obsidianAPI.render.part.Part;
-import obsidianAPI.render.part.PartObj;
-import obsidianAPI.render.part.PartRotation;
-
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
+
+import net.minecraft.nbt.NBTBase;
+import net.minecraft.nbt.NBTTagCompound;
+import obsidianAPI.Quaternion;
+import obsidianAPI.render.part.Part;
+import obsidianAPI.render.part.PartRotation;
 
 /**
  * A section of an animation for a specific part.
