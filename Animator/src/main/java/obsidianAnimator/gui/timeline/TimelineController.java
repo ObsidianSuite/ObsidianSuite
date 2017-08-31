@@ -166,10 +166,13 @@ public class TimelineController
 	}
 	
 	public void trySaveAs() {
+		
+		String suggestedFileName = !currentAnimation.getName().equals("New") ? currentAnimation.getName() + "." + FileHandler.animationExtension : null;
+		
 		//Get file location
 		File file;
 		try {
-			file = FileChooser.getAnimationSaveLocation(this.timelineFrame);
+			file = FileChooser.getAnimationSaveLocation(this.timelineFrame, suggestedFileName);
 		} catch (FileNotChosenException e) {
 			return;
 		}

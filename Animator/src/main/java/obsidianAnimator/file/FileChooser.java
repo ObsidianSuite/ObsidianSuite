@@ -42,18 +42,18 @@ public class FileChooser
 		return modelFile;
 	}
 	
-	public static File getAnimationSaveLocation(Component parentComponent) throws FileNotChosenException
+	public static File getAnimationSaveLocation(Component parentComponent, String suggestedFileName) throws FileNotChosenException
 	{
-		File animationFile = getFile(parentComponent, lastAnimationDirectory, animationFilter, JFileChooser.FILES_ONLY, true, null);
+		File animationFile = getFile(parentComponent, lastAnimationDirectory, animationFilter, JFileChooser.FILES_ONLY, true, suggestedFileName);
 		if(animationFile == null)
 			throw new FileNotChosenException();
 		lastAnimationDirectory = fc.getCurrentDirectory();
 		return animationFile;
 	}
 	
-	public static File getModelSaveLocation(Component parentComponent, String modelFileName) throws FileNotChosenException
+	public static File getModelSaveLocation(Component parentComponent, String suggestedFileName) throws FileNotChosenException
 	{
-		File modelFile = getFile(parentComponent, lastModelDirectory, obsidianModelFilter, JFileChooser.FILES_ONLY, true, modelFileName);
+		File modelFile = getFile(parentComponent, lastModelDirectory, obsidianModelFilter, JFileChooser.FILES_ONLY, true, suggestedFileName);
 		if(modelFile == null)
 			throw new FileNotChosenException();
 		lastModelDirectory = fc.getCurrentDirectory();
