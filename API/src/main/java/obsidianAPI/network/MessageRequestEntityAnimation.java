@@ -39,15 +39,11 @@ public class MessageRequestEntityAnimation implements IMessage {
 
 		@Override
 		public IMessage onMessage(MessageRequestEntityAnimation message, MessageContext ctx) {
-			System.out.println("Animation request recieved for " + message.entityID);
 			Entity entity = ctx.getServerHandler().playerEntity.worldObj.getEntityByID(message.entityID);
-			System.out.println("Entity found: " + entity);
 			if(ObsidianAPIUtil.isAnimatedEntity(entity)) {
 				EntityAnimationProperties animationProps = EntityAnimationProperties.get(entity);
-				if(animationProps != null) {
-					System.out.println("Sending animation for " + entity.getClass());
+				if(animationProps != null)
 					return new MessageAnimationStart(entity, animationProps.getActiveAnimation(), animationProps.getAnimationStartTime(), animationProps.getLoopAnim(), 0.0F);
-				}					
 			}
 			return null;
 		}
