@@ -79,7 +79,7 @@ public class AnimationNewFrame extends BaseFrame {
 
     private void createPressed() {
         String entityName = (String) entityDropDown.getSelectedItem();
-        AnimationSequence sequence = new AnimationSequence(entityName, "new_animation");
+        AnimationSequence sequence = new AnimationSequence(entityName, "New");
         frame.dispose();
         new TimelineController(sequence).display();
     }
