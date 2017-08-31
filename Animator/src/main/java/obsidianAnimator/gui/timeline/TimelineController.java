@@ -44,6 +44,7 @@ public class TimelineController
 	//Animation
 	public File animationFile;
 	public final AnimationSequence currentAnimation;
+	public boolean unsaved = false;
 
 	//Controllers
 	public final TimelineAnimationController animationController;
@@ -89,6 +90,7 @@ public class TimelineController
 		menubarController = new TimelineMenuBarController(this);
 
 		timelineFrame = new TimelineFrame(this);
+		timelineFrame.setTitle(currentAnimation.getName());
 		keyframeController.loadKeyframes();
 
 		this.keyMappings = new TimelineKeyMappings(this);
@@ -200,7 +202,8 @@ public class TimelineController
 		
 		String animationName = animationFile.getName().substring(0, animationFile.getName().indexOf("."));
 		currentAnimation.setName(animationName);
-		
+		timelineFrame.setTitle(animationName);
+		setUnsaved(false);
 	    FileHandler.saveAnimationSequence(animationFile, currentAnimation);
 	}
 
@@ -209,6 +212,8 @@ public class TimelineController
 	}
 	
 	public void openAnimationChooser() {
+		if(!checkSaved())
+			return;
 		try
 		{
 			File animationFile = FileChooser.loadAnimationFile(timelineFrame);
@@ -230,13 +235,27 @@ public class TimelineController
 	
 	public void close(BaseFrame frameToShow)
 	{
-		//TODO check if unsaved changes
+		if(!checkSaved()) 
+			return;
+		
 		timelineFrame.dispose();
 		Minecraft.getMinecraft().displayGuiScreen(new GuiBlack());
 		if(frameToShow != null)
-			frameToShow.display();
+			frameToShow.display();			
 	}
 
+	public void setUnsaved(boolean unsaved) {
+		this.unsaved = unsaved;
+		if(unsaved)
+			timelineFrame.setTitle(currentAnimation.getName() + "*");
+		else
+			timelineFrame.setTitle(currentAnimation.getName());
+	}
+	
+	public boolean checkSaved() {
+		return !unsaved || JOptionPane.showConfirmDialog(timelineFrame, "You have unsaved changes.\n Continue?", "Unsaved Changes", JOptionPane.YES_NO_OPTION) == 0;
+	}
+	
 	public void onGuiDraw()
 	{
 		if(inputController.isPlaying())
