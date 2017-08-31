@@ -24,7 +24,7 @@ public class ModelListFrame extends BaseFrame
 {
 	
 	private JList list;
-	private JButton editButton;
+	private JButton editButton, exportButton;
 	
 	public ModelListFrame()
 	{
@@ -41,13 +41,14 @@ public class ModelListFrame extends BaseFrame
 			@Override
 			public void valueChanged(ListSelectionEvent e) {
 				editButton.setEnabled(((JList)e.getSource()).getSelectedValue() != null);
+				exportButton.setEnabled(((JList)e.getSource()).getSelectedValue() != null);
 			}
 		});
 
 		JScrollPane listScroller = new JScrollPane(list);
 		listScroller.setPreferredSize(new Dimension(280, 150));
 		
-		editButton = new JButton("Edit model");
+		editButton = new JButton("Edit");
 		editButton.setEnabled(false);
 		editButton.addActionListener(new ActionListener()
 		{
@@ -55,6 +56,17 @@ public class ModelListFrame extends BaseFrame
 			public void actionPerformed(ActionEvent e) 
 			{
 				editPressed();
+			}
+		});
+		
+		exportButton = new JButton("Export");
+		exportButton.setEnabled(false);
+		exportButton.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent e) 
+			{
+				exportPressed();
 			}
 		});
 		
@@ -74,7 +86,7 @@ public class ModelListFrame extends BaseFrame
 		c.insets = new Insets(5,5,5,5);
 		c.weightx = 1;
 		
-		c.gridwidth = 2;
+		c.gridwidth = 3;
 		mainPanel.add(listScroller,c);
 		
 		c.fill = GridBagConstraints.BOTH;
@@ -82,6 +94,8 @@ public class ModelListFrame extends BaseFrame
 		c.gridy = 1;
 		mainPanel.add(editButton, c);
 		c.gridx = 1;
+		mainPanel.add(exportButton, c);
+		c.gridx = 2;
 		mainPanel.add(backButton, c);
 	}
 	
@@ -94,6 +108,11 @@ public class ModelListFrame extends BaseFrame
 			frame.dispose();
 			new EntitySetupController(entityName).display();
 		}	
+	}
+	
+	private void exportPressed() 
+	{
+			
 	}
 	
 	private void backPressed()
