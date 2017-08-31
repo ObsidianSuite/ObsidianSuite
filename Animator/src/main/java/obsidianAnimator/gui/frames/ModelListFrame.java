@@ -117,9 +117,12 @@ public class ModelListFrame extends BaseFrame
 	
 	private void exportPressed() 
 	{
+		String entityName = (String) list.getSelectedValue();
+		String suggestedFileName = entityName + "." + FileHandler.obsidianModelExtension;
+		
 		File copy;
 		try {
-			copy = FileChooser.getModelSaveLocation(frame);
+			copy = FileChooser.getModelSaveLocation(frame, suggestedFileName);
 		} catch (FileNotChosenException e) {
 			return;
 		}
@@ -138,8 +141,7 @@ public class ModelListFrame extends BaseFrame
 				return;
 		}
 		
-		String entityName = (String) list.getSelectedValue();
-		File file = new File(FileHandler.modelFolder, entityName + "." + FileHandler.obsidianModelExtension);
+		File file = new File(FileHandler.modelFolder, suggestedFileName);
 		try {
 			org.apache.commons.io.FileUtils.copyFile(file, copy);
 		} catch (IOException e) {
