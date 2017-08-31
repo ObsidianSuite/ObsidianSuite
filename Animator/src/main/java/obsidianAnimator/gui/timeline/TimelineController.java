@@ -1,20 +1,36 @@
 package obsidianAnimator.gui.timeline;
 
+import java.io.File;
+
+import javax.swing.InputMap;
+import javax.swing.JOptionPane;
+import javax.swing.KeyStroke;
+import javax.swing.UIManager;
+
 import net.minecraft.client.Minecraft;
 import obsidianAPI.ObsidianAPIUtil;
 import obsidianAPI.animation.AnimationPart;
 import obsidianAPI.animation.AnimationSequence;
 import obsidianAPI.file.FileHandler;
 import obsidianAPI.render.part.Part;
+import obsidianAnimator.data.ModelHandler;
+import obsidianAnimator.file.FileChooser;
+import obsidianAnimator.file.FileNotChosenException;
 import obsidianAnimator.gui.GuiBlack;
+import obsidianAnimator.gui.frames.AnimationNewFrame;
+import obsidianAnimator.gui.frames.BaseFrame;
 import obsidianAnimator.gui.frames.HomeFrame;
 import obsidianAnimator.gui.timeline.changes.ChangeSetFPS;
 import obsidianAnimator.gui.timeline.swing.TimelineFrame;
+import obsidianAnimator.gui.timeline.swing.TimelineMenuBarController;
 import obsidianAnimator.gui.timeline.swing.TimelineVersionController;
-import obsidianAnimator.gui.timeline.swing.subsection.*;
-
-import javax.swing.*;
-import java.io.File;
+import obsidianAnimator.gui.timeline.swing.subsection.TimelineAnimationController;
+import obsidianAnimator.gui.timeline.swing.subsection.TimelineInputController;
+import obsidianAnimator.gui.timeline.swing.subsection.TimelineItemController;
+import obsidianAnimator.gui.timeline.swing.subsection.TimelineKeyframeController;
+import obsidianAnimator.gui.timeline.swing.subsection.TimelineMovementController;
+import obsidianAnimator.gui.timeline.swing.subsection.TimelinePartController;
+import obsidianAnimator.gui.timeline.swing.subsection.TimelineRenderController;
 
 public class TimelineController
 {
@@ -28,6 +44,7 @@ public class TimelineController
 	//Animation
 	public File animationFile;
 	public final AnimationSequence currentAnimation;
+	public boolean unsaved = false;
 
 	//Controllers
 	public final TimelineAnimationController animationController;
@@ -38,6 +55,7 @@ public class TimelineController
 	public final TimelineInputController inputController;
 	public final TimelineVersionController versionController;
 	public final TimelineKeyframeController keyframeController;
+	public final TimelineMenuBarController menubarController;
 
 	//Key mapping
 	private TimelineKeyMappings keyMappings;
@@ -46,6 +64,10 @@ public class TimelineController
 	private float time = 0.0F;
 	private Part exceptionPart = null;
 	private float[] copiedValues = null;
+
+	public TimelineController(AnimationSequence animation) {
+		this(null, animation);
+	}
 
 	public TimelineController(File animationFile, AnimationSequence animation)
 	{
@@ -65,8 +87,10 @@ public class TimelineController
 		itemController = new TimelineItemController(this);
 		inputController = new TimelineInputController(this);
 		versionController = new TimelineVersionController(this);
+		menubarController = new TimelineMenuBarController(this);
 
 		timelineFrame = new TimelineFrame(this);
+		timelineFrame.setTitle(currentAnimation.getName());
 		keyframeController.loadKeyframes();
 
 		this.keyMappings = new TimelineKeyMappings(this);
@@ -140,15 +164,98 @@ public class TimelineController
 		animationController.onAnimationLengthChange();
 		//versionController.updateAnimation(sequence);
 	}
+	
+	public void trySaveAs() {
+		//Get file location
+		File file;
+		try {
+			file = FileChooser.getSaveLocation(this.timelineFrame);
+		} catch (FileNotChosenException e) {
+			return;
+		}
+		
+		//Ensure extension is correct.
+        String fileName = file.getName();
+        if(fileName.contains("."))
+            fileName = fileName.substring(0, fileName.indexOf("."));
+        fileName += "." + FileHandler.animationExtension;
+        file = new File(file.getParentFile(), fileName);
+		
+		//Check if overwriting existing file
+		if(file.exists() && (animationFile == null || !file.getAbsolutePath().equals(animationFile.getAbsolutePath()))) {
+			//Prompt overwrite - exit method if don't want to overwrite.
+			if(JOptionPane.showConfirmDialog(timelineFrame, "A file already exists with this name.\n Overwrite?", "Overwrite File", JOptionPane.YES_NO_OPTION) == 1)
+				return;
+		}
 
-	public void close()
-	{
-		timelineFrame.dispose();
-		FileHandler.saveAnimationSequence(animationFile, currentAnimation);
-		Minecraft.getMinecraft().displayGuiScreen(new GuiBlack());
-		new HomeFrame().display();
+		animationFile = new File(file.getParentFile(), fileName);
+		save();
+	}
+	
+	public boolean isSaveLocationSet() {
+		return animationFile != null;
+	}
+	
+	public void save() {
+		if(!isSaveLocationSet())
+			trySaveAs();
+		
+		String animationName = animationFile.getName().substring(0, animationFile.getName().indexOf("."));
+		currentAnimation.setName(animationName);
+		timelineFrame.setTitle(animationName);
+		setUnsaved(false);
+	    FileHandler.saveAnimationSequence(animationFile, currentAnimation);
 	}
 
+	public void openAnimationNewFrame() {
+		close(new AnimationNewFrame());
+	}
+	
+	public void openAnimationChooser() {
+		if(!checkSaved())
+			return;
+		try
+		{
+			File animationFile = FileChooser.loadAnimationFile(timelineFrame);
+			AnimationSequence sequence = FileHandler.getAnimationFromFile(animationFile);
+			if(ModelHandler.isModelImported(sequence.getEntityName()))
+			{
+				close(null);
+				new TimelineController(animationFile, sequence).display();
+			}
+			else
+				JOptionPane.showMessageDialog(timelineFrame, "You must import the " + sequence.getEntityName() + " model first.");
+		}
+		catch(FileNotChosenException e){}
+	}
+	
+	public void close() {
+		close(new HomeFrame());
+	}
+	
+	public void close(BaseFrame frameToShow)
+	{
+		if(!checkSaved()) 
+			return;
+		
+		timelineFrame.dispose();
+		Minecraft.getMinecraft().displayGuiScreen(new GuiBlack());
+		if(frameToShow != null)
+			frameToShow.display();			
+	}
+
+	public void setUnsaved(boolean unsaved) {
+		this.unsaved = unsaved;
+		if(unsaved)
+			timelineFrame.setTitle(currentAnimation.getName() + "*");
+		else
+			timelineFrame.setTitle(currentAnimation.getName());
+	}
+	
+	public boolean checkSaved() {
+		return !unsaved || JOptionPane.showConfirmDialog(timelineFrame, "You have unsaved changes.\n Continue?", "Unsaved Changes", JOptionPane.YES_NO_OPTION) == 0;
+	}
+	
 	public void onGuiDraw()
 	{
 		if(inputController.isPlaying())

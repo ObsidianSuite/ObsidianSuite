@@ -62,6 +62,7 @@ public class TimelineVersionController extends TimelineControllerSub
     {
         mainController.updateAnimationParts();
         mainController.setExceptionPart(null);
+        mainController.setUnsaved(true);
         mainController.refresh();
         mainController.animationController.onAnimationLengthChange();
     }

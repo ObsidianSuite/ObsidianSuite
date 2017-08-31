@@ -52,6 +52,8 @@ public class FileHandler
 	{
 		try 
 		{
+		    if(!animationFile.exists())
+	            animationFile.createNewFile();
 			CompressedStreamTools.writeCompressed(sequence.getSaveData(), new FileOutputStream(animationFile));
 		} 
 		catch (FileNotFoundException e) {e.printStackTrace();}

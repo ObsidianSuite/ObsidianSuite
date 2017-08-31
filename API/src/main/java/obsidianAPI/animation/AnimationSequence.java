@@ -25,7 +25,7 @@ public class AnimationSequence
 	private final Map<Integer, Set<String>> actionPoints = Maps.newHashMap();
 	private int fps;
 	private String entityName;
-
+	
 	public AnimationSequence(String entityName, String animationName)
 	{
 		this.entityName = entityName;

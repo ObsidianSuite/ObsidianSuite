@@ -80,10 +80,5 @@ public class TimelineInputController extends TimelineControllerSub {
 	{
 		return mainController.itemController.panel;
 	}
-
-	public void close() 
-	{
-		mainController.close();
-	}
 	
 }

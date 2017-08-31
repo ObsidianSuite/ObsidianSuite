@@ -50,16 +50,6 @@ public class TimelineInputPanel extends JPanel
 			}
 		});
 
-		JButton backButton = new JButton("Back");
-		backButton.addActionListener(new ActionListener()
-		{
-			@Override
-			public void actionPerformed(ActionEvent e) 
-			{
-				controller.close();
-			}
-		});
-
 		setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
 		c.fill = GridBagConstraints.BOTH;
@@ -78,9 +68,6 @@ public class TimelineInputPanel extends JPanel
 		add(renderPanel,c);
 		c.gridy = 5;
 		add(itemPanel,c);
-		c.insets = new Insets(2,5,10,5);
-		c.gridy = 6;
-		add(backButton,c);
 	}
 	
 }

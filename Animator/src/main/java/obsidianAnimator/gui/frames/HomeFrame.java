@@ -100,7 +100,7 @@ public class HomeFrame extends BaseFrame
 	private void newAnimationPressed()
 	{
 		frame.dispose();
-		new AnimationNewFrame().display();;
+		new AnimationNewFrame().display();
 	}
 
 	private void openAnimationPressed()
