@@ -78,14 +78,14 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
 	}
 
 	public void updateActiveAnimation() 
-	{		
+	{
 		Queue<IAnimationWrapper> tempQueue = AnimationRegistry.getAnimationListCopy(entityName);
 		IAnimationWrapper wrapper;
 		while((wrapper = tempQueue.poll()) != null) {
 			if(wrapper.isActive(entity))
 				break;
 		}
-		
+
 		if(wrapper != null) {
 			String name = wrapper.getAnimation().getName();
 			if(!isAnimationActive(name)) {
@@ -236,7 +236,7 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
 	private boolean isAnimationActive(String animationName)
 	{		
 		if(activeAnimation == null)
-			return animationName.equals("Idle");
+			return false;
 		return activeAnimation.equals(animationName) || activeAnimation.equals("transition_" + animationName);
 	}
 
