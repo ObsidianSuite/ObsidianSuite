@@ -6,6 +6,8 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.IOException;
 
 import javax.swing.JButton;
 import javax.swing.JList;
@@ -16,7 +18,10 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import net.minecraft.client.Minecraft;
+import obsidianAPI.file.FileHandler;
 import obsidianAnimator.data.ModelHandler;
+import obsidianAnimator.file.FileChooser;
+import obsidianAnimator.file.FileNotChosenException;
 import obsidianAnimator.gui.entitySetup.EntitySetupController;
 import obsidianAnimator.gui.entitySetup.EntitySetupGui;
 
@@ -112,7 +117,34 @@ public class ModelListFrame extends BaseFrame
 	
 	private void exportPressed() 
 	{
-			
+		File copy;
+		try {
+			copy = FileChooser.getModelSaveLocation(frame);
+		} catch (FileNotChosenException e) {
+			return;
+		}
+		
+		//Ensure extension is correct.
+        String fileName = copy.getName();
+        if(fileName.contains("."))
+            fileName = fileName.substring(0, fileName.indexOf("."));
+        fileName += "." + FileHandler.obsidianModelExtension;
+        copy = new File(copy.getParentFile(), fileName);
+		
+		//Check if overwriting existing file
+		if(copy.exists()) {
+			//Prompt overwrite - exit method if don't want to overwrite.
+			if(JOptionPane.showConfirmDialog(frame, "A file already exists with this name.\n Overwrite?", "Overwrite File", JOptionPane.YES_NO_OPTION) == 1)
+				return;
+		}
+		
+		String entityName = (String) list.getSelectedValue();
+		File file = new File(FileHandler.modelFolder, entityName + "." + FileHandler.obsidianModelExtension);
+		try {
+			org.apache.commons.io.FileUtils.copyFile(file, copy);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	private void backPressed()

@@ -169,7 +169,7 @@ public class TimelineController
 		//Get file location
 		File file;
 		try {
-			file = FileChooser.getSaveLocation(this.timelineFrame);
+			file = FileChooser.getAnimationSaveLocation(this.timelineFrame);
 		} catch (FileNotChosenException e) {
 			return;
 		}

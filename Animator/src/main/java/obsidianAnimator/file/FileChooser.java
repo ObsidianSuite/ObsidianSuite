@@ -42,13 +42,23 @@ public class FileChooser
 		return modelFile;
 	}
 	
-	public static File getSaveLocation(Component parentComponent) throws FileNotChosenException
+	public static File getAnimationSaveLocation(Component parentComponent) throws FileNotChosenException
 	{
 		File animationFile = getFile(parentComponent, lastAnimationDirectory, animationFilter, JFileChooser.FILES_ONLY, true);
 		if(animationFile == null)
 			throw new FileNotChosenException();
 		lastAnimationDirectory = fc.getCurrentDirectory();
 		return animationFile;
+	}
+	
+	public static File getModelSaveLocation(Component parentComponent) throws FileNotChosenException
+	{
+		File modelFile = getFile(parentComponent, lastModelDirectory, obsidianModelFilter, JFileChooser.FILES_ONLY, true);
+		//TODO find way to prepopulate file chooser with model name.
+		if(modelFile == null)
+			throw new FileNotChosenException();
+		lastModelDirectory = fc.getCurrentDirectory();
+		return modelFile;
 	}
 	
 	private static File getFile(Component parentComponent, File parentDirectory, FileNameExtensionFilter fileExtensionFilter, int fileSelectionMode, boolean saveDialog) throws FileNotChosenException
