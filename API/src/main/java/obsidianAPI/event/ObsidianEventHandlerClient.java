@@ -1,9 +1,10 @@
-package obsidianAPI;
+package obsidianAPI.event;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
+import obsidianAPI.ObsidianAPIUtil;
 import obsidianAPI.network.AnimationNetworkHandler;
 import obsidianAPI.network.MessageRequestEntityAnimation;
 

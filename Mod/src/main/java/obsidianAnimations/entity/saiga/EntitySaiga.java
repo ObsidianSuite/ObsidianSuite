@@ -11,6 +11,8 @@ import obsidianAnimations.entity.ai.EntityAIPanicAnimation;
 public class EntitySaiga extends EntityCreature implements IEntityAnimated
 {
 	
+	private boolean calling;
+	
 	public EntitySaiga(World world) 
 	{
 		super(world);
@@ -37,6 +39,21 @@ public class EntitySaiga extends EntityCreature implements IEntityAnimated
 	@Override
 	public boolean isMoving() {
 		return limbSwingAmount > 0.02F;
+	}
+	
+	@Override
+	public void onEntityUpdate() {
+		super.onEntityUpdate();
+		if(!calling && this.rand.nextFloat() < 0.01) 
+			calling = true;
+	}
+	
+	public void setCalling(boolean calling) {
+		this.calling = calling;
+	}
+
+	public boolean isCalling() {
+		return calling;
 	}
 	
 }

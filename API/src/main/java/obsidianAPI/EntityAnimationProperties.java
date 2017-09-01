@@ -20,6 +20,8 @@ import obsidianAPI.animation.ActionPointCallback;
 import obsidianAPI.animation.AnimationPart;
 import obsidianAPI.animation.AnimationSequence;
 import obsidianAPI.animation.wrapper.IAnimationWrapper;
+import obsidianAPI.event.AnimationEvent;
+import obsidianAPI.event.AnimationEvent.AnimationEventType;
 import obsidianAPI.network.AnimationNetworkHandler;
 import obsidianAPI.network.MessageAnimationStart;
 import obsidianAPI.registry.AnimationRegistry;
@@ -204,6 +206,7 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
 
 			if (frameTime > activeAnimationLength)
 			{
+				ObsidianAPI.EVENT_BUS.dispatchAnimationEvent(new AnimationEvent(AnimationEventType.END, entityName, activeAnimation, entity));
 				if (loop)
 					setActiveAnimation(AnimationRegistry.getAnimation(entityName, activeAnimation), true, 0f, false);
 				else if(onFinished != null)
