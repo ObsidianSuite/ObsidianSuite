@@ -206,7 +206,7 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
 
 			if (frameTime > activeAnimationLength)
 			{
-				ObsidianAPI.EVENT_BUS.dispatchAnimationEvent(new AnimationEvent(AnimationEventType.END, entityName, activeAnimation));
+				ObsidianAPI.EVENT_BUS.dispatchAnimationEvent(new AnimationEvent(AnimationEventType.END, entityName, activeAnimation, entity));
 				if (loop)
 					setActiveAnimation(AnimationRegistry.getAnimation(entityName, activeAnimation), true, 0f, false);
 				else if(onFinished != null)

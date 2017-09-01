@@ -43,8 +43,13 @@ public class EntitySaiga extends EntityCreature implements IEntityAnimated
 	
 	@Override
 	public void onEntityUpdate() {
+		super.onEntityUpdate();
 		if(!calling && this.rand.nextFloat() < 0.01) 
 			calling = true;
+	}
+	
+	public void setCalling(boolean calling) {
+		this.calling = calling;
 	}
 
 	public boolean isCalling() {

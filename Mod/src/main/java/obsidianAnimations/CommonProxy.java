@@ -90,7 +90,7 @@ public class CommonProxy
 		AnimationRegistry.registerAnimation("saiga", "Walk", new ResourceLocation("mod_obsidian_animations:animations/saiga/Walk.oba"), 10, true, isWalking);
 		AnimationRegistry.registerAnimation("saiga", "Eat", new AIAnimationWrapper(EntityAIEat.name, new ResourceLocation("mod_obsidian_animations:animations/saiga/SaigaEat.oba"), 50, true, 0.5F));
 		AnimationRegistry.registerAnimation("saiga", "Panic", new AIAnimationWrapper(EntityAIPanicAnimation.name, new ResourceLocation("mod_obsidian_animations:animations/saiga/SaigaRun.oba"), 0, true));
-		AnimationRegistry.registerAnimation("saiga", "Calling", new ResourceLocation("mod_obsidian_animations:animations/saiga/SaigaCall.oba"), 70, true, isCalling);
+		AnimationRegistry.registerAnimation("saiga", "Call", new ResourceLocation("mod_obsidian_animations:animations/saiga/SaigaCall.oba"), 70, false, isCalling);
 		AnimationRegistry.registerAnimation("saiga", "Idle", new ResourceLocation("mod_obsidian_animations:animations/saiga/SaigaIdle.oba"), 100, true, returnTrue);
 
 		IsActiveFunction isIdleStage = (entity) -> {
