@@ -1,4 +1,4 @@
-package obsidianAPI.event;
+package obsidianAPI;
 
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
@@ -8,9 +8,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.event.entity.EntityEvent.EntityConstructing;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
-import obsidianAPI.EntityAnimationProperties;
-import obsidianAPI.EntityAnimationPropertiesClient;
-import obsidianAPI.ObsidianAPIUtil;
 import obsidianAPI.animation.wrapper.IEntityAnimated;
 import obsidianAPI.network.AnimationNetworkHandler;
 import obsidianAPI.network.MessagePlayerLimbSwing;

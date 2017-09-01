@@ -7,8 +7,8 @@ import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.common.MinecraftForge;
 import obsidianAPI.ObsidianAPI;
+import obsidianAPI.ObsidianEventHandler;
 import obsidianAPI.debug.EventHandlerDebug;
-import obsidianAPI.event.ObsidianEventHandler;
 import obsidianAPI.network.AnimationNetworkHandler;
 
 @Mod(modid = "ObsidianAnimations")
