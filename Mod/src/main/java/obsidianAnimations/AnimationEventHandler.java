@@ -12,4 +12,9 @@ public class AnimationEventHandler {
 		((EntitySaiga) event.entity).setCalling(false);
 	}
 	
+	@AnimationEventListener(type = AnimationEventType.START, entityName = "Saiga")
+	public void onSaigaAnimationStart(AnimationEvent event) {
+		System.out.println("Starting " + event.animationName);
+	}
+	
 }

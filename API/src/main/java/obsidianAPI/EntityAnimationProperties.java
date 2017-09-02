@@ -126,8 +126,10 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
 
 		activeAnimation = sequence != null ? sequence.getName() : null;
 		
-		if(sendPacket)
+		if(sendPacket) {
+			ObsidianAPI.EVENT_BUS.dispatchAnimationEvent(new AnimationEvent(AnimationEventType.START, entityName, activeAnimation, entity));
 			AnimationNetworkHandler.network.sendToAll(new MessageAnimationStart(entity, activeAnimation, animationStartTime, loopAnim, transitionTime));
+		}
 		
 		prevEntityPosX = 0f;
 		prevEntityPosZ = 0f;
@@ -144,7 +146,7 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
 			};
 		}
 		else
-			this.loop = loopAnim;
+			this.loop = loopAnim;		
 	}
 
 	private void returnToIdle(float transitionTime)

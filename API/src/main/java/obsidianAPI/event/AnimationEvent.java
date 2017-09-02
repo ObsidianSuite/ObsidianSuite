@@ -5,6 +5,7 @@ import net.minecraft.entity.Entity;
 public class AnimationEvent {
 
 	public enum AnimationEventType {
+		START,
 		END;
 	}
 	
