@@ -1,15 +1,26 @@
 package obsidianAnimator.gui.timeline.swing.subsection;
 
-import com.google.common.base.Joiner;
-import com.google.common.base.Splitter;
-import obsidianAPI.animation.AnimationSequence;
-
-import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import java.awt.*;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.HeadlessException;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.util.Collection;
+
+import javax.swing.AbstractAction;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+
+import com.google.common.base.Joiner;
+
+import obsidianAPI.animation.AnimationSequence;
+import obsidianAnimator.gui.timeline.changes.ChangeActionPoints;
 
 public class ActionPointsFrame extends JFrame
 {
@@ -28,17 +39,7 @@ public class ActionPointsFrame extends JFrame
             @Override
             public void actionPerformed(ActionEvent e)
             {
-                for (String s : animation.getActionPoints(time))
-                {
-                    animation.removeActionPoint(time,s);
-                }
-
-                for (String s : Splitter.on(',').split(actionField.getText()))
-                {
-                    animation.addActionPoint(time, s);
-                }
-
-                panel.updateText();
+                panel.controller.versionController.applyChange(new ChangeActionPoints(time, actionField.getText(), getTextForAnimations(animation, time)));
                 dispose();
             }
         });
@@ -53,7 +54,7 @@ public class ActionPointsFrame extends JFrame
             }
         });
 
-        actionField.setText(getTextForAnimations(animation,time));
+        actionField.setText(getTextForAnimations(animation, time));
         actionField.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e)
