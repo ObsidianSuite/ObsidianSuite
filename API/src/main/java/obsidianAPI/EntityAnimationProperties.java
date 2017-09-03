@@ -1,13 +1,10 @@
 package obsidianAPI;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 import java.util.TreeMap;
-
-import com.google.common.collect.Lists;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -16,7 +13,6 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 import net.minecraftforge.common.IExtendedEntityProperties;
-import obsidianAPI.animation.ActionPointCallback;
 import obsidianAPI.animation.AnimationPart;
 import obsidianAPI.animation.AnimationSequence;
 import obsidianAPI.animation.wrapper.IAnimationWrapper;
@@ -47,7 +43,6 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
 	private TreeMap<Integer, AnimationPart> entityPosAnimations;
 	private boolean loop;
 	private Runnable onFinished;
-	private final List<ActionPointCallback> actionPointCallbacks = Lists.newLinkedList();
 	
 	private float prevEntityPosX, prevEntityPosZ;
 
@@ -56,11 +51,8 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
 	{
 		this.entity = (EntityLivingBase) entity;
 		entityName = AnimationRegistry.getEntityName(entity.getClass());
-	}
-
-	public void addActionPointCallback(ActionPointCallback callback)
-	{
-		actionPointCallbacks.add(callback);
+		now = System.nanoTime();
+		animationStartTime = now;
 	}
 
 	@Override
@@ -72,7 +64,6 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
 	private void updateFrameTime()
 	{
 		now = System.nanoTime();
-
 		if (activeAnimation == null)
 			frameTime = 0f;
 		else
@@ -126,8 +117,10 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
 
 		activeAnimation = sequence != null ? sequence.getName() : null;
 		
-		if(sendPacket)
+		if(sendPacket) {
+			ObsidianAPI.EVENT_BUS.dispatchAnimationEvent(new AnimationEvent(AnimationEventType.START, entityName, activeAnimation, entity));
 			AnimationNetworkHandler.network.sendToAll(new MessageAnimationStart(entity, activeAnimation, animationStartTime, loopAnim, transitionTime));
+		}
 		
 		prevEntityPosX = 0f;
 		prevEntityPosZ = 0f;
@@ -144,7 +137,7 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
 			};
 		}
 		else
-			this.loop = loopAnim;
+			this.loop = loopAnim;		
 	}
 
 	private void returnToIdle(float transitionTime)
@@ -197,10 +190,11 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
 				prevEntityPosX = entityPosX;
 				prevEntityPosZ = entityPosZ;
 			}
-			
+
 			while (frameTime > nextFrame)
 			{
 				fireActions(nextFrame);
+				ObsidianAPI.EVENT_BUS.dispatchAnimationEvent(new AnimationEvent(nextFrame, entityName, activeAnimation, entity));
 				nextFrame++;
 			}
 
@@ -217,35 +211,26 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
 		}
 	}
 
-	private void fireActions(int frame)
-	{
-		if (activeAnimation != null)
-		{
+	private void fireActions(int frame) {
+		if (activeAnimation != null) {
 			if(activeAnimationActionPoints != null) {
 				Collection<String> actions = activeAnimationActionPoints.get(frame);
 				if(actions != null) {
-					for (String action : actions)
-					{
-						for (ActionPointCallback callback : actionPointCallbacks)
-						{
-							callback.onActionPoint(entity, action);
-						}
-					}
+					for (String actionName : actions)
+						ObsidianAPI.EVENT_BUS.dispatchAnimationEvent(new AnimationEvent(actionName, entityName, activeAnimation, entity));
 				}
 			}
 		}
 	}
 
-	private boolean isAnimationActive(String animationName)
-	{		
+	private boolean isAnimationActive(String animationName) {		
 		if(activeAnimation == null)
 			return false;
 		return activeAnimation.equals(animationName) || activeAnimation.equals("transition_" + animationName);
 	}
 
 
-	private boolean isIdle()
-	{
+	private boolean isIdle() {
 		return activeAnimation == null || activeAnimation.equals("Idle") || activeAnimation.equals("transition_idle");
 	}
 
