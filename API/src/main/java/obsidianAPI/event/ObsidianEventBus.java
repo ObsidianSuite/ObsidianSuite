@@ -44,12 +44,22 @@ public class ObsidianEventBus {
     }
      
     private boolean shouldHandleEvent(Method method, AnimationEvent event) {
-    	AnimationEventListener animationEventAnnotation = method.getAnnotation(AnimationEventListener.class);
-        if (animationEventAnnotation != null) {
-        	if(animationEventAnnotation.type() == event.eventType) {
-                if(animationEventAnnotation.entityName().equals("") || animationEventAnnotation.entityName().equalsIgnoreCase(event.entityName)) {
-                	if(animationEventAnnotation.animationName().equals("") || animationEventAnnotation.animationName().equalsIgnoreCase(event.animationName))
-                		return true;
+    	AnimationEventListener annotation = method.getAnnotation(AnimationEventListener.class);
+        if (annotation != null) {
+        	if(annotation.type() == event.eventType) {
+                if(annotation.entityName().equals("") || annotation.entityName().equalsIgnoreCase(event.entityName)) {
+                	if(annotation.animationName().equals("") || annotation.animationName().equalsIgnoreCase(event.animationName)) {
+                		switch(annotation.type()) {
+						case END:
+							return true;
+						case FRAME:
+							return annotation.frame() == -1 || event.frame == annotation.frame();
+						case START:
+							return true;
+						default:
+							return false;                		
+                		}
+                	}
                 }
         	}        	
         }

@@ -12,5 +12,6 @@ import obsidianAPI.event.AnimationEvent.AnimationEventType;
 public @interface AnimationEventListener {	
     AnimationEventType type();
 	String entityName() default ""; 
-    String animationName() default "";      
+    String animationName() default "";    
+    int frame() default -1; //-1 means match all frames
 }

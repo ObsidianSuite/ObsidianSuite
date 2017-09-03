@@ -56,6 +56,8 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
 	{
 		this.entity = (EntityLivingBase) entity;
 		entityName = AnimationRegistry.getEntityName(entity.getClass());
+		now = System.nanoTime();
+		animationStartTime = now;
 	}
 
 	public void addActionPointCallback(ActionPointCallback callback)
@@ -72,7 +74,6 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
 	private void updateFrameTime()
 	{
 		now = System.nanoTime();
-
 		if (activeAnimation == null)
 			frameTime = 0f;
 		else
@@ -199,10 +200,11 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
 				prevEntityPosX = entityPosX;
 				prevEntityPosZ = entityPosZ;
 			}
-			
+
 			while (frameTime > nextFrame)
 			{
 				fireActions(nextFrame);
+				ObsidianAPI.EVENT_BUS.dispatchAnimationEvent(new AnimationEvent(nextFrame, entityName, activeAnimation, entity));
 				nextFrame++;
 			}
 

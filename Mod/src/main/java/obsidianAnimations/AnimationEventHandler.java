@@ -17,4 +17,9 @@ public class AnimationEventHandler {
 		System.out.println("Starting " + event.animationName);
 	}
 	
+	@AnimationEventListener(type = AnimationEventType.FRAME, entityName = "Saiga", animationName = "Call", frame = 10)
+	public void onSaigaAnimationFrame(AnimationEvent event) {
+		System.out.println(event.animationName + " frame " + event.frame);
+	}
+	
 }
