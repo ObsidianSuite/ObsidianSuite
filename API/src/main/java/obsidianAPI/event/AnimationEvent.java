@@ -8,7 +8,8 @@ public class AnimationEvent {
 		START,
 		FRAME,
 		ACTION,
-		END;
+		END,
+		ALL; //All is only for listening, never posting
 	}
 	
 	public final AnimationEventType eventType;
@@ -57,7 +58,7 @@ public class AnimationEvent {
 	@Override
 	public String toString() {
 		return "AnimationEvent [eventType=" + eventType + ", entityName=" + entityName + ", animationName="
-				+ animationName + ", entity=" + entity + ", frame=" + frame + "]";
+				+ animationName + ", entity=" + entity + ", frame=" + frame + ", actionName=" + actionName + "]";
 	}
 
 }

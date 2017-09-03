@@ -4,6 +4,8 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
+import obsidianAPI.event.AnimationEvent.AnimationEventType;
+
 public class ObsidianEventBus {
 	
 	private List<Object> handlers = new ArrayList<Object>();
@@ -46,7 +48,7 @@ public class ObsidianEventBus {
     private boolean shouldHandleEvent(Method method, AnimationEvent event) {
     	AnimationEventListener annotation = method.getAnnotation(AnimationEventListener.class);
         if (annotation != null) {
-        	if(annotation.type() == event.eventType) {
+        	if(annotation.type() == AnimationEventType.ALL || annotation.type() == event.eventType) {
                 if(annotation.entityName().equals("") || annotation.entityName().equalsIgnoreCase(event.entityName)) {
                 	if(annotation.animationName().equals("") || annotation.animationName().equalsIgnoreCase(event.animationName)) {
                 		switch(annotation.type()) {
@@ -58,6 +60,8 @@ public class ObsidianEventBus {
 							return true;
 						case ACTION:
 							return annotation.actionName().equals("") || annotation.actionName().equalsIgnoreCase(event.actionName);
+						case ALL:
+							return true;
 						default:
 							return false;
                 		}
