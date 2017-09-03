@@ -7,6 +7,7 @@ public class AnimationEvent {
 	public enum AnimationEventType {
 		START,
 		FRAME,
+		ACTION,
 		END;
 	}
 	
@@ -15,6 +16,7 @@ public class AnimationEvent {
 	public final String animationName;
 	public final Entity entity;
 	public final Integer frame;
+	public final String actionName;
 	
 	/**
 	 * Constructor for start, end and all event
@@ -25,6 +27,7 @@ public class AnimationEvent {
 		this.animationName = animationName;
 		this.entity = entity;
 		this.frame = null;
+		this.actionName = "";
 	}
 	
 	/**
@@ -36,6 +39,19 @@ public class AnimationEvent {
 		this.animationName = animationName;
 		this.entity = entity;
 		this.frame = frame;
+		this.actionName = "";
+	}
+	
+	/**
+	 * Constructor for action event
+	 */ 
+	public AnimationEvent(String actionName, String entityName, String animationName, Entity entity) {
+		this.eventType = AnimationEventType.ACTION;
+		this.entityName = entityName;
+		this.animationName = animationName;
+		this.entity = entity;
+		this.frame = null;
+		this.actionName = actionName;
 	}
 
 	@Override

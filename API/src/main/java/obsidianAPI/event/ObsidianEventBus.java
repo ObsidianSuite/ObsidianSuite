@@ -56,8 +56,10 @@ public class ObsidianEventBus {
 							return annotation.frame() == -1 || event.frame == annotation.frame();
 						case START:
 							return true;
+						case ACTION:
+							return annotation.actionName().equals("") || annotation.actionName().equalsIgnoreCase(event.actionName);
 						default:
-							return false;                		
+							return false;
                 		}
                 	}
                 }

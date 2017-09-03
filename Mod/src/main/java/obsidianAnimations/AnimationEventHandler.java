@@ -12,14 +12,9 @@ public class AnimationEventHandler {
 		((EntitySaiga) event.entity).setCalling(false);
 	}
 	
-	@AnimationEventListener(type = AnimationEventType.START, entityName = "Saiga")
-	public void onSaigaAnimationStart(AnimationEvent event) {
-		System.out.println("Starting " + event.animationName);
-	}
-	
-	@AnimationEventListener(type = AnimationEventType.FRAME, entityName = "Saiga", animationName = "Call", frame = 10)
+	@AnimationEventListener(type = AnimationEventType.ACTION, entityName = "Saiga", animationName="call", actionName="noise")
 	public void onSaigaAnimationFrame(AnimationEvent event) {
-		System.out.println(event.animationName + " frame " + event.frame);
+		System.out.println("Action: " + event.actionName + " Animation: " + event.animationName);
 	}
 	
 }

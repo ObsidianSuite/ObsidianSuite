@@ -1,13 +1,10 @@
 package obsidianAPI;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 import java.util.TreeMap;
-
-import com.google.common.collect.Lists;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -16,7 +13,6 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 import net.minecraftforge.common.IExtendedEntityProperties;
-import obsidianAPI.animation.ActionPointCallback;
 import obsidianAPI.animation.AnimationPart;
 import obsidianAPI.animation.AnimationSequence;
 import obsidianAPI.animation.wrapper.IAnimationWrapper;
@@ -47,7 +43,6 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
 	private TreeMap<Integer, AnimationPart> entityPosAnimations;
 	private boolean loop;
 	private Runnable onFinished;
-	private final List<ActionPointCallback> actionPointCallbacks = Lists.newLinkedList();
 	
 	private float prevEntityPosX, prevEntityPosZ;
 
@@ -58,11 +53,6 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
 		entityName = AnimationRegistry.getEntityName(entity.getClass());
 		now = System.nanoTime();
 		animationStartTime = now;
-	}
-
-	public void addActionPointCallback(ActionPointCallback callback)
-	{
-		actionPointCallbacks.add(callback);
 	}
 
 	@Override
@@ -221,35 +211,26 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
 		}
 	}
 
-	private void fireActions(int frame)
-	{
-		if (activeAnimation != null)
-		{
+	private void fireActions(int frame) {
+		if (activeAnimation != null) {
 			if(activeAnimationActionPoints != null) {
 				Collection<String> actions = activeAnimationActionPoints.get(frame);
 				if(actions != null) {
-					for (String action : actions)
-					{
-						for (ActionPointCallback callback : actionPointCallbacks)
-						{
-							callback.onActionPoint(entity, action);
-						}
-					}
+					for (String actionName : actions)
+						ObsidianAPI.EVENT_BUS.dispatchAnimationEvent(new AnimationEvent(actionName, entityName, activeAnimation, entity));
 				}
 			}
 		}
 	}
 
-	private boolean isAnimationActive(String animationName)
-	{		
+	private boolean isAnimationActive(String animationName) {		
 		if(activeAnimation == null)
 			return false;
 		return activeAnimation.equals(animationName) || activeAnimation.equals("transition_" + animationName);
 	}
 
 
-	private boolean isIdle()
-	{
+	private boolean isIdle() {
 		return activeAnimation == null || activeAnimation.equals("Idle") || activeAnimation.equals("transition_idle");
 	}
 
