@@ -73,6 +73,8 @@ task sourcesJar(type: Jar, dependsOn: classes) {
 }
 
 artifacts {
-  archives sourcesJar
-  archives deobfJar
+	if(project.gradle.startParameter.taskNames[0] != 'buildAnimatorWithAPI') {
+		archives sourcesJar
+		archives deobfJar
+	}
 }
