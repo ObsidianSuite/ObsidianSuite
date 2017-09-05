@@ -43,7 +43,7 @@ public class ModelObj extends ModelBase {
 	protected List<Bend> bends = new ArrayList<Bend>();
 	public PartGroups partGroups;
 	private Map<PartObj, float[]> defaults;
-	private float modelScale;
+	private float modelScaleX, modelScaleY, modelScaleZ;
 	
 	public static final float initRotFix = 180.0F;
 	public static final float offsetFixY = -1.5F;
@@ -53,10 +53,16 @@ public class ModelObj extends ModelBase {
 	}
 	
 	public ModelObj(String entityName, WavefrontObject obj, ResourceLocation texture, float modelScale) {
+		this(entityName, obj, texture, modelScale, modelScale, modelScale);
+	}
+	
+	public ModelObj(String entityName, WavefrontObject obj, ResourceLocation texture, float modelScaleX, float modelScaleY, float modelScaleZ) {
 		this.entityName = entityName;
 		this.obj = obj;
 		this.texture = texture;
-		this.modelScale = modelScale;
+		this.modelScaleX = modelScaleX;
+		this.modelScaleY = modelScaleY;
+		this.modelScaleZ = modelScaleZ;
 		defaults = Maps.newHashMap();
 		loadObj(obj);
 		init();
@@ -122,12 +128,51 @@ public class ModelObj extends ModelBase {
 		partGroups = new PartGroups(this);
 	}
 	
+	@Deprecated
 	public float getModelScale() {
-		return modelScale;
+		return modelScaleX;
 	}
 	
+	/**
+	 * @param dimension 0 for x, 1 for y, 2 for z
+	 */
+	public float getModelScale(int dimension) {
+		switch(dimension) {
+			case 0: return modelScaleX;
+			case 1: return modelScaleY;
+			case 2: return modelScaleZ;
+		}
+		return 1.0F;
+	}
+	
+	/**
+	 * Set scale in all dimensions to same value
+	 */
 	public void setModelScale(float modelScale) {
-		this.modelScale = modelScale;
+		this.modelScaleX = modelScale;
+		this.modelScaleY = modelScale;
+		this.modelScaleZ = modelScale;
+	}
+	
+	/**
+	 * Set scale in all dimensions to different values
+	 */
+	public void setModelScale(float modelScaleX, float modelScaleY, float modelScaleZ) {
+		this.modelScaleX = modelScaleX;
+		this.modelScaleY = modelScaleY;
+		this.modelScaleZ = modelScaleZ;
+	}
+	
+	/**
+	 * Set scale in one dimension
+	 * @param dimension 0 for x, 1 for y, 2 for z
+	 */
+	public void setModelScale(float modelScale, int dimension) {
+		switch(dimension) {
+			case 0: modelScaleX = modelScale; break;
+			case 1: modelScaleY = modelScale; break;
+			case 2: modelScaleZ = modelScale; break;
+		}
 	}
 
 	// ----------------------------------------------------------------
@@ -312,7 +357,7 @@ public class ModelObj extends ModelBase {
 		GL11.glPushMatrix();
 		GL11.glRotatef(initRotFix, 1.0F, 0.0F, 0.0F);
 		GL11.glTranslatef(0.0F, offsetFixY, 0.0F);
-		GL11.glScalef(modelScale, modelScale, modelScale);
+		GL11.glScalef(modelScaleX, modelScaleY, modelScaleZ);
 		
 		for (Part p : this.parts) {
 			if (p instanceof PartObj) {
