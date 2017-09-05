@@ -312,6 +312,7 @@ public class TimelineController
 	public void setExceptionPart(Part exceptionPart)
 	{
 		this.exceptionPart = exceptionPart;
+		this.timelineFrame.requestFocusInWindow();
 	}
 
 	public float[] getCopiedValues()

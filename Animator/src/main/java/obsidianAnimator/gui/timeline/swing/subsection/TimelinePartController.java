@@ -1,18 +1,13 @@
 package obsidianAnimator.gui.timeline.swing.subsection;
 
-import java.text.DecimalFormat;
-
 import obsidianAPI.render.part.Part;
 import obsidianAnimator.gui.timeline.TimelineController;
 import obsidianAnimator.gui.timeline.swing.TimelineControllerSub;
 
 public class TimelinePartController extends TimelineControllerSub
 {
-	
 	public final TimelinePartPanel panel;
-	
-	private DecimalFormat df = new DecimalFormat("#.##");
-	
+
 	public TimelinePartController(TimelineController controller)
 	{
 		super(controller);
