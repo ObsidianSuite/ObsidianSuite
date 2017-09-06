@@ -81,7 +81,7 @@ public class TimelinePartPanel extends JPanel
 				public void stateChanged(ChangeEvent e) {
 					Part part = controller.getSelectedPart();
 					PartSpinner spinner = (PartSpinner) e.getSource();
-					if(part != null) {
+					if(part != null && ((JSpinner.DefaultEditor)getEditor()).getTextField().hasFocus()) {
 						double d = (double) spinner.getValue();
 						float[] prevValues = part.getValues();
 						part.setValue((float) d, dimension);
