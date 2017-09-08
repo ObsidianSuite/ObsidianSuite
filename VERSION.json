@@ -2,6 +2,18 @@
 	"versionList": [
 		{
 			"mcVersion":"Minecraft 1.7.10",
+			"modVersion":"0.4.0-Alpha",
+			"changeLog": [
+			    "+ New save load system.",
+				"+ Easy exporting of models.",
+				"~ Minor bug fixes and improvements."
+			],
+			"updateURL":"https://github.com/ObsidianSuite/ObsidianSuite/releases/download/Animator_v0.4.0-Alpha/ObsidianAnimator_v0.4.0-Alpha.jar",
+			"isDirectLink":"true",
+			"newFileName":""
+		},
+		{
+			"mcVersion":"Minecraft 1.7.10",
 			"modVersion":"0.3.4-Alpha",
 			"changeLog": [
 				"~ Changed versioning to reflect GitHub repository change."
