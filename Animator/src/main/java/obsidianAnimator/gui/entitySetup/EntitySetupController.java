@@ -62,10 +62,11 @@ public class EntitySetupController
 
 	private void parent(PartObj parent, PartObj child)
 	{
-		Object[] options = {"Yes", "No"};
-		int n = JOptionPane.showOptionDialog(frame, "Add bend?", "Bend",
-											 JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,null, options, options[1]);
-		boolean bend = n == 0;
+//		Object[] options = {"Yes", "No"};
+//		int n = JOptionPane.showOptionDialog(frame, "Add bend?", "Bend",
+//											 JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,null, options, options[1]);
+//		boolean bend = n == 0;
+		boolean bend = false;
 		getEntityModel().setParent(child, parent, bend);
 		refresh();
 	}
