@@ -52,21 +52,12 @@ public class EntityAnimationPropertiesClient implements IExtendedEntityPropertie
 		if (activeAnimation == null)
 			frameTime = 0f;
 		else
-			frameTime = ObsidianAPIUtil.getAnimationFrameTime(System.nanoTime(), animationStartTime, 0, activeAnimation.getFPS(), 1.0f);
+			frameTime = ObsidianAPIUtil.getAnimationFrameTime(System.currentTimeMillis(), animationStartTime, 0, activeAnimation.getFPS(), 1.0f);
 	}
 
 	public void setActiveAnimation(ModelAnimated model, String animationName, long animationStartTime, boolean loopAnim, float transitionTime)
 	{    	
 		AnimationSequence sequence = AnimationRegistry.getAnimation(entityName, animationName);
-		
-		Map<String, float[]> currentValues;
-		if (activeAnimation != null)
-		{
-			currentValues = getCurrentValues(model);
-		} else
-		{
-			currentValues = getOriginalValues(model);
-		}
 
 		this.animationStartTime = animationStartTime;
 		prevEntityPosX = 0f;
@@ -74,7 +65,7 @@ public class EntityAnimationPropertiesClient implements IExtendedEntityPropertie
 		if (transitionTime > 0.001f)
 		{
 			updateFrameTime();
-
+			Map<String, float[]> currentValues = activeAnimation != null ? getCurrentValues(model) : getOriginalValues(model);
 			loop = false;
 
 			if(sequence != null)
@@ -86,7 +77,7 @@ public class EntityAnimationPropertiesClient implements IExtendedEntityPropertie
 				onFinished = null;
 				loop = sequence != null ? loopAnim : false;
 				activeAnimation = sequence;
-				this.animationStartTime = System.nanoTime();
+				this.animationStartTime = System.currentTimeMillis();
 			};
 		}
 		else
@@ -100,7 +91,7 @@ public class EntityAnimationPropertiesClient implements IExtendedEntityPropertie
 	{
 		if(activeAnimation == null || activeAnimation.getName().equals("Idle"))
 			return;
-		setActiveAnimation(model, "Idle", System.nanoTime(), true, transitionTime);
+		setActiveAnimation(model, "Idle", System.currentTimeMillis(), true, transitionTime);
 	}
 
 	public void returnToIdle(ModelAnimated model)
@@ -125,7 +116,6 @@ public class EntityAnimationPropertiesClient implements IExtendedEntityPropertie
 		Map<String, float[]> values = Maps.newHashMap();
 
 		float time = getAnimationFrameTime();
-
 		for (Part part : model.parts)
 		{
 			values.put(part.getName(), activeAnimation.getPartValueAtTime(part, time));
@@ -168,7 +158,7 @@ public class EntityAnimationPropertiesClient implements IExtendedEntityPropertie
 			if (frameTime > activeAnimation.getTotalTime())
 			{
 				if (loop)
-					setActiveAnimation(model, activeAnimation.getName(), System.nanoTime(), true, 0f);
+					setActiveAnimation(model, activeAnimation.getName(), System.currentTimeMillis(), true, 0f);
 				else if (onFinished != null)
 					onFinished.run();
 				else

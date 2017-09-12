@@ -9,8 +9,8 @@ public class TimelineInputController extends TimelineControllerSub {
 	
 	private boolean boolPlay = false;	
 	
-	//Nano time at which the animation started playing (play button pressed).
-	private long playStartTimeNano;
+	//Milli time at which the animation started playing (play button pressed).
+	private long playStartTimeMilli;
 	//Frame time at which the animation started playing (play button pressed).
 	private float playStartTimeFrame;
 	
@@ -35,14 +35,14 @@ public class TimelineInputController extends TimelineControllerSub {
 		panel.playPauseButton.setText(boolPlay ? "Pause" : "Play");
 	}
 	
-	public long getPlayStartTimeNano() 
+	public long getPlayStartTimeMilli()
 	{
-		return playStartTimeNano;
+		return playStartTimeMilli;
 	}
 
-	public void setPlayStartTimeNano(long playStartTimeNano) 
+	public void setPlayStartTimeMilli(long playStartTimeMilli)
 	{
-		this.playStartTimeNano = playStartTimeNano;
+		this.playStartTimeMilli = playStartTimeMilli;
 	}
 
 	public float getPlayStartTimeFrame() 

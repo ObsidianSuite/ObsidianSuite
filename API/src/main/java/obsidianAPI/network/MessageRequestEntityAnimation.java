@@ -43,7 +43,7 @@ public class MessageRequestEntityAnimation implements IMessage {
 			if(ObsidianAPIUtil.isAnimatedEntity(entity)) {
 				EntityAnimationProperties animationProps = EntityAnimationProperties.get(entity);
 				if(animationProps != null)
-					return new MessageAnimationStart(entity, animationProps.getActiveAnimation(), animationProps.getAnimationStartTime(), animationProps.getLoopAnim(), 0.0F);
+					return new MessageAnimationStart(entity, animationProps.getActiveAnimation(), animationProps.getLoopAnim(), 0.0F);
 			}
 			return null;
 		}
