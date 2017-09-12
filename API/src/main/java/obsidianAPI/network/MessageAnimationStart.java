@@ -20,16 +20,14 @@ public class MessageAnimationStart implements IMessage {
 
 	private int entityID;
 	private String animationName;
-	private long animationStartTime;
 	private boolean loopAnim;
 	private float transitionTime;
 
 	public MessageAnimationStart() {}
 
-	public MessageAnimationStart(Entity entity, String animationName, long animationStartTime, boolean loopAnim, float transitionTime) {
+	public MessageAnimationStart(Entity entity, String animationName, boolean loopAnim, float transitionTime) {
 		this.entityID = entity.getEntityId();
 		this.animationName = animationName != null ? animationName : "null";
-		this.animationStartTime = animationStartTime;
 		this.loopAnim = loopAnim;
 		this.transitionTime = transitionTime;
 	}
@@ -38,7 +36,6 @@ public class MessageAnimationStart implements IMessage {
 	public void fromBytes(ByteBuf buf) {
 		entityID = buf.readInt();
 		animationName = ByteBufUtils.readUTF8String(buf);
-		animationStartTime = buf.readLong();
 		loopAnim = buf.readBoolean();
 		transitionTime = buf.readFloat();
 	}
@@ -47,7 +44,6 @@ public class MessageAnimationStart implements IMessage {
 	public void toBytes(ByteBuf buf) {
 		buf.writeInt(entityID);
 		ByteBufUtils.writeUTF8String(buf, animationName);
-		buf.writeLong(animationStartTime);
 		buf.writeBoolean(loopAnim);
 		buf.writeFloat(transitionTime);
 	}
@@ -59,7 +55,7 @@ public class MessageAnimationStart implements IMessage {
 			Entity entity = Minecraft.getMinecraft().theWorld.getEntityByID(message.entityID);
 			if(entity != null) {
 				ModelAnimated model = ((IRenderAnimated) RenderManager.instance.getEntityRenderObject(entity)).getModel();
-				EntityAnimationPropertiesClient.get(entity).setActiveAnimation(model, message.animationName, message.animationStartTime, message.loopAnim, message.transitionTime);
+				EntityAnimationPropertiesClient.get(entity).setActiveAnimation(model, message.animationName, System.currentTimeMillis(), message.loopAnim, message.transitionTime);
 			}
 			return null;
 		}

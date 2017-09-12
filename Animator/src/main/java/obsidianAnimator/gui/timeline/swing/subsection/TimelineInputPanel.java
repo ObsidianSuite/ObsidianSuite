@@ -42,7 +42,7 @@ public class TimelineInputPanel extends JPanel
 				controller.setPlaying(!controller.isPlaying());	
 				if(controller.isPlaying())
 				{
-					controller.setPlayStartTimeNano(System.nanoTime());
+					controller.setPlayStartTimeMilli(System.currentTimeMillis());
 					controller.setPlayStartTimeFrame(controller.getTime());
 				}
 

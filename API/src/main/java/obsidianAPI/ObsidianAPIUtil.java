@@ -16,25 +16,14 @@ import obsidianAPI.render.ModelObj;
 public class ObsidianAPIUtil
 {
 
-
-
-
-	/**
-	 * Calculate which frame an animation is on based on the time that it started at, which frame it started at, and its FPS.
-	 * @param startTimeNano - Nano time the aniamtion starting being played on.
-	 * @param startTimeFrame - Frame the animation started being played on.
-	 * @param fps - FPS the animation is running at.
-	 * @param multiplier - Speed multiplier so the animation is rendered slower or faster
-	 * @return Frame time.
-	 */
-	public static float getAnimationFrameTime(long startTimeNano, float startTimeFrame, int fps, float multiplier)
+	public static float getAnimationFrameTime(long startTimeMillis, float startTimeFrame, int fps, float multiplier)
 	{
-		return (System.nanoTime() - startTimeNano)/1000000000F*fps*multiplier + startTimeFrame;
+		return (System.currentTimeMillis() - startTimeMillis)/1000F*fps*multiplier + startTimeFrame;
 	}
 
-	public static float getAnimationFrameTime(long now, long startTimeNano, float startTimeFrame, int fps, float multiplier)
+	public static float getAnimationFrameTime(long now, long startTimeMillis, float startTimeFrame, int fps, float multiplier)
 	{
-		return (float) ((now - startTimeNano) / 1000000000D * fps * multiplier + startTimeFrame);
+		return (float) ((now - startTimeMillis) / 1000D * fps * multiplier + startTimeFrame);
 	}
 
 	public static AnimationSequence createTransition(ModelObj model, String animName, Map<String, float[]> from, Map<String, float[]> to, float duration)

@@ -263,14 +263,14 @@ public class TimelineController
 	{
 		if(inputController.isPlaying())
 		{
-			setTime(ObsidianAPIUtil.getAnimationFrameTime(inputController.getPlayStartTimeNano(), inputController.getPlayStartTimeFrame(), currentAnimation.getFPS(), animationController.getTimeMultiplier()));
+			setTime(ObsidianAPIUtil.getAnimationFrameTime(inputController.getPlayStartTimeMilli(), inputController.getPlayStartTimeFrame(), currentAnimation.getFPS(), animationController.getTimeMultiplier()));
 			setExceptionPart(null);
 			if(getTime() >= currentAnimation.getTotalTime())
 			{
 				if(renderController.isLooping())
 				{
 					setTime(0.0F);
-					inputController.setPlayStartTimeNano(System.nanoTime());
+					inputController.setPlayStartTimeMilli(System.currentTimeMillis());
 					inputController.setPlayStartTimeFrame(0);
 				}
 				else
