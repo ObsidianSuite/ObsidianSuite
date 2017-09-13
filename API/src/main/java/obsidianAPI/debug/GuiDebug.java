@@ -18,7 +18,7 @@ public class GuiDebug extends Gui {
 	}
 
 	public void draw() {
-		ScaledResolution scaled = new ScaledResolution(mc, mc.displayWidth, mc.displayHeight);
+		ScaledResolution scaled = new ScaledResolution(mc);
 		int width = scaled.getScaledWidth();
 		drawCenteredString(mc.fontRenderer, stateText, width - 40, 2, Integer.parseInt("FFFF00", 16));
 		drawCenteredString(mc.fontRenderer, animationText, width - 40, 12, Integer.parseInt("FFFF00", 16));

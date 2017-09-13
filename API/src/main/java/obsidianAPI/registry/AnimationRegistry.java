@@ -6,14 +6,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.PriorityQueue;
 
-import cpw.mods.fml.common.FMLCommonHandler;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.IResource;
 import net.minecraft.nbt.CompressedStreamTools;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.common.MinecraftForge;
-import obsidianAPI.ObsidianEventHandler;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import obsidianAPI.animation.AnimationSequence;
 import obsidianAPI.animation.wrapper.FunctionAnimationWrapper;
 import obsidianAPI.animation.wrapper.FunctionAnimationWrapper.IsActiveFunction;

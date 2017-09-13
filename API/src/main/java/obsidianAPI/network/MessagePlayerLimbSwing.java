@@ -1,10 +1,10 @@
 package obsidianAPI.network;
 
-import cpw.mods.fml.common.network.simpleimpl.IMessage;
-import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
-import cpw.mods.fml.common.network.simpleimpl.MessageContext;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
+import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 /**
  * Client -> Server
@@ -38,7 +38,7 @@ public class MessagePlayerLimbSwing implements IMessage {
 
 		@Override
 		public IMessage onMessage(MessagePlayerLimbSwing message, MessageContext ctx) {
-			ctx.getServerHandler().playerEntity.limbSwingAmount = message.limbSwingAmount;
+			ctx.getServerHandler().player.limbSwingAmount = message.limbSwingAmount;
 			return null;
 		}
 

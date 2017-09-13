@@ -1,6 +1,6 @@
 package obsidianAPI;
 
-import net.minecraft.util.MathHelper;
+import net.minecraft.util.math.MathHelper;
 
 public class Quaternion {
 
@@ -154,7 +154,7 @@ public class Quaternion {
         if (dot > DOT_THRESHOLD)
             return lerp(q0, q1, alpha);
 
-        dot = MathHelper.clamp_double(dot, -1, 1);
+        dot = MathHelper.clamp(dot, -1, 1);
         double theta = Math.acos(dot) * alpha;
 
         Quaternion q2 = q1.sub(q0.scale((float) dot)).normalise();

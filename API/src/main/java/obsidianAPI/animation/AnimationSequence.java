@@ -1,17 +1,25 @@
 package obsidianAPI.animation;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTTagString;
-import net.minecraft.util.MathHelper;
+import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.common.util.Constants;
 import obsidianAPI.render.ModelObj;
 import obsidianAPI.render.part.Part;
-
-import java.util.*;
 
 /**
  * An actual animation. Comprised of animation parts - sections for each part of the model.
@@ -181,7 +189,7 @@ public class AnimationSequence
 				TreeMap<Integer, AnimationPart> animations = partsByPartName.get(part.getName());
 				if(animations != null && animations.size() > 0)
 				{
-					AnimationPart anim = findPartForTime(animations, MathHelper.floor_float(time));
+					AnimationPart anim = findPartForTime(animations, MathHelper.floor(time));
 					if (anim == null)
 						anim = animations.lastEntry().getValue();
 					float frameTime = Math.min(time - anim.getStartTime(), anim.getEndTime() - anim.getStartTime());
@@ -204,7 +212,7 @@ public class AnimationSequence
 		TreeMap<Integer, AnimationPart> animations = partsByPartName.get(part.getName());
 		if(animations != null && animations.size() > 0)
 		{
-			AnimationPart anim = findPartForTime(animations, MathHelper.floor_float(time));
+			AnimationPart anim = findPartForTime(animations, MathHelper.floor(time));
 			if (anim == null)
 				anim = animations.lastEntry().getValue();
 			float frameTime = Math.min(time - anim.getStartTime(), anim.getEndTime() - anim.getStartTime());
@@ -218,7 +226,7 @@ public class AnimationSequence
 	{
 		if(animations != null && animations.size() > 0)
 		{
-			AnimationPart anim = findPartForTime(animations, MathHelper.floor_float(time));
+			AnimationPart anim = findPartForTime(animations, MathHelper.floor(time));
 			if (anim == null)
 				anim = animations.lastEntry().getValue();
 			float frameTime = Math.min(time - anim.getStartTime(), anim.getEndTime() - anim.getStartTime());
