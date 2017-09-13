@@ -40,8 +40,6 @@ public class ObsidianAnimator
 		
 		instance = this;		
 		proxy.init();
-		proxy.registerBlocks();
-		proxy.registerItems();
         
         EventHandler eventHandler = new EventHandler();
         MinecraftForge.EVENT_BUS.register(eventHandler);

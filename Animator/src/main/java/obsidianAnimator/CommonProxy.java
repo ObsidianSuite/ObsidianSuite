@@ -1,10 +1,18 @@
 package obsidianAnimator;
 
-import cpw.mods.fml.common.registry.EntityRegistry;
-import cpw.mods.fml.common.registry.GameRegistry;
+import net.minecraft.block.Block;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemBlock;
+import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.registry.EntityRegistry;
+import obsidianAnimator.block.BlockBase;
+import obsidianAnimator.block.BlockGrid;
 import obsidianAnimator.data.ModelHandler;
 import obsidianAnimator.render.entity.EntityObj;
 
+@Mod.EventBusSubscriber
 public class CommonProxy
 {	
 	public void init() 
@@ -23,13 +31,17 @@ public class CommonProxy
 	public void registerRendering() {}
 
 
-	public void registerBlocks()
-	{
-		GameRegistry.registerBlock(ObsidianAnimator.Base, "Base");
-		GameRegistry.registerBlock(ObsidianAnimator.Grid, "Grid");
-	}
-	
-	public void registerItems(){}
+	@SubscribeEvent
+    public static void registerBlocks(RegistryEvent.Register<Block> event) {
+        event.getRegistry().register(new BlockBase());
+        event.getRegistry().register(new BlockGrid());
+    }
+
+    @SubscribeEvent
+    public static void registerItems(RegistryEvent.Register<Item> event) {
+        event.getRegistry().register(new ItemBlock(ModBlocks.base).setRegistryName(ModBlocks.base.getRegistryName()));
+        event.getRegistry().register(new ItemBlock(ModBlocks.grid).setRegistryName(ModBlocks.grid.getRegistryName()));
+    }
 }
 
 
