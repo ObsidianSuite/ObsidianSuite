@@ -3,12 +3,12 @@ package obsidianAnimator.render;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.client.model.obj.Face;
-import net.minecraftforge.client.model.obj.TextureCoordinate;
-import net.minecraftforge.client.model.obj.Vertex;
 import obsidianAPI.render.ModelObj;
 import obsidianAPI.render.bend.BendPart;
 import obsidianAPI.render.bend.PartUVMap;
+import obsidianAPI.render.wavefront.Face;
+import obsidianAPI.render.wavefront.TextureCoordinate;
+import obsidianAPI.render.wavefront.Vertex;
 import obsidianAnimator.render.entity.ModelObj_Animator;
 
 public class BendPart_Animator extends BendPart

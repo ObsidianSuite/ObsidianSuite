@@ -6,18 +6,16 @@ import net.minecraft.item.ItemBlock;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.registry.EntityRegistry;
 import obsidianAnimator.block.BlockBase;
 import obsidianAnimator.block.BlockGrid;
 import obsidianAnimator.data.ModelHandler;
-import obsidianAnimator.render.entity.EntityObj;
 
 @Mod.EventBusSubscriber
 public class CommonProxy
 {	
 	public void init() 
 	{	
-		EntityRegistry.registerGlobalEntityID(EntityObj.class, "Obj", EntityRegistry.findGlobalUniqueEntityId());
+		ModEntities.init();
 		registerRendering();
 		registerModels();
 	}

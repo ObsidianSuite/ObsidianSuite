@@ -1,17 +1,18 @@
 package obsidianAnimator.render;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.lwjgl.opengl.GL11;
+
 import net.minecraft.entity.Entity;
-import net.minecraftforge.client.model.obj.Face;
-import net.minecraftforge.client.model.obj.Vertex;
 import obsidianAPI.render.bend.Bend;
 import obsidianAPI.render.bend.BendPart;
 import obsidianAPI.render.bend.PartUVMap;
 import obsidianAPI.render.part.PartObj;
+import obsidianAPI.render.wavefront.Face;
+import obsidianAPI.render.wavefront.Vertex;
 import obsidianAnimator.render.entity.ModelObj_Animator;
-import org.lwjgl.opengl.GL11;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class Bend_Animator extends Bend
 {

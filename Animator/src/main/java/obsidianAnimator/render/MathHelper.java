@@ -6,8 +6,8 @@ import java.nio.FloatBuffer;
 
 import org.lwjgl.util.vector.Quaternion;
 
-import net.minecraft.util.Vec3;
-import net.minecraftforge.client.model.obj.Face;
+import net.minecraft.util.math.Vec3d;
+import obsidianAPI.render.wavefront.Face;
 
 public class MathHelper 
 {
@@ -17,11 +17,11 @@ public class MathHelper
 
 	public static Double rayIntersectsFace(RayTrace ray, Face f)
 	{		
-		Vec3 v0 = Vec3.createVectorHelper(f.vertices[0].x, f.vertices[0].y, f.vertices[0].z);
-		Vec3 v1 = Vec3.createVectorHelper(f.vertices[1].x, f.vertices[1].y, f.vertices[1].z);
-		Vec3 v2 = Vec3.createVectorHelper(f.vertices[2].x, f.vertices[2].y, f.vertices[2].z);
-		Vec3 n = v0.subtract(v1).crossProduct(v0.subtract(v2));
-		Vec3 pI = getRayPlaneIntersection(ray,v0,n);
+		Vec3d v0 = new Vec3d(f.vertices[0].x, f.vertices[0].y, f.vertices[0].z);
+		Vec3d v1 = new Vec3d(f.vertices[1].x, f.vertices[1].y, f.vertices[1].z);
+		Vec3d v2 = new Vec3d(f.vertices[2].x, f.vertices[2].y, f.vertices[2].z);
+		Vec3d n = v0.subtract(v1).crossProduct(v0.subtract(v2));
+		Vec3d pI = getRayPlaneIntersection(ray,v0,n);
 		if(pI == null)
 			return null;
 		
@@ -31,7 +31,7 @@ public class MathHelper
 		//Extra check if quad face
 		if(f.vertices.length == 4)
 		{
-			Vec3 v4 = Vec3.createVectorHelper(f.vertices[3].x, f.vertices[3].y, f.vertices[3].z);
+			Vec3d v4 = new Vec3d(f.vertices[3].x, f.vertices[3].y, f.vertices[3].z);
 			
 			//Two extra checks cover all bases of vertex order
 			if(pointWithinTriangle(pI, v4, v1, v2))
@@ -47,11 +47,11 @@ public class MathHelper
 	 * Check if a point is within a triangle.
 	 * Point is assumed to on same plane as triangle.
 	 */
-	private static boolean pointWithinTriangle(Vec3 p, Vec3 v0, Vec3 v1, Vec3 v2)
+	private static boolean pointWithinTriangle(Vec3d p, Vec3d v0, Vec3d v1, Vec3d v2)
 	{
-		Vec3 u = v0.subtract(v1);
-		Vec3 v = v0.subtract(v2);
-		Vec3 w = v0.subtract(p);
+		Vec3d u = v0.subtract(v1);
+		Vec3d v = v0.subtract(v2);
+		Vec3d w = v0.subtract(p);
 		//System.out.println(u + " " + v + " " + w);
 		double dn = u.dotProduct(v)*u.dotProduct(v)-u.dotProduct(u)*v.dotProduct(v);
 		double s = (u.dotProduct(v)*w.dotProduct(v)-v.dotProduct(v)*w.dotProduct(u))/dn;
@@ -68,9 +68,9 @@ public class MathHelper
 	 * @param n - Normal to rotation wheel.
 	 * @return - Distance or null if not intersection.
 	 */
-	public static Double rayIntersectsRotationWheel(RayTrace ray, Vec3 p, Vec3 n)
+	public static Double rayIntersectsRotationWheel(RayTrace ray, Vec3d p, Vec3d n)
 	{
-		Vec3 pI = getRayPlaneIntersection(ray,p,n);
+		Vec3d pI = getRayPlaneIntersection(ray,p,n);
 		if(pI == null)
 			return null;
 		double d = pI.distanceTo(p);
@@ -87,12 +87,12 @@ public class MathHelper
 	 * @param n - Normal to slider.
 	 * @return - Distance or null if not intersection.
 	 */
-	public static Double rayIntersectsAxisSlider(RayTrace ray, Vec3 p, Vec3 n)
+	public static Double rayIntersectsAxisSlider(RayTrace ray, Vec3d p, Vec3d n)
 	{
-		Vec3 pI = getRayPlaneIntersection(ray,p,n);
+		Vec3d pI = getRayPlaneIntersection(ray,p,n);
 		if(pI == null)
 			return null;
-		double t = getLineScalarForClosestPoint(Vec3.createVectorHelper(0, 0, 0), p, pI);
+		double t = getLineScalarForClosestPoint(new Vec3d(0, 0, 0), p, pI);
 		double d;
 		if(t < 0)
 			d = pI.lengthVector();
@@ -112,7 +112,7 @@ public class MathHelper
 	 * @param p - Test point.
 	 * @return t
 	 */
-	public static Double getLineScalarForClosestPoint(Vec3 u, Vec3 v, Vec3 p)
+	public static Double getLineScalarForClosestPoint(Vec3d u, Vec3d v, Vec3d p)
 	{
 		//System.out.println(v.dotProduct(v));
 		return v.dotProduct(u.subtract(p))/v.dotProduct(v);
@@ -125,7 +125,7 @@ public class MathHelper
 	 * @param n - Normal to plane.
 	 * @return - Point on plane where ray intersects, null if no interception. 
 	 */
-	public static Vec3 getRayPlaneIntersection(RayTrace ray, Vec3 p, Vec3 n)
+	public static Vec3d getRayPlaneIntersection(RayTrace ray, Vec3d p, Vec3d n)
 	{
 		//System.out.println(ray.p1);
 		double rd = n.dotProduct(ray.p0.subtract(ray.p1));
@@ -135,23 +135,23 @@ public class MathHelper
 		return addVector(ray.p0, scale(ray.p0.subtract(ray.p1),r));
 	}
 
-	public static double getAngleBetweenVectors(Vec3 v, Vec3 w, Vec3 n)
+	public static double getAngleBetweenVectors(Vec3d v, Vec3d w, Vec3d n)
 	{
 		double angleDot =  Math.acos(v.dotProduct(w)/(v.lengthVector()*w.lengthVector()));
-		Vec3 crossProduct = v.crossProduct(w);
+		Vec3d crossProduct = v.crossProduct(w);
 		if(n.dotProduct(crossProduct) < 0)
 			angleDot *= -1;
 		return angleDot;
 	}
 
-	public static Vec3 addVector(Vec3 v, Vec3 w)
+	public static Vec3d addVector(Vec3d v, Vec3d w)
 	{
-		return Vec3.createVectorHelper(v.xCoord + w.xCoord, v.yCoord + w.yCoord, v.zCoord + w.zCoord);
+		return new Vec3d(v.x + w.x, v.y + w.y, v.z + w.z);
 	}
 
-	public static Vec3 scale(Vec3 v, double scale)
+	public static Vec3d scale(Vec3d v, double scale)
 	{
-		return Vec3.createVectorHelper(v.xCoord*scale, v.yCoord*scale, v.zCoord*scale);
+		return new Vec3d(v.x*scale, v.y*scale, v.z*scale);
 	}
 
 	public static float[] intToRGB(int color)

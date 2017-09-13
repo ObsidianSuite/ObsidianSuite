@@ -1,13 +1,16 @@
 package obsidianAnimator.gui;
 
 import java.io.File;
+import java.io.IOException;
 
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiButtonLanguage;
 import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.world.GameType;
 import net.minecraft.world.WorldSettings;
 import net.minecraft.world.WorldType;
+import net.minecraft.world.storage.WorldSummary;
 import net.minecraftforge.fml.client.FMLClientHandler;
 
 public class GuiAnimationMainMenu extends GuiMainMenu
@@ -41,7 +44,7 @@ public class GuiAnimationMainMenu extends GuiMainMenu
         this.buttonList.add(new GuiButton(2, this.width / 2 - 100, y + spaceY * 1, I18n.format("menu.multiplayer", new Object[0])));
         GuiButton realmsButton = new GuiButton(14, this.width / 2 - 100, y + spaceY * 3, I18n.format("menu.online", new Object[0]));
         GuiButton fmlModButton = new GuiButton(6, this.width / 2 - 100, y + spaceY * 3, "Mods");
-        fmlModButton.xPosition = this.width / 2 + 2;
+        fmlModButton.x = this.width / 2 + 2;
         realmsButton.width = 98;
         fmlModButton.width = 98;
         this.buttonList.add(realmsButton);
@@ -49,7 +52,7 @@ public class GuiAnimationMainMenu extends GuiMainMenu
     }
 	
     @Override
-    protected void actionPerformed(GuiButton button)
+    protected void actionPerformed(GuiButton button) throws IOException
     {
     	super.actionPerformed(button);
 
@@ -62,19 +65,14 @@ public class GuiAnimationMainMenu extends GuiMainMenu
 			{
 				System.out.println("No animation world found, creating a new one.");
 				
-				WorldType.worldTypes[1].onGUICreateWorldPress();
+				WorldType.WORLD_TYPES[1].onGUICreateWorldPress();
 
-				WorldSettings.GameType gametype = WorldSettings.GameType.getByName("creative");
-				WorldSettings worldsettings = new WorldSettings(0, gametype, false, false, WorldType.worldTypes[1]);
+				GameType gametype = GameType.getByName("creative");
+				WorldSettings worldsettings = new WorldSettings(0, gametype, false, false, WorldType.WORLD_TYPES[1]);
 				worldsettings.enableCommands();
 
-				this.mc.launchIntegratedServer(s, s, worldsettings);
 			}
-			else
-			{
-				System.out.println("Animation world found, loading.");
-				FMLClientHandler.instance().tryLoadExistingWorld(null, s, s);
-			}
+			this.mc.launchIntegratedServer(s, s, null);
 		}
     }
 

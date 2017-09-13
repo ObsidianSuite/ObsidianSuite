@@ -1,18 +1,19 @@
 package obsidianAnimator.render.entity;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.lwjgl.opengl.GL11;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.client.model.obj.Face;
-import net.minecraftforge.client.model.obj.GroupObject;
-import net.minecraftforge.client.model.obj.TextureCoordinate;
 import obsidianAPI.render.part.PartObj;
+import obsidianAPI.render.wavefront.Face;
+import obsidianAPI.render.wavefront.GroupObject;
+import obsidianAPI.render.wavefront.TextureCoordinate;
 import obsidianAnimator.render.MathHelper;
 import obsidianAnimator.render.RayTrace;
-import org.lwjgl.opengl.GL11;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * One partObj for each 'part' of the model.

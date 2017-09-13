@@ -6,10 +6,14 @@ import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.gui.inventory.GuiContainerCreative;
+import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.inventory.ClickType;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
@@ -32,12 +36,12 @@ public class GuiContainerChooseItem extends GuiContainerCreative
 	}
 
 	@Override
-	protected void handleMouseClick(Slot par1Slot, int par2, int par3, int par4)
+	protected void handleMouseClick(Slot par1Slot, int par2, int par3, ClickType clickType)
 	{
 		ItemStack itemstack;
 		InventoryPlayer inventoryplayer;
 
-		if(par4 == 0 && par1Slot != null && par1Slot.getHasStack())
+		if(par1Slot != null && par1Slot.getHasStack())
 		{
 			this.gui.setItemStack(par1Slot.getStack());
 		}
@@ -47,9 +51,9 @@ public class GuiContainerChooseItem extends GuiContainerCreative
 	public void initGui()
 	{
 		super.initGui();
-		Method setCurrentCreativeTab = ReflectionHelper.findMethod(GuiContainerCreative.class, this, new String[] { "setCurrentCreativeTab", "func_147050_b"}, CreativeTabs.class);
+		Method setCurrentCreativeTab = ReflectionHelper.findMethod(GuiContainerCreative.class, "setCurrentCreativeTab", "func_147050_b", CreativeTabs.class);
 		GuiTextField searchField = ObfuscationReflectionHelper.getPrivateValue(GuiContainerCreative.class, this, "searchField", "field_147062_A");
-		Method updateCreativeSearch = ReflectionHelper.findMethod(GuiContainerCreative.class, this, new String[] { "updateCreativeSearch", "func_147053_i"});
+		Method updateCreativeSearch = ReflectionHelper.findMethod(GuiContainerCreative.class, "updateCreativeSearch", "func_147053_i");
 	}
 
 	@Override
@@ -64,12 +68,15 @@ public class GuiContainerChooseItem extends GuiContainerCreative
 	
 	private void drawCustomGui(double x, double y, double width, double height, double zLevel)
 	{
-		Tessellator tessellator = Tessellator.instance;
-        tessellator.startDrawingQuads();
-        tessellator.addVertexWithUV(x + 0, y + height, zLevel, 0,1);
-        tessellator.addVertexWithUV(x + width, y + height, zLevel, 1, 1);
-        tessellator.addVertexWithUV(x + width, y + 0, zLevel, 1,0);
-        tessellator.addVertexWithUV(x + 0, y + 0, zLevel, 0, 0);
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+		Tessellator tessellator = Tessellator.getInstance();
+        BufferBuilder bufferbuilder = tessellator.getBuffer();
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        bufferbuilder.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR);
+        bufferbuilder.pos(x + 0, y + height, zLevel).endVertex();
+        bufferbuilder.pos(x + width, y + height, zLevel).endVertex();
+        bufferbuilder.pos(x + width, y + 0, zLevel).endVertex();
+        bufferbuilder.pos(x + 0, y + 0, zLevel).endVertex();
         tessellator.draw();
 	}
 }

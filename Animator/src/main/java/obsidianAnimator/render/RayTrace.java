@@ -8,16 +8,15 @@ import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.GLU;
 
-import net.minecraft.util.Vec3;
-import obsidianAPI.render.part.PartObj;
+import net.minecraft.util.math.Vec3d;
 
 public class RayTrace 
 {
 	
-	public final Vec3 p0;
-	public final Vec3 p1;
+	public final Vec3d p0;
+	public final Vec3d p1;
 
-	public RayTrace(Vec3 p0, Vec3 p1)
+	public RayTrace(Vec3d p0, Vec3d p1)
 	{
 		this.p0 = p0;
 		this.p1 = p1;
@@ -48,8 +47,8 @@ public class RayTrace
 			posFar[i] = posFarBuffer.get(i);
 		}
 
-		Vec3 v = Vec3.createVectorHelper(posNear[0], posNear[1], posNear[2]);
-		Vec3 w = Vec3.createVectorHelper(posFar[0], posFar[1], posFar[2]);
+		Vec3d v = new Vec3d(posNear[0], posNear[1], posNear[2]);
+		Vec3d w = new Vec3d(posFar[0], posFar[1], posFar[2]);
 		
 		return new RayTrace(v,w);
 		

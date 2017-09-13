@@ -4,12 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.client.model.obj.GroupObject;
-import net.minecraftforge.client.model.obj.WavefrontObject;
 import obsidianAPI.render.ModelObj;
 import obsidianAPI.render.bend.Bend;
 import obsidianAPI.render.part.Part;
 import obsidianAPI.render.part.PartObj;
+import obsidianAPI.render.wavefront.GroupObject;
+import obsidianAPI.render.wavefront.WavefrontObject;
 import obsidianAnimator.render.Bend_Animator;
 
 public class ModelObj_Animator extends ModelObj

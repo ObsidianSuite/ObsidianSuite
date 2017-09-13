@@ -1,9 +1,8 @@
 package obsidianAnimator.render.entity;
 
 import net.minecraft.entity.monster.EntityMob;
-import net.minecraft.item.Item.ToolMaterial;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemSword;
+import net.minecraft.util.EnumHand;
 import net.minecraft.world.World;
 
 public class EntityObj extends EntityMob
@@ -23,7 +22,7 @@ public class EntityObj extends EntityMob
 	}
 	
     @Override
-	public ItemStack getHeldItem()
+	public ItemStack getHeldItem(EnumHand hand)
 	{
 		return heldItem;
 	}
