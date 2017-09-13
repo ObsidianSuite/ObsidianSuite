@@ -4,14 +4,14 @@ import javax.swing.InputMap;
 import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.Mod;
-import cpw.mods.fml.common.SidedProxy;
-import cpw.mods.fml.common.event.FMLInitializationEvent;
-import cpw.mods.fml.common.event.FMLInterModComms;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.SidedProxy;
+import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLInterModComms;
 import obsidianAnimator.block.BlockBase;
 import obsidianAnimator.block.BlockGrid;
 
@@ -49,7 +49,7 @@ public class ObsidianAnimator
         if(FMLCommonHandler.instance().getEffectiveSide().isClient())
             FMLCommonHandler.instance().bus().register(eventHandler);
         
-        Minecraft.getMinecraft().gameSettings.showInventoryAchievementHint = false;
+        //Minecraft.getMinecraft().gameSettings.showInventoryAchievementHint = false;
         Minecraft.getMinecraft().gameSettings.saveOptions();
         
         //Stop space from activating buttons, allowing it to be used for adding keyframes in the timeline.

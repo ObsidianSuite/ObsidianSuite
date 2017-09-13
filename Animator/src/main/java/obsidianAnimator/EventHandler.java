@@ -1,13 +1,13 @@
 package obsidianAnimator;
 
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.common.gameevent.TickEvent;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.event.world.WorldEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import obsidianAnimator.data.Persistence;
 import obsidianAnimator.gui.GuiAnimationMainMenu;
 import obsidianAnimator.gui.GuiBlack;
@@ -108,7 +108,7 @@ public class EventHandler
 		if(Minecraft.getMinecraft().currentScreen instanceof GuiMainMenu && !(Minecraft.getMinecraft().currentScreen instanceof GuiAnimationMainMenu))
 			Minecraft.getMinecraft().displayGuiScreen(new GuiAnimationMainMenu());
 
-		if(Minecraft.getMinecraft().inGameHasFocus && Minecraft.getMinecraft().currentScreen == null && MinecraftServer.getServer().getWorldName().equals("animation_world"))
+		if(Minecraft.getMinecraft().inGameHasFocus && Minecraft.getMinecraft().currentScreen == null && Minecraft.getMinecraft().world.getWorldInfo().getWorldName().equals("animation_world"))
 		{
 			Minecraft.getMinecraft().displayGuiScreen(new GuiBlack());
 			new HomeFrame().display();
