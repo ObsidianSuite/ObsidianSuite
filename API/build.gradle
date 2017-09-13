@@ -22,7 +22,7 @@ group = "ObsidianSuite" // http://maven.apache.org/guides/mini/guide-naming-conv
 archivesBaseName = "ObsidianAPI"
 
 minecraft {
-    version = "1.7.10-10.13.4.1614-1.7.10"
+    version = "1.12.1-14.22.1.2478"
     runDir = "run"
 }
 
