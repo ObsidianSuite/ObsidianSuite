@@ -21,19 +21,13 @@ public class EntitySaiga extends EntityCreature implements IEntityAnimated
         this.tasks.addTask(1, new EntityAIPanicAnimation(this, 2.0D));
         this.tasks.addTask(2, new EntityAIEat(this));
 	}
-	
-	@Override
-	protected boolean isAIEnabled()
-	{
-	   return true;
-	}
 
 	@Override
     protected void applyEntityAttributes()
     {
         super.applyEntityAttributes();
-        this.getEntityAttribute(SharedMonsterAttributes.maxHealth).setBaseValue(10.0D);
-        this.getEntityAttribute(SharedMonsterAttributes.movementSpeed).setBaseValue(0.18D);
+        this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(10.0D);
+        this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.18D);
     }
 
 	@Override

@@ -2,20 +2,16 @@ package obsidianAnimations;
 
 import java.util.Random;
 
-import cpw.mods.fml.common.registry.EntityRegistry;
 import net.minecraft.entity.EntityList;
-import obsidianAnimations.entity.EntityDummyPlayer;
+import net.minecraftforge.fml.common.registry.EntityRegistry;
 import obsidianAnimations.entity.saiga.EntitySaiga;
-import obsidianAnimations.fnaf.EntityFreddy;
 
 public class ModEntities 
 {
 
 	public static void registerEntities()
 	{
-		registerEntity(EntityDummyPlayer.class, "DummyPlayer");
 		registerEntity(EntitySaiga.class, "Saiga");
-		registerEntity(EntityFreddy.class, "Freddy");
 	}
 
 	public static void registerEntity(Class entityClass, String name)
