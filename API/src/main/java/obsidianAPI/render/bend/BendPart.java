@@ -1,16 +1,16 @@
 package obsidianAPI.render.bend;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.client.model.obj.Face;
-import net.minecraftforge.client.model.obj.GroupObject;
-import net.minecraftforge.client.model.obj.TextureCoordinate;
-import net.minecraftforge.client.model.obj.Vertex;
 import obsidianAPI.render.ModelObj;
-
-import java.util.ArrayList;
-import java.util.List;
+import obsidianAPI.render.wavefront.Face;
+import obsidianAPI.render.wavefront.GroupObject;
+import obsidianAPI.render.wavefront.TextureCoordinate;
+import obsidianAPI.render.wavefront.Vertex;
 
 public class BendPart extends GroupObject
 {

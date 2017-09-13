@@ -1,14 +1,14 @@
 package obsidianAPI.render.bend;
 
-import net.minecraftforge.client.model.obj.Face;
-import net.minecraftforge.client.model.obj.TextureCoordinate;
-import net.minecraftforge.client.model.obj.Vertex;
-import obsidianAPI.render.part.PartObj;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import obsidianAPI.render.part.PartObj;
+import obsidianAPI.render.wavefront.Face;
+import obsidianAPI.render.wavefront.TextureCoordinate;
+import obsidianAPI.render.wavefront.Vertex;
 
 public class PartUVMap
 {

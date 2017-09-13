@@ -20,11 +20,8 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTTagString;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.client.model.obj.GroupObject;
-import net.minecraftforge.client.model.obj.WavefrontObject;
 import obsidianAPI.animation.AnimationParenting;
 import obsidianAPI.animation.PartGroups;
-import obsidianAPI.animation.wrapper.IEntityAnimated;
 import obsidianAPI.file.PartData;
 import obsidianAPI.render.bend.Bend;
 import obsidianAPI.render.part.Part;
@@ -33,6 +30,8 @@ import obsidianAPI.render.part.PartObj;
 import obsidianAPI.render.part.prop.PartPropRotation;
 import obsidianAPI.render.part.prop.PartPropScale;
 import obsidianAPI.render.part.prop.PartPropTranslation;
+import obsidianAPI.render.wavefront.GroupObject;
+import obsidianAPI.render.wavefront.WavefrontObject;
 
 public class ModelObj extends ModelBase {
 

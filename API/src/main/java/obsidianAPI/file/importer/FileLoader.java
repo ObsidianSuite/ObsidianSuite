@@ -14,11 +14,11 @@ import org.apache.commons.io.IOUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.IResource;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.client.model.obj.WavefrontObject;
 import obsidianAPI.file.FileHandler;
 import obsidianAPI.file.ModelFileHandler;
 import obsidianAPI.file.ObsidianFile;
 import obsidianAPI.render.ModelObj;
+import obsidianAPI.render.wavefront.WavefrontObject;
 
 public class FileLoader {
 

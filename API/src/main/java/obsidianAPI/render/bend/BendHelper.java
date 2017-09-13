@@ -1,12 +1,12 @@
 package obsidianAPI.render.bend;
 
-import net.minecraftforge.client.model.obj.Face;
-import net.minecraftforge.client.model.obj.Vertex;
-import obsidianAPI.render.part.PartObj;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import obsidianAPI.render.part.PartObj;
+import obsidianAPI.render.wavefront.Face;
+import obsidianAPI.render.wavefront.Vertex;
 
 public class BendHelper
 {

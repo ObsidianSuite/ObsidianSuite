@@ -1,8 +1,8 @@
 package obsidianAPI.render.bend;
 
-import net.minecraftforge.client.model.obj.Face;
-import net.minecraftforge.client.model.obj.TextureCoordinate;
-import net.minecraftforge.client.model.obj.Vertex;
+import obsidianAPI.render.wavefront.Face;
+import obsidianAPI.render.wavefront.TextureCoordinate;
+import obsidianAPI.render.wavefront.Vertex;
 
 /**
  * Maps a vertices to texturecoordinates.

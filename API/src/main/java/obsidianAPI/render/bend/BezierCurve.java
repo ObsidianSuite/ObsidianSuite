@@ -1,9 +1,9 @@
 package obsidianAPI.render.bend;
 
-import net.minecraft.util.Vec3;
-import net.minecraftforge.client.model.obj.Face;
-import net.minecraftforge.client.model.obj.GroupObject;
-import net.minecraftforge.client.model.obj.Vertex;
+import net.minecraft.util.math.Vec3d;
+import obsidianAPI.render.wavefront.Face;
+import obsidianAPI.render.wavefront.GroupObject;
+import obsidianAPI.render.wavefront.Vertex;
 
 /**
  * Used for calculations involving cubic bezier curves.
@@ -49,26 +49,26 @@ public class BezierCurve
     private void setupControlVertices()
     {
         //Line l1: v1 = p1 + t*d1.
-        Vec3 p1 = Vec3.createVectorHelper(a1.x, a1.y, a1.z);
-        Vec3 d1 = getDirectionVector(a1, a2);
+        Vec3d p1 = new Vec3d(a1.x, a1.y, a1.z);
+        Vec3d d1 = getDirectionVector(a1, a2);
         //Line l2: v2 = p2 + u*d2.
-        Vec3 p2 = Vec3.createVectorHelper(b1.x, b1.y, b1.z);
-        Vec3 d2 = getDirectionVector(b1, b2);
+        Vec3d p2 = new Vec3d(b1.x, b1.y, b1.z);
+        Vec3d d2 = getDirectionVector(b1, b2);
 
         //S is the scalar value that will produce the vertex (a2.x, defaultY, a2.z).
         //Control points work best if they are slightly further away, so multiply scalar by 1.2.
-        double s = (defaultY - a1.y) / d1.yCoord;
+        double s = (defaultY - a1.y) / d1.y;
         double s1 = s * 1.3F;
         double s2 = s * 1.3F;
 
         //Point on line1 = p1 + scalar*d1
         //Point on line2 = p2 + scalar*d2
-        Vec3 cl1 = p1.addVector(d1.xCoord * s1, d1.yCoord * s1, d1.zCoord * s1);
-        Vec3 cl2 = p2.addVector(d2.xCoord * s2, d2.yCoord * s2, d2.zCoord * s2);
+        Vec3d cl1 = p1.addVector(d1.x * s1, d1.y * s1, d1.z * s1);
+        Vec3d cl2 = p2.addVector(d2.x * s2, d2.y * s2, d2.z * s2);
 
         //Convert to vertex.
-        c1 = new Vertex((float) cl1.xCoord, (float) cl1.yCoord, (float) cl1.zCoord);
-        c2 = new Vertex((float) cl2.xCoord, (float) cl2.yCoord, (float) cl2.zCoord);
+        c1 = new Vertex((float) cl1.x, (float) cl1.y, (float) cl1.z);
+        c2 = new Vertex((float) cl2.x, (float) cl2.y, (float) cl2.z);
 
         groupObj = new BezierGroupObj();
     }
@@ -115,10 +115,10 @@ public class BezierCurve
     /**
      * Get the direction vector from p to q.
      */
-    private Vec3 getDirectionVector(Vertex p, Vertex q)
+    private Vec3d getDirectionVector(Vertex p, Vertex q)
     {
-        Vec3 pVec = Vec3.createVectorHelper(p.x, p.y, p.z);
-        Vec3 qVec = Vec3.createVectorHelper(q.x, q.y, q.z);
+        Vec3d pVec = new Vec3d(p.x, p.y, p.z);
+        Vec3d qVec = new Vec3d(q.x, q.y, q.z);
         return pVec.subtract(qVec);
     }
 

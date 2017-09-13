@@ -1,5 +1,6 @@
 package obsidianAPI.render;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.RenderLiving;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
@@ -16,7 +17,7 @@ public class RenderAnimated extends RenderLiving implements IRenderAnimated
 	
 	public RenderAnimated(ModelAnimated model, float shadowSize)
 	{
-		super(model, shadowSize);
+		super(Minecraft.getMinecraft().getRenderManager(), model, shadowSize);
 		this.model = model;
 	}
 	

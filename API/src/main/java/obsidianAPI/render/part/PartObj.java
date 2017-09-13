@@ -12,12 +12,11 @@ import com.google.common.collect.Sets;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.client.model.obj.Face;
-import net.minecraftforge.client.model.obj.GroupObject;
-import net.minecraftforge.client.model.obj.TextureCoordinate;
 import obsidianAPI.render.ModelObj;
 import obsidianAPI.render.bend.Bend;
+import obsidianAPI.render.wavefront.Face;
+import obsidianAPI.render.wavefront.GroupObject;
+import obsidianAPI.render.wavefront.TextureCoordinate;
 
 /**
  * One partObj for each 'part' of the model.

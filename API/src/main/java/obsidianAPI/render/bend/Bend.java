@@ -1,12 +1,13 @@
 package obsidianAPI.render.bend;
 
-import net.minecraft.entity.Entity;
-import net.minecraftforge.client.model.obj.Vertex;
-import obsidianAPI.render.part.PartObj;
-import org.lwjgl.opengl.GL11;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import org.lwjgl.opengl.GL11;
+
+import net.minecraft.entity.Entity;
+import obsidianAPI.render.part.PartObj;
+import obsidianAPI.render.wavefront.Vertex;
 
 
 public class Bend

@@ -6,10 +6,10 @@ import org.lwjgl.opengl.GL11;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.client.model.obj.WavefrontObject;
 import obsidianAPI.EntityAnimationPropertiesClient;
 import obsidianAPI.animation.AnimationSequence;
 import obsidianAPI.render.part.Part;
+import obsidianAPI.render.wavefront.WavefrontObject;
 
 public abstract class ModelAnimated extends ModelObj
 {

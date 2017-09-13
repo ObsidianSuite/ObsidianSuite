@@ -1,6 +1,6 @@
 package obsidianAPI.render.bend;
 
-import net.minecraftforge.client.model.obj.Vertex;
+import obsidianAPI.render.wavefront.Vertex;
 
 /**
  * More complex vertex class, includes a distance component.

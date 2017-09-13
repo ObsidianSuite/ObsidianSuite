@@ -1,14 +1,12 @@
 package obsidianAPI.render.player;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.client.model.obj.WavefrontObject;
-import obsidianAPI.EntityAnimationProperties;
-import obsidianAPI.animation.AnimationSequence;
+import net.minecraft.util.math.MathHelper;
 import obsidianAPI.debug.GuiDebug;
 import obsidianAPI.render.ModelAnimated;
 import obsidianAPI.render.part.PartObj;
+import obsidianAPI.render.wavefront.WavefrontObject;
 
 public class ModelAnimatedPlayer extends ModelAnimated
 {
@@ -144,10 +142,10 @@ public class ModelAnimatedPlayer extends ModelAnimated
 		float f6;
 		float f7;
 
-		if (this.onGround > -9990.0F)
+		if (this.swingProgress > -9990.0F)
 		{
-			f6 = this.onGround;
-			bodyUp.setValue(MathHelper.sin(MathHelper.sqrt_float(f6) * (float)Math.PI * 2.0F) * 0.2F, 1);
+			f6 = this.swingProgress;
+			bodyUp.setValue(MathHelper.sin(MathHelper.sqrt(f6) * (float)Math.PI * 2.0F) * 0.2F, 1);
 			//armUpR.setValue(MathHelper.sin(bodyUp.getValue(1)) * 5.0F, 2);
 			//armUpR.setValue(-MathHelper.cos(bodyUp.getValue(1)) * 5.0F, 0);
 			//armUpL.setValue(-MathHelper.sin(bodyUp.getValue(1)) * 5.0F, 2);
@@ -155,15 +153,15 @@ public class ModelAnimatedPlayer extends ModelAnimated
 			armUpR.setValue(armUpR.getValue(1) + bodyUp.getValue(1), 1);
 			armUpL.setValue(armUpR.getValue(1) + bodyUp.getValue(1), 1);
 			armUpL.setValue(armUpL.getValue(0) + bodyUp.getValue(1), 0);
-			f6 = 1.0F - this.onGround;
+			f6 = 1.0F - this.swingProgress;
 			f6 *= f6;
 			f6 *= f6;
 			f6 = 1.0F - f6;
 			f7 = MathHelper.sin(f6 * (float)Math.PI);
-			float f8 = MathHelper.sin(this.onGround * (float)Math.PI) * -(head.getValue(0) - 0.7F) * 0.75F;
+			float f8 = MathHelper.sin(this.swingProgress * (float)Math.PI) * -(head.getValue(0) - 0.7F) * 0.75F;
 			armUpR.setValue((float) (armUpR.getValue(0)  - ((double)f7 * 1.2D + (double)f8)), 0);            
 			armUpR.setValue(armUpR.getValue(1) + bodyUp.getValue(1) * 2.0F, 1);
-			armUpR.setValue(MathHelper.sin(this.onGround * (float)Math.PI) * -0.4F, 2);
+			armUpR.setValue(MathHelper.sin(this.swingProgress * (float)Math.PI) * -0.4F, 2);
 		}
 
 		//Sneaking, or not...
