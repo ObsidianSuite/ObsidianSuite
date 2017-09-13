@@ -1,10 +1,10 @@
 package obsidianAnimator.gui;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import obsidianAnimator.data.ModelHandler;
 import obsidianAnimator.gui.timeline.swing.subsection.TimelineItemController;
 import obsidianAnimator.render.entity.EntityObj;
@@ -19,7 +19,7 @@ public class GuiInventoryChooseItem extends GuiInventory
 
     public GuiInventoryChooseItem(boolean leftHand, TimelineItemController controller, EntityObj entity)
     {
-        super(Minecraft.getMinecraft().thePlayer);
+        super(Minecraft.getMinecraft().player);
         this.allowUserInput = true;
         this.controller = controller;
         this.entity = entity;
@@ -32,7 +32,7 @@ public class GuiInventoryChooseItem extends GuiInventory
     public void initGui()
     {
         this.buttonList.clear();
-        this.mc.displayGuiScreen(new GuiContainerChooseItem(this.mc.thePlayer, this));
+        this.mc.displayGuiScreen(new GuiContainerChooseItem(this.mc.player, this));
     }
     
     /**
@@ -40,7 +40,7 @@ public class GuiInventoryChooseItem extends GuiInventory
      */
     public void updateScreen()
     {
-    	this.mc.displayGuiScreen(new GuiContainerChooseItem(this.mc.thePlayer, this));
+    	this.mc.displayGuiScreen(new GuiContainerChooseItem(this.mc.player, this));
     }
     
     public void setItemStack(ItemStack itemStack)

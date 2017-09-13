@@ -1,5 +1,7 @@
 package obsidianAnimator.gui.entitySetup;
 
+import java.io.IOException;
+
 import org.lwjgl.input.Keyboard;
 
 import obsidianAPI.render.part.PartObj;
@@ -25,7 +27,7 @@ public class EntitySetupGui extends GuiEntityRenderer
 
 
 	@Override
-	protected void keyTyped(char par1, int par2)
+	protected void keyTyped(char par1, int par2) throws IOException
 	{
 		if(par2 == Keyboard.KEY_ESCAPE)
 			controller.close();
@@ -34,7 +36,7 @@ public class EntitySetupGui extends GuiEntityRenderer
 	}
 
 	@Override
-	protected void mouseClicked(int x, int y, int i) 
+	protected void mouseClicked(int x, int y, int i) throws IOException 
 	{
 		super.mouseClicked(x, y, i);
 		if(i == 1 && hoveredPart != null) {

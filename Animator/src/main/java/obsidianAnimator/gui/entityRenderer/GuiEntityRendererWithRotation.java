@@ -1,11 +1,16 @@
 package obsidianAnimator.gui.entityRenderer;
 
+import java.io.IOException;
+
 import org.lwjgl.opengl.GL11;
 
+import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.Vec3;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.Vec3d;
 import obsidianAPI.render.part.Part;
 import obsidianAPI.render.part.PartObj;
 import obsidianAPI.render.part.PartRotation;
@@ -25,9 +30,9 @@ public class GuiEntityRendererWithRotation extends GuiEntityRenderer
 	private Integer rotationWheelPlane;
 
 	//Vector for current rotation of wheel while dragging.
-	private Vec3 rotationGuidePoint;
+	private Vec3d rotationGuidePoint;
 	//Vector for rotation of wheel when first clicked on.
-	private Vec3 initialRotationGuidePoint;
+	private Vec3d initialRotationGuidePoint;
 	private double prevRotationWheelDelta = 0.0F;
 	
 	//Used for storing the values of the part before rotation 
@@ -56,7 +61,7 @@ public class GuiEntityRendererWithRotation extends GuiEntityRenderer
 	 * ---------------------------------------------------- */
 
 	@Override
-	protected void mouseClicked(int x, int y, int button) 
+	protected void mouseClicked(int x, int y, int button) throws IOException 
 	{
 		//If mouse over and lmb clicked, begin drag.
 		if(rotationWheelMouseOver && button == 0)
@@ -72,9 +77,9 @@ public class GuiEntityRendererWithRotation extends GuiEntityRenderer
 	}
 
 	@Override
-	public void mouseMovedOrUp(int x, int y, int which) 
+	public void mouseReleased(int x, int y, int which) 
 	{
-		super.mouseMovedOrUp(x, y, which);
+		super.mouseReleased(x, y, which);
 		//If lmb lifted, reset drag, guide and delta.
 		if(which == 0)
 		{
@@ -163,15 +168,15 @@ public class GuiEntityRendererWithRotation extends GuiEntityRenderer
 	{
 		Double min = null;
 		Integer dim = null;
-		Vec3 p = Vec3.createVectorHelper(0,0,0);
+		Vec3d p = new Vec3d(0,0,0);
 		for(int i = 0; i < 3; i++)
 		{
-			Vec3 n = null;
+			Vec3d n = null;
 			switch(i)
 			{
-			case 0: n = Vec3.createVectorHelper(1, 0, 0); break;
-			case 1: n = Vec3.createVectorHelper(0, 1, 0); break;
-			case 2: n = Vec3.createVectorHelper(0, 0, 1); break;
+			case 0: n = new Vec3d(1, 0, 0); break;
+			case 1: n = new Vec3d(0, 1, 0); break;
+			case 2: n = new Vec3d(0, 0, 1); break;
 			}
 			Double d = MathHelper.rayIntersectsRotationWheel(RayTrace.getRayTrace(), p, n);
 			if(d != null && (min == null || d < min))
@@ -183,17 +188,17 @@ public class GuiEntityRendererWithRotation extends GuiEntityRenderer
 		return dim;	
 	}
 
-	public Vec3 getMouseVectorInPlane(int dim)
+	public Vec3d getMouseVectorInPlane(int dim)
 	{
-		Vec3 n = null;
-		Vec3 p = Vec3.createVectorHelper(0,0,0);
+		Vec3d n = null;
+		Vec3d p = new Vec3d(0,0,0);
 		switch(dim)
 		{
-		case 0: n = Vec3.createVectorHelper(1, 0, 0); break;
-		case 1: n = Vec3.createVectorHelper(0, 1, 0); break;
-		case 2: n = Vec3.createVectorHelper(0, 0, 1); break; 
+		case 0: n = new Vec3d(1, 0, 0); break;
+		case 1: n = new Vec3d(0, 1, 0); break;
+		case 2: n = new Vec3d(0, 0, 1); break; 
 		}
-		Vec3 v = MathHelper.getRayPlaneIntersection(RayTrace.getRayTrace(), p, n);
+		Vec3d v = MathHelper.getRayPlaneIntersection(RayTrace.getRayTrace(), p, n);
 		return v;
 	}
 
@@ -201,12 +206,12 @@ public class GuiEntityRendererWithRotation extends GuiEntityRenderer
 	{
 		if(rotationGuidePoint != null && initialRotationGuidePoint != null)
 		{
-			Vec3 n = null;
+			Vec3d n = null;
 			switch(rotationWheelPlane)
 			{
-			case 0: n = Vec3.createVectorHelper(1, 0, 0); break;
-			case 1: n = Vec3.createVectorHelper(0, 1, 0); break;
-			case 2: n = Vec3.createVectorHelper(0, 0, 1); break; 
+			case 0: n = new Vec3d(1, 0, 0); break;
+			case 1: n = new Vec3d(0, 1, 0); break;
+			case 2: n = new Vec3d(0, 0, 1); break; 
 			}
 			double rotationWheelDelta = MathHelper.getAngleBetweenVectors(rotationGuidePoint, initialRotationGuidePoint, n);
 			double d = rotationWheelDelta - prevRotationWheelDelta;
@@ -260,7 +265,7 @@ public class GuiEntityRendererWithRotation extends GuiEntityRenderer
 		}
 		else if(selectedPart instanceof PartPropRotation) //Prop rotation
 		{
-			ItemStack itemstack = entityToRender.getHeldItem();
+			ItemStack itemstack = entityToRender.getHeldItem(EnumHand.MAIN_HAND);
 			if (selectedPart.getName().equals("prop_rot"))
 			{
 				ModelHandler.modelRenderer.transformToItemCentreAndRotateRight(itemstack);
@@ -278,11 +283,11 @@ public class GuiEntityRendererWithRotation extends GuiEntityRenderer
 
 	private void drawRotationWheel()
 	{
-		Vec3 origin = Vec3.createVectorHelper(0.0F, 0.0F, 0.0F);
+		Vec3d origin = new Vec3d(0.0F, 0.0F, 0.0F);
 
-		drawLine(Vec3.createVectorHelper(-0.05F, 0.0F, 0.0F), Vec3.createVectorHelper(0.05F, 0.0F, 0.0F), 0xFFFFFF);
-		drawLine(Vec3.createVectorHelper(0.0F, -0.05F, 0.0F), Vec3.createVectorHelper(0.0F, 0.05F, 0.0F), 0xFFFFFF);
-		drawLine(Vec3.createVectorHelper(0.0F, 0.0F, -0.05F), Vec3.createVectorHelper(0.0F, 0.0F, 0.05F), 0xFFFFFF);
+		drawLine(new Vec3d(-0.05F, 0.0F, 0.0F), new Vec3d(0.05F, 0.0F, 0.0F), 0xFFFFFF, 1.0f, 1.0f);
+		drawLine(new Vec3d(0.0F, -0.05F, 0.0F), new Vec3d(0.0F, 0.05F, 0.0F), 0xFFFFFF, 1.0f, 1.0f);
+		drawLine(new Vec3d(0.0F, 0.0F, -0.05F), new Vec3d(0.0F, 0.0F, 0.05F), 0xFFFFFF, 1.0f, 1.0f);
 
 		int colour = 0xFFFFFF;
 		for(int i = 0; i < 3; i++)
@@ -306,7 +311,7 @@ public class GuiEntityRendererWithRotation extends GuiEntityRenderer
 	 * @param r - Radius of circle.
 	 * @param plane - 0,1,2 for x,y and z.
 	 */
-	private void drawCircle(Vec3 c, double r, int plane, int colour, float width, float alpha)
+	private void drawCircle(Vec3d c, double r, int plane, int colour, float width, float alpha)
 	{		
 		GL11.glPushMatrix();
 		GL11.glEnable(GL11.GL_BLEND);
@@ -319,20 +324,20 @@ public class GuiEntityRendererWithRotation extends GuiEntityRenderer
 		for(int i = 0; i < 360; i++)
 		{
 			double rad = i/180F*Math.PI;
-			double x = c.xCoord,y = c.yCoord,z = c.zCoord;
+			double x = c.x,y = c.y,z = c.z;
 			switch(plane)
 			{
 			case 0:
-				y = c.yCoord + r*Math.sin(rad);
-				z = c.zCoord + r*Math.cos(rad);
+				y = c.y + r*Math.sin(rad);
+				z = c.z + r*Math.cos(rad);
 				break;
 			case 1:
-				x = c.xCoord + r*Math.sin(rad);
-				z = c.zCoord + r*Math.cos(rad);
+				x = c.x + r*Math.sin(rad);
+				z = c.z + r*Math.cos(rad);
 				break;
 			case 2:
-				x = c.xCoord + r*Math.sin(rad);
-				y = c.yCoord + r*Math.cos(rad);
+				x = c.x + r*Math.sin(rad);
+				y = c.y + r*Math.cos(rad);
 				break;
 			}
 			GL11.glVertex3d(x,y,z);
@@ -344,22 +349,24 @@ public class GuiEntityRendererWithRotation extends GuiEntityRenderer
 		GL11.glPopMatrix();
 	}
 
-	private void drawLine(Vec3 p1, Vec3 p2, int color)
+	protected void drawLine(Vec3d p1, Vec3d p2, int colour, float alpha, float width)
 	{
 		GL11.glPushMatrix();
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
 		OpenGlHelper.glBlendFunc(770, 771, 1, 0);
-		GL11.glLineWidth(2.0F);
+		GL11.glColor4f(1.0F, 1.0F, 1.0F, alpha);
+		GL11.glLineWidth(width);
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glDepthMask(false);
-
-		Tessellator tessellator = Tessellator.instance;
-
-		tessellator.startDrawing(1);
-		tessellator.setColorOpaque_I(color);
-		tessellator.addVertex(p1.xCoord,p1.yCoord,p1.zCoord);
-		tessellator.addVertex(p2.xCoord,p2.yCoord,p2.zCoord);
+		float[] rgb = MathHelper.intToRGB(colour);
+		
+		Tessellator tessellator = Tessellator.getInstance();
+		BufferBuilder buffer = tessellator.getBuffer();
+		buffer.begin(1, DefaultVertexFormats.POSITION);
+		buffer.color(rgb[0], rgb[1], rgb[2], alpha);
+		buffer.pos(p1.x, p1.y, p1.z).endVertex();
+		buffer.pos(p2.x, p2.y, p2.z).endVertex();
 		tessellator.draw();
 
 		GL11.glDepthMask(true);

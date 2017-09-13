@@ -4,6 +4,9 @@ import obsidianAPI.render.part.Part;
 import obsidianAnimator.gui.ExternalFrame;
 import obsidianAnimator.gui.entityRenderer.GuiEntityRendererWithTranslation;
 import obsidianAnimator.gui.timeline.changes.ChangeSetValues;
+
+import java.io.IOException;
+
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
@@ -44,7 +47,7 @@ public class TimelineGui extends GuiEntityRendererWithTranslation implements Ext
     }
 
     @Override
-    protected void keyTyped(char par1, int par2)
+    protected void keyTyped(char par1, int par2) throws IOException
     {
         controller.handleMinecraftKey(par2);
         if (par2 != Keyboard.KEY_ESCAPE)

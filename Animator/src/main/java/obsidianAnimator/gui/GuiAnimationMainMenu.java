@@ -2,18 +2,13 @@ package obsidianAnimator.gui;
 
 import java.io.File;
 
-import org.lwjgl.opengl.GL11;
-
-import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiButtonLanguage;
 import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.client.resources.I18n;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.WorldSettings;
 import net.minecraft.world.WorldType;
-import net.minecraft.world.storage.ISaveFormat;
-import net.minecraft.world.storage.WorldInfo;
+import net.minecraftforge.fml.client.FMLClientHandler;
 
 public class GuiAnimationMainMenu extends GuiMainMenu
 {

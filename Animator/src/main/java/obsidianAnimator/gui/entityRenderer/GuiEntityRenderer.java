@@ -1,11 +1,9 @@
 package obsidianAnimator.gui.entityRenderer;
 
-import java.util.ArrayList;
+import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import obsidianAPI.render.part.PartEntityPos;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
@@ -13,13 +11,15 @@ import org.lwjgl.opengl.GL12;
 
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.BlockRendererDispatcher;
 import net.minecraft.client.renderer.OpenGlHelper;
-import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.util.math.BlockPos;
 import obsidianAPI.render.part.Part;
+import obsidianAPI.render.part.PartEntityPos;
 import obsidianAPI.render.part.PartObj;
 import obsidianAnimator.ObsidianAnimator;
 import obsidianAnimator.data.ModelHandler;
@@ -46,7 +46,7 @@ public class GuiEntityRenderer extends GuiBlack
 
 	protected int scaleModifier = 0, horizontalPan = 0,verticalPan = 0;
 
-	private RenderBlocks renderBlocks = new RenderBlocks();
+	private BlockRendererDispatcher blockRenderer = Minecraft.getMinecraft().getBlockRendererDispatcher();
 
 	private final Map<Integer,View> views = new HashMap<Integer, View>();
 
@@ -59,7 +59,7 @@ public class GuiEntityRenderer extends GuiBlack
 		//Init variables.
 		this.entityName = entityName;
 		this.entityModel = ModelHandler.getModel(entityName);
-		entityToRender = new EntityObj(Minecraft.getMinecraft().theWorld, entityName);
+		entityToRender = new EntityObj(Minecraft.getMinecraft().world, entityName);
 
 		selectedPart = entityModel.parts.get(0);
 		setupViews();
@@ -165,7 +165,7 @@ public class GuiEntityRenderer extends GuiBlack
 	 * ---------------------------------------------------- */
 
 	@Override
-	protected void mouseClicked(int x, int y, int i) 
+	protected void mouseClicked(int x, int y, int i) throws IOException 
 	{
 		super.mouseClicked(x, y, i);
 		if(i == 0 && hoveredPart != null)
@@ -196,9 +196,9 @@ public class GuiEntityRenderer extends GuiBlack
 	}
 
 	@Override
-	public void mouseMovedOrUp(int x, int y, int which)
+	public void mouseReleased(int x, int y, int which)
 	{
-		super.mouseMovedOrUp(x, y, which);
+		super.mouseReleased(x, y, which);
 		if(which != -1)
 		{
 			prevMouseMoveX = 0;
@@ -207,7 +207,7 @@ public class GuiEntityRenderer extends GuiBlack
 	}
 
 	@Override
-	protected void keyTyped(char par1, int par2)
+	protected void keyTyped(char par1, int par2) throws IOException
 	{
 		switch(par2)
 		{
@@ -228,7 +228,7 @@ public class GuiEntityRenderer extends GuiBlack
 	}
 
 	@Override
-	public void handleMouseInput()
+	public void handleMouseInput() throws IOException
 	{
 		scaleModifier += Mouse.getEventDWheel()/40;
 		super.handleMouseInput();
@@ -279,8 +279,11 @@ public class GuiEntityRenderer extends GuiBlack
 		GL11.glRotatef(-((float)Math.atan((double)(rotY / 40.0F))) * 20.0F + verticalRotation , 1.0F, 0.0F, 0.0F);
 		GL11.glRotatef(((float)Math.atan((double)(rotX / 40.0F))) * 20.0F + horizontalRotation, 0.0F, -1.0F, 0.0F);
 		GL11.glTranslated(par5EntityLivingBase.posX, par5EntityLivingBase.posY, par5EntityLivingBase.posZ);
-		RenderManager.instance.playerViewY = 180.0F;
-		RenderManager.instance.renderEntityWithPosYaw(par5EntityLivingBase, 0.0D, 0.0D, 0.0D, 0.0F, 1.0F);
+		RenderManager rendermanager = Minecraft.getMinecraft().getRenderManager();
+        rendermanager.setPlayerViewY(180.0F);
+        rendermanager.setRenderShadow(false);
+        rendermanager.doRenderEntity(par5EntityLivingBase, 0.0D, 0.0D, 0.0D, 0.0F, 1.0F, false);
+        rendermanager.setRenderShadow(true);
 		RenderHelper.disableStandardItemLighting();
 		GL11.glDisable(GL12.GL_RESCALE_NORMAL);
 		OpenGlHelper.setActiveTexture(OpenGlHelper.lightmapTexUnit);
@@ -319,23 +322,25 @@ public class GuiEntityRenderer extends GuiBlack
 		GL11.glRotatef(-((float)Math.atan((double)(rotY / 40.0F))) * 20.0F + verticalRotation , 1.0F, 0.0F, 0.0F);
 		GL11.glRotatef(((float)Math.atan((double)(rotX / 40.0F))) * 20.0F + horizontalRotation, 0.0F, -1.0F, 0.0F);
 
-
-		mc.getTextureManager().bindTexture(TextureMap.locationBlocksTexture);
-		
-		GL11.glTranslatef(gridMinX + 0.5F, -0.5F, gridMinZ + 0.5F);
-		for(int z = gridMinZ; z < gridMaxZ; z++)
-		{
-			for(int x = gridMinX; x < gridMaxX; x++)
-			{
-				GL11.glPushMatrix();
-				Block block = ObsidianAnimator.Base;
-				block.setBlockBounds(0.0F, 0.97F, 0.0F, 1.0F, 1.0F, 1.0F);
-				renderBlocks.renderBlockAsItem(block, 0, 1.0F);
-				GL11.glPopMatrix();
-				GL11.glTranslatef(1.0F, 0.0F, 0.0F);
-			}
-			GL11.glTranslatef(gridMinX - gridMaxX, 0.0F, 1.0F);
-		}
+//TODO render base
+//		mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+//		
+//		GL11.glTranslatef(gridMinX + 0.5F, -0.5F, gridMinZ + 0.5F);
+//		for(int z = gridMinZ; z < gridMaxZ; z++)
+//		{
+//			for(int x = gridMinX; x < gridMaxX; x++)
+//			{
+//				GL11.glPushMatrix();
+//				Block block = ObsidianAnimator.Base;
+//				block.setBlockBounds(0.0F, 0.97F, 0.0F, 1.0F, 1.0F, 1.0F);
+//				blockRenderer.renderBlock(block.getDefaultState(), new BlockPos(0, 0, 0), block.getD, Tesselator.get)
+//				renderBlocks.renderBlockAsItem(block, 0, 1.0F);
+//				block.getRenderType(state)
+//				GL11.glPopMatrix();
+//				GL11.glTranslatef(1.0F, 0.0F, 0.0F);
+//			}
+//			GL11.glTranslatef(gridMinX - gridMaxX, 0.0F, 1.0F);
+//		}
 
 		GL11.glPopMatrix();
 	}
@@ -353,26 +358,26 @@ public class GuiEntityRenderer extends GuiBlack
 		GL11.glRotatef(-((float)Math.atan((double)(rotY / 40.0F))) * 20.0F + verticalRotation , 1.0F, 0.0F, 0.0F);
 		GL11.glRotatef(((float)Math.atan((double)(rotX / 40.0F))) * 20.0F + horizontalRotation, 0.0F, -1.0F, 0.0F);
 
-
-		mc.getTextureManager().bindTexture(TextureMap.locationBlocksTexture);
-
-		GL11.glTranslatef(-1.0F, 0.5F, -1.0F);
-
-		for(int z = 0; z < 3; z++)
-		{
-			for(int x = 0; x < 3; x++)
-			{
-				for(int y = 0; y < 3; y++)
-				{
-					GL11.glPushMatrix();
-					renderBlocks.renderBlockAsItem(ObsidianAnimator.Grid, 0, 1.0F);
-					GL11.glPopMatrix();
-					GL11.glTranslatef(1.0F, 0.0F, 0.0F);
-				}
-				GL11.glTranslatef(-3.0F, 0.0F, 1.0F);
-			}
-			GL11.glTranslatef(0.0F, 1.0F, -3.0F);
-		}
+//TODO render grid
+//		mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+//
+//		GL11.glTranslatef(-1.0F, 0.5F, -1.0F);
+//
+//		for(int z = 0; z < 3; z++)
+//		{
+//			for(int x = 0; x < 3; x++)
+//			{
+//				for(int y = 0; y < 3; y++)
+//				{
+//					GL11.glPushMatrix();
+//					renderBlocks.renderBlockAsItem(ObsidianAnimator.Grid, 0, 1.0F);
+//					GL11.glPopMatrix();
+//					GL11.glTranslatef(1.0F, 0.0F, 0.0F);
+//				}
+//				GL11.glTranslatef(-3.0F, 0.0F, 1.0F);
+//			}
+//			GL11.glTranslatef(0.0F, 1.0F, -3.0F);
+//		}
 		GL11.glPopMatrix();
 	}
 
