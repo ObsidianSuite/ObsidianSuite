@@ -11,9 +11,13 @@ import obsidianAPI.ObsidianEventHandler;
 import obsidianAPI.debug.EventHandlerDebug;
 import obsidianAPI.network.AnimationNetworkHandler;
 
-@Mod(modid = "ObsidianAnimations")
+@Mod(modid = ObsidianAnimations.MODID, name = ObsidianAnimations.MODNAME, version = ObsidianAnimations.VERSION)
 public class ObsidianAnimations
 {
+
+	public static final String MODID = "ObsidianAnimations";
+	public static final String MODNAME = "Obsidian Animations";
+	public static final String VERSION = "0.1.0";
 
 	@Mod.Instance("ObsidianAnimations")
 	public static ObsidianAnimations instance;

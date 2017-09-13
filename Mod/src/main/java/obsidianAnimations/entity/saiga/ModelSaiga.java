@@ -2,11 +2,8 @@ package obsidianAnimations.entity.saiga;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.client.model.obj.WavefrontObject;
-import obsidianAPI.EntityAnimationPropertiesClient;
-import obsidianAPI.animation.AnimationSequence;
-import obsidianAPI.debug.GuiDebug;
 import obsidianAPI.render.ModelAnimated;
+import obsidianAPI.render.wavefront.WavefrontObject;
 
 public class ModelSaiga extends ModelAnimated {
 
