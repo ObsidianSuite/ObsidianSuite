@@ -2,8 +2,11 @@ package obsidianAPI.render.wavefront;
 
 import java.util.ArrayList;
 
+import org.lwjgl.opengl.GL11;
+
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -36,7 +39,7 @@ public class GroupObject
         {
             Tessellator tessellator = Tessellator.getInstance();
             render(tessellator.getBuffer());
-            tessellator.draw();
+            //tessellator.draw();
         }
     }
 

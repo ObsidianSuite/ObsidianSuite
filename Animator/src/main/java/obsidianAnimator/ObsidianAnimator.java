@@ -19,7 +19,7 @@ import obsidianAnimator.block.BlockGrid;
 public class ObsidianAnimator
 {
 	
-    public static final String MODID = "ObsidianAnimator";
+    public static final String MODID = "obsidian_api";
     public static final String MODNAME = "Obsidian Animator";
     public static final String VERSION = "0.4.0-Alpha";
     private static final String VERSION_LINK = "https://raw.githubusercontent.com/ObsidianSuite/ObsidianSuite/master/VERSION.json";

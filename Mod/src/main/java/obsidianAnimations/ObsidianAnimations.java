@@ -15,7 +15,7 @@ import obsidianAPI.network.AnimationNetworkHandler;
 public class ObsidianAnimations
 {
 
-	public static final String MODID = "ObsidianAnimations";
+	public static final String MODID = "obsidian_animations";
 	public static final String MODNAME = "Obsidian Animations";
 	public static final String VERSION = "0.1.0";
 

@@ -11,6 +11,7 @@ import obsidianAPI.animation.AnimationPart;
 import obsidianAPI.animation.AnimationSequence;
 import obsidianAPI.animation.ai.IEntityAIAnimation;
 import obsidianAPI.animation.wrapper.IEntityAnimated;
+import obsidianAPI.properties.EntityAnimationProperties;
 import obsidianAPI.render.ModelObj;
 
 public class ObsidianAPIUtil

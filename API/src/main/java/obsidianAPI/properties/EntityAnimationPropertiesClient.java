@@ -1,28 +1,24 @@
-package obsidianAPI;
+package obsidianAPI.properties;
 
 import java.util.Map;
-import java.util.TreeMap;
 
 import com.google.common.collect.Maps;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.MathHelper;
-import net.minecraft.world.World;
-import net.minecraftforge.common.IExtendedEntityProperties;
-import obsidianAPI.animation.AnimationPart;
+import net.minecraft.util.math.MathHelper;
+import net.minecraftforge.fml.relauncher.Side;
+import obsidianAPI.ObsidianAPIUtil;
 import obsidianAPI.animation.AnimationSequence;
 import obsidianAPI.registry.AnimationRegistry;
 import obsidianAPI.render.ModelAnimated;
 import obsidianAPI.render.ModelObj;
 import obsidianAPI.render.part.Part;
 
-public class EntityAnimationPropertiesClient implements IExtendedEntityProperties
+public class EntityAnimationPropertiesClient implements IAnimationProperties
 {
-	public static final String EXT_PROP_NAME = "ObsidianAnimationClient";
-
+	
 	private String entityName;
 	private EntityLivingBase entity;
 	private float prevEntityPosX, prevEntityPosZ;
@@ -35,17 +31,11 @@ public class EntityAnimationPropertiesClient implements IExtendedEntityPropertie
 	private Runnable onFinished;
 
 	@Override
-	public void init(Entity entity, World world)
+	public void init(Entity entity)
 	{
 		this.entity = (EntityLivingBase) entity;
 		entityName = AnimationRegistry.getEntityName(entity.getClass());
 	}
-
-	@Override
-	public void saveNBTData(NBTTagCompound compound) {}
-
-	@Override
-	public void loadNBTData(NBTTagCompound compound) {}
 
 	public void updateFrameTime()
 	{
@@ -139,7 +129,7 @@ public class EntityAnimationPropertiesClient implements IExtendedEntityPropertie
 		if (activeAnimation != null)
 		{
 			Part entityPos = model.getPartFromName("entitypos");
-			if (entityPos != null && this.entity.equals(Minecraft.getMinecraft().thePlayer))
+			if (entityPos != null && this.entity.equals(Minecraft.getMinecraft().player))
 			{            	
 				float entityPosX = entityPos.getValue(0);
 				float entityPosZ = entityPos.getValue(2);
@@ -166,9 +156,9 @@ public class EntityAnimationPropertiesClient implements IExtendedEntityPropertie
 			}
 		}
 	}
-
-	public static EntityAnimationPropertiesClient get(Entity e) {
-		return (EntityAnimationPropertiesClient) e.getExtendedProperties(EXT_PROP_NAME);
+	
+	public static EntityAnimationPropertiesClient get(Entity entity) {
+		return (EntityAnimationPropertiesClient) EntityAnimationPropertiesProvider.get(entity, Side.CLIENT);
 	}
 
 }

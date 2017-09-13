@@ -6,8 +6,8 @@ import org.lwjgl.opengl.GL11;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
-import obsidianAPI.EntityAnimationPropertiesClient;
 import obsidianAPI.animation.AnimationSequence;
+import obsidianAPI.properties.EntityAnimationPropertiesClient;
 import obsidianAPI.render.part.Part;
 import obsidianAPI.render.wavefront.WavefrontObject;
 

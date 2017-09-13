@@ -6,8 +6,8 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
-import obsidianAPI.EntityAnimationProperties;
 import obsidianAPI.ObsidianAPIUtil;
+import obsidianAPI.properties.EntityAnimationProperties;
 
 /**
  * Client -> Server

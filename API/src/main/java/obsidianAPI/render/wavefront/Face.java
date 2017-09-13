@@ -1,5 +1,7 @@
 package obsidianAPI.render.wavefront;
 
+import org.lwjgl.opengl.GL11;
+
 import net.minecraft.client.model.PositionTextureVertex;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.Tessellator;
@@ -81,7 +83,7 @@ public class Face
     		TextureCoordinate tc = textureCoordinates[i];
     		texturedVertices[i] = new PositionTextureVertex(v.x, v.y, v.z, tc.u, tc.v); 
     	}
-    	TexturedTri texturedtri = new TexturedTri(null);
+    	TexturedTri texturedtri = new TexturedTri(texturedVertices);
         texturedtri.draw(renderer, 1.0f);
     }
     

@@ -20,6 +20,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTTagString;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.Vec3d;
 import obsidianAPI.animation.AnimationParenting;
 import obsidianAPI.animation.PartGroups;
 import obsidianAPI.file.PartData;

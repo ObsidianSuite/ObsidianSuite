@@ -8,7 +8,7 @@ import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
-import obsidianAPI.EntityAnimationPropertiesClient;
+import obsidianAPI.properties.EntityAnimationPropertiesClient;
 import obsidianAPI.render.IRenderAnimated;
 import obsidianAPI.render.ModelAnimated;
 
@@ -55,7 +55,9 @@ public class MessageAnimationStart implements IMessage {
 			Entity entity = Minecraft.getMinecraft().world.getEntityByID(message.entityID);
 			if(entity != null) {
 				ModelAnimated model = ((IRenderAnimated) Minecraft.getMinecraft().getRenderManager().getEntityRenderObject(entity)).getModel();
-				EntityAnimationPropertiesClient.get(entity).setActiveAnimation(model, message.animationName, System.currentTimeMillis(), message.loopAnim, message.transitionTime);
+				EntityAnimationPropertiesClient animProps = EntityAnimationPropertiesClient.get(entity);
+				if(animProps != null) 
+					animProps.setActiveAnimation(model, message.animationName, System.currentTimeMillis(), message.loopAnim, message.transitionTime);
 			}
 			return null;
 		}

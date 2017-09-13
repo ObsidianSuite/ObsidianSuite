@@ -12,6 +12,7 @@ import com.google.common.collect.Sets;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
+import net.minecraft.util.math.Vec3d;
 import obsidianAPI.render.ModelObj;
 import obsidianAPI.render.bend.Bend;
 import obsidianAPI.render.wavefront.Face;
@@ -209,16 +210,15 @@ public class PartObj extends PartRotation
 	public void render(Entity entity)
 	{
 		GL11.glPushMatrix();
-		move();
 		updateTextureCoordinates(entity);
 		groupObj.render();
-
+		
 		//Do for children - rotation for parent compensated for!
         for (PartObj child : getChildren())
             child.render(entity);
 
         GL11.glPopMatrix();
-		Minecraft.getMinecraft().getTextureManager().bindTexture(modelObj.getTexture(entity));
+		//Minecraft.getMinecraft().getTextureManager().bindTexture(modelObj.getTexture(entity));
 	}
 
 	/**

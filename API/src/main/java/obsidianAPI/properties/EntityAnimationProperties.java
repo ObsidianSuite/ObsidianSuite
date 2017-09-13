@@ -1,4 +1,4 @@
-package obsidianAPI;
+package obsidianAPI.properties;
 
 import java.util.Collection;
 import java.util.Map;
@@ -9,10 +9,10 @@ import java.util.TreeMap;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.MathHelper;
-import net.minecraft.world.World;
-import net.minecraftforge.common.IExtendedEntityProperties;
+import net.minecraft.util.math.MathHelper;
+import net.minecraftforge.fml.relauncher.Side;
+import obsidianAPI.ObsidianAPI;
+import obsidianAPI.ObsidianAPIUtil;
 import obsidianAPI.animation.AnimationPart;
 import obsidianAPI.animation.AnimationSequence;
 import obsidianAPI.animation.wrapper.IAnimationWrapper;
@@ -23,10 +23,9 @@ import obsidianAPI.network.MessageAnimationStart;
 import obsidianAPI.registry.AnimationRegistry;
 import obsidianAPI.render.ModelAnimated;
 
-public class EntityAnimationProperties implements IExtendedEntityProperties
+public class EntityAnimationProperties implements IAnimationProperties
 {
-	public static final String EXT_PROP_NAME = "ObsidianAnimation";
-
+	
 	private EntityLivingBase entity;
 	private String entityName;
 
@@ -47,19 +46,13 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
 	private float prevEntityPosX, prevEntityPosZ;
 
 	@Override
-	public void init(Entity entity, World world)
+	public void init(Entity entity)
 	{
 		this.entity = (EntityLivingBase) entity;
 		entityName = AnimationRegistry.getEntityName(entity.getClass());
 		now = System.currentTimeMillis();
 		animationStartTime = now;
 	}
-
-	@Override
-	public void saveNBTData(NBTTagCompound compound) {}
-
-	@Override
-	public void loadNBTData(NBTTagCompound compound) {}
 	
 	private void updateFrameTime()
 	{
@@ -167,7 +160,7 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
 		if (activeAnimation != null)
 		{
 			if(entityPosAnimations != null) {
-				float[] values = AnimationSequence.getPartValueAtTime(entityPosAnimations, MathHelper.floor_float(frameTime));
+				float[] values = AnimationSequence.getPartValueAtTime(entityPosAnimations, MathHelper.floor(frameTime));
 				
 				float entityPosX = values[0];
 				float entityPosZ = values[2];
@@ -233,10 +226,6 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
 	private boolean isIdle() {
 		return activeAnimation == null || activeAnimation.equals("Idle") || activeAnimation.equals("transition_idle");
 	}
-
-	public static EntityAnimationProperties get(Entity e) {
-		return (EntityAnimationProperties) e.getExtendedProperties(EXT_PROP_NAME);
-	}
 	
 	public String getActiveAnimation() {
 		return activeAnimation;
@@ -252,6 +241,10 @@ public class EntityAnimationProperties implements IExtendedEntityProperties
 	
 	public boolean getLoopAnim() {
 		return this.loop;
+	}
+
+	public static EntityAnimationProperties get(Entity entity2) {
+		return (EntityAnimationProperties) EntityAnimationPropertiesProvider.get(entity2, Side.SERVER);
 	}
 
 }
