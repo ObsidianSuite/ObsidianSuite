@@ -211,6 +211,7 @@ public class PartObj extends PartRotation
 	{
 		GL11.glPushMatrix();
 		updateTextureCoordinates(entity);
+		move();
 		groupObj.render();
 		
 		//Do for children - rotation for parent compensated for!
