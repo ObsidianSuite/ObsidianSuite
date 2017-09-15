@@ -13,23 +13,10 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class TexturedTri
 {
     public PositionTextureVertex[] vertexPositions;
-    private boolean invertNormal;
 
     public TexturedTri(PositionTextureVertex[] vertices)
     {
         this.vertexPositions = vertices;
-    }
-
-    public void flipFace()
-    {
-        PositionTextureVertex[] apositiontexturevertex = new PositionTextureVertex[this.vertexPositions.length];
-
-        for (int i = 0; i < this.vertexPositions.length; ++i)
-        {
-            apositiontexturevertex[i] = this.vertexPositions[this.vertexPositions.length - i - 1];
-        }
-
-        this.vertexPositions = apositiontexturevertex;
     }
 
     /**
@@ -45,14 +32,7 @@ public class TexturedTri
         float f = (float)vec3d2.x;
         float f1 = (float)vec3d2.y;
         float f2 = (float)vec3d2.z;
-
-        if (this.invertNormal)
-        {
-            f = -f;
-            f1 = -f1;
-            f2 = -f2;
-        }
-
+        
         renderer.begin(7, DefaultVertexFormats.POSITION_TEX);
         for (int i = 0; i < 3; ++i)
         {
