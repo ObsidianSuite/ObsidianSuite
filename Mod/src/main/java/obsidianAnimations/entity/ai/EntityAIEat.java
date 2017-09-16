@@ -33,7 +33,8 @@ public class EntityAIEat extends EntityAIAnimationBase {
 		return entity.getRNG().nextInt(50) == 0;
 	}
 	
-	public boolean continueExecuting()
+	@Override
+	public boolean shouldContinueExecuting()
 	{
 		if(counter < limit) {
 			counter++;

@@ -16,11 +16,15 @@ public class EntitySaiga extends EntityCreature implements IEntityAnimated
 	public EntitySaiga(World world) 
 	{
 		super(world);
-		this.tasks.taskEntries.clear();
-        this.tasks.addTask(0, new EntityAIWander(this, 1.0D));
-        this.tasks.addTask(1, new EntityAIPanicAnimation(this, 2.0D));
-        this.tasks.addTask(2, new EntityAIEat(this));
 	}
+	
+	@Override
+    protected void initEntityAI()
+    {
+        this.tasks.addTask(0, new EntityAIWander(this, 1.0D));
+        this.tasks.addTask(1, new EntityAIEat(this));
+        this.tasks.addTask(2, new EntityAIPanicAnimation(this, 2.0D));
+    }
 
 	@Override
     protected void applyEntityAttributes()

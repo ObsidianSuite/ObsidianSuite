@@ -39,9 +39,10 @@ public class ObsidianEventHandler
 			ObsidianEventHandlerClient.handleOnEntityJoin(e);
 
 		if(AnimationRegistry.isRegisteredClass(entity.getClass())) {
-			EntityAnimationPropertiesProvider.register(entity, Side.SERVER);
 			if(FMLCommonHandler.instance().getEffectiveSide().isClient())
 				EntityAnimationPropertiesProvider.register(entity, Side.CLIENT);
+			else
+				EntityAnimationPropertiesProvider.register(entity, Side.SERVER);
 		}
 	}
 
