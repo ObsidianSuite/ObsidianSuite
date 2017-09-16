@@ -27,7 +27,7 @@ public class GuiContainerChooseItem extends GuiContainerCreative
 {
 
 	private GuiInventoryChooseItem gui;
-	private final ResourceLocation texture = new ResourceLocation("mod_obsidian_animator:gui/gui_black.png");
+	private final ResourceLocation texture = new ResourceLocation("obsidian_animator:gui/gui_black.png");
 	
 	public GuiContainerChooseItem(EntityPlayer par1EntityPlayer, GuiInventoryChooseItem guiInventoryChooseItem)
 	{

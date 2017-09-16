@@ -14,7 +14,7 @@ import net.minecraft.util.ResourceLocation;
 public class GuiBlack extends GuiScreen
 {
 
-	private final ResourceLocation texture = new ResourceLocation("mod_obsidian_animator:gui/gui_black.png");
+	private final ResourceLocation texture = new ResourceLocation("obsidian_animator:gui/gui_black.png");
 	private boolean closeToMenu = false;
 	
 	@Override

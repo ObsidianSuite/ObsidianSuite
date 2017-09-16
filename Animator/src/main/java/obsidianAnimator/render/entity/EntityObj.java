@@ -10,6 +10,11 @@ public class EntityObj extends EntityMob
 	private ItemStack heldItem;
 	private String entityType;
 	
+	public EntityObj(World world)
+	{
+		super(world);
+	}
+	
 	public EntityObj(World world, String type) 
 	{
 		super(world);

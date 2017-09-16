@@ -2,14 +2,20 @@ package obsidianAnimator.gui;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
 
+import net.minecraft.client.AnvilConverterException;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiButtonLanguage;
+import net.minecraft.client.gui.GuiErrorScreen;
+import net.minecraft.client.gui.GuiListWorldSelectionEntry;
 import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.world.GameType;
 import net.minecraft.world.WorldSettings;
 import net.minecraft.world.WorldType;
+import net.minecraft.world.storage.ISaveFormat;
 import net.minecraft.world.storage.WorldSummary;
 import net.minecraftforge.fml.client.FMLClientHandler;
 
@@ -56,6 +62,7 @@ public class GuiAnimationMainMenu extends GuiMainMenu
     {
     	super.actionPerformed(button);
 
+		WorldSettings worldsettings = null;
         if(button.id == 10)
 		{
 			String s = "animation_world";
@@ -68,11 +75,10 @@ public class GuiAnimationMainMenu extends GuiMainMenu
 				WorldType.WORLD_TYPES[1].onGUICreateWorldPress();
 
 				GameType gametype = GameType.getByName("creative");
-				WorldSettings worldsettings = new WorldSettings(0, gametype, false, false, WorldType.WORLD_TYPES[1]);
+				worldsettings = new WorldSettings(0, gametype, false, false, WorldType.WORLD_TYPES[1]);
 				worldsettings.enableCommands();
-
 			}
-			this.mc.launchIntegratedServer(s, s, null);
+			this.mc.launchIntegratedServer(s, s, worldsettings);
 		}
     }
 

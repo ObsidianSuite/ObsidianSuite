@@ -3,7 +3,10 @@ package obsidianAnimator;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.server.MinecraftServer;
+import net.minecraftforge.client.MinecraftForgeClient;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.world.WorldEvent;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.relauncher.Side;
@@ -104,11 +107,11 @@ public class EventHandler
 	@SideOnly(Side.CLIENT)
 	@SubscribeEvent
 	public void onClientTick(TickEvent.ClientTickEvent event)
-	{    	    	
+	{    	  		
 		if(Minecraft.getMinecraft().currentScreen instanceof GuiMainMenu && !(Minecraft.getMinecraft().currentScreen instanceof GuiAnimationMainMenu))
 			Minecraft.getMinecraft().displayGuiScreen(new GuiAnimationMainMenu());
 
-		if(Minecraft.getMinecraft().inGameHasFocus && Minecraft.getMinecraft().currentScreen == null && Minecraft.getMinecraft().world.getWorldInfo().getWorldName().equals("animation_world"))
+		if(Minecraft.getMinecraft().inGameHasFocus && Minecraft.getMinecraft().currentScreen == null && Minecraft.getMinecraft().getIntegratedServer().worlds[0].getWorldInfo().getWorldName().equals("animation_world"))
 		{
 			Minecraft.getMinecraft().displayGuiScreen(new GuiBlack());
 			new HomeFrame().display();

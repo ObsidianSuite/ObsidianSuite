@@ -18,8 +18,8 @@ public class ModelObj_Animator extends ModelObj
 	private PartObj mainHighlight = null;
 	private List<PartObj> hightlightedParts;
 
-	public static final ResourceLocation pinkResLoc = new ResourceLocation("mod_obsidian_animator:defaultModelTextures/pink.png");
-	public static final ResourceLocation whiteResLoc = new ResourceLocation("mod_obsidian_animator:defaultModelTextures/white.png");
+	public static final ResourceLocation pinkResLoc = new ResourceLocation("obsidian_animator:defaultModelTextures/pink.png");
+	public static final ResourceLocation whiteResLoc = new ResourceLocation("obsidian_animator:defaultModelTextures/white.png");
 	
 	public ModelObj_Animator(String entityName, WavefrontObject objRes, ResourceLocation texture)
 	{			

@@ -47,7 +47,7 @@ public class ModelHandler
 	 */
 	private static ResourceLocation generateInternalModelResourceLocation(String entityName)
 	{
-		return new ResourceLocation(String.format("mod_obsidian_animator:models/%s.obm", entityName));
+		return new ResourceLocation(String.format("obsidian_animator:models/%s.obm", entityName));
 	}
 
 	public static void updateRenderer(String entityName)
