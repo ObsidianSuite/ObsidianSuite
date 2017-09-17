@@ -349,23 +349,4 @@ public class GuiEntityRendererWithRotation extends GuiEntityRenderer
 		GL11.glPopMatrix();
 	}
 
-	protected void drawLine(Vec3d p1, Vec3d p2, int colour, float alpha, float width)
-	{
-		GL11.glPushMatrix();
-		GL11.glEnable(GL11.GL_BLEND);
-		GL11.glDisable(GL11.GL_DEPTH_TEST);
-		float[] rgb = MathHelper.intToRGB(colour);
-		GL11.glColor4f(rgb[0], rgb[1], rgb[2], alpha);
-		GL11.glLineWidth(width);
-		GL11.glDisable(GL11.GL_TEXTURE_2D);
-		GL11.glBegin(GL11.GL_LINE_LOOP);
-		GL11.glVertex3d(p1.x,p1.y,p1.z);
-		GL11.glVertex3d(p2.x,p2.y,p2.z);
-		GL11.glEnd();
-		GL11.glEnable(GL11.GL_DEPTH_TEST);
-		GL11.glEnable(GL11.GL_TEXTURE_2D);
-		GL11.glDisable(GL11.GL_BLEND);
-		GL11.glPopMatrix();
-	}
-
 }

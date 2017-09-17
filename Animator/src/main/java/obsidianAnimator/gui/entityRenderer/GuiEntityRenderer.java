@@ -18,12 +18,14 @@ import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import obsidianAPI.render.part.Part;
 import obsidianAPI.render.part.PartEntityPos;
 import obsidianAPI.render.part.PartObj;
 import obsidianAnimator.ObsidianAnimator;
 import obsidianAnimator.data.ModelHandler;
 import obsidianAnimator.gui.GuiBlack;
+import obsidianAnimator.render.MathHelper;
 import obsidianAnimator.render.entity.EntityObj;
 import obsidianAnimator.render.entity.ModelObj_Animator;
 
@@ -136,13 +138,11 @@ public class GuiEntityRenderer extends GuiBlack
 		if(entityToRender != null)
 		{
 			float scale = scaleModifier + 50;
-
-
+			renderEntityIntoGui(posX + (width-posX-5)/2 + horizontalPan, posY + (height - 10)/2 + scaleModifier/2 + verticalPan, scale, 0.0F, 0.0F, entityToRender);
 			if(boolBase)
 				renderBase(posX + (width-posX-5)/2 + horizontalPan, posY + (height - 10)/2 + scaleModifier/2 + verticalPan, scale, 0.0F, 0.0F);
 			if(boolGrid)
 				renderGrid(posX + (width-posX-5)/2 + horizontalPan, posY + (height - 10)/2 + scaleModifier/2 + verticalPan, scale, 0.0F, 0.0F);
-			renderEntityIntoGui(posX + (width-posX-5)/2 + horizontalPan, posY + (height - 10)/2 + scaleModifier/2 + verticalPan, scale, 0.0F, 0.0F, entityToRender); 
 		}
 
 		entityModel.clearHighlights();
@@ -322,25 +322,18 @@ public class GuiEntityRenderer extends GuiBlack
 		GL11.glRotatef(-((float)Math.atan((double)(rotY / 40.0F))) * 20.0F + verticalRotation , 1.0F, 0.0F, 0.0F);
 		GL11.glRotatef(((float)Math.atan((double)(rotX / 40.0F))) * 20.0F + horizontalRotation, 0.0F, -1.0F, 0.0F);
 
-//TODO render base
-//		mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
-//		
-//		GL11.glTranslatef(gridMinX + 0.5F, -0.5F, gridMinZ + 0.5F);
-//		for(int z = gridMinZ; z < gridMaxZ; z++)
-//		{
-//			for(int x = gridMinX; x < gridMaxX; x++)
-//			{
-//				GL11.glPushMatrix();
-//				Block block = ObsidianAnimator.Base;
-//				block.setBlockBounds(0.0F, 0.97F, 0.0F, 1.0F, 1.0F, 1.0F);
-//				blockRenderer.renderBlock(block.getDefaultState(), new BlockPos(0, 0, 0), block.getD, Tesselator.get)
-//				renderBlocks.renderBlockAsItem(block, 0, 1.0F);
-//				block.getRenderType(state)
-//				GL11.glPopMatrix();
-//				GL11.glTranslatef(1.0F, 0.0F, 0.0F);
-//			}
-//			GL11.glTranslatef(gridMinX - gridMaxX, 0.0F, 1.0F);
-//		}
+		GL11.glTranslatef(gridMinX + 0.5F, -0.001f, gridMinZ + 0.5F);
+		for(int z = gridMinZ; z < gridMaxZ; z++)
+		{
+			for(int x = gridMinX; x < gridMaxX; x++)
+			{
+				GL11.glPushMatrix();
+				drawRect(new Vec3d(0.5, 0, -0.5), new Vec3d(-0.5, 0, -0.5), new Vec3d(0.5, 0, 0.5), new Vec3d(-0.5, 0, 0.5), 0xFF0000, 0.5f, 2.0f);
+				GL11.glPopMatrix();
+				GL11.glTranslatef(1.0F, 0.0F, 0.0F);
+			}
+			GL11.glTranslatef(gridMinX - gridMaxX, 0.0F, 1.0F);
+		}
 
 		GL11.glPopMatrix();
 	}
@@ -358,26 +351,85 @@ public class GuiEntityRenderer extends GuiBlack
 		GL11.glRotatef(-((float)Math.atan((double)(rotY / 40.0F))) * 20.0F + verticalRotation , 1.0F, 0.0F, 0.0F);
 		GL11.glRotatef(((float)Math.atan((double)(rotX / 40.0F))) * 20.0F + horizontalRotation, 0.0F, -1.0F, 0.0F);
 
-//TODO render grid
-//		mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
-//
-//		GL11.glTranslatef(-1.0F, 0.5F, -1.0F);
-//
-//		for(int z = 0; z < 3; z++)
-//		{
-//			for(int x = 0; x < 3; x++)
-//			{
-//				for(int y = 0; y < 3; y++)
-//				{
-//					GL11.glPushMatrix();
-//					renderBlocks.renderBlockAsItem(ObsidianAnimator.Grid, 0, 1.0F);
-//					GL11.glPopMatrix();
-//					GL11.glTranslatef(1.0F, 0.0F, 0.0F);
-//				}
-//				GL11.glTranslatef(-3.0F, 0.0F, 1.0F);
-//			}
-//			GL11.glTranslatef(0.0F, 1.0F, -3.0F);
-//		}
+		GL11.glTranslatef(-0.5F, 0.5F, -0.5F);
+
+		for(int z = 0; z < 2; z++)
+		{
+			for(int x = 0; x < 2; x++)
+			{
+				for(int y = 0; y < 2; y++)
+				{
+					GL11.glPushMatrix();
+					drawCube(new Vec3d(0,0,0), 1f, 0x0000FF, 0.5f, 2.0f);
+					GL11.glPopMatrix();
+					GL11.glTranslatef(1.0F, 0.0F, 0.0F);
+				}
+				GL11.glTranslatef(-2.0F, 0.0F, 1.0F);
+			}
+			GL11.glTranslatef(0.0F, 1.0F, -2.0F);
+		}
+		GL11.glPopMatrix();
+	}
+
+	/**
+	 * Draw an axis aligned cube
+	 * @param centre - centre of cube
+	 * @param width - width of side
+	 */
+	protected void drawCube(Vec3d centre, float width, int colour, float alpha, float lineWidth) {
+		float f = width/2;
+		double left = centre.x + f;
+		double right = centre.x - f;
+		double top = centre.y + f;
+		double bottom = centre.y - f;
+		double front = centre.z + f;
+		double back = centre.z - f;
+		Vec3d ltf = new Vec3d(left, top, front);
+		Vec3d ltb = new Vec3d(left, top, back);
+		Vec3d lbf = new Vec3d(left, bottom, front);
+		Vec3d lbb = new Vec3d(left, bottom, back);
+		Vec3d rtf = new Vec3d(right, top, front);
+		Vec3d rtb = new Vec3d(right, top, back);
+		Vec3d rbf = new Vec3d(right, bottom, front);
+		Vec3d rbb = new Vec3d(right, bottom, back);
+		drawRect(ltf, rtf, lbf, rbf, colour, alpha, lineWidth);
+		drawRect(ltb, rtb, ltf, rtf, colour, alpha, lineWidth);
+		drawRect(ltb, rtb, lbb, rbb, colour, alpha, lineWidth);
+		drawRect(lbb, rbb, lbf, rbf, colour, alpha, lineWidth);
+	}
+
+	/**
+	 * Draw a rectangle
+	 * @param p1 - Top left
+	 * @param p2 - Top right
+	 * @param p3 - Bottom left
+	 * @param p4 - Bottom right
+	 */
+	protected void drawRect(Vec3d p1, Vec3d p2, Vec3d p3, Vec3d p4, int colour, float alpha, float lineWidth)
+	{
+		drawLine(p1, p2, colour, alpha, lineWidth);
+		drawLine(p1, p3, colour, alpha, lineWidth);
+		drawLine(p2, p4, colour, alpha, lineWidth);
+		drawLine(p3, p4, colour, alpha, lineWidth);
+	}
+
+	protected void drawLine(Vec3d p1, Vec3d p2, int colour, float alpha, float width)
+	{
+		GL11.glPushMatrix();
+		GL11.glEnable(GL11.GL_BLEND);
+		GL11.glDisable(GL11.GL_DEPTH_TEST);
+		float[] rgb = MathHelper.intToRGB(colour);
+		GL11.glColor4f(rgb[0], rgb[1], rgb[2], alpha);
+		GL11.glLineWidth(width);
+		GL11.glDisable(GL11.GL_TEXTURE_2D);
+		GL11.glBegin(GL11.GL_LINE_LOOP);
+		GL11.glVertex3d(p1.x,p1.y,p1.z);
+		GL11.glVertex3d(p2.x,p2.y,p2.z);
+		GL11.glEnd();
+		GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+		GL11.glEnable(GL11.GL_DEPTH_TEST);
+		GL11.glEnable(GL11.GL_TEXTURE_2D);
+		GL11.glDisable(GL11.GL_BLEND);
 		GL11.glPopMatrix();
 	}
 
