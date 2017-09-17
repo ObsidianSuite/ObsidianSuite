@@ -4,12 +4,9 @@ import java.io.IOException;
 
 import org.lwjgl.opengl.GL11;
 
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.OpenGlHelper;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.EnumHandSide;
 import net.minecraft.util.math.Vec3d;
 import obsidianAPI.render.part.Part;
 import obsidianAPI.render.part.PartObj;
@@ -265,15 +262,8 @@ public class GuiEntityRendererWithRotation extends GuiEntityRenderer
 		}
 		else if(selectedPart instanceof PartPropRotation) //Prop rotation
 		{
-			ItemStack itemstack = entityToRender.getHeldItem(EnumHand.MAIN_HAND);
-			if (selectedPart.getName().equals("prop_rot"))
-			{
-				ModelHandler.modelRenderer.transformToItemCentreAndRotateRight(itemstack);
-			}
-			else
-			{
-				ModelHandler.modelRenderer.transformToItemCentreAndRotateLeft(ModelHandler.modelRenderer.getLeftItem());
-			}
+			EnumHandSide handSide = selectedPart.getName().equals("prop_rot") ? EnumHandSide.RIGHT : EnumHandSide.LEFT;
+			ModelHandler.modelRenderer.transformToHandAndRotate(handSide);
 		}
 	}
 

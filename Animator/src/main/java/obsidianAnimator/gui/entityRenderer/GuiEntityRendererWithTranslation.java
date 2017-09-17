@@ -8,6 +8,7 @@ import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.EnumHandSide;
 import net.minecraft.util.math.Vec3d;
 import obsidianAPI.render.part.Part;
 import obsidianAPI.render.part.PartEntityPos;
@@ -84,14 +85,8 @@ public class GuiEntityRendererWithTranslation extends GuiEntityRendererWithRotat
 				return;
 			} else if (selectedPart instanceof PartPropTranslation || selectedPart instanceof PartPropScale)
 			{
-				ItemStack itemstack = entityToRender.getHeldItem(EnumHand.MAIN_HAND);
-				if (selectedPart.getName().equals("prop_trans") || selectedPart.getName().equals("prop_scale"))
-				{
-					ModelHandler.modelRenderer.transformToItemCentreRight(itemstack);
-				} else
-				{
-					ModelHandler.modelRenderer.transformToItemCentreLeft(ModelHandler.modelRenderer.getLeftItem());
-				}
+				EnumHandSide handSide = selectedPart.getName().equals("prop_trans") || selectedPart.getName().equals("prop_scale") ? EnumHandSide.RIGHT : EnumHandSide.LEFT;
+				ModelHandler.modelRenderer.transformToHand(handSide);
 			}
 
 
