@@ -18,7 +18,7 @@ public class ObsidianAnimator
 	
     public static final String MODID = "obsidian_animator";
     public static final String MODNAME = "Obsidian Animator";
-    public static final String VERSION = "0.4.0-Alpha";
+    public static final String VERSION = "1.0.0";
     private static final String VERSION_LINK = "https://raw.githubusercontent.com/ObsidianSuite/ObsidianSuite/master/VERSION.json";
     
 	@Mod.Instance
