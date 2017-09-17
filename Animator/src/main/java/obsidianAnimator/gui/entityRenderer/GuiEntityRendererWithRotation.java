@@ -354,22 +354,14 @@ public class GuiEntityRendererWithRotation extends GuiEntityRenderer
 		GL11.glPushMatrix();
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
-		OpenGlHelper.glBlendFunc(770, 771, 1, 0);
-		GL11.glColor4f(1.0F, 1.0F, 1.0F, alpha);
+		float[] rgb = MathHelper.intToRGB(colour);
+		GL11.glColor4f(rgb[0], rgb[1], rgb[2], alpha);
 		GL11.glLineWidth(width);
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
-		GL11.glDepthMask(false);
-		float[] rgb = MathHelper.intToRGB(colour);
-		
-		Tessellator tessellator = Tessellator.getInstance();
-		BufferBuilder buffer = tessellator.getBuffer();
-		buffer.begin(1, DefaultVertexFormats.POSITION);
-		buffer.color(rgb[0], rgb[1], rgb[2], alpha);
-		buffer.pos(p1.x, p1.y, p1.z).endVertex();
-		buffer.pos(p2.x, p2.y, p2.z).endVertex();
-		tessellator.draw();
-
-		GL11.glDepthMask(true);
+		GL11.glBegin(GL11.GL_LINE_LOOP);
+		GL11.glVertex3d(p1.x,p1.y,p1.z);
+		GL11.glVertex3d(p2.x,p2.y,p2.z);
+		GL11.glEnd();
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glDisable(GL11.GL_BLEND);

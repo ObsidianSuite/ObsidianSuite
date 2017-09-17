@@ -259,9 +259,9 @@ public class GuiEntityRendererWithTranslation extends GuiEntityRendererWithRotat
 				break;
 			}
 			if(translationAxisPlane != null && translationAxisPlane == i)
-				drawLine(origin, v, colour, 3.0F, 1.0F);
+				drawLine(origin, v, colour, 1.0F, 3.0F);
 			else
-				drawLine(origin, v, colour, 2.0F, 0.4F);
+				drawLine(origin, v, colour, 0.4F, 2.0F);
 		}	
 	}
 

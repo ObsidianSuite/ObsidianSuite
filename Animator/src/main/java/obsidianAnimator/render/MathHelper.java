@@ -93,7 +93,7 @@ public class MathHelper
 	 * @param ray - Ray to test.
 	 * @param p - End of slider.
 	 * @param n - Normal to slider.
-	 * @return - Distance or null if not intersection.
+	 * @return - Distance or null if no intersection.
 	 */
 	public static Double rayIntersectsAxisSlider(RayTrace ray, Vec3d p, Vec3d n)
 	{
@@ -105,9 +105,9 @@ public class MathHelper
 		if(t < 0)
 			d = pI.lengthVector();
 		else if(t > 1.0F)
-			d = p.subtract(pI).lengthVector();
+			d = pI.subtract(p).lengthVector();
 		else
-			d = scale(p,t).subtract(pI).lengthVector();
+			d = pI.subtract(scale(p,t)).lengthVector();
 		if(d < 0.05F)
 			return ray.p0.distanceTo(pI);
 		return null;
@@ -123,7 +123,7 @@ public class MathHelper
 	public static Double getLineScalarForClosestPoint(Vec3d u, Vec3d v, Vec3d p)
 	{
 		//System.out.println(v.dotProduct(v));
-		return v.dotProduct(u.subtract(p))/v.dotProduct(v);
+		return v.dotProduct(p.subtract(u))/v.dotProduct(v);
 	}
 
 	/**
