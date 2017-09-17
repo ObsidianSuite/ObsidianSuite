@@ -50,7 +50,7 @@ public class GuiBlack extends GuiScreen
 		Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder bufferbuilder = tessellator.getBuffer();
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-        bufferbuilder.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR);
+        bufferbuilder.begin(7, DefaultVertexFormats.POSITION);
         bufferbuilder.pos(x + 0, y + height, zLevel).endVertex();
         bufferbuilder.pos(x + width, y + height, zLevel).endVertex();
         bufferbuilder.pos(x + width, y + 0, zLevel).endVertex();

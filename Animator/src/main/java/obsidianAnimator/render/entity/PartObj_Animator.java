@@ -53,11 +53,10 @@ public class PartObj_Animator extends PartObj
 		//Compensate for all parents. TODO remove compensate Part rotation method
 		for(PartObj q : parents)
 			q.move();
-		
+
 		Double min = null;
 		for(Face f : groupObj.faces)
 		{
-			//System.out.println(groupObj.faces.get(0).vertices[0].x + ", " + groupObj.faces.get(0).vertices[0].y + ", " + groupObj.faces.get(0).vertices[0].z);
 			Double d = MathHelper.rayIntersectsFace(RayTrace.getRayTrace(), f);
 			if(d != null && (min == null || d < min))
 				min = d;

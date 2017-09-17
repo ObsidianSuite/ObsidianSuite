@@ -4,10 +4,17 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 
+import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.vector.Quaternion;
 
+import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.OpenGlHelper;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.math.Vec3d;
 import obsidianAPI.render.wavefront.Face;
+import obsidianAPI.render.wavefront.TextureCoordinate;
+import obsidianAPI.render.wavefront.Vertex;
 
 public class MathHelper 
 {
@@ -22,12 +29,13 @@ public class MathHelper
 		Vec3d v2 = new Vec3d(f.vertices[2].x, f.vertices[2].y, f.vertices[2].z);
 		Vec3d n = v0.subtract(v1).crossProduct(v0.subtract(v2));
 		Vec3d pI = getRayPlaneIntersection(ray,v0,n);
+
 		if(pI == null)
 			return null;
 		
 		if(pointWithinTriangle(pI, v0, v1, v2))
 			return ray.p0.distanceTo(pI);
-	
+
 		//Extra check if quad face
 		if(f.vertices.length == 4)
 		{
@@ -123,16 +131,18 @@ public class MathHelper
 	 * @param ray - Ray to test.
 	 * @param p - Point on plane.
 	 * @param n - Normal to plane.
-	 * @return - Point on plane where ray intersects, null if no interception. 
+	 * @return - Point on plane where ray intersects, null if no intersection.
 	 */
 	public static Vec3d getRayPlaneIntersection(RayTrace ray, Vec3d p, Vec3d n)
 	{
-		//System.out.println(ray.p1);
-		double rd = n.dotProduct(ray.p0.subtract(ray.p1));
+		//Vector in direction of line
+		Vec3d l = ray.p1.subtract(ray.p0);
+
+		double rd = n.dotProduct(l);
 		if(rd == 0)
 			return p;
-		double r = n.dotProduct(ray.p0.subtract(p))/rd;
-		return addVector(ray.p0, scale(ray.p0.subtract(ray.p1),r));
+		double r = n.dotProduct(p.subtract(ray.p1))/rd;
+		return addVector(ray.p1, scale(l,r));
 	}
 
 	public static double getAngleBetweenVectors(Vec3d v, Vec3d w, Vec3d n)
