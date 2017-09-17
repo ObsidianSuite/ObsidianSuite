@@ -2,6 +2,7 @@ package obsidianAnimator.gui;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiInventory;
+import net.minecraft.inventory.ContainerPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -24,13 +25,13 @@ public class GuiInventoryChooseItem extends GuiInventory
         this.controller = controller;
         this.entity = entity;
         this.leftHand = leftHand;
+        this.func_194310_f().func_194303_a(this.width, this.height, Minecraft.getMinecraft(), false, ((ContainerPlayer)this.inventorySlots).craftMatrix);
     }
     
-    /**
-     * Adds the buttons (and other controls) to the screen in question.
-     */
+    @Override
     public void initGui()
     {
+    	super.initGui();
         this.buttonList.clear();
         this.mc.displayGuiScreen(new GuiContainerChooseItem(this.mc.player, this));
     }

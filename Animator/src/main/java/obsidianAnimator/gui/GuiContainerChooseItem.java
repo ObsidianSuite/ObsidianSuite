@@ -1,24 +1,16 @@
 package obsidianAnimator.gui;
 
-import java.lang.reflect.Method;
-
 import org.lwjgl.opengl.GL11;
 
-import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.gui.inventory.GuiContainerCreative;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.ClickType;
 import net.minecraft.inventory.Slot;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
-import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -38,22 +30,8 @@ public class GuiContainerChooseItem extends GuiContainerCreative
 	@Override
 	protected void handleMouseClick(Slot par1Slot, int par2, int par3, ClickType clickType)
 	{
-		ItemStack itemstack;
-		InventoryPlayer inventoryplayer;
-
 		if(par1Slot != null && par1Slot.getHasStack())
-		{
 			this.gui.setItemStack(par1Slot.getStack());
-		}
-	}
-
-	@Override
-	public void initGui()
-	{
-		super.initGui();
-		Method setCurrentCreativeTab = ReflectionHelper.findMethod(GuiContainerCreative.class, "setCurrentCreativeTab", "func_147050_b", CreativeTabs.class);
-		GuiTextField searchField = ObfuscationReflectionHelper.getPrivateValue(GuiContainerCreative.class, this, "searchField", "field_147062_A");
-		Method updateCreativeSearch = ReflectionHelper.findMethod(GuiContainerCreative.class, "updateCreativeSearch", "func_147053_i");
 	}
 
 	@Override
@@ -72,7 +50,7 @@ public class GuiContainerChooseItem extends GuiContainerCreative
 		Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder bufferbuilder = tessellator.getBuffer();
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-        bufferbuilder.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR);
+        bufferbuilder.begin(7, DefaultVertexFormats.POSITION);
         bufferbuilder.pos(x + 0, y + height, zLevel).endVertex();
         bufferbuilder.pos(x + width, y + height, zLevel).endVertex();
         bufferbuilder.pos(x + width, y + 0, zLevel).endVertex();

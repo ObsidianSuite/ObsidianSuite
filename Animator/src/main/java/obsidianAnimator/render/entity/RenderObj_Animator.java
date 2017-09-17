@@ -2,7 +2,6 @@ package obsidianAnimator.render.entity;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.RenderLiving;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
@@ -11,9 +10,10 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import obsidianAPI.render.part.Part;
 import obsidianAPI.render.part.PartObj;
 import obsidianAPI.render.part.PartRotation;
+import obsidianAnimator.render.LayerHeldItemAnimated;
 
 @SideOnly(Side.CLIENT)
-public class RenderObj_Animator extends RenderLiving
+public class RenderObj_Animator extends RenderLiving<EntityObj>
 {
     private ModelObj_Animator modelObj;
     private ItemStack leftItem;
@@ -21,10 +21,11 @@ public class RenderObj_Animator extends RenderLiving
     public RenderObj_Animator()
     {
         super(Minecraft.getMinecraft().getRenderManager(), null, 0.5F);
+        this.addLayer(new LayerHeldItemAnimated(this));
     }
 
     @Override
-    protected ResourceLocation getEntityTexture(Entity entity)
+    protected ResourceLocation getEntityTexture(EntityObj entity)
     {
         return modelObj.getTexture(entity);
     }
@@ -33,6 +34,10 @@ public class RenderObj_Animator extends RenderLiving
     {
         modelObj = model;
         mainModel = model;
+    }
+    
+    public ModelObj_Animator getModel() {
+    	return modelObj;
     }
 
     public void setLeftItem(ItemStack leftItem)
