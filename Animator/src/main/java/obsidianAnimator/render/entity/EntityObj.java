@@ -3,11 +3,13 @@ package obsidianAnimator.render.entity;
 import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.EnumHandSide;
 import net.minecraft.world.World;
 
 public class EntityObj extends EntityMob
 {
-	private ItemStack heldItem = ItemStack.EMPTY;
+	private ItemStack heldItemRight = ItemStack.EMPTY;
+	private ItemStack heldItemLeft = ItemStack.EMPTY;
 	private String entityType;
 	
 	public EntityObj(World world)
@@ -21,25 +23,28 @@ public class EntityObj extends EntityMob
 		entityType = type;
 	}
 
-	public void setCurrentItem(ItemStack par1ItemStack) 
+	public void setCurrentItem(ItemStack itemStack, EnumHandSide handSide) 
 	{
-		 this.heldItem = par1ItemStack;
+		if(handSide == EnumHandSide.RIGHT)
+			heldItemRight = itemStack;
+		else
+			heldItemLeft = itemStack;
 	}
 	
     @Override
 	public ItemStack getHeldItem(EnumHand hand)
 	{
-		return heldItem;
+		return hand == EnumHand.MAIN_HAND ? getHeldItemMainhand() : getHeldItemOffhand();
 	}
     
 	@Override
 	public ItemStack getHeldItemMainhand() {
-		return heldItem;
+		return heldItemRight;
 	}
 
 	@Override
 	public ItemStack getHeldItemOffhand() {
-		return heldItem;
+		return heldItemLeft;
 	}
 
 	public String getType() 

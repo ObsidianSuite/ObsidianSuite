@@ -11,6 +11,8 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumHandSide;
 import obsidianAnimator.data.ModelHandler;
 import obsidianAnimator.gui.GuiInventoryChooseItem;
 
@@ -35,7 +37,7 @@ public class TimelineItemPanel extends JPanel
 			public void actionPerformed(ActionEvent e) 
 			{
 				controller.getTimelineFrame().setVisible(false);
-				Minecraft.getMinecraft().displayGuiScreen(new GuiInventoryChooseItem(false, controller, controller.getEntityToRender()));
+				Minecraft.getMinecraft().displayGuiScreen(new GuiInventoryChooseItem(EnumHandSide.RIGHT, controller, controller.getEntityToRender()));
 			}
 		});
 		add(itemButton, c);
@@ -47,7 +49,7 @@ public class TimelineItemPanel extends JPanel
 			@Override
 			public void actionPerformed(ActionEvent e) 
 			{
-		    	controller.getEntityToRender().setCurrentItem(null); 
+		    	controller.getEntityToRender().setCurrentItem(ItemStack.EMPTY, EnumHandSide.RIGHT); 
 			}
 		});
 		add(emptyItemButton, c);
@@ -61,7 +63,7 @@ public class TimelineItemPanel extends JPanel
 			public void actionPerformed(ActionEvent e)
 			{
 				controller.getTimelineFrame().setVisible(false);
-				Minecraft.getMinecraft().displayGuiScreen(new GuiInventoryChooseItem(true, controller, controller.getEntityToRender()));
+				Minecraft.getMinecraft().displayGuiScreen(new GuiInventoryChooseItem(EnumHandSide.LEFT, controller, controller.getEntityToRender()));
 			}
 		});
 		add(itemButton, c);
@@ -74,7 +76,7 @@ public class TimelineItemPanel extends JPanel
 			@Override
 			public void actionPerformed(ActionEvent e)
 			{
-				ModelHandler.modelRenderer.setLeftItem(null);
+		    	controller.getEntityToRender().setCurrentItem(ItemStack.EMPTY, EnumHandSide.LEFT); 
 			}
 		});
 		add(emptyItemButton, c);

@@ -4,9 +4,9 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.inventory.ContainerPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumHandSide;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import obsidianAnimator.data.ModelHandler;
 import obsidianAnimator.gui.timeline.swing.subsection.TimelineItemController;
 import obsidianAnimator.render.entity.EntityObj;
 
@@ -14,17 +14,17 @@ import obsidianAnimator.render.entity.EntityObj;
 public class GuiInventoryChooseItem extends GuiInventory
 {
 
-    private final boolean leftHand;
+    private final EnumHandSide handSide;
     private TimelineItemController controller;
 	private EntityObj entity;
 
-    public GuiInventoryChooseItem(boolean leftHand, TimelineItemController controller, EntityObj entity)
+    public GuiInventoryChooseItem(EnumHandSide handSide, TimelineItemController controller, EntityObj entity)
     {
         super(Minecraft.getMinecraft().player);
         this.allowUserInput = true;
         this.controller = controller;
         this.entity = entity;
-        this.leftHand = leftHand;
+        this.handSide = handSide;
         this.func_194310_f().func_194303_a(this.width, this.height, Minecraft.getMinecraft(), false, ((ContainerPlayer)this.inventorySlots).craftMatrix);
     }
     
@@ -46,10 +46,7 @@ public class GuiInventoryChooseItem extends GuiInventory
     
     public void setItemStack(ItemStack itemStack)
     {
-        if (leftHand)
-            ModelHandler.modelRenderer.setLeftItem(itemStack);
-        else
-    	    this.entity.setCurrentItem(itemStack);
+    	this.entity.setCurrentItem(itemStack, handSide);
     	controller.display();
     }
 	
