@@ -61,7 +61,7 @@ public class LayerHeldItemAnimated implements LayerRenderer<EntityObj> {
 			{
 				GlStateManager.translate(0.0F, 0.2F, 0.0F);
 			}
-			objRenderer.transformToHandAndRotate(handSide);
+			objRenderer.transformToHandAndRotateAndScale(handSide);
 			GlStateManager.rotate(90.0F, 1.0F, 0.0F, 0.0F);
 			GlStateManager.rotate(-180.0F, 0.0F, 1.0F, 0.0F);
 			boolean flag = handSide == EnumHandSide.LEFT;

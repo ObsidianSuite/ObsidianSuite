@@ -15,6 +15,7 @@ import obsidianAPI.render.part.Part;
 import obsidianAPI.render.part.PartObj;
 import obsidianAPI.render.part.PartRotation;
 import obsidianAPI.render.part.prop.PartPropRotation;
+import obsidianAPI.render.part.prop.PartPropScale;
 import obsidianAPI.render.part.prop.PartPropTranslation;
 import obsidianAnimator.render.LayerHeldItemAnimated;
 
@@ -293,10 +294,7 @@ public class RenderObj_Animator extends RenderLiving<EntityObj>
 
 
     }
-    
-    /**
-     * Transform an existing GL matrix to the hand position.
-     */
+
     public void transformToHand(EnumHandSide handSide)
     {
     	boolean right = handSide.equals(EnumHandSide.RIGHT);
@@ -310,16 +308,22 @@ public class RenderObj_Animator extends RenderLiving<EntityObj>
         GL11.glTranslatef(propTrans.getValue(0), propTrans.getValue(1), propTrans.getValue(2));
     }
     
-    /**
-     * Transform an existing GL matrix to the hand position.
-     */
     public void transformToHandAndRotate(EnumHandSide handSide)
     {
     	boolean right = handSide.equals(EnumHandSide.RIGHT);
     	PartPropRotation propRot = right ? (PartPropRotation) modelObj.getPartFromName("prop_rot") : (PartPropRotation) modelObj.getPartFromName("prop_rot_l");
-
+    	
     	transformToHand(handSide);
         propRot.rotate();
+    }
+
+    public void transformToHandAndRotateAndScale(EnumHandSide handSide)
+    {
+    	boolean right = handSide.equals(EnumHandSide.RIGHT);
+    	
+    	PartPropScale propScale = right ? (PartPropScale) modelObj.getPartFromName("prop_scale") : (PartPropScale) modelObj.getPartFromName("prop_scale_l");
+    	transformToHandAndRotate(handSide);
+		GL11.glScalef(1F + propScale.getValue(0), 1F + propScale.getValue(1), 1F + propScale.getValue(2));
     }
 
 }
