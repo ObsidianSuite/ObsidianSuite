@@ -1,6 +1,0 @@
-{
-  "parent": "block/cube_all",
-  "textures": {
-    "all": "mod_obsidian_animator:blocks/grid"
-  }
-}

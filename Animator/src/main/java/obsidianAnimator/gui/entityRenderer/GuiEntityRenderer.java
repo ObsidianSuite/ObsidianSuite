@@ -322,7 +322,7 @@ public class GuiEntityRenderer extends GuiBlack
 		GL11.glRotatef(-((float)Math.atan((double)(rotY / 40.0F))) * 20.0F + verticalRotation , 1.0F, 0.0F, 0.0F);
 		GL11.glRotatef(((float)Math.atan((double)(rotX / 40.0F))) * 20.0F + horizontalRotation, 0.0F, -1.0F, 0.0F);
 
-		GL11.glTranslatef(gridMinX + 0.5F, -0.001f, gridMinZ + 0.5F);
+		GL11.glTranslatef(gridMinX + 0.5F, 0, gridMinZ + 0.5F);
 		for(int z = gridMinZ; z < gridMaxZ; z++)
 		{
 			for(int x = gridMinX; x < gridMaxX; x++)
