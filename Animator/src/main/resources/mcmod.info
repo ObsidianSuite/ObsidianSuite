@@ -1,0 +1,16 @@
+[
+{
+  "modid": "obsidian_animator",
+  "name": "Obsidian Animator",
+  "description": "Allows creation of animations for use with mods.",
+  "version": "1.0.0",
+  "mcversion": "${mcversion}",
+  "url": "http://www.dabigjoe.com/",
+  "updateUrl": "",
+  "authorList": ["DaBigJoe", "Cubex2"],
+  "credits": "Thank you to gegy1000 for contributions to the open source project.",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
