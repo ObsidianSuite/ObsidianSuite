@@ -1,0 +1,16 @@
+[
+{
+  "modid": "obsidian_api",
+  "name": "Obsidian API",
+  "description": "Allows use of Obsidian Suite models and animations.",
+  "version": "1.0.0",
+  "mcversion": "${mcversion}",
+  "url": "http://www.dabigjoe.com/",
+  "updateUrl": "",
+  "authorList": ["DaBigJoe"],
+  "credits": "",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
