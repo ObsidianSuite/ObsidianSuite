@@ -1,4 +1,4 @@
-package obsidianAnimations.entity.saiga;
+package obsidianOverhaul.entity.saiga;
 
 import org.lwjgl.opengl.GL11;
 

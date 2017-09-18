@@ -1,4 +1,4 @@
-package obsidianAnimations.entity.ai;
+package obsidianOverhaul.entity.ai;
 
 import net.minecraft.entity.EntityCreature;
 import obsidianAPI.animation.ai.EntityAIAnimationBase;

@@ -1,4 +1,4 @@
-package obsidianAnimations.entity.saiga;
+package obsidianOverhaul.entity.saiga;
 
 import obsidianAPI.render.RenderAnimated;
 

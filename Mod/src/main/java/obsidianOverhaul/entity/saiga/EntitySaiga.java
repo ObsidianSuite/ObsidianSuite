@@ -1,12 +1,12 @@
-package obsidianAnimations.entity.saiga;
+package obsidianOverhaul.entity.saiga;
 
 import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.EntityAIWander;
 import net.minecraft.world.World;
 import obsidianAPI.animation.wrapper.IEntityAnimated;
-import obsidianAnimations.entity.ai.EntityAIEat;
-import obsidianAnimations.entity.ai.EntityAIPanicAnimation;
+import obsidianOverhaul.entity.ai.EntityAIEat;
+import obsidianOverhaul.entity.ai.EntityAIPanicAnimation;
 
 public class EntitySaiga extends EntityCreature implements IEntityAnimated
 {

@@ -1,11 +1,11 @@
-package obsidianAnimations;
+package obsidianOverhaul;
 
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import obsidianAPI.file.importer.FileLoader;
-import obsidianAnimations.entity.saiga.EntitySaiga;
-import obsidianAnimations.entity.saiga.ModelSaiga;
-import obsidianAnimations.entity.saiga.RenderSaiga;
+import obsidianOverhaul.entity.saiga.EntitySaiga;
+import obsidianOverhaul.entity.saiga.ModelSaiga;
+import obsidianOverhaul.entity.saiga.RenderSaiga;
 
 public class ClientProxy extends CommonProxy
 {	

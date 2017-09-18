@@ -1,0 +1,18 @@
+[
+{
+  "modid": "obsidian_overhaul",
+  "name": "Obsidian Overhaul",
+  "description": "A complete overhaul of Minecraft's entity animations.",
+  "version": "1.0.0",
+  "mcversion": "${mcversion}",
+  "url": "http://www.dabigjoe.com/",
+  "updateUrl": "",
+  "authorList": ["DaBigJoe"],
+  "credits": "",
+  "logoFile": "",
+  "screenshots": [],
+  "useDependencyInformation": "true",
+  "requiredMods": ["obsidian_api" ],
+  "dependencies": ["obsidian_api"]
+}
+]

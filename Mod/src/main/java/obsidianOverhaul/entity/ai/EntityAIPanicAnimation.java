@@ -1,4 +1,4 @@
-package obsidianAnimations.entity.ai;
+package obsidianOverhaul.entity.ai;
 
 import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.ai.EntityAIPanic;

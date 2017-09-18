@@ -1,13 +1,13 @@
-package obsidianAnimations;
+package obsidianOverhaul;
 
 import net.minecraft.util.ResourceLocation;
 import obsidianAPI.ObsidianAPIUtil;
 import obsidianAPI.animation.wrapper.AIAnimationWrapper;
 import obsidianAPI.animation.wrapper.FunctionAnimationWrapper.IsActiveFunction;
 import obsidianAPI.registry.AnimationRegistry;
-import obsidianAnimations.entity.ai.EntityAIEat;
-import obsidianAnimations.entity.ai.EntityAIPanicAnimation;
-import obsidianAnimations.entity.saiga.EntitySaiga;
+import obsidianOverhaul.entity.ai.EntityAIEat;
+import obsidianOverhaul.entity.ai.EntityAIPanicAnimation;
+import obsidianOverhaul.entity.saiga.EntitySaiga;
 
 public class CommonProxy
 {	
