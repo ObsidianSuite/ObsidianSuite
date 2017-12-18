@@ -11,7 +11,7 @@ apply plugin: 'net.minecraftforge.gradle.forge'
 
 version = "1.0.0"
 group = "ObsidianSuite" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = "ObsidianAnimations"
+archivesBaseName = "ObsidianOverhaul"
 
 minecraft {
     version = "1.12.1-14.22.1.2478"
